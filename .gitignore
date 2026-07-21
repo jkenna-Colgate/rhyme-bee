@@ -1,0 +1,21 @@
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Data — CMUdict, prevalence norms and derived indexes are large and
+# regenerable. See docs/adr/0003 and docs/adr/0004.
+/data/
+*.csv
+*.xlsx
+
+# Dependencies / build
+node_modules/
+dist/
+build/
+.env
+.env.local
