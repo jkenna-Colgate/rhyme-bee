@@ -2,6 +2,11 @@
 .vscode/
 .idea/
 
+# Vendored agent skills — installed via `npx skills`, restorable from
+# skills-lock.json. Symlinked, so committing them breaks on Windows anyway.
+.agents/
+.claude/
+
 # OS
 .DS_Store
 Thumbs.db
