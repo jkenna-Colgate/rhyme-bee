@@ -201,6 +201,15 @@ export class RhymeIndex {
     return { seed, answers, bonusWords };
   }
 
+  /**
+   * The tier and knownness of a wordhood-valid word — the same judgement
+   * `buildPuzzle` and `adjudicate` apply. Public so curation can tally family
+   * sizes directly, without rebuilding a full Puzzle for every Rhyme Key.
+   */
+  tierOf(word: string): { tier: Tier; knownness: number | null } {
+    return this.#tier(normaliseWord(word));
+  }
+
   #matchingPronunciation(
     seedKey: RhymeKey,
     prons: Pronunciation[],

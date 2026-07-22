@@ -93,12 +93,22 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
 
   for (const [rhymeKey, words] of wordsByKey) {
     const representative = chooseRepresentative(words, index);
-    const puzzle = index.buildPuzzle({ word: representative, rhymeKey });
+    // Tally the family straight from its grouped words rather than rebuilding a
+    // full Puzzle per Rhyme Key. `buildPuzzle` re-scans every wordhood word on
+    // each call (O(keys × words)); `wordsByKey` already holds each key's members.
+    // Membership, tier judgement and Seed exclusion match buildPuzzle exactly.
+    let answerCount = 0;
+    let bonusCount = 0;
+    for (const word of words) {
+      if (word === representative) continue; // buildPuzzle skips the Seed Word
+      if (index.tierOf(word).tier === "answer") answerCount++;
+      else bonusCount++;
+    }
     const family: FamilyEntry = {
       rhymeKey,
       representative,
-      answerCount: puzzle.answers.length,
-      bonusCount: puzzle.bonusWords.length,
+      answerCount,
+      bonusCount,
       multiplePronunciations: index.isAmbiguous(representative),
     };
     families.push(family);
