@@ -1,0 +1,14 @@
+# Normalise line endings: store text as LF in the repo, check out as-is.
+# Silences the "LF will be replaced by CRLF" warning on Windows.
+* text=auto eol=lf
+
+# Explicit for the file types in this repo.
+*.ts   text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+
+# Binary — never touch.
+*.xlsx binary
+*.zip  binary
