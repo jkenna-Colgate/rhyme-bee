@@ -21,6 +21,7 @@ desktop.ini
 # Dependencies / build
 node_modules/
 dist/
+dist-data/
 build/
 .env
 .env.local

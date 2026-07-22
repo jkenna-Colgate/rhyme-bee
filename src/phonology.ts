@@ -1,0 +1,56 @@
+/**
+ * Phonology primitives: phonemes, pronunciations, and the Rhyme Key.
+ *
+ * A phoneme is a CMUdict ARPABET symbol. Vowels carry a trailing stress digit:
+ * `0` unstressed, `1` primary, `2` secondary (ADR-0001). Consonants carry none.
+ *
+ * The Rhyme Key is the sequence of *sounds* from a word's last stressed vowel
+ * (primary or secondary) to the end of the word, with stress digits stripped —
+ * stress locates the key's start but is not itself part of the key, so that
+ * `ate` (EY1 T) and `impregnate` (... N EY2 T) share the key `EY T`.
+ */
+
+export type Phoneme = string;
+export type Pronunciation = Phoneme[];
+
+/** A normalised, comparable Rhyme Key, e.g. "EY T". */
+export type RhymeKey = string;
+
+/** True for an ARPABET vowel, i.e. a symbol ending in a stress digit 0/1/2. */
+export function isVowel(phoneme: Phoneme): boolean {
+  return /[0-2]$/.test(phoneme);
+}
+
+/** The stress digit of a vowel phoneme (0/1/2), or null for a consonant. */
+export function stressOf(phoneme: Phoneme): 0 | 1 | 2 | null {
+  const match = phoneme.match(/([0-2])$/);
+  if (!match) return null;
+  return Number(match[1]) as 0 | 1 | 2;
+}
+
+/** Strip the stress digit from a phoneme, leaving the bare sound. */
+export function bareSound(phoneme: Phoneme): Phoneme {
+  return phoneme.replace(/[0-2]$/, "");
+}
+
+/**
+ * The Rhyme Key of a single pronunciation: scan back to the last vowel marked
+ * primary or secondary, then take every phoneme from there to the end with
+ * stress digits removed. Returns null if the pronunciation has no stressed
+ * vowel (e.g. a bare function word), which cannot anchor a rhyme.
+ */
+export function rhymeKeyOf(pronunciation: Pronunciation): RhymeKey | null {
+  let start = -1;
+  for (let i = pronunciation.length - 1; i >= 0; i--) {
+    const stress = stressOf(pronunciation[i]!);
+    if (stress === 1 || stress === 2) {
+      start = i;
+      break;
+    }
+  }
+  if (start === -1) return null;
+  return pronunciation
+    .slice(start)
+    .map(bareSound)
+    .join(" ");
+}

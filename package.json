@@ -1,0 +1,20 @@
+{
+  "name": "rhyme-bee",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A daily word puzzle where the mechanic is rhyming, not spelling.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build:index": "tsx scripts/build-index.ts",
+    "histogram": "tsx scripts/histogram.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

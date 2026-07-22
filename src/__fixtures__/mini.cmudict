@@ -1,0 +1,26 @@
+;;; Mini CMUdict fixture. Same format as the real dictionary (BSD-2-Clause):
+;;; WORD  P1 P2 P3, two spaces before the phonemes; WORD(n) for alternates.
+;;; Every entry here backs a row in the verdict table.
+ATE  EY1 T
+EIGHT  EY1 T
+LATE  L EY1 T
+COLLATE  K AH0 L EY1 T
+IMPREGNATE  IH0 M P R EH1 G N EY2 T
+ADJUDICATE  AH0 JH UW1 D IH0 K EY2 T
+DEFENESTRATE  D IH0 F EH1 N AH0 S T R EY2 T
+OBJURGATE  AA1 B JH ER0 G EY2 T
+CHOCOLATE  CH AO1 K L AH0 T
+COMMENSURATE  K AH0 M EH1 N S ER0 AH0 T
+HAT  HH AE1 T
+SATE  S EY1 T
+READ  R IY1 D
+READ(1)  R EH1 D
+BED  B EH1 D
+TEAR  T IH1 R
+TEAR(1)  T EH1 R
+BEER  B IH1 R
+CARE  K EH1 R
+KATE  K EY1 T
+GATE  G EY1 T
+GATES  G EY1 T S
+PLATES  P L EY1 T S
