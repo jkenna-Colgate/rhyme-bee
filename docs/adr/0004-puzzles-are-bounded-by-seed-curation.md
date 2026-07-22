@@ -18,40 +18,42 @@ Truncating means rejecting words that genuinely rhyme and that the player genuin
 
 The distribution has been computed by running the production curation path
 (`npm run histogram`) over CMUdict, the word-prevalence norms, and the common-word
-list. English contains **17,750 distinct Rhyme Keys**, and **290** of them fall in
-the default playable band of 20–120 Answers.
+list. Counts are at the tuned knownness threshold of 0.0 (see ADR-0003's
+Resolution), since the Answer/Bonus split is what sizes a family. English contains
+**17,750 distinct Rhyme Keys**, and **325** of them fall in the default playable
+band of 20–120 Answers.
 
 ```
 answers   families
-      0 | ##########################################  12561
-      1 | ########                                     2233
-    2–4 | #####                                        1619
-    5–9 | ##                                            645
-  10–19 | #                                             384
-  20–49 | #                                             228  ┐ band [20, 120]
- 50–120 |                                                62  ┘ → 290 candidates
-   121+ |                                                18
+      0 | ##########################################  12287
+      1 | ########                                     2294
+    2–4 | ######                                       1710
+    5–9 | ##                                            696
+  10–19 | #                                             416
+  20–49 | #                                             245  ┐ band [20, 120]
+ 50–120 |                                                80  ┘ → 325 candidates
+   121+ |                                                22
 ```
 
-The shape is exactly as predicted: a huge empty tail (12,561 keys have no known
-rhyme at all — obscure-only or singleton families), a steep drop, and a narrow
-playable middle. The full per-count histogram is regenerable at
+The shape is exactly as predicted: a huge empty tail (12,287 keys have no
+Answer-tier rhyme at all — obscure-only or singleton families), a steep drop, and
+a narrow playable middle. The full per-count histogram is regenerable at
 `dist-data/histogram.txt`.
 
-**Decision: ship v1 at the default band [20, 120].** 290 puzzles is not the
-~80-family seasonal run the low case feared; at one per day it is roughly ten
+**Decision: ship v1 at the default band [20, 120].** 325 puzzles is not the
+~80-family seasonal run the low case feared; at one per day it is roughly eleven
 months of never-repeat play, comfortably enough to launch and validate the game.
 It is also not yet the ~800 that would make repeats a non-issue for years, so the
 size of the library stays a tracked concern rather than a solved one.
 
 **Pre-approved first lever if the library needs to grow: widen the floor to
-[10, 120].** That admits the 384 families with 10–19 Answers, taking the candidate
-pool to ~674 — most of the way to the "daily for years" case — without touching
+[10, 120].** That admits the 416 families with 10–19 Answers, taking the candidate
+pool to ~741 — most of the way to the "daily for years" case — without touching
 the ceiling or truncating anything. Per the reasoning above this is nearly free:
 ranks are percentage-based and adapt to smaller Answer sets without retuning. The
 band lives in configuration (`BAND_MIN`/`BAND_MAX`), so widening is a config change
 and a rebuild, not a code change.
 
-We are **not** widening now: 290 is enough for launch, and a smaller minimum band
+We are **not** widening now: 325 is enough for launch, and a smaller minimum band
 means thinner puzzles, so it is better spent as headroom held in reserve than as
 launch content.

@@ -21,7 +21,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
 const outDir = resolve(root, "dist-data");
 
-const KNOWNNESS_THRESHOLD = Number(process.env.KNOWNNESS_THRESHOLD ?? "1.0");
+// Default sits between the two probe words so `defenestrate` (+0.25) is an
+// Answer and `objurgate` (-0.43) is a Bonus Word — see ADR-0003's Resolution.
+// Still tunable per build via the env var, and to be sharpened by human review.
+const KNOWNNESS_THRESHOLD = Number(process.env.KNOWNNESS_THRESHOLD ?? "0.0");
 
 function read(name: string): string {
   return readFileSync(resolve(dataDir, name), "utf8");
