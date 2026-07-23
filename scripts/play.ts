@@ -37,6 +37,7 @@ import { isAccepted } from "../src/verdict.ts";
 import {
   applySubmission,
   emptyPlayState,
+  missedAnswers,
   progress,
   rank,
   score,
@@ -241,8 +242,7 @@ function printFinish(context: PuzzleContext, state: PlayState): void {
   console.log(`  Final Rank:  ${result.finalRank.label}`);
   console.log(`  Answers:     ${result.found}/${result.totalAnswers}`);
 
-  const found = new Set(state.foundAnswers);
-  const missed = context.puzzle.answers.filter((a) => !found.has(a.word));
+  const missed = missedAnswers(context, state);
   if (missed.length === 0) {
     console.log(`  You found every Answer. Perfect game.`);
   } else {

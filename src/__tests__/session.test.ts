@@ -21,6 +21,7 @@ import {
   applySubmission,
   DEFAULT_SCORING_CONFIG,
   emptyPlayState,
+  missedAnswers,
   progress,
   rank,
   score,
@@ -164,6 +165,19 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
       // A rejection leaves state untouched — the same object comes back.
       expect(state).toBe(emptyPlayState);
     }
+  });
+
+  it("reports the Answers not yet found, in the Puzzle's order", () => {
+    // Empty state misses every Answer; the reveal is the full Answer list.
+    const allWords = context.puzzle.answers.map((a) => a.word);
+    expect(missedAnswers(context, emptyPlayState).map((a) => a.word)).toEqual(allWords);
+
+    // After finding two, the reveal is exactly the remaining Answers.
+    const afterLate = applySubmission(context, emptyPlayState, "late").state;
+    const afterGate = applySubmission(context, afterLate, "gate").state;
+    expect(missedAnswers(context, afterGate).map((a) => a.word)).toEqual(
+      allWords.filter((w) => w !== "late" && w !== "gate"),
+    );
   });
 
   it("accepts a pre-pinned SeedWord, skipping the raw-word pinning branch", () => {
