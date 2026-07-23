@@ -44,5 +44,9 @@ _Avoid_: Points, total
 The player's progress tier within a single Puzzle — the thing the game congratulates you for reaching, in the spirit of Spelling Bee's "Genius". It is the player's current Score as a percentage of the Puzzle's maximum achievable Score (the sum of every Answer's points), mapped onto an ordered ladder of named tiers. Because it is a percentage of a per-Puzzle maximum, Rank is comparable across days and adapts to Puzzles of any size without retuning. Bonus Words never affect it. Rank is per-Puzzle and resets each day.
 _Avoid_: Level, grade, score (Rank is derived from Score, it is not the Score itself)
 
+**Difficulty**:
+How hard a Puzzle is to finish, as distinct from how big it is. It is the share of a Puzzle's maximum achievable Score that lives in rare (low-knownness) Answers — so a player who knows only common words tops out at a Rank of `1 − Difficulty`, and a high-Difficulty Puzzle can't be finished without digging out the words most people don't know. It is *not* the answer count: because Rank is a percentage of maximum, a Puzzle with more Answers is a longer session, not a harder one. The shipped week ramps Difficulty up monotonically, Monday easiest to Sunday hardest, so a player knows roughly how hard today will be before starting. See [ADR-0007](./docs/adr/0007-difficulty-is-rare-word-score-mass.md).
+_Avoid_: using "difficulty" for answer-set size (that is a size-band / session-length concern, see Puzzle)
+
 **Proper Noun**:
 A name. Never valid, however well it rhymes, because the space of names is unbounded and has no defensible edge. Rejected with a reason of its own, since `Kate` obviously rhymes with `ate` and a silent refusal reads as a bug.
