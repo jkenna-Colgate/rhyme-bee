@@ -233,7 +233,7 @@ function synthContext(
   return {
     index: null as unknown as RhymeIndex,
     seed,
-    puzzle: { seed, answers: entries, bonusWords: [] },
+    puzzle: { seed, seedRespelling: "", answers: entries, bonusWords: [] },
     config,
     answerScores,
     maxScore,
