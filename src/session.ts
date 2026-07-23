@@ -214,6 +214,16 @@ export function progress(context: PuzzleContext, state: PlayState): Progress {
 }
 
 /**
+ * The Answers the player has not found — the Puzzle's Answers minus the found
+ * ones, in the Puzzle's own order. The reveal shown at the end of a game; a
+ * derivation over play-state that belongs in the core, not in a client.
+ */
+export function missedAnswers(context: PuzzleContext, state: PlayState): PuzzleEntry[] {
+  const found = new Set(state.foundAnswers);
+  return context.puzzle.answers.filter((answer) => !found.has(answer.word));
+}
+
+/**
  * Snapshot a finished game into a durable `PuzzleResult`. It reads Score, Rank
  * and progress at the moment it is called and freezes them into plain values, so
  * a later scoring retune never rewrites a past result.
