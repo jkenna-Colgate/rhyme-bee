@@ -10,8 +10,6 @@
  * game scores with, not a parallel re-implementation.
  */
 
-import type { PuzzleEntry } from "./rhymeIndex.ts";
-
 /** One rung of the Rank ladder: the percentage-of-maximum it triggers at. */
 export interface RankTier {
   threshold: number;
@@ -61,11 +59,26 @@ export const DEFAULT_SCORING_CONFIG: ScoringConfig = {
   rankLadder: DEFAULT_RANK_LADDER,
 };
 
+/** The minimum an Answer must expose to be scored: its length and knownness. */
+export interface Scorable {
+  length: number;
+  knownness: number | null;
+}
+
+/**
+ * The single rare line — an Answer is rare when its knownness sits below the
+ * cutoff. This is the *one* notion of "rare": both the scoring bonus and the
+ * curation Difficulty draw the line here, so they can never diverge (ADR-0007).
+ *
+ * Every Answer carries a non-null knownness (a word absent from the prevalence
+ * data always tiers to Bonus, ADR-0003), so this is a clean numeric comparison;
+ * the null guard only ever fires for a defensive caller.
+ */
+export function isRare(knownness: number | null, config: ScoringConfig): boolean {
+  return knownness !== null && knownness < config.rareKnownnessCutoff;
+}
+
 /** The points an Answer is worth: length, plus a flat bonus when it is rare (ADR-0006). */
-export function scoreEntry(entry: PuzzleEntry, config: ScoringConfig): number {
-  // Every Answer carries a non-null knownness (a word absent from the prevalence
-  // data always tiers to Bonus, ADR-0003), so the rare test is a clean numeric
-  // comparison; the null guard only ever fires for a defensive caller.
-  const rare = entry.knownness !== null && entry.knownness < config.rareKnownnessCutoff;
-  return entry.length + (rare ? config.rareBonus : 0);
+export function scoreEntry(entry: Scorable, config: ScoringConfig): number {
+  return entry.length + (isRare(entry.knownness, config) ? config.rareBonus : 0);
 }
