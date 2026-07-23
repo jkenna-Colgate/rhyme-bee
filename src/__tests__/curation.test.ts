@@ -8,6 +8,10 @@
 import { describe, expect, it } from "vitest";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 import { curate } from "../curation.ts";
+import type { Pronunciation } from "../phonology.ts";
+import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
+import { DEFAULT_SCORING_CONFIG, type ScoringConfig } from "../scoring.ts";
+import { score, startSession } from "../session.ts";
 
 const index = makeTestIndex();
 
@@ -66,3 +70,74 @@ describe("the size band and exclusions", () => {
     expect(dropped?.note).toBe("reserved for the tutorial family");
   });
 });
+
+// --- Difficulty: the share of a Puzzle's Score locked in rare Answers ----------
+
+describe("Difficulty of a candidate Seed Word (ADR-0007)", () => {
+  it("computes the real EY T family's Difficulty from the shared scoreEntry", () => {
+    // The default rare cutoff (0.7) marks nothing rare on the fixture's z-scale,
+    // so we pin the same fixture-appropriate 1.55 the session suite uses — only
+    // `defenestrate` (1.5) is then rare. The 7 EY T Answers (with the seed `ate`
+    // excluded as the representative):
+    //   adjudicate 10, collate 7, eight 5, gate 4, impregnate 10, late 4  (common)
+    //   defenestrate 12+2=14                                              (rare)
+    // maxScore 54, rareMass 14 -> difficulty 14/54.
+    const scoring: ScoringConfig = { ...DEFAULT_SCORING_CONFIG, rareKnownnessCutoff: 1.55 };
+    const report = curate(index, { sizeBand: { min: 1, max: 100 }, scoring });
+    const family = report.candidates.find((f) => f.rhymeKey === "EY T");
+    expect(family?.difficulty).toBeCloseTo(14 / 54, 10);
+  });
+
+  it("is exactly rareMass / maxScore, and 1 − Difficulty is the common-only ceiling", () => {
+    // A hand-built family under one Rhyme Key with controlled lengths and
+    // knownness. Representative `og` (uniquely shortest) is skipped, leaving four
+    // Answers under DEFAULT_SCORING_CONFIG (rare cutoff 0.7, rare bonus 2):
+    //   quag   len 4, knownness 2.0 -> 4   (common)
+    //   shabog len 6, knownness 2.0 -> 6   (common)
+    //   vroog  len 5, knownness 0.2 -> 7   (rare: 5 + 2)
+    //   yog    len 3, knownness 0.1 -> 5   (rare: 3 + 2)
+    // maxScore 22, rareMass 12 -> difficulty 12/22.
+    const synthetic = makeSyntheticIndex();
+    const report = curate(synthetic, { sizeBand: { min: 1, max: 100 } });
+    const family = report.candidates.find((f) => f.representative === "og");
+    expect(family?.difficulty).toBe(12 / 22);
+
+    // The identity, proven end-to-end through the session scorer: a player who
+    // knows only the common Answers tops out at Score/maxScore = 1 − Difficulty.
+    const context = startSession(synthetic, "og", DEFAULT_SCORING_CONFIG);
+    const commonOnly = { foundAnswers: ["quag", "shabog"], foundBonus: [] };
+    expect(score(context, commonOnly) / context.maxScore).toBeCloseTo(1 - family!.difficulty, 10);
+  });
+});
+
+/**
+ * A synthetic Rhyme Index: one family under the Rhyme Key `AO G`, with each
+ * word's length (spelling) and knownness (prevalence) hand-chosen so the
+ * Difficulty arithmetic is exact. Pronunciations are built directly — no CMUdict
+ * text needed — each ending in a stressed `AO` + `G` so all share the key.
+ */
+function makeSyntheticIndex(): RhymeIndex {
+  const p = (...phonemes: string[]): Pronunciation[] => [phonemes];
+  const pronunciations = new Map<string, Pronunciation[]>([
+    ["og", p("AO1", "G")], // representative (uniquely shortest), excluded
+    ["quag", p("K", "W", "AO1", "G")],
+    ["shabog", p("SH", "AO1", "G")],
+    ["vroog", p("V", "R", "AO1", "G")],
+    ["yog", p("Y", "AO1", "G")],
+  ]);
+  const data: RhymeIndexData = {
+    pronunciations,
+    words: new Set(["og", "quag", "shabog", "vroog", "yog"]),
+    names: new Set(),
+    prevalence: new Map([
+      ["og", 2.0],
+      ["quag", 2.0],
+      ["shabog", 2.0],
+      ["vroog", 0.2],
+      ["yog", 0.1],
+    ]),
+  };
+  // Threshold 0 so every rhyming word tiers to Answer; rarity (the 0.7 cutoff) is
+  // a separate line, so `vroog`/`yog` are rare Answers, not Bonus Words.
+  return new RhymeIndex(data, { knownnessThreshold: 0 });
+}

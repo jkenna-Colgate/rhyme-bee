@@ -10,6 +10,12 @@
 
 import { rhymeKeyOf, type RhymeKey } from "./phonology.ts";
 import type { RhymeIndex } from "./rhymeIndex.ts";
+import {
+  DEFAULT_SCORING_CONFIG,
+  isRare,
+  scoreEntry,
+  type ScoringConfig,
+} from "./scoring.ts";
 
 export interface CurationOptions {
   /** Inclusive Answer-count band a shippable Puzzle must fall in. */
@@ -18,6 +24,13 @@ export interface CurationOptions {
   accentUnstable?: ReadonlySet<RhymeKey>;
   /** Representative word -> note explaining why the Seed is blocked. */
   blocked?: ReadonlyMap<string, string>;
+  /**
+   * The scoring config Difficulty is measured in. Difficulty is defined in the
+   * game's own Score currency, so it is downstream of scoring: retune the rare
+   * cutoff or bonus and the Difficulty ranking shifts (ADR-0007). Defaults to
+   * the shipped scoring.
+   */
+  scoring?: ScoringConfig;
 }
 
 export interface FamilyEntry {
@@ -27,6 +40,13 @@ export interface FamilyEntry {
   bonusCount: number;
   /** True if the representative has more than one pronunciation. */
   multiplePronunciations: boolean;
+  /**
+   * Difficulty: the share of the family's maximum Score that lives in rare
+   * Answers — `rareMass / maxScore`, in 0…1 (ADR-0007). Higher is harder; a
+   * common-only player's Rank ceiling is `1 − difficulty`. A family with no
+   * Answers (below-band) has no Score to divide, and reports 0.
+   */
+  difficulty: number;
 }
 
 export type DropReason =
@@ -70,6 +90,7 @@ function chooseRepresentative(words: string[], index: RhymeIndex): string {
 export function curate(index: RhymeIndex, options: CurationOptions): CurationReport {
   const accentUnstable = options.accentUnstable ?? new Set<RhymeKey>();
   const blocked = options.blocked ?? new Map<string, string>();
+  const scoring = options.scoring ?? DEFAULT_SCORING_CONFIG;
 
   // Group wordhood-valid words by Rhyme Key (a word contributes to each of its
   // keys). Names are already excluded by `wordhoodEntries`, so no Seed is a name.
@@ -97,12 +118,25 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
     // full Puzzle per Rhyme Key. `buildPuzzle` re-scans every wordhood word on
     // each call (O(keys × words)); `wordsByKey` already holds each key's members.
     // Membership, tier judgement and Seed exclusion match buildPuzzle exactly.
+    // Difficulty rides along the same pass: each Answer's points (from the shared
+    // `scoreEntry`, so the `1 − difficulty` identity is exact) feed a running
+    // maxScore and the rare-only rareMass. length is the word's length, knownness
+    // is the tier judgement's — no Puzzle build, and no second rare line.
     let answerCount = 0;
     let bonusCount = 0;
+    let maxScore = 0;
+    let rareMass = 0;
     for (const word of words) {
       if (word === representative) continue; // buildPuzzle skips the Seed Word
-      if (index.tierOf(word).tier === "answer") answerCount++;
-      else bonusCount++;
+      const { tier, knownness } = index.tierOf(word);
+      if (tier !== "answer") {
+        bonusCount++;
+        continue;
+      }
+      answerCount++;
+      const points = scoreEntry({ length: word.length, knownness }, scoring);
+      maxScore += points;
+      if (isRare(knownness, scoring)) rareMass += points;
     }
     const family: FamilyEntry = {
       rhymeKey,
@@ -110,6 +144,7 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
       answerCount,
       bonusCount,
       multiplePronunciations: index.isAmbiguous(representative),
+      difficulty: maxScore === 0 ? 0 : rareMass / maxScore,
     };
     families.push(family);
     histogram.set(family.answerCount, (histogram.get(family.answerCount) ?? 0) + 1);
