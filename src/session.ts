@@ -14,56 +14,24 @@
 
 import { normaliseWord } from "./cmudict.ts";
 import type { Puzzle, PuzzleEntry, RhymeIndex, SeedWord } from "./rhymeIndex.ts";
+import {
+  DEFAULT_SCORING_CONFIG,
+  scoreEntry,
+  type ScoringConfig,
+} from "./scoring.ts";
 import { isAccepted, type Verdict } from "./verdict.ts";
 
-/** One rung of the Rank ladder: the percentage-of-maximum it triggers at. */
-export interface RankTier {
-  threshold: number;
-  label: string;
-}
-
-/**
- * The scoring tuning knobs — configuration with documented defaults, not
- * constants, so the game can be tuned against real play without a code change.
- */
-export interface ScoringConfig {
-  /** An Answer is rare when its knownness sits below this cutoff. */
-  rareKnownnessCutoff: number;
-  /** Flat points a rare Answer earns on top of its length. */
-  rareBonus: number;
-  /** Ordered rungs (ascending threshold); Rank is the highest rung reached. */
-  rankLadder: RankTier[];
-}
-
-/**
- * The default Rank ladder. Thresholds mirror Spelling Bee — the top *named* tier
- * sits at 70% so it is aspirational, and the 100% tier is reached only by finding
- * every Answer (every Answer scores positive, so 100% means a perfect game).
- *
- * The labels are PROVISIONAL placeholders. Finalising them is deferred (see the
- * session module issue / ADR-0006): they must form an instantly-legible
- * progression where higher unambiguously reads as better. They are pure config
- * data and do not block the module.
- */
-export const DEFAULT_RANK_LADDER: RankTier[] = [
-  { threshold: 0, label: "Beginner" },
-  { threshold: 2, label: "Good Start" },
-  { threshold: 5, label: "Moving Up" },
-  { threshold: 8, label: "Good" },
-  { threshold: 15, label: "Solid" },
-  { threshold: 25, label: "Nice" },
-  { threshold: 40, label: "Great" },
-  { threshold: 50, label: "Amazing" },
-  { threshold: 70, label: "Genius" },
-  { threshold: 100, label: "All Answers" },
-];
-
-/** The shipped defaults; every knob is expected to be tuned against real play. */
-export const DEFAULT_SCORING_CONFIG: ScoringConfig = {
-  rareKnownnessCutoff: 0.7,
-  rareBonus: 2,
-  rankLadder: DEFAULT_RANK_LADDER,
-};
+// The scoring primitive (`scoreEntry`, `ScoringConfig`, `DEFAULT_SCORING_CONFIG`,
+// `RankTier`, `DEFAULT_RANK_LADDER`) lives in `scoring.ts` so curation scores a
+// candidate's Difficulty with the identical points function (ADR-0007). They are
+// re-exported here so the session's existing public surface is unchanged.
+export {
+  DEFAULT_RANK_LADDER,
+  DEFAULT_SCORING_CONFIG,
+  scoreEntry,
+  type RankTier,
+  type ScoringConfig,
+} from "./scoring.ts";
 
 /**
  * Immutable per-session context, built once by `startSession`. Carries the
@@ -142,15 +110,6 @@ export interface PuzzleResult {
   finalRank: Rank;
   found: number;
   totalAnswers: number;
-}
-
-/** The points an Answer is worth: length, plus a flat bonus when it is rare (ADR-0006). */
-function scoreEntry(entry: PuzzleEntry, config: ScoringConfig): number {
-  // Every Answer carries a non-null knownness (a word absent from the prevalence
-  // data always tiers to Bonus, ADR-0003), so the rare test is a clean numeric
-  // comparison; the null guard only ever fires for a defensive caller.
-  const rare = entry.knownness !== null && entry.knownness < config.rareKnownnessCutoff;
-  return entry.length + (rare ? config.rareBonus : 0);
 }
 
 /**
