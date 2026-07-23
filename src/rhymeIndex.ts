@@ -33,6 +33,12 @@ export interface PuzzleEntry {
 
 export interface Puzzle {
   seed: SeedWord;
+  /**
+   * Plain-English respelling of the Seed Word, read in its pinned Rhyme Key — the
+   * "establish the pronunciation first" promise, so a client can show how the
+   * Seed is meant to sound before play begins.
+   */
+  seedRespelling: string;
   answers: PuzzleEntry[];
   bonusWords: PuzzleEntry[];
 }
@@ -198,7 +204,15 @@ export class RhymeIndex {
     const byWord = (a: PuzzleEntry, b: PuzzleEntry) => a.word.localeCompare(b.word);
     answers.sort(byWord);
     bonusWords.sort(byWord);
-    return { seed, answers, bonusWords };
+
+    // Respell the Seed Word in its own pinned reading, so the Puzzle can announce
+    // how the Seed sounds before play (a homograph like `bass` is spoken in the
+    // one reading its Rhyme Key fixes, never the other).
+    const seedProns = this.#data.pronunciations.get(seedWord) ?? [];
+    const seedMatch = this.#matchingPronunciation(seed.rhymeKey, seedProns);
+    const seedRespelling = seedMatch ? respell(seedMatch) : "";
+
+    return { seed, seedRespelling, answers, bonusWords };
   }
 
   /**

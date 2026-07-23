@@ -9,7 +9,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:index": "tsx scripts/build-index.ts",
-    "histogram": "tsx scripts/histogram.ts"
+    "histogram": "tsx scripts/histogram.ts",
+    "play": "tsx scripts/play.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

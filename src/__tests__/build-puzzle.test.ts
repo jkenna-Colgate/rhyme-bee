@@ -45,6 +45,11 @@ describe("buildPuzzle shape", () => {
       expect(typeof answer.knownness).toBe("number");
     }
   });
+
+  it("respells the Seed Word in its pinned reading", () => {
+    // `ate` is EY1 T -> "AY-t"; the stressed syllable is upper-cased.
+    expect(puzzle.seedRespelling).toBe("AY-t");
+  });
 });
 
 describe("buildPuzzle stability", () => {
