@@ -38,7 +38,11 @@ A Submission that rhymes and is a genuine English word, but one almost nobody kn
 
 **Score**:
 The player's running point total for a Puzzle, summed over the Answers they have found. Length dominates rarity: an Answer scores mainly on length, with a small flat bonus for a rare (low-knownness) one — so a long, rare word like `defenestrate` is among the highest-scoring finds. Length is the primary driver, but because the rarity bonus is a flat amount, a much rarer short word can occasionally edge past a slightly longer common one. Bonus Words score nothing; they are celebrated, not counted. The formula is configurable and tuned against real play.
-_Avoid_: Points, total
+_Avoid_: total; "points" as a synonym for the Score itself (points are the per-Answer unit that *sums into* Score — see Points)
+
+**Points**:
+What a single Answer is worth: its length, plus a small flat bonus when it is rare (ADR-0006). The points of the Answers a player has found sum to their Score — points are the per-Answer contribution, never the running total itself. `scoreEntry` computes an Answer's points, and both the session (a game in progress) and curation (a candidate's Difficulty) score with that one function, so the unit means the same thing everywhere (ADR-0007).
+_Avoid_: using "points" for the Score as a whole (that is the Score); "score" for a single Answer's points
 
 **Rank**:
 The player's progress tier within a single Puzzle — the thing the game congratulates you for reaching, in the spirit of Spelling Bee's "Genius". It is the player's current Score as a percentage of the Puzzle's maximum achievable Score (the sum of every Answer's points), mapped onto an ordered ladder of named tiers. Because it is a percentage of a per-Puzzle maximum, Rank is comparable across days and adapts to Puzzles of any size without retuning. Bonus Words never affect it. Rank is per-Puzzle and resets each day.
