@@ -20,7 +20,16 @@ npm test              # the verdict-table suite
 npm run typecheck
 npm run build:index   # build the index from pinned data in data/ (uncommitted)
 npm run histogram     # answer ADR-0004: how many playable Rhyme Keys exist
+npm run play          # play a Puzzle in the terminal
 ```
+
+`play` and `histogram` draw Seed Words from a playable size band, set by the
+`BAND_MIN` / `BAND_MAX` env vars (default `20` / `120`).
+
+`play` takes flags: `-- --day 1..7` (1 easiest … 7 hardest) or `-- --seed <word>`.
+On **Windows PowerShell** the bare `--` separator swallows the flag after it, so
+use the equals form — `npm run play -- --day=6`, `npm run play -- --seed=books` —
+or invoke tsx directly: `npx tsx scripts/play.ts --day 6`.
 
 ## The rules, in short
 
