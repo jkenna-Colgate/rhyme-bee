@@ -11,6 +11,11 @@
  *
  * Everything is asserted through the module's public surface only — never its
  * internal representation — in the data-table style of `verdict-table.test.ts`.
+ *
+ * A final suite covers the `Session` facade: it asserts each method matches the
+ * free function it delegates to and that `submit` threads state immutably (a new
+ * Session forward, `this` on a rejection) — the deep behaviour is already pinned
+ * above, so the facade suite only checks delegation and value semantics.
  */
 
 import { describe, expect, it } from "vitest";
@@ -25,6 +30,7 @@ import {
   progress,
   rank,
   score,
+  Session,
   startSession,
   toResult,
   type PlayState,
@@ -296,5 +302,74 @@ describe("rank ladder boundaries (synthetic context)", () => {
     const degenerate = synthContext([], 0);
     const resolved = rank(degenerate, emptyPlayState);
     expect(resolved).toEqual({ tier: 0, label: "bottom", threshold: 0 });
+  });
+});
+
+// --- The Session facade: delegation and value semantics ------------------------
+
+describe("Session facade over the core (fixture `ate` Puzzle)", () => {
+  const index = makeTestIndex();
+  // The reference context/state the facade must match, method for free function.
+  const context = startSession(index, "ate", PLAYTHROUGH_CONFIG);
+
+  it("Session.start builds an empty Session over a fresh context", () => {
+    const session = Session.start(index, "ate", PLAYTHROUGH_CONFIG);
+    expect(session.context).toEqual(context);
+    expect(session.state).toEqual(emptyPlayState);
+    expect(session.maxScore).toBe(context.maxScore);
+    expect(session.puzzle).toBe(session.context.puzzle);
+    expect(session.seed).toEqual(context.seed);
+    expect(session.score()).toBe(0);
+    expect(session.rank().tier).toBe(0);
+  });
+
+  it("submit returns a new Session carrying the found word, leaving the original intact", () => {
+    const session = Session.start(index, "ate", PLAYTHROUGH_CONFIG);
+    const { session: next, result } = session.submit("late");
+
+    // The accepted Answer advances a brand-new Session...
+    expect(next).not.toBe(session);
+    expect(result.verdict.outcome).toBe("answer");
+    expect(next.foundAnswers).toEqual(["late"]);
+    expect(next.score()).toBe(score(context, next.state));
+
+    // ...while the original Session is untouched (a value, not a mutable cell).
+    expect(session.foundAnswers).toEqual([]);
+    expect(session.score()).toBe(0);
+  });
+
+  it("submit returns the very same Session instance on a rejection", () => {
+    const session = Session.start(index, "ate", PLAYTHROUGH_CONFIG);
+    const { session: next, result } = session.submit("hat");
+    expect(result.verdict.outcome).toBe("rejected");
+    expect(next).toBe(session);
+  });
+
+  it("every accessor matches its underlying free function for the same finds", () => {
+    // Play a short line through both the facade and the raw core, then compare.
+    let session = Session.start(index, "ate", PLAYTHROUGH_CONFIG);
+    let state: PlayState = emptyPlayState;
+    for (const word of ["late", "defenestrate", "eight", "objurgate"]) {
+      session = session.submit(word).session;
+      state = applySubmission(context, state, word).state;
+    }
+
+    expect(session.state).toEqual(state);
+    expect(session.score()).toBe(score(context, state));
+    expect(session.rank()).toEqual(rank(context, state));
+    expect(session.progress()).toEqual(progress(context, state));
+    expect(session.missedAnswers()).toEqual(missedAnswers(context, state));
+    expect(session.pointsFor("defenestrate")).toBe(context.answerScores.get("defenestrate"));
+    expect(session.toResult({ date: "2026-07-26" })).toEqual(
+      toResult(context, state, { date: "2026-07-26" }),
+    );
+  });
+
+  it("can be rehydrated from a context and a saved PlayState", () => {
+    const saved: PlayState = { foundAnswers: ["late", "gate"], foundBonus: ["objurgate"] };
+    const session = new Session(context, saved);
+    expect(session.foundAnswers).toEqual(["late", "gate"]);
+    expect(session.foundBonus).toEqual(["objurgate"]);
+    expect(session.score()).toBe(score(context, saved));
   });
 });

@@ -1,15 +1,22 @@
 /**
- * The game-session + scoring layer: a pure functional core over `RhymeIndex`.
- * It gives the engine a memory of a game in progress — which words a player has
- * found — and derives Score, Rank, progress, and a final result from that memory.
- * It introduces no seam below the index (it reuses `adjudicate`, `buildPuzzle`
- * and `pinSeed` unchanged) and holds no UI, audio, or persistence — only the
- * logic of playing and scoring one Puzzle (ADR-0006; respects ADR-0003/0004).
+ * The Session + scoring layer: a pure functional core over `RhymeIndex`. A
+ * Session is one player's play-through of a Puzzle (CONTEXT.md); this module
+ * gives the engine a memory of one in progress — which words a player has found —
+ * and derives Score, Rank, progress, and a final result from that memory. It
+ * introduces no seam below the index (it reuses `adjudicate`, `buildPuzzle` and
+ * `pinSeed` unchanged) and holds no UI, audio, or persistence — only the logic of
+ * playing and scoring one Puzzle (ADR-0006; respects ADR-0003/0004).
  *
  * Two structures carry the state, neither a glossary term (both are seams):
- *   - `PuzzleContext` — immutable, built once at session start, NOT serialized.
+ *   - `PuzzleContext` — immutable, built once at Session start, NOT serialized.
  *   - `PlayState` — tiny, serializable, the single source of truth. Only the
  *     found words are stored; Score and Rank are never denormalised into it.
+ *
+ * The `Session` class at the foot of the file is a thin, immutable facade that
+ * bundles the `(PuzzleContext, PlayState)` pair the pure functions thread — so
+ * callers (the REPL and the web shell) hold one value and call `session.score()`
+ * rather than passing both. It adds no logic; every method delegates to the free
+ * function of the same name above it.
  */
 
 import { normaliseWord } from "./cmudict.ts";
@@ -242,4 +249,98 @@ export function toResult(
     found,
     totalAnswers,
   };
+}
+
+// --- The Session facade --------------------------------------------------------
+
+/**
+ * A Session (CONTEXT.md): one player's play-through of a Puzzle, as one value.
+ * It bundles the immutable `PuzzleContext` and the current `PlayState` — the pair
+ * every accessor above threads — and exposes `score()` / `rank()` / `progress()`
+ * / `missedAnswers()` / `submit()` / `toResult()` as methods, so callers stop
+ * passing both. It is a thin convenience over the pure core, not a replacement:
+ * each method delegates straight to the free function of the same name.
+ *
+ * A Session is itself a value. `submit` returns a *new* Session rather than
+ * mutating, so the "snapshots are values" property the core guarantees survives
+ * and React can hold one in `useState`. Start one with `Session.start`, or
+ * reconstruct a saved one with `new Session(context, deserializedState)`.
+ */
+export class Session {
+  constructor(
+    readonly context: PuzzleContext,
+    readonly state: PlayState = emptyPlayState,
+  ) {}
+
+  /** Start a fresh Session: build the context (pinning the Seed if raw), empty state. */
+  static start(index: RhymeIndex, seed: string | SeedWord, config?: ScoringConfig): Session {
+    return new Session(startSession(index, seed, config));
+  }
+
+  /** The built Puzzle (Seed Word, respelling, Answers, Bonus Words). */
+  get puzzle(): Puzzle {
+    return this.context.puzzle;
+  }
+
+  /** The pinned Seed Word this Session is built around. */
+  get seed(): SeedWord {
+    return this.context.seed;
+  }
+
+  /** The fixed Rank denominator: the summed points of every Answer. */
+  get maxScore(): number {
+    return this.context.maxScore;
+  }
+
+  /** The Answer words found so far, in the order they were found. */
+  get foundAnswers(): readonly string[] {
+    return this.state.foundAnswers;
+  }
+
+  /** The Bonus Words collected so far, in the order they were found. */
+  get foundBonus(): readonly string[] {
+    return this.state.foundBonus;
+  }
+
+  /** The points a given Answer word is worth (0 if it is not an Answer). */
+  pointsFor(word: string): number {
+    return this.context.answerScores.get(word) ?? 0;
+  }
+
+  /** The player's Score: the summed points of the Answers found. */
+  score(): number {
+    return score(this.context, this.state);
+  }
+
+  /** The player's resolved Rank on the ladder. */
+  rank(): Rank {
+    return rank(this.context, this.state);
+  }
+
+  /** How far through the Puzzle: Answers found of the total, Bonus collected. */
+  progress(): Progress {
+    return progress(this.context, this.state);
+  }
+
+  /** The Answers not yet found, in the Puzzle's order — the end-of-game reveal. */
+  missedAnswers(): PuzzleEntry[] {
+    return missedAnswers(this.context, this.state);
+  }
+
+  /** Snapshot the Session into a durable, value-typed `PuzzleResult`. */
+  toResult(meta: { date: string }): PuzzleResult {
+    return toResult(this.context, this.state, meta);
+  }
+
+  /**
+   * Apply a Submission. Returns the lean `SubmissionResult` and the Session to
+   * carry forward: a new Session when the state advanced, or `this` unchanged
+   * when the Submission was rejected (the core returns the same state on a
+   * rejection, so the same instance flows on).
+   */
+  submit(submission: string): { session: Session; result: SubmissionResult } {
+    const { state, result } = applySubmission(this.context, this.state, submission);
+    const session = state === this.state ? this : new Session(this.context, state);
+    return { session, result };
+  }
 }

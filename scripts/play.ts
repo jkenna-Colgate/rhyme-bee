@@ -31,12 +31,12 @@
  * Buckets are quantiles only; fixing absolute Difficulty thresholds is the
  * deferred scheduler's job.
  *
- * A throwaway imperative shell: the whole game in progress lives in one `Game`
- * local, and all game logic runs through the tested session core the facade wraps
- * (`startGame` -> `game.submit` -> `game.score()` / `rank()` / `progress()` /
- * `toResult()`); the Difficulty itself comes from the tested `curate`. The script
- * carries no game logic of its own and is left untested, exactly as `build-index`
- * and `histogram` are.
+ * A throwaway imperative shell: the whole Session in progress lives in one
+ * `session` local, and all game logic runs through the tested core the facade
+ * wraps (`Session.start` -> `session.submit` -> `session.score()` / `rank()` /
+ * `progress()` / `toResult()`); the Difficulty itself comes from the tested
+ * `curate`. The script carries no game logic of its own and is left untested,
+ * exactly as `build-index` and `histogram` are.
  */
 
 import { createInterface } from "node:readline";
@@ -47,8 +47,7 @@ import { loadRhymeIndex } from "../src/loader.ts";
 import type { SeedWord } from "../src/rhymeIndex.ts";
 import { isAccepted } from "../src/verdict.ts";
 import { DAYS, parsePlayArgs, type PlayArgs } from "./playArgs.ts";
-import { Game, startGame } from "../src/game.ts";
-import type { SubmissionResult } from "../src/session.ts";
+import { Session, type SubmissionResult } from "../src/session.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const index = loadRhymeIndex(resolve(root, "dist-data/index.json"));
@@ -77,9 +76,9 @@ try {
   fail(error instanceof Error ? error.message : String(error));
 }
 const chosen = selectSeed(args);
-let game = startGame(index, chosen.seed);
+let session = Session.start(index, chosen.seed);
 
-printBanner(game, chosen.family);
+printBanner(session, chosen.family);
 
 const rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "> " });
 rl.prompt();
@@ -95,14 +94,14 @@ rl.on("line", (line) => {
     return;
   }
 
-  const applied = game.submit(submission);
-  game = applied.game;
-  printSubmission(game, applied.result);
+  const applied = session.submit(submission);
+  session = applied.session;
+  printSubmission(session, applied.result);
   rl.prompt();
 });
 
 rl.on("close", () => {
-  printFinish(game);
+  printFinish(session);
   process.exit(0);
 });
 
@@ -170,8 +169,8 @@ function pickRandom<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)]!;
 }
 
-function printBanner(game: Game, family: FamilyEntry | undefined): void {
-  const { puzzle, maxScore } = game;
+function printBanner(session: Session, family: FamilyEntry | undefined): void {
+  const { puzzle, maxScore } = session;
   console.log("");
   console.log(`  Seed Word:  ${puzzle.seed.word}  —  spoken "${puzzle.seedRespelling}"`);
   console.log(`  Find words that rhyme with it.`);
@@ -191,7 +190,7 @@ function tierLine(family: FamilyEntry | undefined): string {
   return `Difficulty ${family.difficulty.toFixed(2)}${dayLabel}`;
 }
 
-function printSubmission(game: Game, result: SubmissionResult): void {
+function printSubmission(session: Session, result: SubmissionResult): void {
   const { verdict, word, scoreDelta } = result;
   if (!isAccepted(verdict)) {
     console.log(`  ✗ ${word} — rejected: ${verdict.reason}`);
@@ -199,11 +198,11 @@ function printSubmission(game: Game, result: SubmissionResult): void {
   }
 
   const badge = verdict.outcome === "answer" ? "✓ ANSWER" : "★ BONUS ";
-  const current = game.rank();
-  const { found, totalAnswers, foundBonus } = game.progress();
+  const current = session.rank();
+  const { found, totalAnswers, foundBonus } = session.progress();
   console.log(
     `  ${badge} ${word} (+${scoreDelta})  ` +
-      `Score ${game.score()}/${game.maxScore}  ` +
+      `Score ${session.score()}/${session.maxScore}  ` +
       `Rank ${current.label}  ·  Answers ${found}/${totalAnswers} · Bonus ${foundBonus}`,
   );
   if (result.rankChange) {
@@ -211,17 +210,17 @@ function printSubmission(game: Game, result: SubmissionResult): void {
   }
 }
 
-function printFinish(game: Game): void {
+function printFinish(session: Session): void {
   const today = new Date().toISOString().slice(0, 10);
-  const result = game.toResult({ date: today });
+  const result = session.toResult({ date: today });
   console.log("");
   console.log("  ── Final ──────────────────────────────────");
   console.log(`  Seed Word:   ${result.seed}`);
-  console.log(`  Final Score: ${result.finalScore}/${game.maxScore}`);
+  console.log(`  Final Score: ${result.finalScore}/${session.maxScore}`);
   console.log(`  Final Rank:  ${result.finalRank.label}`);
   console.log(`  Answers:     ${result.found}/${result.totalAnswers}`);
 
-  const missed = game.missedAnswers();
+  const missed = session.missedAnswers();
   if (missed.length === 0) {
     console.log(`  You found every Answer. Perfect game.`);
   } else {

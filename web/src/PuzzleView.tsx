@@ -4,15 +4,15 @@
  * `applySubmission`, and renders the result of each — a found Answer, a
  * celebrated Bonus Word, or one of the six rejection reasons, each distinctly
  * (ADR-0005). Running Score, Rank, progress and the found list are always on
- * screen, read off the `Game` facade via its `score()` / `rank()` / `progress()`
- * methods. It holds no game logic, so it is left untested, like `scripts/play.ts`.
+ * screen, read off the `Session` facade via its `score()` / `rank()` /
+ * `progress()` methods. It holds no game logic, so it is left untested, like
+ * `scripts/play.ts`.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { playableSeeds } from "../../src/curation.ts";
 import type { RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
-import type { Game } from "../../src/game.ts";
-import type { SubmissionResult } from "../../src/session.ts";
+import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, type RejectionReason } from "../../src/verdict.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
@@ -21,8 +21,7 @@ import { usePuzzleSession } from "./usePuzzleSession.ts";
 const TUTORIAL_SEED = "ate";
 
 export function PuzzleView({ index }: { index: RhymeIndex }) {
-  const session = usePuzzleSession(index, TUTORIAL_SEED);
-  const { game, last, seq, submit, newPuzzle } = session;
+  const { session, last, seq, submit, newPuzzle } = usePuzzleSession(index, TUTORIAL_SEED);
 
   // The shared in-band Seed pool (#33). The boot Seed stays the fixed tutorial
   // word `ate`; only the "new puzzle" button draws from this pool.
@@ -57,8 +56,8 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
           🎲 New puzzle
         </button>
       </div>
-      <Seed game={game} />
-      <Stats game={game} />
+      <Seed session={session} />
+      <Stats session={session} />
       {last?.rankChange && <RankBanner key={seq} label={last.rankChange.to.label} />}
 
       <form className="entry" onSubmit={onSubmit}>
@@ -82,15 +81,15 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
       </form>
 
       {last && <Feedback key={seq} result={last} />}
-      <FoundList game={game} />
+      <FoundList session={session} />
     </section>
   );
 }
 
 // --- The Seed Word -------------------------------------------------------------
 
-function Seed({ game }: { game: Game }) {
-  const { puzzle } = game;
+function Seed({ session }: { session: Session }) {
+  const { puzzle } = session;
   const word = puzzle.seed.word;
 
   // Speak the Seed aloud when the Puzzle starts. Keyed on the word, so #37's
@@ -121,12 +120,12 @@ function Seed({ game }: { game: Game }) {
 
 // --- Always-on Score / Rank / progress ----------------------------------------
 
-function Stats({ game }: { game: Game }) {
-  const { found, totalAnswers, foundBonus } = game.progress();
+function Stats({ session }: { session: Session }) {
+  const { found, totalAnswers, foundBonus } = session.progress();
   return (
     <dl className="stats" aria-label="Your progress">
-      <Stat label="Score" value={`${game.score()}`} />
-      <Stat label="Rank" value={game.rank().label} />
+      <Stat label="Score" value={`${session.score()}`} />
+      <Stat label="Rank" value={session.rank().label} />
       <Stat label="Answers" value={`${found}/${totalAnswers}`} />
       <Stat label="Bonus" value={`${foundBonus}`} />
     </dl>
@@ -196,8 +195,8 @@ function RankBanner({ label }: { label: string }) {
 
 // --- The found lists -----------------------------------------------------------
 
-function FoundList({ game }: { game: Game }) {
-  const { foundAnswers, foundBonus } = game;
+function FoundList({ session }: { session: Session }) {
+  const { foundAnswers, foundBonus } = session;
   return (
     <div className="found">
       <section className="found__group" aria-label="Answers you have found">
@@ -211,7 +210,7 @@ function FoundList({ game }: { game: Game }) {
             {foundAnswers.map((word) => (
               <li key={word} className="found__item">
                 <span>{word}</span>
-                <span className="found__points">+{game.pointsFor(word)}</span>
+                <span className="found__points">+{session.pointsFor(word)}</span>
               </li>
             ))}
           </ul>
