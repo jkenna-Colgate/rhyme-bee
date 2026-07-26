@@ -123,6 +123,7 @@ code {
   font-size: clamp(2.5rem, 12vw, 4rem);
   font-weight: 800;
   line-height: 1.1;
+  overflow-wrap: anywhere;
 }
 
 .seed__respelling {
@@ -386,4 +387,31 @@ code {
 .found__points {
   color: var(--good);
   font-variant-numeric: tabular-nums;
+}
+
+/* --- Narrow (phone-width) screens --------------------------------------- */
+
+@media (max-width: 480px) {
+  .shell {
+    padding: 1.25rem 0.9rem 3rem;
+  }
+
+  /* Four stat tiles don't fit a phone row — the "Beginner" Rank overflows an
+     ~80px column. Drop to a 2×2 grid so every value stays legible. */
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat__value {
+    font-size: 1.25rem;
+  }
+
+  /* Keep the input the obvious central action; shrink the button, not it. */
+  .entry__submit {
+    padding: 0.7rem 0.85rem;
+  }
+
+  .feedback {
+    padding: 0.55rem 0.75rem;
+  }
 }
