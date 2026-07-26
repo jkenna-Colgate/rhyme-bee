@@ -131,6 +131,25 @@ code {
   color: var(--muted);
 }
 
+.seed__replay {
+  margin: 0.9rem auto 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.seed__replay:hover {
+  border-color: var(--accent);
+}
+
 .puzzle {
   display: flex;
   flex-direction: column;

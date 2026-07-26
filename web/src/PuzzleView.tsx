@@ -8,7 +8,7 @@
  * It holds no game logic, so it is left untested, like `scripts/play.ts`.
  */
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import {
   progress,
@@ -19,6 +19,7 @@ import {
   type SubmissionResult,
 } from "../../src/session.ts";
 import { isAccepted, type RejectionReason } from "../../src/verdict.ts";
+import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
 
 /** The unscored first-run Puzzle is always seeded with `ate` (CONTEXT.md). */
@@ -74,11 +75,30 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
 
 function Seed({ context }: { context: PuzzleContext }) {
   const { puzzle } = context;
+  const word = puzzle.seed.word;
+
+  // Speak the Seed aloud when the Puzzle starts. Keyed on the word, so #37's
+  // new-puzzle draw (a fresh session with a new Seed) auto-speaks for free. The
+  // visible respelling below stays the source of truth regardless of the audio.
+  useEffect(() => {
+    speak(word);
+  }, [word]);
+
   return (
     <header className="seed">
       <p className="seed__label">Seed Word</p>
-      <p className="seed__word">{puzzle.seed.word}</p>
+      <p className="seed__word">{word}</p>
       <p className="seed__respelling">“{puzzle.seedRespelling}”</p>
+      {speechSupported() && (
+        <button
+          type="button"
+          className="seed__replay"
+          onClick={() => speak(word)}
+          aria-label={`Hear “${word}” again`}
+        >
+          🔊 Hear it again
+        </button>
+      )}
     </header>
   );
 }
