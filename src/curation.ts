@@ -97,6 +97,30 @@ function chooseRepresentative(words: string[], index: RhymeIndex): string {
   })[0]!;
 }
 
+/**
+ * The default playable Answer-count band a shipped Puzzle's Seed is drawn from.
+ * Defined here, next to `curate`, so `play.ts` and the web shell share one
+ * default rather than each re-declaring 20 / 120 (`play` still lets BAND_MIN /
+ * BAND_MAX override it). Mirrors ADR-0004: Puzzle size is bounded by curation.
+ */
+export const DEFAULT_PLAYABLE_BAND: { min: number; max: number } = { min: 20, max: 120 };
+
+/**
+ * The in-band Seed pool: the candidate families whose Answer count lands in the
+ * playable size band and survive every exclusion (accent-unstable, blocked,
+ * Shadow Key). This is the single shared draw both the `play` REPL and the web
+ * shell read from; each caller then does its own thing with the pool — the
+ * random pick, `--day` Difficulty bucketing, reading the Seed off a family, the
+ * banner — so those legitimately stay in the caller. Pure and deterministic:
+ * `curate` sorts the candidates by Rhyme Key.
+ */
+export function playableSeeds(
+  index: RhymeIndex,
+  band: { min: number; max: number } = DEFAULT_PLAYABLE_BAND,
+): FamilyEntry[] {
+  return curate(index, { sizeBand: band }).candidates;
+}
+
 export function curate(index: RhymeIndex, options: CurationOptions): CurationReport {
   const accentUnstable = options.accentUnstable ?? new Set<RhymeKey>();
   const blocked = options.blocked ?? new Map<string, string>();

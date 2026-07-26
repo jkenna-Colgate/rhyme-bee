@@ -41,7 +41,7 @@
 import { createInterface } from "node:readline";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { curate, type FamilyEntry } from "../src/curation.ts";
+import { DEFAULT_PLAYABLE_BAND, playableSeeds, type FamilyEntry } from "../src/curation.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import type { SeedWord } from "../src/rhymeIndex.ts";
 import { isAccepted } from "../src/verdict.ts";
@@ -63,11 +63,12 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const index = loadRhymeIndex(resolve(root, "dist-data/index.json"));
 
-// The playable size band — the same knobs `histogram` exposes.
-const BAND_MIN = Number(process.env.BAND_MIN ?? "20");
-const BAND_MAX = Number(process.env.BAND_MAX ?? "120");
+// The playable size band — the same knobs `histogram` exposes, defaulting to the
+// shared `DEFAULT_PLAYABLE_BAND` the web shell also draws from.
+const BAND_MIN = Number(process.env.BAND_MIN ?? DEFAULT_PLAYABLE_BAND.min);
+const BAND_MAX = Number(process.env.BAND_MAX ?? DEFAULT_PLAYABLE_BAND.max);
 
-const candidates = curate(index, { sizeBand: { min: BAND_MIN, max: BAND_MAX } }).candidates;
+const candidates = playableSeeds(index, { min: BAND_MIN, max: BAND_MAX });
 if (candidates.length === 0) {
   console.error(`No in-band candidates in [${BAND_MIN}, ${BAND_MAX}]. Widen the band.`);
   process.exit(1);
