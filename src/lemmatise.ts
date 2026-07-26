@@ -46,3 +46,46 @@ export function lemmaCandidates(word: string): string[] {
 
   return dedupe(candidates);
 }
+
+/**
+ * Common derivational prefixes (ADR-0008). Deliberately short: a prefix only
+ * counts when it strips down to a real base word, so a longer list buys little
+ * and risks stripping a native word to a coincidental base.
+ */
+const DERIVATIONAL_PREFIXES = [
+  "un", "re", "out", "over", "mis", "non", "under", "inter",
+];
+
+/**
+ * True if `word` is a regular inflection of some *other* dictionary word — the
+ * inflectional bases `lemmaCandidates` already yields, kept only when the
+ * dictionary actually holds one. The word standing in for its own base (a word
+ * that is its own only candidate) is not an inflection.
+ */
+function isInflection(word: string, isWord: (w: string) => boolean): boolean {
+  return lemmaCandidates(word).some((base) => base !== word && isWord(base));
+}
+
+/**
+ * True if `word` is *derived* — a regular inflection (`-s/-es/-ies/-ed/-ing`) or
+ * a common-prefix affixation (`un-/re-/out-/…`) of a dictionary word (ADR-0008).
+ * A word that is neither is *native*: it carries rhyme content of its own, and
+ * only native content makes a Rhyme Key eligible to be a Seed.
+ *
+ * Both passes are required. Suffix stripping alone lets `unaided`/`outstanding`
+ * masquerade as native, so the shadow keys they sit in wrongly survive. A prefix
+ * counts only when what remains is itself a real word or an inflection of one, so
+ * a prefix that merely happens to start a native word — the `re` in `read` — is
+ * not a false positive.
+ */
+export function isDerived(word: string, isWord: (w: string) => boolean): boolean {
+  const w = word.trim().toLowerCase();
+  if (isInflection(w, isWord)) return true;
+  for (const prefix of DERIVATIONAL_PREFIXES) {
+    if (!w.startsWith(prefix)) continue;
+    const base = w.slice(prefix.length);
+    if (base.length < 2) continue;
+    if (isWord(base) || isInflection(base, isWord)) return true;
+  }
+  return false;
+}

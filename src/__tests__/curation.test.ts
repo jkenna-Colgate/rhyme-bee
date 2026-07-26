@@ -71,6 +71,68 @@ describe("the size band and exclusions", () => {
   });
 });
 
+// --- Shadow Keys: a Rhyme Key with no native content is barred as a Seed --------
+
+describe("Shadow Keys are dropped from the candidate pool (ADR-0008)", () => {
+  const report = curate(makeShadowIndex(), { sizeBand: { min: 1, max: 100 } });
+
+  it("drops a key whose every member is a derived form, with reason shadow-key", () => {
+    const dropped = report.dropped.find((d) => d.rhymeKey === "AW N Z");
+    expect(dropped?.reason).toBe("shadow-key");
+    expect(report.candidates).not.toContainEqual(
+      expect.objectContaining({ rhymeKey: "AW N Z" }),
+    );
+  });
+
+  it("keeps a key that holds native words even when it also holds derived ones", () => {
+    // AY N D: find/mind/blind are native; `combined` is derived from `combine`.
+    const family = report.candidates.find((f) => f.rhymeKey === "AY N D");
+    expect(family).toBeDefined();
+    expect(family?.nativeCount).toBe(3);
+  });
+
+  it("reports a shadow key's native content as zero", () => {
+    const shadow = report.families.find((f) => f.rhymeKey === "AW N Z");
+    expect(shadow?.nativeCount).toBe(0);
+  });
+});
+
+/**
+ * A synthetic Rhyme Index with two families: a pure shadow key `AW N Z` (every
+ * member is a base word with `-s` stapled on — `crowns/frowns/gowns`, the `downs`
+ * shape) and a native key `AY N D` (`find/mind/blind` plus the derived
+ * `combined`). The base words `crown/frown/gown/combine` sit in the word list so
+ * the derivation detector can find them, but carry no pronunciation of their own,
+ * so they are not themselves family members.
+ */
+function makeShadowIndex(): RhymeIndex {
+  const p = (...phonemes: string[]): Pronunciation[] => [phonemes];
+  const pronunciations = new Map<string, Pronunciation[]>([
+    ["crowns", p("K", "R", "AW1", "N", "Z")],
+    ["frowns", p("F", "R", "AW1", "N", "Z")],
+    ["gowns", p("G", "AW1", "N", "Z")],
+    ["find", p("F", "AY1", "N", "D")],
+    ["mind", p("M", "AY1", "N", "D")],
+    ["blind", p("B", "L", "AY1", "N", "D")],
+    ["combined", p("K", "AH0", "M", "B", "AY1", "N", "D")],
+  ]);
+  const data: RhymeIndexData = {
+    pronunciations,
+    words: new Set([
+      "crowns", "frowns", "gowns", "find", "mind", "blind", "combined",
+      // Bases present for the derivation detector, absent from pronunciations so
+      // they are not family members themselves.
+      "crown", "frown", "gown", "combine",
+    ]),
+    names: new Set(),
+    prevalence: new Map([
+      ["crowns", 2.0], ["frowns", 2.0], ["gowns", 2.0],
+      ["find", 2.0], ["mind", 2.0], ["blind", 2.0], ["combined", 2.0],
+    ]),
+  };
+  return new RhymeIndex(data, { knownnessThreshold: 0 });
+}
+
 // --- Difficulty: the share of a Puzzle's Score locked in rare Answers ----------
 
 describe("Difficulty of a candidate Seed Word (ADR-0007)", () => {

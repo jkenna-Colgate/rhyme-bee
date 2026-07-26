@@ -4,7 +4,7 @@
  *
  *   npm run play                     # a random in-band Puzzle
  *   npm run play -- --day 3           # a Puzzle of weekday-3 Difficulty
- *   npm run play -- --seed books      # replay a specific Seed Word
+ *   npm run play -- --seed book       # replay a specific Seed Word
  *
  * Deserialises the built index (from `npm run build:index`), picks a Seed Word —
  * by precedence `--seed` > `--day` > random — announces it (respelled, with its
@@ -125,7 +125,7 @@ function parseArgs(argv: string[]): Args {
     const flag = argv[i];
     if (flag === "--seed") {
       const value = argv[++i];
-      if (value === undefined) fail("--seed needs a word, e.g. --seed books");
+      if (value === undefined) fail("--seed needs a word, e.g. --seed book");
       args.seed = value;
     } else if (flag === "--day") {
       const value = Number(argv[++i]);

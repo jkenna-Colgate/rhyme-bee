@@ -9,6 +9,7 @@
  */
 
 import { rhymeKeyOf, type RhymeKey } from "./phonology.ts";
+import { isDerived } from "./lemmatise.ts";
 import type { RhymeIndex } from "./rhymeIndex.ts";
 import {
   DEFAULT_SCORING_CONFIG,
@@ -47,13 +48,22 @@ export interface FamilyEntry {
    * Answers (below-band) has no Score to divide, and reports 0.
    */
   difficulty: number;
+  /**
+   * Native content: the count of family members that are not a derived form —
+   * not an inflection or affixation of a word in another Rhyme Key (ADR-0008). A
+   * key with zero native content is a Shadow Key (e.g. `downs` = the `down`
+   * family with `-s` on every word) and carries no rhyme identity of its own, so
+   * it is barred from the Seed pool.
+   */
+  nativeCount: number;
 }
 
 export type DropReason =
   | "below-band"
   | "above-band"
   | "accent-unstable"
-  | "blocked";
+  | "blocked"
+  | "shadow-key";
 
 export interface DroppedEntry {
   rhymeKey: RhymeKey;
@@ -91,6 +101,9 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
   const accentUnstable = options.accentUnstable ?? new Set<RhymeKey>();
   const blocked = options.blocked ?? new Map<string, string>();
   const scoring = options.scoring ?? DEFAULT_SCORING_CONFIG;
+  // Derivation is tested against the wordhood word list — a member is derived
+  // only relative to other real words (ADR-0008).
+  const isWord = (word: string): boolean => index.hasWord(word);
 
   // Group wordhood-valid words by Rhyme Key (a word contributes to each of its
   // keys). Names are already excluded by `wordhoodEntries`, so no Seed is a name.
@@ -126,7 +139,11 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
     let bonusCount = 0;
     let maxScore = 0;
     let rareMass = 0;
+    let nativeCount = 0;
     for (const word of words) {
+      // Native content counts every member — including the representative — a
+      // Shadow Key is one whose *whole* family is derived, Seed included.
+      if (!isDerived(word, isWord)) nativeCount++;
       if (word === representative) continue; // buildPuzzle skips the Seed Word
       const { tier, knownness } = index.tierOf(word);
       if (tier !== "answer") {
@@ -145,6 +162,7 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
       bonusCount,
       multiplePronunciations: index.isAmbiguous(representative),
       difficulty: maxScore === 0 ? 0 : rareMass / maxScore,
+      nativeCount,
     };
     families.push(family);
     histogram.set(family.answerCount, (histogram.get(family.answerCount) ?? 0) + 1);
@@ -158,6 +176,11 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
       dropped.push({ rhymeKey, representative, reason: "below-band" });
     } else if (family.answerCount > options.sizeBand.max) {
       dropped.push({ rhymeKey, representative, reason: "above-band" });
+    } else if (family.nativeCount === 0) {
+      // In-band but a pure Shadow Key: no native rhyme content, so it is a rerun
+      // of the base key in a different suit. The distinctness gate, orthogonal to
+      // the size gate above (ADR-0008 refining ADR-0004).
+      dropped.push({ rhymeKey, representative, reason: "shadow-key" });
     } else {
       candidates.push(family);
     }

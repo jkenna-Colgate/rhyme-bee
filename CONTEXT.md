@@ -38,7 +38,11 @@ A Submission that rhymes and is a genuine English word, but one almost nobody kn
 
 **Score**:
 The player's running point total for a Puzzle, summed over the Answers they have found. Length dominates rarity: an Answer scores mainly on length, with a small flat bonus for a rare (low-knownness) one — so a long, rare word like `defenestrate` is among the highest-scoring finds. Length is the primary driver, but because the rarity bonus is a flat amount, a much rarer short word can occasionally edge past a slightly longer common one. Bonus Words score nothing; they are celebrated, not counted. The formula is configurable and tuned against real play.
-_Avoid_: Points, total
+_Avoid_: total; "points" as a synonym for the Score itself (points are the per-Answer unit that *sums into* Score — see Points)
+
+**Points**:
+What a single Answer is worth: its length, plus a small flat bonus when it is rare (ADR-0006). The points of the Answers a player has found sum to their Score — points are the per-Answer contribution, never the running total itself. `scoreEntry` computes an Answer's points, and both the session (a game in progress) and curation (a candidate's Difficulty) score with that one function, so the unit means the same thing everywhere (ADR-0007).
+_Avoid_: using "points" for the Score as a whole (that is the Score); "score" for a single Answer's points
 
 **Rank**:
 The player's progress tier within a single Puzzle — the thing the game congratulates you for reaching, in the spirit of Spelling Bee's "Genius". It is the player's current Score as a percentage of the Puzzle's maximum achievable Score (the sum of every Answer's points), mapped onto an ordered ladder of named tiers. Because it is a percentage of a per-Puzzle maximum, Rank is comparable across days and adapts to Puzzles of any size without retuning. Bonus Words never affect it. Rank is per-Puzzle and resets each day.
@@ -47,6 +51,10 @@ _Avoid_: Level, grade, score (Rank is derived from Score, it is not the Score it
 **Difficulty**:
 How hard a Puzzle is to finish, as distinct from how big it is. It is the share of a Puzzle's maximum achievable Score that lives in rare (low-knownness) Answers — so a player who knows only common words tops out at a Rank of `1 − Difficulty`, and a high-Difficulty Puzzle can't be finished without digging out the words most people don't know. It is *not* the answer count: because Rank is a percentage of maximum, a Puzzle with more Answers is a longer session, not a harder one. The shipped week ramps Difficulty up monotonically, Monday easiest to Sunday hardest, so a player knows roughly how hard today will be before starting. See [ADR-0007](./docs/adr/0007-difficulty-is-rare-word-score-mass.md).
 _Avoid_: using "difficulty" for answer-set size (that is a size-band / session-length concern, see Puzzle)
+
+**Shadow Key**:
+A Rhyme Key whose members are *entirely derived* — regular inflections (`-s/-es/-ed/-ing`) or affixed forms (`un-/re-/out-/…`) of words that belong to another Rhyme Key — so it carries no rhyme content of its own. `downs` (/aʊnz/) is a shadow of `down` (/aʊn/): its family is the `down` family with an `s` on every word (`clowns, crowns, gowns, downtowns`). A key that also holds words which are *not* so derived — `blind, mind, find` in /aɪnd/ — has **native** content and is a real Puzzle. Shadow Keys are barred from being Seed Words, so the schedule can't serve `down` one day and `downs` the next; derived words stay valid Answers wherever they rhyme. See [ADR-0008](./docs/adr/0008-seeds-need-native-rhyme-content.md).
+_Avoid_: "inflected key" (inflection *density* is not the test — /aɪnd/ is inflection-heavy but native; the test is whether any native content remains)
 
 **Proper Noun**:
 A name. Never valid, however well it rhymes, because the space of names is unbounded and has no defensible edge. Rejected with a reason of its own, since `Kate` obviously rhymes with `ate` and a silent refusal reads as a bug.
