@@ -6,6 +6,17 @@
  *   npm run play -- --day 3           # a Puzzle of weekday-3 Difficulty
  *   npm run play -- --seed book       # replay a specific Seed Word
  *
+ * On Windows PowerShell the bare `--` separator (and the token after it) is
+ * stripped before npm forwards anything, so `--day 3` never reaches the script.
+ * Use the equals form, which survives it, or invoke tsx directly:
+ *
+ *   npm run play -- --day=3           # equals form — works in PowerShell
+ *   npx tsx scripts/play.ts --day 3   # bypasses npm's `--` handling entirely
+ *
+ * The playable size band is set by the BAND_MIN / BAND_MAX env vars (default
+ * 20 / 120), mirroring `histogram`; narrow or widen it to change the candidate
+ * pool the Seed Word is drawn from.
+ *
  * Deserialises the built index (from `npm run build:index`), picks a Seed Word —
  * by precedence `--seed` > `--day` > random — announces it (respelled, with its
  * Answer count, maximum Score, and day/Difficulty tier), then judges each typed
@@ -34,6 +45,7 @@ import { curate, type FamilyEntry } from "../src/curation.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import type { SeedWord } from "../src/rhymeIndex.ts";
 import { isAccepted } from "../src/verdict.ts";
+import { DAYS, parsePlayArgs, type PlayArgs } from "./playArgs.ts";
 import {
   applySubmission,
   emptyPlayState,
@@ -47,8 +59,6 @@ import {
   type PuzzleContext,
   type SubmissionResult,
 } from "../src/session.ts";
-
-const DAYS = 7;
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const index = loadRhymeIndex(resolve(root, "dist-data/index.json"));
@@ -69,7 +79,12 @@ if (candidates.length === 0) {
 const byDifficulty = [...candidates].sort((a, b) => a.difficulty - b.difficulty);
 const { buckets, dayByKey } = bucketByQuantile(byDifficulty, DAYS);
 
-const args = parseArgs(process.argv.slice(2));
+let args: PlayArgs;
+try {
+  args = parsePlayArgs(process.argv.slice(2));
+} catch (error) {
+  fail(error instanceof Error ? error.message : String(error));
+}
 const chosen = selectSeed(args);
 const context = startSession(index, chosen.seed);
 let state: PlayState = emptyPlayState;
@@ -103,11 +118,6 @@ rl.on("close", () => {
 
 // --- selection (thin wiring over the tested Difficulty metric and session) -----
 
-interface Args {
-  seed?: string;
-  day?: number;
-}
-
 interface Selection {
   seed: string | SeedWord;
   /** The in-band candidate being played, if the Seed is one — for the tier line. */
@@ -119,29 +129,8 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-function parseArgs(argv: string[]): Args {
-  const args: Args = {};
-  for (let i = 0; i < argv.length; i++) {
-    const flag = argv[i];
-    if (flag === "--seed") {
-      const value = argv[++i];
-      if (value === undefined) fail("--seed needs a word, e.g. --seed book");
-      args.seed = value;
-    } else if (flag === "--day") {
-      const value = Number(argv[++i]);
-      if (!Number.isInteger(value) || value < 1 || value > DAYS) {
-        fail(`--day needs an integer 1..${DAYS} (1 easiest, ${DAYS} hardest)`);
-      }
-      args.day = value;
-    } else {
-      fail(`Unknown argument: ${flag}`);
-    }
-  }
-  return args;
-}
-
 /** Precedence: explicit `--seed` > `--day` bucket draw > random in-band candidate. */
-function selectSeed(args: Args): Selection {
+function selectSeed(args: PlayArgs): Selection {
   if (args.seed !== undefined) {
     let pinned: SeedWord;
     try {
@@ -198,7 +187,7 @@ function printBanner(context: PuzzleContext, family: FamilyEntry | undefined): v
   console.log(`  Find words that rhyme with it.`);
   console.log(`  ${puzzle.answers.length} Answers · max Score ${maxScore}`);
   console.log(`  ${tierLine(family)}`);
-  console.log(`  (replay this Puzzle:  npm run play -- --seed ${puzzle.seed.word})`);
+  console.log(`  (replay this Puzzle:  npm run play -- --seed=${puzzle.seed.word})`);
   console.log(`  Type a word, or :quit to finish and reveal the misses.`);
   console.log("");
 }

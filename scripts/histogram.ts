@@ -5,6 +5,10 @@
  *
  *   npm run histogram
  *
+ * The candidate size band is set by the BAND_MIN / BAND_MAX env vars (default
+ * 20 / 120); a Rhyme Key counts as a candidate when its Answer count falls in
+ * [BAND_MIN, BAND_MAX].
+ *
  * Requires the built artifact from `npm run build:index`.
  */
 
