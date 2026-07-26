@@ -27,6 +27,10 @@ One day's game: a Seed Word and the set of words that rhyme with it. Seed Words 
 **Tutorial**:
 The unscored first-run Puzzle, seeded with `ate`. It exists to teach that the game is about sound and not spelling, and is exempt from the size band that governs shipped Puzzles.
 
+**Session**:
+One player's play-through of a single Puzzle: the words they have found, and the Score, Rank and progress derived from them. The Puzzle is the shared content of the day; the Session is one person's engagement with it, and it resets each day.
+_Avoid_: Game (the whole product is "the game", and one day's game is the Puzzle), playthrough, run
+
 **Submission**:
 A word the player enters as an attempted rhyme for the Seed Word. Each Submission resolves to an Answer, a Bonus Word, or a rejection. The Seed Word itself and any word already accepted this Puzzle are rejected.
 
