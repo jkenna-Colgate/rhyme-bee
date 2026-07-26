@@ -22,6 +22,11 @@ const words = new Set<string>([
   // `sate` is a real word we deliberately leave out of the prevalence data,
   // to exercise the absent-from-knownness -> Bonus default (ADR-0003).
   "sate",
+  // `grates` is a real word we deliberately leave out of CMUdict: it passes
+  // the wordhood gate but has no pronunciation, exercising the truthful
+  // no-pronunciation verdict (a player hears it rhyming with `plates`, but the
+  // engine has nothing to rhyme-test) — issue #28.
+  "grates",
 ]);
 
 /** Names, used only to label a rejection as a Proper Noun. */

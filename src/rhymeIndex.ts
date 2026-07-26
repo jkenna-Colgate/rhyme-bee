@@ -153,7 +153,16 @@ export class RhymeIndex {
       return { outcome: "rejected", reason: "not-a-known-word" };
     }
 
+    // A word can pass the wordhood gate yet be absent from the pronunciation
+    // data (e.g. `founds`, `nightgowns` — in the word list, missing from
+    // CMUdict). Without a pronunciation there is nothing to rhyme-test, so
+    // `does-not-rhyme` would be untruthful — the word never got a rhyme test.
+    // Reject as `not-a-known-word`: without a reading, the engine cannot treat
+    // it as a fully known word (reusing the closed reason set, ADR-0005).
     const prons = this.#data.pronunciations.get(word) ?? [];
+    if (prons.length === 0) {
+      return { outcome: "rejected", reason: "not-a-known-word" };
+    }
     const match = this.#matchingPronunciation(seed.rhymeKey, prons);
     if (!match) {
       const used = prons[0];
