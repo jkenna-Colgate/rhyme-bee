@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from "vitest";
 import { makeTestIndex } from "../__fixtures__/index.ts";
-import { curate } from "../curation.ts";
+import { curate, DEFAULT_PLAYABLE_BAND, playableSeeds } from "../curation.ts";
 import type { Pronunciation } from "../phonology.ts";
 import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
 import { DEFAULT_SCORING_CONFIG, type ScoringConfig } from "../scoring.ts";
@@ -132,6 +132,44 @@ function makeShadowIndex(): RhymeIndex {
   };
   return new RhymeIndex(data, { knownnessThreshold: 0 });
 }
+
+// --- playableSeeds: the shared in-band Seed pool (issue #33) --------------------
+
+describe("playableSeeds: the shared in-band Seed pool", () => {
+  it("returns only families whose Answer count lands inside the band", () => {
+    const band = { min: 1, max: 100 };
+    const pool = playableSeeds(index, band);
+    expect(pool.length).toBeGreaterThan(0);
+    for (const family of pool) {
+      expect(family.answerCount).toBeGreaterThanOrEqual(band.min);
+      expect(family.answerCount).toBeLessThanOrEqual(band.max);
+    }
+  });
+
+  it("returns exactly curation's surviving candidates for the same band", () => {
+    const band = { min: 1, max: 100 };
+    expect(playableSeeds(index, band)).toEqual(curate(index, { sizeBand: band }).candidates);
+  });
+
+  it("honours the band bounds — a tighter band excludes out-of-band Rhyme Keys", () => {
+    // EY T has 7 Answers: in the pool at [1, 100], dropped above-band at [3, 5].
+    expect(playableSeeds(index, { min: 1, max: 100 }).map((f) => f.rhymeKey)).toContain("EY T");
+    expect(playableSeeds(index, { min: 3, max: 5 }).map((f) => f.rhymeKey)).not.toContain("EY T");
+  });
+
+  it("is deterministic and sorted by Rhyme Key", () => {
+    const band = { min: 1, max: 100 };
+    const first = playableSeeds(index, band);
+    const second = playableSeeds(index, band);
+    expect(first).toEqual(second);
+    const keys = first.map((f) => f.rhymeKey);
+    expect(keys).toEqual([...keys].sort((a, b) => a.localeCompare(b)));
+  });
+
+  it("defaults to DEFAULT_PLAYABLE_BAND when no band is passed", () => {
+    expect(playableSeeds(index)).toEqual(playableSeeds(index, DEFAULT_PLAYABLE_BAND));
+  });
+});
 
 // --- Difficulty: the share of a Puzzle's Score locked in rare Answers ----------
 
