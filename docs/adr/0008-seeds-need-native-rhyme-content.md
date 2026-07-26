@@ -147,3 +147,28 @@ collapse, perhaps, relapse`), `IH P S` (`eclipse, ellipse, apocalypse`).
   removing that rhyme experience from the game. It is rare (a plural key in band
   while its base is not implies the plural pools extra compound members), and for a
   for-fun daily we accept the loss rather than special-case it.
+
+## Resolution (2026-07-26)
+
+The filter now runs in the production curation path (a native-content pass over the
+grouped Rhyme Keys, using the derivation detector `isDerived` in `lemmatise.ts`,
+which strips both inflection and a common-prefix affix against the wordhood word
+list). Measured by `npm run histogram` at the default band [20, 120]:
+
+- **80 in-band keys are pure Shadow Keys** (native content `== 0`) and are dropped
+  with the distinct reason `shadow-key`.
+- The candidate Seed pool falls from **325 → 245** — the 325 in-band keys of
+  [ADR-0004](./0004-puzzles-are-bounded-by-seed-curation.md)'s Resolution, less
+  those 80 shadows. So **~24.6%** of in-band keys were shadows — higher than the
+  ~18% the family-size proxy in [Measurement](#measurement) estimated, because the
+  answer-count band concentrates the large plural families that are most likely to
+  be shadows.
+
+Spot-checks confirm the intent: `downs` (`AW N Z`) and `books` (`UH K S`) drop as
+`shadow-key` with zero native content; `down` (`AW N`, 52 native), `AY N D`
+(`bind/blind/mind/find`, 16 native) and `EY S T` (`taste/waste`, 12 native) remain
+candidates.
+
+At 245 puzzles the library is still ~eight months of never-repeat daily play —
+comfortably above the ~80-family floor ADR-0004 worried about, and its pre-approved
+lever (widen the band to [10, 120]) remains available if the pool ever dips too low.

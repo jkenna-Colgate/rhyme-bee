@@ -87,6 +87,15 @@ export class RhymeIndex {
   }
 
   /**
+   * True if the surface form is in the wordhood word list. Exposed so curation
+   * can test a member's derivation (ADR-0008) against the very word set the
+   * wordhood gate uses — a word is *derived* only relative to other real words.
+   */
+  hasWord(word: string): boolean {
+    return this.#data.words.has(normaliseWord(word));
+  }
+
+  /**
    * Every wordhood-valid surface form with its pronunciations — the words that
    * can appear in a Puzzle (names and non-words excluded). The single traversal
    * both `buildPuzzle` and curation are built on.
