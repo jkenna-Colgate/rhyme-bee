@@ -4,21 +4,15 @@
  * `applySubmission`, and renders the result of each — a found Answer, a
  * celebrated Bonus Word, or one of the six rejection reasons, each distinctly
  * (ADR-0005). Running Score, Rank, progress and the found list are always on
- * screen, derived from the core via the `score` / `rank` / `progress` selectors.
- * It holds no game logic, so it is left untested, like `scripts/play.ts`.
+ * screen, read off the `Game` facade via its `score()` / `rank()` / `progress()`
+ * methods. It holds no game logic, so it is left untested, like `scripts/play.ts`.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { playableSeeds } from "../../src/curation.ts";
 import type { RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
-import {
-  progress,
-  rank,
-  score,
-  type PlayState,
-  type PuzzleContext,
-  type SubmissionResult,
-} from "../../src/session.ts";
+import type { Game } from "../../src/game.ts";
+import type { SubmissionResult } from "../../src/session.ts";
 import { isAccepted, type RejectionReason } from "../../src/verdict.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
@@ -28,7 +22,7 @@ const TUTORIAL_SEED = "ate";
 
 export function PuzzleView({ index }: { index: RhymeIndex }) {
   const session = usePuzzleSession(index, TUTORIAL_SEED);
-  const { context, state, last, seq, submit, newPuzzle } = session;
+  const { game, last, seq, submit, newPuzzle } = session;
 
   // The shared in-band Seed pool (#33). The boot Seed stays the fixed tutorial
   // word `ate`; only the "new puzzle" button draws from this pool.
@@ -63,8 +57,8 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
           🎲 New puzzle
         </button>
       </div>
-      <Seed context={context} />
-      <Stats context={context} state={state} />
+      <Seed game={game} />
+      <Stats game={game} />
       {last?.rankChange && <RankBanner key={seq} label={last.rankChange.to.label} />}
 
       <form className="entry" onSubmit={onSubmit}>
@@ -88,15 +82,15 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
       </form>
 
       {last && <Feedback key={seq} result={last} />}
-      <FoundList context={context} state={state} />
+      <FoundList game={game} />
     </section>
   );
 }
 
 // --- The Seed Word -------------------------------------------------------------
 
-function Seed({ context }: { context: PuzzleContext }) {
-  const { puzzle } = context;
+function Seed({ game }: { game: Game }) {
+  const { puzzle } = game;
   const word = puzzle.seed.word;
 
   // Speak the Seed aloud when the Puzzle starts. Keyed on the word, so #37's
@@ -127,12 +121,12 @@ function Seed({ context }: { context: PuzzleContext }) {
 
 // --- Always-on Score / Rank / progress ----------------------------------------
 
-function Stats({ context, state }: { context: PuzzleContext; state: PlayState }) {
-  const { found, totalAnswers, foundBonus } = progress(context, state);
+function Stats({ game }: { game: Game }) {
+  const { found, totalAnswers, foundBonus } = game.progress();
   return (
     <dl className="stats" aria-label="Your progress">
-      <Stat label="Score" value={`${score(context, state)}`} />
-      <Stat label="Rank" value={rank(context, state).label} />
+      <Stat label="Score" value={`${game.score()}`} />
+      <Stat label="Rank" value={game.rank().label} />
       <Stat label="Answers" value={`${found}/${totalAnswers}`} />
       <Stat label="Bonus" value={`${foundBonus}`} />
     </dl>
@@ -202,8 +196,8 @@ function RankBanner({ label }: { label: string }) {
 
 // --- The found lists -----------------------------------------------------------
 
-function FoundList({ context, state }: { context: PuzzleContext; state: PlayState }) {
-  const { foundAnswers, foundBonus } = state;
+function FoundList({ game }: { game: Game }) {
+  const { foundAnswers, foundBonus } = game;
   return (
     <div className="found">
       <section className="found__group" aria-label="Answers you have found">
@@ -217,7 +211,7 @@ function FoundList({ context, state }: { context: PuzzleContext; state: PlayStat
             {foundAnswers.map((word) => (
               <li key={word} className="found__item">
                 <span>{word}</span>
-                <span className="found__points">+{context.answerScores.get(word) ?? 0}</span>
+                <span className="found__points">+{game.pointsFor(word)}</span>
               </li>
             ))}
           </ul>

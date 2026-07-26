@@ -31,11 +31,12 @@
  * Buckets are quantiles only; fixing absolute Difficulty thresholds is the
  * deferred scheduler's job.
  *
- * A throwaway imperative shell: play-state lives in one local variable and all
- * game logic runs through the tested session core (`startSession` /
- * `applySubmission` / `score` / `rank` / `progress` / `toResult`); the Difficulty
- * itself comes from the tested `curate`. The script carries no game logic of its
- * own and is left untested, exactly as `build-index` and `histogram` are.
+ * A throwaway imperative shell: the whole game in progress lives in one `Game`
+ * local, and all game logic runs through the tested session core the facade wraps
+ * (`startGame` -> `game.submit` -> `game.score()` / `rank()` / `progress()` /
+ * `toResult()`); the Difficulty itself comes from the tested `curate`. The script
+ * carries no game logic of its own and is left untested, exactly as `build-index`
+ * and `histogram` are.
  */
 
 import { createInterface } from "node:readline";
@@ -46,19 +47,8 @@ import { loadRhymeIndex } from "../src/loader.ts";
 import type { SeedWord } from "../src/rhymeIndex.ts";
 import { isAccepted } from "../src/verdict.ts";
 import { DAYS, parsePlayArgs, type PlayArgs } from "./playArgs.ts";
-import {
-  applySubmission,
-  emptyPlayState,
-  missedAnswers,
-  progress,
-  rank,
-  score,
-  startSession,
-  toResult,
-  type PlayState,
-  type PuzzleContext,
-  type SubmissionResult,
-} from "../src/session.ts";
+import { Game, startGame } from "../src/game.ts";
+import type { SubmissionResult } from "../src/session.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const index = loadRhymeIndex(resolve(root, "dist-data/index.json"));
@@ -87,10 +77,9 @@ try {
   fail(error instanceof Error ? error.message : String(error));
 }
 const chosen = selectSeed(args);
-const context = startSession(index, chosen.seed);
-let state: PlayState = emptyPlayState;
+let game = startGame(index, chosen.seed);
 
-printBanner(context, chosen.family);
+printBanner(game, chosen.family);
 
 const rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "> " });
 rl.prompt();
@@ -106,14 +95,14 @@ rl.on("line", (line) => {
     return;
   }
 
-  const applied = applySubmission(context, state, submission);
-  state = applied.state;
-  printSubmission(context, state, applied.result);
+  const applied = game.submit(submission);
+  game = applied.game;
+  printSubmission(game, applied.result);
   rl.prompt();
 });
 
 rl.on("close", () => {
-  printFinish(context, state);
+  printFinish(game);
   process.exit(0);
 });
 
@@ -181,8 +170,8 @@ function pickRandom<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)]!;
 }
 
-function printBanner(context: PuzzleContext, family: FamilyEntry | undefined): void {
-  const { puzzle, maxScore } = context;
+function printBanner(game: Game, family: FamilyEntry | undefined): void {
+  const { puzzle, maxScore } = game;
   console.log("");
   console.log(`  Seed Word:  ${puzzle.seed.word}  —  spoken "${puzzle.seedRespelling}"`);
   console.log(`  Find words that rhyme with it.`);
@@ -202,7 +191,7 @@ function tierLine(family: FamilyEntry | undefined): string {
   return `Difficulty ${family.difficulty.toFixed(2)}${dayLabel}`;
 }
 
-function printSubmission(context: PuzzleContext, state: PlayState, result: SubmissionResult): void {
+function printSubmission(game: Game, result: SubmissionResult): void {
   const { verdict, word, scoreDelta } = result;
   if (!isAccepted(verdict)) {
     console.log(`  ✗ ${word} — rejected: ${verdict.reason}`);
@@ -210,11 +199,11 @@ function printSubmission(context: PuzzleContext, state: PlayState, result: Submi
   }
 
   const badge = verdict.outcome === "answer" ? "✓ ANSWER" : "★ BONUS ";
-  const current = rank(context, state);
-  const { found, totalAnswers, foundBonus } = progress(context, state);
+  const current = game.rank();
+  const { found, totalAnswers, foundBonus } = game.progress();
   console.log(
     `  ${badge} ${word} (+${scoreDelta})  ` +
-      `Score ${score(context, state)}/${context.maxScore}  ` +
+      `Score ${game.score()}/${game.maxScore}  ` +
       `Rank ${current.label}  ·  Answers ${found}/${totalAnswers} · Bonus ${foundBonus}`,
   );
   if (result.rankChange) {
@@ -222,17 +211,17 @@ function printSubmission(context: PuzzleContext, state: PlayState, result: Submi
   }
 }
 
-function printFinish(context: PuzzleContext, state: PlayState): void {
+function printFinish(game: Game): void {
   const today = new Date().toISOString().slice(0, 10);
-  const result = toResult(context, state, { date: today });
+  const result = game.toResult({ date: today });
   console.log("");
   console.log("  ── Final ──────────────────────────────────");
   console.log(`  Seed Word:   ${result.seed}`);
-  console.log(`  Final Score: ${result.finalScore}/${context.maxScore}`);
+  console.log(`  Final Score: ${result.finalScore}/${game.maxScore}`);
   console.log(`  Final Rank:  ${result.finalRank.label}`);
   console.log(`  Answers:     ${result.found}/${result.totalAnswers}`);
 
-  const missed = missedAnswers(context, state);
+  const missed = game.missedAnswers();
   if (missed.length === 0) {
     console.log(`  You found every Answer. Perfect game.`);
   } else {
