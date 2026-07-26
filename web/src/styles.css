@@ -1,0 +1,138 @@
+:root {
+  --bg: #fffdf5;
+  --surface: #ffffff;
+  --ink: #1c1a12;
+  --muted: #6b6552;
+  --line: #e7e1cf;
+  --accent: #f6c945;
+  --accent-ink: #4a3b00;
+  --good: #1f9d55;
+  --good-bg: #e7f6ec;
+  --bonus: #8a4bd6;
+  --bonus-bg: #f2e9fb;
+  --bad: #b23a3a;
+  --bad-bg: #fbeaea;
+  --radius: 12px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+.shell {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.shell__brand {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+}
+
+.shell__brand::before {
+  content: "🐝 ";
+}
+
+/* --- Loading / error states --------------------------------------------- */
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.state__spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.state--error {
+  color: var(--ink);
+}
+
+.state__title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.state__detail {
+  color: var(--bad);
+  margin: 0;
+}
+
+.state__hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  background: var(--line);
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+/* --- The Seed Word ------------------------------------------------------- */
+
+.seed {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.seed__label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.seed__word {
+  margin: 0.25rem 0 0;
+  font-size: clamp(2.5rem, 12vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.seed__respelling {
+  margin: 0.25rem 0 0;
+  font-size: 1.25rem;
+  color: var(--muted);
+}
+
+.puzzle__prompt {
+  text-align: center;
+  color: var(--muted);
+  margin: 1rem 0 0;
+}
