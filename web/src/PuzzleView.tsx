@@ -8,8 +8,9 @@
  * It holds no game logic, so it is left untested, like `scripts/play.ts`.
  */
 
-import { useEffect, useRef, useState } from "react";
-import type { RhymeIndex } from "../../src/rhymeIndex.ts";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { playableSeeds } from "../../src/curation.ts";
+import type { RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import {
   progress,
   rank,
@@ -27,7 +28,11 @@ const TUTORIAL_SEED = "ate";
 
 export function PuzzleView({ index }: { index: RhymeIndex }) {
   const session = usePuzzleSession(index, TUTORIAL_SEED);
-  const { context, state, last, seq, submit } = session;
+  const { context, state, last, seq, submit, newPuzzle } = session;
+
+  // The shared in-band Seed pool (#33). The boot Seed stays the fixed tutorial
+  // word `ate`; only the "new puzzle" button draws from this pool.
+  const pool = useMemo(() => playableSeeds(index), [index]);
 
   const [field, setField] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,8 +44,25 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
     inputRef.current?.focus();
   }
 
+  function onNewPuzzle() {
+    if (pool.length === 0) return;
+    const family = pool[Math.floor(Math.random() * pool.length)]!;
+    // Read the Seed off the drawn family, pinned to the family's own Rhyme Key
+    // so an ambiguous representative can't misfire. Auto-speak follows for free:
+    // Seed's speak effect is keyed on the Seed Word (#36).
+    const seed: SeedWord = { word: family.representative, rhymeKey: family.rhymeKey };
+    newPuzzle(seed);
+    setField("");
+    inputRef.current?.focus();
+  }
+
   return (
     <section className="puzzle">
+      <div className="puzzle__bar">
+        <button type="button" className="new-puzzle" onClick={onNewPuzzle}>
+          🎲 New puzzle
+        </button>
+      </div>
       <Seed context={context} />
       <Stats context={context} state={state} />
       {last?.rankChange && <RankBanner key={seq} label={last.rankChange.to.label} />}

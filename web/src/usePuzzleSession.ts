@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useState } from "react";
-import type { RhymeIndex } from "../../src/rhymeIndex.ts";
+import type { RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import {
   applySubmission,
   emptyPlayState,
@@ -26,10 +26,12 @@ export interface PuzzleSession {
   /** Increments per Submission, so the view can re-key a per-Submission flash. */
   seq: number;
   submit: (raw: string) => void;
+  /** Start a fresh Puzzle on `seed`, clearing the found words, Score and Rank. */
+  newPuzzle: (seed: string | SeedWord) => void;
 }
 
 export function usePuzzleSession(index: RhymeIndex, seed: string): PuzzleSession {
-  const [context] = useState<PuzzleContext>(() => startSession(index, seed));
+  const [context, setContext] = useState<PuzzleContext>(() => startSession(index, seed));
   const [state, setState] = useState<PlayState>(emptyPlayState);
   const [last, setLast] = useState<SubmissionResult | null>(null);
   const [seq, setSeq] = useState(0);
@@ -46,5 +48,18 @@ export function usePuzzleSession(index: RhymeIndex, seed: string): PuzzleSession
     [context, state],
   );
 
-  return { context, state, last, seq, submit };
+  const newPuzzle = useCallback(
+    (nextSeed: string | SeedWord) => {
+      // A fresh session replaces the whole context; resetting to emptyPlayState
+      // clears the found words, and Score / Rank fall out because they are
+      // derived from state, never stored.
+      setContext(startSession(index, nextSeed));
+      setState(emptyPlayState);
+      setLast(null);
+      setSeq((n) => n + 1);
+    },
+    [index],
+  );
+
+  return { context, state, last, seq, submit, newPuzzle };
 }

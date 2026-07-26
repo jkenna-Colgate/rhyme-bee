@@ -156,6 +156,29 @@ code {
   gap: 1.25rem;
 }
 
+.puzzle__bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.new-puzzle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.new-puzzle:hover {
+  border-color: var(--accent);
+}
+
 /* --- Stats: Score / Rank / Answers / Bonus ----------------------------- */
 
 .stats {
