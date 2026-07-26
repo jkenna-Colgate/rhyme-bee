@@ -414,4 +414,116 @@ code {
   .feedback {
     padding: 0.55rem 0.75rem;
   }
+
+  .feedback-fab,
+  .feedback-panel {
+    right: 0.75rem;
+    bottom: 0.75rem;
+  }
+
+  .feedback-panel {
+    width: min(20rem, calc(100vw - 1.5rem));
+  }
+}
+
+/* --- Dev-only feedback button (#41) ------------------------------------- */
+/* A fixed, non-modal affordance: no backdrop, so the game stays interactive.
+   The button, endpoint and its JS are stripped from production builds by the
+   `import.meta.env.DEV` gate; these selectors then simply match nothing. */
+
+.feedback-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 12%);
+  cursor: pointer;
+}
+
+.feedback-panel {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  width: 22rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 18%);
+}
+
+.feedback-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.feedback-panel__title {
+  font-weight: 600;
+}
+
+.feedback-panel__close {
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.feedback-panel__text {
+  width: 100%;
+  resize: vertical;
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.feedback-panel__foot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.55rem;
+}
+
+.feedback-panel__submit {
+  padding: 0.45rem 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.feedback-panel__submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.feedback-panel__filed {
+  color: var(--good);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.feedback-panel__error {
+  color: var(--bad);
+  font-size: 0.85rem;
 }

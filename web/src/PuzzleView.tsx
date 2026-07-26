@@ -16,6 +16,7 @@ import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, type RejectionReason } from "../../src/verdict.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
+import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
 
 /** The unscored first-run Puzzle is always seeded with `ate` (CONTEXT.md). */
 const TUTORIAL_SEED = "ate";
@@ -82,6 +83,9 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
 
       {last && <Feedback key={seq} result={last} />}
       <FoundList session={session} />
+
+      {/* Dev-only: dead-code-eliminated from the production build (#41). */}
+      {import.meta.env.DEV && <FeedbackButton session={session} />}
     </section>
   );
 }
