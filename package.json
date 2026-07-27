@@ -10,7 +10,8 @@
     "test:watch": "vitest",
     "build:index": "tsx scripts/build-index.ts",
     "histogram": "tsx scripts/histogram.ts",
-    "play": "tsx scripts/play.ts"
+    "play": "tsx scripts/play.ts",
+    "supplement:candidates": "tsx scripts/supplement-candidates.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
