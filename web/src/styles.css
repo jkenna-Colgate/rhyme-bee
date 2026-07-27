@@ -306,6 +306,30 @@ code {
   color: var(--bad);
 }
 
+/* Dev-only "should count" flag on a rejection (supplement-candidate capture). */
+.feedback__flag {
+  margin-left: auto;
+  padding: 0.15rem 0.55rem;
+  border: 1px dashed currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.feedback__flag:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.feedback__flagged {
+  margin-left: auto;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
 /* --- Rank banner -------------------------------------------------------- */
 
 .rank-banner {
