@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
 import react from "@vitejs/plugin-react";
 import { feedbackPlugin } from "./feedbackPlugin.ts";
+import { supplementPlugin } from "./supplementPlugin.ts";
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
 
@@ -18,8 +19,9 @@ const rootDir = dirname(fileURLToPath(import.meta.url));
  */
 export default defineConfig({
   root: rootDir,
-  // `feedbackPlugin` is dev-only (`apply: "serve"`); it adds no build output.
-  plugins: [react(), feedbackPlugin()],
+  // `feedbackPlugin` and `supplementPlugin` are dev-only (`apply: "serve"`); they
+  // add no build output.
+  plugins: [react(), feedbackPlugin(), supplementPlugin()],
   publicDir: resolve(rootDir, "../dist-data"),
   server: {
     fs: {

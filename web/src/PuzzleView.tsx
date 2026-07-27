@@ -108,7 +108,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
         </button>
       </form>
 
-      {last && <Feedback key={seq} result={last} />}
+      {last && <Feedback key={seq} result={last} seed={session.seed} />}
       <FoundList session={session} />
 
       {/* Dev-only: dead-code-eliminated from the production build (#41). */}
@@ -252,7 +252,7 @@ const REJECTION_MESSAGE: Record<RejectionReason, string> = {
   malformed: "letters only, please",
 };
 
-function Feedback({ result }: { result: SubmissionResult }) {
+function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }) {
   const { verdict, word, scoreDelta } = result;
 
   if (!isAccepted(verdict)) {
@@ -261,6 +261,16 @@ function Feedback({ result }: { result: SubmissionResult }) {
         <span className="feedback__badge">✗</span>
         <b className="feedback__word">{word}</b>
         <span className="feedback__note">{REJECTION_MESSAGE[verdict.reason]}</span>
+        {/* Dev-only: queue a wrongly-rejected word for the supplement judge (#54
+            follow-up). Dead-code-eliminated from the production build. */}
+        {import.meta.env.DEV && (
+          <ShouldCountButton
+            word={word}
+            seed={seed}
+            reason={verdict.reason}
+            engineRespelling={verdict.respelling ?? null}
+          />
+        )}
       </p>
     );
   }
@@ -281,6 +291,64 @@ function Feedback({ result }: { result: SubmissionResult }) {
       <b className="feedback__word">{word}</b>
       <span className="feedback__note">a real word — celebrated, but not scored</span>
     </p>
+  );
+}
+
+/**
+ * Dev-only: flag a wrongly-rejected word for the supplement judge. It POSTs the
+ * word with its Seed and Rhyme Key — what the judge needs to know *what it must
+ * rhyme with* — to the dev-server queue; the judging (add / stress-correction /
+ * derive-from-inflection / defer) happens later against that queue. Capture only
+ * records, so this stays a thin fire-and-forget with a small status.
+ */
+function ShouldCountButton({
+  word,
+  seed,
+  reason,
+  engineRespelling,
+}: {
+  word: string;
+  seed: SeedWord;
+  reason: RejectionReason;
+  engineRespelling: string | null;
+}) {
+  const [status, setStatus] = useState<"idle" | "sending" | "queued" | "error">("idle");
+
+  async function flag() {
+    if (status === "sending" || status === "queued") return;
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/supplement-candidate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          word,
+          seedWord: seed.word,
+          seedRhymeKey: seed.rhymeKey,
+          reason,
+          engineRespelling,
+        }),
+      });
+      setStatus(res.ok ? "queued" : "error");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "queued") {
+    return <span className="feedback__flagged">✓ queued for the supplement</span>;
+  }
+
+  return (
+    <button
+      type="button"
+      className="feedback__flag"
+      onClick={flag}
+      disabled={status === "sending"}
+      title="Queue this word for the supplement judge"
+    >
+      {status === "error" ? "⚠ retry" : "＋ should count"}
+    </button>
   );
 }
 
