@@ -31,6 +31,25 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   const [field, setField] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Puzzle-complete overlay (#49): fire once, on the Submission that finds the
+  // *last* Answer. Bonus Words never gate completion. It is a one-shot per
+  // Session — a rising edge on "every Answer found" — so it does not reappear on
+  // the Bonus Words a player keeps submitting afterwards, and resets for the
+  // fresh Session a new Puzzle starts (completion falls back to false there).
+  const { found, totalAnswers } = session.progress();
+  const isComplete = totalAnswers > 0 && found >= totalAnswers;
+  const wasComplete = useRef(false);
+  const [showComplete, setShowComplete] = useState(false);
+  useEffect(() => {
+    if (isComplete && !wasComplete.current) setShowComplete(true);
+    wasComplete.current = isComplete;
+  }, [isComplete]);
+
+  function dismissComplete() {
+    setShowComplete(false);
+    inputRef.current?.focus();
+  }
+
   function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     submit(field);
@@ -60,6 +79,14 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
       <Seed session={session} />
       <Stats session={session} />
       {last?.rankChange && <RankBanner key={seq} label={last.rankChange.to.label} />}
+
+      {showComplete && (
+        <CompletionOverlay
+          score={session.score()}
+          rankLabel={session.rank().label}
+          onDismiss={dismissComplete}
+        />
+      )}
 
       <form className="entry" onSubmit={onSubmit}>
         <input
@@ -119,6 +146,74 @@ function Seed({ session }: { session: Session }) {
         </button>
       )}
     </header>
+  );
+}
+
+// --- Puzzle-complete overlay (#49) ---------------------------------------------
+
+/**
+ * A dismiss-required celebration shown once the player has found every Answer,
+ * so completion "cannot be missed" — the reporter kept submitting words without
+ * realising there were no Answers left (#49). It does not auto-dismiss: the
+ * player leaves it via an explicit action, either acknowledging or choosing to
+ * keep hunting for Bonus Words (in the spirit of NYT's "admire puzzle"); both
+ * return to the same board, and the caller returns focus to the input.
+ *
+ * Accessible as a modal: focus moves onto it on open, Escape dismisses, and the
+ * primary action is keyboard-reachable. Score and Rank are read, never mutated.
+ */
+function CompletionOverlay({
+  score,
+  rankLabel,
+  onDismiss,
+}: {
+  score: number;
+  rankLabel: string;
+  onDismiss: () => void;
+}) {
+  const primaryRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    primaryRef.current?.focus();
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onDismiss();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onDismiss]);
+
+  return (
+    <div
+      className="complete-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="complete-title"
+    >
+      <div className="complete-card">
+        <button
+          type="button"
+          className="complete-card__close"
+          onClick={onDismiss}
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <h2 id="complete-title" className="complete-card__title">
+          🏆 Puzzle complete!
+        </h2>
+        <p className="complete-card__body">
+          You found every Answer. Final Score <b>{score}</b>, Rank <b>{rankLabel}</b>.
+        </p>
+        <button
+          ref={primaryRef}
+          type="button"
+          className="complete-card__primary"
+          onClick={onDismiss}
+        >
+          Keep hunting for Bonus Words
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -189,7 +284,20 @@ function Feedback({ result }: { result: SubmissionResult }) {
   );
 }
 
+/** How long a Rank-change banner lingers before it dismisses itself (#47). */
+const RANK_BANNER_MS = 4000;
+
 function RankBanner({ label }: { label: string }) {
+  // The banner is re-keyed on `seq` by the parent, so every Rank change mounts a
+  // fresh one and restarts this timer; without the timeout it would hang on
+  // screen until the next Submission (#47).
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(false), RANK_BANNER_MS);
+    return () => clearTimeout(timer);
+  }, []);
+  if (!visible) return null;
+
   return (
     <p className="rank-banner" role="status" aria-live="polite">
       🎉 New Rank: <b>{label}</b>!
