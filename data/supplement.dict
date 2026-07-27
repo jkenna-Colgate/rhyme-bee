@@ -1,0 +1,35 @@
+# Committed pronunciation supplement — the permanent human override layer.
+#
+# CMUdict text (`WORD  P1 P2 ...`, ARPAbet with stress digits 0/1/2), merged
+# over the pinned upstream inputs by `npm run build:index` (ADR-0009). Unlike
+# the rest of data/, this file is committed and survives the rebuild.
+#
+#   - A word absent upstream is ADDED and granted wordhood (but a name is never
+#     laundered into a word). It carries no prevalence, so it tiers as a Bonus
+#     Word until the deferred prevalence machinery lands (#56).
+#   - A word already upstream has its pronunciation CORRECTED — the entry here
+#     OVERRIDES the upstream reading, it does not add a variant alongside it.
+#
+# A correction is a rhyme-verdict change, so keep it deliberate and note why.
+
+# --- Adds (word valid, but absent from CMUdict so it had no reading) ---
+
+# overjoy (#52): derived from the upstream inflection `overjoyed OW2 V ER0 JH
+# OY1 D` by dropping the final D — rhymes on OY, with `joy`.
+overjoy OW2 V ER0 JH OY1
+
+# airburst (#48): air (EH1 R) + burst (B ER1 S T), the compound taking secondary
+# stress on the final syllable so it rhymes on ER S T, with `burst`.
+airburst EH1 R B ER2 S T
+
+# --- Corrections (correct engine, wrong upstream stress) ---
+
+# viceroy (#53): upstream `V AY1 S R OY0` leaves the final diphthong unstressed,
+# so the rhyme wrongly anchored on AY. The final -roy carries real secondary
+# stress; OY0 -> OY2 makes it rhyme on OY, with `oy`.
+viceroy V AY1 S R OY2
+
+# bratwurst (#46): upstream `B R AE1 T W ER0 S T` leaves -wurst unstressed, so
+# the rhyme wrongly anchored on AE. The loanword's final syllable carries real
+# secondary stress; ER0 -> ER2 makes it rhyme on ER S T, with `burst`.
+bratwurst B R AE1 T W ER2 S T

@@ -12,7 +12,12 @@ data/            (uncommitted)         dist-data/         (uncommitted)
   names.txt      proper nouns
   prevalence.csv knownness
   sources.json   pinned versions
+  supplement.dict human overrides  (committed — see below)
 ```
+
+`supplement.dict` is the one hand-authored input and the only committed file in
+`data/` — the permanent human override layer (ADR-0009). The build merges it over
+the pinned inputs, so its adds and stress corrections survive the rebuild.
 
 Build with `npm run build:index`, then `npm run histogram` to answer ADR-0004.
 
@@ -25,6 +30,7 @@ Build with `npm run build:index`, then `npm run histogram` to answer ADR-0004.
 | `names.txt` | one name per line | labels a rejection as Proper Noun |
 | `prevalence.csv` | header with `Word`,`Prevalence` | knownness (lemma → score) |
 | `sources.json` | `{ "<name>": "<version/url>" }` | pinned provenance |
+| `supplement.dict` | CMUdict text, `#` comments | **committed** human adds + stress corrections (ADR-0009) |
 
 `words.txt` is the wordhood authority and must exclude proper nouns, so CMUdict's
 surnames do not leak in (ADR-0003). `names.txt` only affects the *reason* a

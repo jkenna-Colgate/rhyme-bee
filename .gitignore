@@ -13,8 +13,10 @@ Thumbs.db
 desktop.ini
 
 # Data — CMUdict, prevalence norms and derived indexes are large and
-# regenerable. See docs/adr/0003 and docs/adr/0004.
-/data/
+# regenerable. See docs/adr/0003 and docs/adr/0004. The committed pronunciation
+# supplement (ADR-0009) is the one hand-authored input, so it is kept.
+/data/*
+!/data/supplement.dict
 *.csv
 *.xlsx
 

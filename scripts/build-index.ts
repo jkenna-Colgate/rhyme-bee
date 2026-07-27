@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../src/cmudict.ts";
 import { parsePrevalenceCsv, parseWordList } from "../src/pipeline.ts";
 import { serialise } from "../src/serialise.ts";
+import { applySupplement } from "../src/supplement.ts";
 import type { RhymeIndexData } from "../src/rhymeIndex.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,6 +37,11 @@ const pronunciations = parseCmudict(read("cmudict.dict"));
 const words = parseWordList(read("words.txt"));
 const names = parseWordList(read("names.txt"));
 const prevalence = parsePrevalenceCsv(read("prevalence.csv"));
+
+// The committed human override layer (ADR-0009), merged over the pinned upstream
+// inputs: it adds missing words (with a reading) and corrects mis-marked stress,
+// and — unlike everything else in data/ — it survives this rebuild.
+applySupplement(read("supplement.dict"), { pronunciations, words, names });
 
 const data: RhymeIndexData = { pronunciations, words, names, prevalence };
 
