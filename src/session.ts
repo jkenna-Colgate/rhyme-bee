@@ -10,7 +10,8 @@
  * Two structures carry the state, neither a glossary term (both are seams):
  *   - `PuzzleContext` — immutable, built once at Session start, NOT serialized.
  *   - `PlayState` — tiny, serializable, the single source of truth. Only the
- *     found words are stored; Score and Rank are never denormalised into it.
+ *     found words and whether the Session has ended are stored; Score and Rank
+ *     are never denormalised into it.
  *
  * The `Session` class at the foot of the file is a thin, immutable facade that
  * bundles the `(PuzzleContext, PlayState)` pair the pure functions thread — so
@@ -58,17 +59,25 @@ export interface PuzzleContext {
 }
 
 /**
- * The serializable single source of truth: the found Answer words and found
- * Bonus Words, as arrays (set semantics — no duplicates — enforced by the
- * reducer). Nothing else; Score and Rank are derived on demand.
+ * The serializable single source of truth: the found Answer words, the found
+ * Bonus Words (both arrays with set semantics — no duplicates — enforced by the
+ * reducer), and whether the Session is over. Nothing else; Score and Rank are
+ * derived on demand.
+ *
+ * `ended` is the whole of "the game is finished": it is set by `endSession` when
+ * the player takes the Reveal (CONTEXT.md), and it makes `applySubmission`
+ * decline before it ever adjudicates. Being over is a property of the Session,
+ * not of the word submitted, so it deliberately stays out of the rejection
+ * vocabulary.
  */
 export interface PlayState {
   foundAnswers: string[];
   foundBonus: string[];
+  ended: boolean;
 }
 
-/** The starting state: nothing found yet. */
-export const emptyPlayState: PlayState = { foundAnswers: [], foundBonus: [] };
+/** The starting state: nothing found yet, and still playable. */
+export const emptyPlayState: PlayState = { foundAnswers: [], foundBonus: [], ended: false };
 
 /**
  * A resolved Rank: which rung of the ladder the player is on, plus its label and
@@ -148,12 +157,21 @@ export function startSession(
  * Bonus Words is passed to `adjudicate` as `alreadySubmitted`, so a found word is
  * rejected as a repeat while a previously *rejected* word — never stored — is
  * re-adjudicated on its real merits.
+ *
+ * An ended Session declines: the state comes back unchanged and `result` is
+ * `null`, meaning "no Submission happened". The guard sits above `adjudicate`
+ * deliberately — a Verdict answers "does this word rhyme?", and "the game is
+ * over" is not an answer to that question, so it never enters the closed
+ * rejection set. Clients should stop offering entry once a Session has ended
+ * rather than render a null result per attempt.
  */
 export function applySubmission(
   context: PuzzleContext,
   state: PlayState,
   submission: string,
-): { state: PlayState; result: SubmissionResult } {
+): { state: PlayState; result: SubmissionResult | null } {
+  if (state.ended) return { state, result: null };
+
   const alreadySubmitted = new Set<string>([...state.foundAnswers, ...state.foundBonus]);
   const verdict = context.index.adjudicate(context.seed, submission, alreadySubmitted);
 
@@ -166,8 +184,8 @@ export function applySubmission(
   const word = normaliseWord(submission);
   const nextState: PlayState =
     verdict.outcome === "answer"
-      ? { foundAnswers: [...state.foundAnswers, word], foundBonus: state.foundBonus }
-      : { foundAnswers: state.foundAnswers, foundBonus: [...state.foundBonus, word] };
+      ? { ...state, foundAnswers: [...state.foundAnswers, word] }
+      : { ...state, foundBonus: [...state.foundBonus, word] };
 
   const rankBefore = rank(context, state);
   const rankAfter = rank(context, nextState);
@@ -231,9 +249,36 @@ export function missedAnswers(context: PuzzleContext, state: PlayState): PuzzleE
 }
 
 /**
+ * The Bonus Words the player never reached — the mirror of `missedAnswers` over
+ * the Puzzle's Bonus Words, same entry type, same Puzzle order. The other half of
+ * the Reveal, and a derivation for the same reason: a client subtracting the
+ * collected words from `puzzle.bonusWords` would be doing game logic.
+ */
+export function missedBonusWords(context: PuzzleContext, state: PlayState): PuzzleEntry[] {
+  const found = new Set(state.foundBonus);
+  return context.puzzle.bonusWords.filter((bonus) => !found.has(bonus.word));
+}
+
+/**
+ * End the Session — what taking the Reveal does to play-state (CONTEXT.md). The
+ * finds are kept exactly as they are, so Score, Rank and progress freeze at the
+ * values they already held and the Reveal can show the misses beside them; only
+ * further Submissions are shut off. Idempotent: an already-ended state is
+ * returned as-is, so re-ending is a no-op rather than a new object.
+ */
+export function endSession(state: PlayState): PlayState {
+  return state.ended ? state : { ...state, ended: true };
+}
+
+/**
  * Snapshot a finished game into a durable `PuzzleResult`. It reads Score, Rank
  * and progress at the moment it is called and freezes them into plain values, so
  * a later scoring retune never rewrites a past result.
+ *
+ * It deliberately does not record whether the game ended in a Reveal. Nothing
+ * reads such a flag — Puzzle history is a separate concern that does not exist
+ * yet — and `found` against `totalAnswers` already shows a snapshot taken short
+ * of completion.
  */
 export function toResult(
   context: PuzzleContext,
@@ -257,9 +302,10 @@ export function toResult(
  * A Session (CONTEXT.md): one player's play-through of a Puzzle, as one value.
  * It bundles the immutable `PuzzleContext` and the current `PlayState` — the pair
  * every accessor above threads — and exposes `score()` / `rank()` / `progress()`
- * / `missedAnswers()` / `submit()` / `toResult()` as methods, so callers stop
- * passing both. It is a thin convenience over the pure core, not a replacement:
- * each method delegates straight to the free function of the same name.
+ * / `missedAnswers()` / `missedBonusWords()` / `submit()` / `end()` /
+ * `toResult()` as methods, so callers stop passing both. It is a thin
+ * convenience over the pure core, not a replacement: each method delegates
+ * straight to the free function of the same name.
  *
  * A Session is itself a value. `submit` returns a *new* Session rather than
  * mutating, so the "snapshots are values" property the core guarantees survives
@@ -302,6 +348,15 @@ export class Session {
     return this.state.foundBonus;
   }
 
+  /**
+   * Whether this Session is over — the player took the Reveal. Score and Rank are
+   * frozen and `submit` no longer lands; a client reads this to stop offering
+   * entry at all, rather than to explain a refusal after the fact.
+   */
+  get ended(): boolean {
+    return this.state.ended;
+  }
+
   /** The points a given Answer word is worth (0 if it is not an Answer). */
   pointsFor(word: string): number {
     return this.context.answerScores.get(word) ?? 0;
@@ -322,9 +377,25 @@ export class Session {
     return progress(this.context, this.state);
   }
 
-  /** The Answers not yet found, in the Puzzle's order — the end-of-game reveal. */
+  /** The Answers not yet found, in the Puzzle's order — half of the Reveal. */
   missedAnswers(): PuzzleEntry[] {
     return missedAnswers(this.context, this.state);
+  }
+
+  /** The Bonus Words never collected, in the Puzzle's order — the other half. */
+  missedBonusWords(): PuzzleEntry[] {
+    return missedBonusWords(this.context, this.state);
+  }
+
+  /**
+   * Take the Reveal: a *new*, ended Session with the same finds, Score and Rank,
+   * which accepts no further Submissions. The Session this was called on is a
+   * value and stays playable, so a caller that has not committed the result can
+   * still discard the ending. Already ended, `this` comes back unchanged.
+   */
+  end(): Session {
+    const state = endSession(this.state);
+    return state === this.state ? this : new Session(this.context, state);
   }
 
   /** Snapshot the Session into a durable, value-typed `PuzzleResult`. */
@@ -336,9 +407,10 @@ export class Session {
    * Apply a Submission. Returns the lean `SubmissionResult` and the Session to
    * carry forward: a new Session when the state advanced, or `this` unchanged
    * when the Submission was rejected (the core returns the same state on a
-   * rejection, so the same instance flows on).
+   * rejection, so the same instance flows on). On an ended Session nothing lands
+   * and `result` is `null` — see `applySubmission`.
    */
-  submit(submission: string): { session: Session; result: SubmissionResult } {
+  submit(submission: string): { session: Session; result: SubmissionResult | null } {
     const { state, result } = applySubmission(this.context, this.state, submission);
     const session = state === this.state ? this : new Session(this.context, state);
     return { session, result };

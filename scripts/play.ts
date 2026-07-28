@@ -21,8 +21,9 @@
  * by precedence `--seed` > `--day` > random — announces it (respelled, with its
  * Answer count, maximum Score, and day/Difficulty tier), then judges each typed
  * Submission exactly as the game will, printing points, running Score, Rank, a
- * banner on a Rank change, and progress. `:quit` (or Ctrl-D) prints the durable
- * result and reveals the Answers that were missed.
+ * banner on a Rank change, and progress. `:quit` (or Ctrl-D) takes the Reveal:
+ * it ends the Session, prints the durable result, and discloses the Answers and
+ * Bonus Words that were missed.
  *
  * The `--day 1..7` knob sorts the in-band candidates by their curation Difficulty
  * (ADR-0007) into seven equal quantile buckets — day 1 easiest, day 7 hardest —
@@ -96,11 +97,16 @@ rl.on("line", (line) => {
 
   const applied = session.submit(submission);
   session = applied.session;
-  printSubmission(session, applied.result);
+  // `null` means an ended Session declined the word; the REPL only ends on the
+  // way out, so nothing is typed after that and this is belt and braces.
+  if (applied.result !== null) printSubmission(session, applied.result);
   rl.prompt();
 });
 
 rl.on("close", () => {
+  // `:quit` is the terminal Reveal — it discloses what was missed, and the
+  // process exits, which is all "the Session ends" can mean here. (The web shell
+  // has to end the Session properly, and puts a confirmation in front of it.)
   printFinish(session);
   process.exit(0);
 });
@@ -227,6 +233,17 @@ function printFinish(session: Session): void {
     console.log(`  Missed Answers (${missed.length}):`);
     for (const answer of missed) {
       console.log(`    ${answer.word}  —  "${answer.respelling}"`);
+    }
+  }
+
+  // The other half of the Reveal. A Puzzle can have no Bonus Words at all, and a
+  // player can have collected every one, so the section only prints when there is
+  // something in it.
+  const missedBonus = session.missedBonusWords();
+  if (missedBonus.length > 0) {
+    console.log(`  Bonus Words you missed (${missedBonus.length}):`);
+    for (const bonus of missedBonus) {
+      console.log(`    ★ ${bonus.word}  —  "${bonus.respelling}"`);
     }
   }
   console.log("");
