@@ -12,6 +12,11 @@
  * Everything is asserted through the module's public surface only — never its
  * internal representation — in the data-table style of `verdict-table.test.ts`.
  *
+ * A Reveal suite then covers the end-of-game derivations and the ended Session:
+ * both missed lists at their boundaries (nothing found, everything found) and as
+ * exact complements of the finds, and what ending freezes — Score, Rank and the
+ * refusal to adjudicate another word at all.
+ *
  * A final suite covers the `Session` facade: it asserts each method matches the
  * free function it delegates to and that `submit` threads state immutably (a new
  * Session forward, `this` on a rejection) — the deep behaviour is already pinned
@@ -26,7 +31,9 @@ import {
   applySubmission,
   DEFAULT_SCORING_CONFIG,
   emptyPlayState,
+  endSession,
   missedAnswers,
+  missedBonusWords,
   progress,
   rank,
   score,
@@ -114,6 +121,9 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
       // The input state is never mutated (immutability rides along every row).
       expect(state).toEqual(before);
 
+      // A live Session always judges the word; only an ended one declines (null).
+      if (result === null) throw new Error(`declined a live Submission: ${row.submission}`);
+
       // Verdict.
       expect(result.verdict.outcome).toBe(row.verdict.outcome);
       if (row.verdict.outcome === "rejected" && result.verdict.outcome === "rejected") {
@@ -164,6 +174,7 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
     ];
     for (const { submission, reason } of cases) {
       const { state, result } = applySubmission(context, emptyPlayState, submission);
+      if (result === null) throw new Error(`declined a live Submission: ${submission}`);
       expect(result.verdict.outcome).toBe("rejected");
       if (result.verdict.outcome === "rejected") expect(result.verdict.reason).toBe(reason);
       expect(result.scoreDelta).toBe(0);
@@ -198,8 +209,8 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
     // reported as already-submitted.
     const first = applySubmission(context, emptyPlayState, "hat");
     const second = applySubmission(context, first.state, "hat");
-    expect(second.result.verdict.outcome).toBe("rejected");
-    if (second.result.verdict.outcome === "rejected") {
+    expect(second.result?.verdict.outcome).toBe("rejected");
+    if (second.result?.verdict.outcome === "rejected") {
       expect(second.result.verdict.reason).toBe("does-not-rhyme");
     }
   });
@@ -217,6 +228,110 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
     });
     expect(score(retuned, played)).not.toBe(snapshot.finalScore);
     expect(snapshot).toEqual(before);
+  });
+});
+
+// --- The Reveal: the two missed lists, and the ended Session -------------------
+
+describe("the Reveal (fixture `ate` Puzzle)", () => {
+  const index = makeTestIndex();
+  const context = startSession(index, "ate", PLAYTHROUGH_CONFIG);
+  const allAnswers = context.puzzle.answers.map((a) => a.word);
+  const allBonus = context.puzzle.bonusWords.map((b) => b.word);
+
+  /** Play a line of Submissions from empty, returning the state they reach. */
+  function play(...submissions: string[]): PlayState {
+    let state: PlayState = emptyPlayState;
+    for (const word of submissions) state = applySubmission(context, state, word).state;
+    return state;
+  }
+
+  it("misses no Answer once every one has been found", () => {
+    // The far boundary of `missedAnswers`; the empty-state one is asserted above.
+    const state = play(...allAnswers);
+    expect(state.foundAnswers).toEqual(allAnswers);
+    expect(missedAnswers(context, state)).toEqual([]);
+  });
+
+  it("misses every Bonus Word when none has been collected", () => {
+    // The boundary the Reveal opens on for a player who found no Bonus Word.
+    expect(missedBonusWords(context, emptyPlayState)).toEqual(context.puzzle.bonusWords);
+  });
+
+  it("misses no Bonus Word once every one has been collected", () => {
+    const state = play(...allBonus);
+    expect(state.foundBonus).toEqual(allBonus);
+    expect(missedBonusWords(context, state)).toEqual([]);
+  });
+
+  it("returns the Puzzle's own entries, in the Puzzle's order", () => {
+    const state = play("objurgate");
+    expect(missedBonusWords(context, state)).toEqual(
+      context.puzzle.bonusWords.filter((b) => b.word !== "objurgate"),
+    );
+  });
+
+  it("partitions the Answers: each is a find or a miss, never both, never neither", () => {
+    const state = play("late", "gate", "objurgate");
+    const missed = missedAnswers(context, state).map((a) => a.word);
+    expect([...state.foundAnswers, ...missed].sort()).toEqual([...allAnswers].sort());
+    expect(missed.filter((word) => state.foundAnswers.includes(word))).toEqual([]);
+  });
+
+  it("partitions the Bonus Words: each is a find or a miss, never both, never neither", () => {
+    const state = play("late", "objurgate");
+    const missed = missedBonusWords(context, state).map((b) => b.word);
+    expect([...state.foundBonus, ...missed].sort()).toEqual([...allBonus].sort());
+    expect(missed.filter((word) => state.foundBonus.includes(word))).toEqual([]);
+  });
+
+  it("ends the Session, freezing Score and Rank and keeping the finds", () => {
+    const played = play("late", "defenestrate");
+    const ended = endSession(played);
+    expect(ended.ended).toBe(true);
+    expect(score(context, ended)).toBe(score(context, played));
+    expect(rank(context, ended)).toEqual(rank(context, played));
+    // The finds survive: a Reveal shows the misses *beside* them.
+    expect(ended.foundAnswers).toEqual(played.foundAnswers);
+    expect(progress(context, ended)).toEqual(progress(context, played));
+  });
+
+  it("leaves the pre-Reveal state untouched — ending is a value transition", () => {
+    const played = play("late");
+    const before = structuredClone(played);
+    endSession(played);
+    expect(played).toEqual(before);
+  });
+
+  it("declines a Submission once ended, without reaching adjudication", () => {
+    // Poison the index: if an ended Session adjudicated, "the game is over" would
+    // have to become a rejection reason, and that set is closed by design.
+    const poisoned: PuzzleContext = {
+      ...context,
+      index: {
+        adjudicate() {
+          throw new Error("an ended Session must not adjudicate");
+        },
+      } as unknown as RhymeIndex,
+    };
+    const ended = endSession(play("late"));
+
+    const { state, result } = applySubmission(poisoned, ended, "gate");
+    expect(result).toBeNull();
+    expect(state).toBe(ended);
+    expect(score(context, state)).toBe(score(context, ended));
+    expect(rank(context, state)).toEqual(rank(context, ended));
+  });
+
+  it("is idempotent: ending an ended Session changes nothing", () => {
+    const ended = endSession(play("late"));
+    expect(endSession(ended)).toBe(ended);
+  });
+
+  it("snapshots an ended Session at the totals it froze", () => {
+    const played = play("late", "defenestrate");
+    const live = toResult(context, played, { date: "2026-07-28" });
+    expect(toResult(context, endSession(played), { date: "2026-07-28" })).toEqual(live);
   });
 });
 
@@ -290,7 +405,7 @@ describe("rank ladder boundaries (synthetic context)", () => {
 
   for (const row of rankRows) {
     it(`${row.pct}% -> tier ${row.tier} (${row.note})`, () => {
-      const state: PlayState = { foundAnswers: row.found, foundBonus: [] };
+      const state: PlayState = { foundAnswers: row.found, foundBonus: [], ended: false };
       const resolved = rank(context, state);
       expect(resolved.tier).toBe(row.tier);
       expect(resolved.label).toBe(row.label);
@@ -329,7 +444,7 @@ describe("Session facade over the core (fixture `ate` Puzzle)", () => {
 
     // The accepted Answer advances a brand-new Session...
     expect(next).not.toBe(session);
-    expect(result.verdict.outcome).toBe("answer");
+    expect(result?.verdict.outcome).toBe("answer");
     expect(next.foundAnswers).toEqual(["late"]);
     expect(next.score()).toBe(score(context, next.state));
 
@@ -341,7 +456,7 @@ describe("Session facade over the core (fixture `ate` Puzzle)", () => {
   it("submit returns the very same Session instance on a rejection", () => {
     const session = Session.start(index, "ate", PLAYTHROUGH_CONFIG);
     const { session: next, result } = session.submit("hat");
-    expect(result.verdict.outcome).toBe("rejected");
+    expect(result?.verdict.outcome).toBe("rejected");
     expect(next).toBe(session);
   });
 
@@ -359,14 +474,44 @@ describe("Session facade over the core (fixture `ate` Puzzle)", () => {
     expect(session.rank()).toEqual(rank(context, state));
     expect(session.progress()).toEqual(progress(context, state));
     expect(session.missedAnswers()).toEqual(missedAnswers(context, state));
+    expect(session.missedBonusWords()).toEqual(missedBonusWords(context, state));
     expect(session.pointsFor("defenestrate")).toBe(context.answerScores.get("defenestrate"));
     expect(session.toResult({ date: "2026-07-26" })).toEqual(
       toResult(context, state, { date: "2026-07-26" }),
     );
   });
 
+  it("end() returns an ended Session that declines Submissions, leaving the original playable", () => {
+    const session = Session.start(index, "ate", PLAYTHROUGH_CONFIG).submit("late").session;
+    expect(session.ended).toBe(false);
+
+    const over = session.end();
+    expect(over).not.toBe(session);
+    expect(over.ended).toBe(true);
+    expect(over.state).toEqual(endSession(session.state));
+    // The Session it came from is a value, and stays playable.
+    expect(session.ended).toBe(false);
+    expect(session.submit("gate").result).not.toBeNull();
+
+    // Nothing more lands, and the frozen totals hold.
+    const { session: after, result } = over.submit("gate");
+    expect(result).toBeNull();
+    expect(after).toBe(over);
+    expect(over.score()).toBe(session.score());
+    expect(over.rank()).toEqual(session.rank());
+  });
+
+  it("end() on an ended Session returns the same instance", () => {
+    const over = Session.start(index, "ate", PLAYTHROUGH_CONFIG).end();
+    expect(over.end()).toBe(over);
+  });
+
   it("can be rehydrated from a context and a saved PlayState", () => {
-    const saved: PlayState = { foundAnswers: ["late", "gate"], foundBonus: ["objurgate"] };
+    const saved: PlayState = {
+      foundAnswers: ["late", "gate"],
+      foundBonus: ["objurgate"],
+      ended: false,
+    };
     const session = new Session(context, saved);
     expect(session.foundAnswers).toEqual(["late", "gate"]);
     expect(session.foundBonus).toEqual(["objurgate"]);

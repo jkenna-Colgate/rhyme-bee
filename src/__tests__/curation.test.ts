@@ -205,7 +205,7 @@ describe("Difficulty of a candidate Seed Word (ADR-0007)", () => {
     // The identity, proven end-to-end through the session scorer: a player who
     // knows only the common Answers tops out at Score/maxScore = 1 − Difficulty.
     const context = startSession(synthetic, "og", DEFAULT_SCORING_CONFIG);
-    const commonOnly = { foundAnswers: ["quag", "shabog"], foundBonus: [] };
+    const commonOnly = { foundAnswers: ["quag", "shabog"], foundBonus: [], ended: false };
     expect(score(context, commonOnly) / context.maxScore).toBeCloseTo(1 - family!.difficulty, 10);
   });
 });

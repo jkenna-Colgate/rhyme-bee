@@ -159,7 +159,9 @@ code {
 
 .puzzle__bar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .new-puzzle {
@@ -476,6 +478,116 @@ code {
 .found__points {
   color: var(--good);
   font-variant-numeric: tabular-nums;
+}
+
+/* --- The Reveal (#62) ---------------------------------------------------- */
+/* Deliberately quieter than "New puzzle": giving up is available, not inviting.
+   The confirmation reuses the completion overlay's card, so the two modals in the
+   shell look like one thing. The `--missed` modifiers sit *after* the found-list
+   rules they override: same specificity, so source order decides. */
+
+.reveal-button {
+  margin-right: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.reveal-button:hover {
+  color: var(--ink);
+  border-color: var(--muted);
+}
+
+.give-up__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+/* The irreversible action is the plainer of the two: "Keep playing" keeps the
+   filled accent button, and the focus. */
+.give-up__confirm {
+  padding: 0.7rem 1.2rem;
+  border: 1px solid var(--bad);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--bad);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.give-up__confirm:hover {
+  background: var(--bad-bg);
+}
+
+.ended {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: center;
+}
+
+.ended__title {
+  font-size: 1.05rem;
+}
+
+.ended__detail {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.missed {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.found__title--missed {
+  color: var(--bad);
+}
+
+/* Misses read as absences: no fill, a dashed edge, and the word un-bolded — the
+   player's own finds keep the solid tiles above. */
+.found__item--missed {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  background: transparent;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.found__item--bonus-missed {
+  color: var(--bonus);
+  border-color: var(--bonus);
+  opacity: 0.75;
+}
+
+.missed__word {
+  color: var(--ink);
+}
+
+.found__item--bonus-missed .missed__word {
+  color: inherit;
+}
+
+.missed__respelling {
+  font-size: 0.85rem;
 }
 
 /* --- Narrow (phone-width) screens --------------------------------------- */
