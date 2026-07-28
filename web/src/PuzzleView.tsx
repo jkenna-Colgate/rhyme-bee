@@ -78,7 +78,16 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
       </div>
       <Seed session={session} />
       <Stats session={session} />
-      {last?.rankChange && <RankBanner key={seq} label={last.rankChange.to.label} />}
+      {/* Both per-Submission flashes are re-keyed on `seq` so each new Submission
+          genuinely remounts them (that is what restarts the banner's dismissal
+          timer), but they are siblings in this `section`, so their keys must also
+          be unique *among siblings* — hence the distinct prefixes. Keying both on
+          the bare `seq` collided, and React resolved the collision by dropping the
+          banner's fiber while leaving its DOM node connected: an orphan whose
+          timer had been cleaned up, so it hung on screen forever (#60). */}
+      {last?.rankChange && (
+        <RankBanner key={`rank-${seq}`} label={last.rankChange.to.label} />
+      )}
 
       {showComplete && (
         <CompletionOverlay
@@ -108,7 +117,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
         </button>
       </form>
 
-      {last && <Feedback key={seq} result={last} seed={session.seed} />}
+      {last && <Feedback key={`feedback-${seq}`} result={last} seed={session.seed} />}
       <FoundList session={session} />
 
       {/* Dev-only: dead-code-eliminated from the production build (#41). */}
@@ -356,9 +365,10 @@ function ShouldCountButton({
 const RANK_BANNER_MS = 4000;
 
 function RankBanner({ label }: { label: string }) {
-  // The banner is re-keyed on `seq` by the parent, so every Rank change mounts a
-  // fresh one and restarts this timer; without the timeout it would hang on
-  // screen until the next Submission (#47).
+  // The banner is re-keyed `rank-${seq}` by the parent, so every Rank change
+  // mounts a fresh one and restarts this timer; without the timeout it would hang
+  // on screen until the next Submission (#47). The remount is only real while
+  // that key stays unique among its siblings (#60).
   const [visible, setVisible] = useState(true);
   useEffect(() => {
     const timer = setTimeout(() => setVisible(false), RANK_BANNER_MS);
