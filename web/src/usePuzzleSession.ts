@@ -24,6 +24,11 @@ export interface PuzzleSession {
    */
   seq: number;
   submit: (raw: string) => void;
+  /**
+   * Take the Reveal: end the Session, freezing Score and Rank. The view gates
+   * this behind a confirmation; the engine decides what ending means.
+   */
+  reveal: () => void;
   /** Start a fresh Puzzle on `seed`, clearing the found words, Score and Rank. */
   newPuzzle: (seed: string | SeedWord) => void;
 }
@@ -38,12 +43,24 @@ export function usePuzzleSession(index: RhymeIndex, seed: string): PuzzleSession
       const trimmed = raw.trim();
       if (trimmed === "") return;
       const applied = session.submit(trimmed);
+      // An ended Session declines with a null result: nothing happened, so leave
+      // the last feedback alone rather than flashing an empty one. The view stops
+      // rendering the entry control at that point, so this is a backstop.
+      if (applied.result === null) return;
       setSession(applied.session);
       setLast(applied.result);
       setSeq((n) => n + 1);
     },
     [session],
   );
+
+  const reveal = useCallback(() => {
+    // The ended Session is a new value; Score and Rank freeze because they were
+    // never stored, and the missed lists come off the same Session.
+    setSession((current) => current.end());
+    setLast(null);
+    setSeq((n) => n + 1);
+  }, []);
 
   const newPuzzle = useCallback(
     (nextSeed: string | SeedWord) => {
@@ -56,5 +73,5 @@ export function usePuzzleSession(index: RhymeIndex, seed: string): PuzzleSession
     [index],
   );
 
-  return { session, last, seq, submit, newPuzzle };
+  return { session, last, seq, submit, reveal, newPuzzle };
 }

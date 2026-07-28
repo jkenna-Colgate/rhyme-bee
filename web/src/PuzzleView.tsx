@@ -7,11 +7,17 @@
  * screen, read off the `Session` facade via its `score()` / `rank()` /
  * `progress()` methods. It holds no game logic, so it is left untested, like
  * `scripts/play.ts`.
+ *
+ * The Reveal (#62) is the same story: the view owns only the give-up gate — the
+ * button, the confirmation, and dropping the entry control once the Session is
+ * over. Whether a Session has ended, and what was missed, are read from
+ * `session.ended` / `missedAnswers()` / `missedBonusWords()`; nothing here
+ * subtracts one word list from another.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { playableSeeds } from "../../src/curation.ts";
-import type { RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
+import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, type RejectionReason } from "../../src/verdict.ts";
 import { speak, speechSupported } from "./speech.ts";
@@ -22,7 +28,7 @@ import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
 const TUTORIAL_SEED = "ate";
 
 export function PuzzleView({ index }: { index: RhymeIndex }) {
-  const { session, last, seq, submit, newPuzzle } = usePuzzleSession(index, TUTORIAL_SEED);
+  const { session, last, seq, submit, reveal, newPuzzle } = usePuzzleSession(index, TUTORIAL_SEED);
 
   // The shared in-band Seed pool (#33). The boot Seed stays the fixed tutorial
   // word `ate`; only the "new puzzle" button draws from this pool.
@@ -50,6 +56,20 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
     inputRef.current?.focus();
   }
 
+  // The Reveal (#62): a give-up gate, so the button only arms a confirmation —
+  // `reveal()` is what actually ends the Session. Both missed lists are engine
+  // derivations; the view reads them and never subtracts anything itself.
+  const missed = useMemo(
+    () => ({ answers: session.missedAnswers(), bonus: session.missedBonusWords() }),
+    [session],
+  );
+  const [confirming, setConfirming] = useState(false);
+
+  function takeReveal() {
+    reveal();
+    setConfirming(false);
+  }
+
   function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     submit(field);
@@ -66,12 +86,27 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
     const seed: SeedWord = { word: family.representative, rhymeKey: family.rhymeKey };
     newPuzzle(seed);
     setField("");
+    setConfirming(false);
     inputRef.current?.focus();
   }
 
   return (
     <section className="puzzle">
       <div className="puzzle__bar">
+        {/* Nothing left to disclose (a perfect game, Bonus Words and all) means
+            no Reveal to offer — the button would end the Session for nothing.
+            With every Answer already found there is nothing left to *give up*
+            either, so that state skips the confirmation: the gate guards the
+            Answers a player could still have found, and there are none. */}
+        {!session.ended && (missed.answers.length > 0 || missed.bonus.length > 0) && (
+          <button
+            type="button"
+            className="reveal-button"
+            onClick={() => (isComplete ? takeReveal() : setConfirming(true))}
+          >
+            {isComplete ? "★ Show the Bonus Words I missed" : "🏳️ Reveal Answers"}
+          </button>
+        )}
         <button type="button" className="new-puzzle" onClick={onNewPuzzle}>
           🎲 New puzzle
         </button>
@@ -97,28 +132,50 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
         />
       )}
 
-      <form className="entry" onSubmit={onSubmit}>
-        <input
-          ref={inputRef}
-          className="entry__input"
-          type="text"
-          value={field}
-          onChange={(event) => setField(event.target.value)}
-          placeholder="Type a word that rhymes…"
-          autoFocus
-          autoComplete="off"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-          aria-label="Your rhyme"
+      {confirming && (
+        <GiveUpConfirm
+          remaining={missed.answers.length}
+          onConfirm={takeReveal}
+          onCancel={() => {
+            setConfirming(false);
+            inputRef.current?.focus();
+          }}
         />
-        <button className="entry__submit" type="submit">
-          Submit
-        </button>
-      </form>
+      )}
+
+      {/* An ended Session has no entry: the shell reflects "over" structurally,
+          rather than rendering a refusal for every word typed after the fact. */}
+      {session.ended ? (
+        <EndedNotice
+          gaveUp={!isComplete}
+          score={session.score()}
+          rankLabel={session.rank().label}
+        />
+      ) : (
+        <form className="entry" onSubmit={onSubmit}>
+          <input
+            ref={inputRef}
+            className="entry__input"
+            type="text"
+            value={field}
+            onChange={(event) => setField(event.target.value)}
+            placeholder="Type a word that rhymes…"
+            autoFocus
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            aria-label="Your rhyme"
+          />
+          <button className="entry__submit" type="submit">
+            Submit
+          </button>
+        </form>
+      )}
 
       {last && <Feedback key={`feedback-${seq}`} result={last} seed={session.seed} />}
       <FoundList session={session} />
+      {session.ended && <MissedList answers={missed.answers} bonus={missed.bonus} />}
 
       {/* Dev-only: dead-code-eliminated from the production build (#41). */}
       {import.meta.env.DEV && <FeedbackButton session={session} />}
@@ -158,6 +215,26 @@ function Seed({ session }: { session: Session }) {
   );
 }
 
+// --- Modal dialogs: the completion overlay (#49) and the give-up gate (#62) ----
+
+/**
+ * The reflex both dialogs in this shell share: move focus onto the way *out* as
+ * the dialog opens, and let Escape take it. Each names its own escape hatch —
+ * the completion overlay dismisses, the give-up gate cancels — but a modal that
+ * only one of them was keyboard-reachable from would be a bug in whichever
+ * missed it, so the behaviour lives in one place.
+ */
+function useDialogKeys(focusRef: React.RefObject<HTMLElement>, onEscape: () => void): void {
+  useEffect(() => {
+    focusRef.current?.focus();
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onEscape();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [focusRef, onEscape]);
+}
+
 // --- Puzzle-complete overlay (#49) ---------------------------------------------
 
 /**
@@ -181,15 +258,7 @@ function CompletionOverlay({
   onDismiss: () => void;
 }) {
   const primaryRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    primaryRef.current?.focus();
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onDismiss();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onDismiss]);
+  useDialogKeys(primaryRef, onDismiss);
 
   return (
     <div
@@ -223,6 +292,145 @@ function CompletionOverlay({
         </button>
       </div>
     </div>
+  );
+}
+
+// --- The Reveal: confirmation, ended notice, and the missed lists (#62) --------
+
+/**
+ * The give-up gate. A Reveal ends the Session and cannot be undone (CONTEXT.md),
+ * so it is never one click away: this modal asks first, and says what it costs —
+ * how many Answers are still out there to find. Cancelling touches nothing.
+ *
+ * "Keep playing" holds the focus, so Enter or Escape on a dialog the player did
+ * not mean to open backs out rather than ending their game.
+ */
+function GiveUpConfirm({
+  remaining,
+  onConfirm,
+  onCancel,
+}: {
+  remaining: number;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  useDialogKeys(cancelRef, onCancel);
+
+  return (
+    <div
+      className="complete-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="give-up-title"
+    >
+      <div className="complete-card">
+        <h2 id="give-up-title" className="complete-card__title">
+          🏳️ Give up and reveal?
+        </h2>
+        <p className="complete-card__body">
+          {remaining === 1
+            ? "There is still 1 Answer out there."
+            : `There are still ${remaining} Answers out there.`}{" "}
+          Revealing ends this Puzzle: your Score and Rank stop here, and you can’t
+          submit any more words.
+        </p>
+        <div className="give-up__actions">
+          <button
+            ref={cancelRef}
+            type="button"
+            className="complete-card__primary"
+            onClick={onCancel}
+          >
+            Keep playing
+          </button>
+          <button type="button" className="give-up__confirm" onClick={onConfirm}>
+            Reveal the Answers
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * What stands where the entry form was once the Session is over. `gaveUp` is read
+ * off the Reveal itself — Answers still missing means the player gave up; none
+ * means they had already finished and only asked for the Bonus Words, which is
+ * not giving up and should not be worded as if it were.
+ */
+function EndedNotice({
+  gaveUp,
+  score,
+  rankLabel,
+}: {
+  gaveUp: boolean;
+  score: number;
+  rankLabel: string;
+}) {
+  return (
+    <p className="ended" role="status" aria-live="polite">
+      <b className="ended__title">
+        {gaveUp ? "Session over — Answers revealed." : "Session over — everything revealed."}
+      </b>
+      <span className="ended__detail">
+        Final Score <b>{score}</b>, Rank <b>{rankLabel}</b>. Start a new Puzzle to play again.
+      </span>
+    </p>
+  );
+}
+
+/**
+ * The Reveal's two lists: the Answers the player never found and the Bonus Words
+ * they never reached, both straight from the engine's derivations and in the
+ * Puzzle's own order. They render *below* the found lists and styled as misses,
+ * so what the player got stays theirs and distinguishable. Each group drops
+ * itself when empty, so a Puzzle with no Bonus Words (or a player who collected
+ * them all) reveals with no hollow heading.
+ */
+function MissedList({ answers, bonus }: { answers: PuzzleEntry[]; bonus: PuzzleEntry[] }) {
+  return (
+    <div className="missed">
+      <MissedGroup title="Answers you missed" entries={answers} />
+      <MissedGroup title="Bonus Words you missed" entries={bonus} bonus />
+    </div>
+  );
+}
+
+/** One revealed group, or nothing at all when the player missed none of it. */
+function MissedGroup({
+  title,
+  entries,
+  bonus = false,
+}: {
+  title: string;
+  entries: PuzzleEntry[];
+  bonus?: boolean;
+}) {
+  if (entries.length === 0) return null;
+
+  return (
+    <section className="found__group" aria-label={title}>
+      <h2 className="found__title found__title--missed">
+        {title} <span className="found__count">{entries.length}</span>
+      </h2>
+      <ul className="found__list">
+        {entries.map((entry) => (
+          <li
+            key={entry.word}
+            className={`found__item found__item--missed${bonus ? " found__item--bonus-missed" : ""}`}
+          >
+            {/* The respelling shows why the word rhymed — the whole point of
+                seeing it, in a game adjudicated on sound (ADR-0001). */}
+            <span className="missed__word">
+              {bonus && "★ "}
+              {entry.word}
+            </span>
+            <span className="missed__respelling">“{entry.respelling}”</span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -393,7 +601,10 @@ function FoundList({ session }: { session: Session }) {
           Answers <span className="found__count">{foundAnswers.length}</span>
         </h2>
         {foundAnswers.length === 0 ? (
-          <p className="found__empty">No Answers yet — type one above.</p>
+          // Once the Session is over there is no entry control to point at.
+          <p className="found__empty">
+            {session.ended ? "You found no Answers this time." : "No Answers yet — type one above."}
+          </p>
         ) : (
           <ul className="found__list">
             {foundAnswers.map((word) => (
