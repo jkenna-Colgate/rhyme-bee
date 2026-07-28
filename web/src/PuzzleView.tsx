@@ -298,7 +298,6 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
     <p className="feedback feedback--bonus" role="status" aria-live="polite">
       <span className="feedback__badge">★ Bonus Word!</span>
       <b className="feedback__word">{word}</b>
-      <span className="feedback__note">a real word — celebrated, but not scored</span>
     </p>
   );
 }
