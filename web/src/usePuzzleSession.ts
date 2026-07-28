@@ -17,7 +17,11 @@ export interface PuzzleSession {
   session: Session;
   /** The transient "what just happened" of the most recent Submission. */
   last: SubmissionResult | null;
-  /** Increments per Submission, so the view can re-key a per-Submission flash. */
+  /**
+   * Increments per Submission, so the view can re-key its per-Submission
+   * flashes. Each gets its own prefix over this counter: they are siblings, and
+   * sharing a bare `seq` orphaned one of them out of React's tree (#60).
+   */
   seq: number;
   submit: (raw: string) => void;
   /** Start a fresh Puzzle on `seed`, clearing the found words, Score and Rank. */
