@@ -31,6 +31,10 @@ The unscored first-run Puzzle, seeded with `ate`. It exists to teach that the ga
 One player's play-through of a single Puzzle: the words they have found, and the Score, Rank and progress derived from them. The Puzzle is the shared content of the day; the Session is one person's engagement with it, and it resets each day.
 _Avoid_: Game (the whole product is "the game", and one day's game is the Puzzle), playthrough, run
 
+**Reveal**:
+The end-of-game disclosure of what the player never found — the missed Answers, and the Bonus Words they never reached. It is a **give-up gate, not a peek**: taking the Reveal ends the Session, which is what keeps the Score and Rank it freezes honest. A Reveal a player could take mid-Puzzle and then carry on from would quietly empty Rank of meaning, since the remaining Answers would be there for the copying. Helping a player who is stuck *keep playing* is not the Reveal's job and belongs to the hint system; the two are deliberately separate mechanics.
+_Avoid_: Hint (a hint helps you keep playing, a Reveal ends the play), "show answers" as something available mid-Puzzle
+
 **Submission**:
 A word the player enters as an attempted rhyme for the Seed Word. Each Submission resolves to an Answer, a Bonus Word, or a rejection. The Seed Word itself and any word already accepted this Puzzle are rejected.
 
