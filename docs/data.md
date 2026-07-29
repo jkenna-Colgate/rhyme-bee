@@ -7,9 +7,9 @@ and the runtime loads that artifact with no network call.
 
 ```
 data/            (uncommitted)         dist-data/         (uncommitted)
-  cmudict.dict   pronunciations   ->     index.json         the built index
-  words.txt      wordhood gate    ->     dropped-report.json why each word dropped
-  names.txt      proper nouns
+  cmudict.dict   pronunciations          index.json          the built index
+  words.txt      wordhood gate      ->   dropped-report.json why each word dropped
+  names.txt      proper nouns            derived-report.json what gained a reading
   prevalence.csv knownness
   sources.json   pinned versions
   supplement.dict human overrides  (committed — see below)
@@ -30,15 +30,24 @@ stage means choosing a position in this list and saying why:
 | # | Stage | Code | What it asserts |
 |---|---|---|---|
 | 1 | Committed supplement | `src/supplement.ts` | *readings* — hand-authored adds and stress corrections (ADR-0009) |
-| 2 | Coverage derivation | — *not built yet* | *readings* — derived for well-known words CMUdict has none for |
+| 2 | Coverage derivation | `src/coverage.ts` | *readings* — composed from a known stem, for well-known words CMUdict has none for |
 | 3 | Normalisation | `src/normalise.ts` | the *accent* — contrasts a General American listener cannot hear are erased (ADR-0010) |
 
 Normalisation runs **last** because the stages before it assert readings while it
 asserts the accent those readings are spoken in. A hand-authored correction is
 therefore an input to the accent specification, never an exemption from it, and
-the same is true of a derived reading when stage 2 lands. Normalisation also runs
-**before any Rhyme Key is computed**, so a verdict and the respelling shown
-beside it are derived from the same reading and cannot disagree.
+so is a derived reading. Normalisation also runs **before any Rhyme Key is
+computed**, so a verdict and the respelling shown beside it are derived from the
+same reading and cannot disagree.
+
+Stage 2 runs after stage 1 so a hand-authored reading always beats a composed
+one, and it **never grants wordhood** — only stage 1 can introduce a word. Its
+affix inventory (`src/affixes.ts`) is plain configured data, so widening
+coverage is a data change; its candidate set is bounded to words that are in the
+prevalence norms, already carry wordhood, are not names, and have no reading
+yet. It is a single pass, so a derived reading is never itself a stem in the
+same build. Everything it produced is listed in `derived-report.json`, with the
+stem and the rule, so over-generation is visible.
 
 Nothing downstream of stage 3 knows the stages exist: Rhyme Key computation,
 respelling, tiering, Puzzle building, adjudication and curation all receive
