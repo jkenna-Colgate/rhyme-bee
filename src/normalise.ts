@@ -102,7 +102,7 @@ function mergeCotCaught(reading: Pronunciation): Pronunciation {
 
 /** The schwa, and the sonorants that can carry a syllable without one. */
 const SCHWA = "AH";
-const SYLLABIC_CONSONANTS = new Set(["L", "N", "M"]);
+const SYLLABIFIABLE_SONORANTS = new Set(["L", "N", "M"]);
 
 /**
  * Rule 2 — the syllabic consonant, the optional schwa before a final sonorant.
@@ -126,17 +126,31 @@ const SYLLABIC_CONSONANTS = new Set(["L", "N", "M"]);
  * Three limits keep the claim honest, and each is the difference between a
  * contrast nobody can hear and one everybody can:
  *
- *   - **Only a schwa.** `AH0` alone, never a full unstressed vowel. `crayon`
- *     (`K R EY1 AA0 N`) does not become `crane`.
+ *   - **Only a schwa.** `AH0` alone. A full unstressed vowel is not reducible,
+ *     so `crayon` (`K R EY1 AA0 N`) does not become `crane`. `ER0` is left out
+ *     too, though it is reduced: it is *already* a syllabic consonant, and
+ *     dropping it would turn `modern` into `M AA1 D N`. `IH0` is left out on the
+ *     evidence discipline ADR-0010 applies throughout — no complaint turns on
+ *     it, and admissibility is a floor, not a mandate.
  *   - **Only unstressed.** A stressed vowel is what a Rhyme Key hangs from, so
  *     dropping one would not restate a word's sound, it would erase it.
- *   - **Only word-finally.** The schwa in `chocolate` sits mid-word before an
- *     `L`; dropping it is a claim about a different speech habit, and this rule
- *     does not make it. That keeps the `-ate` guardrails untouched — none of
- *     them ends in a sonorant, so none of them is reachable from here.
+ *   - **Only at the very end of the reading.** The schwa in `chocolate` sits
+ *     mid-word before an `L`, and dropping *that* is a claim about a different
+ *     speech habit this rule does not make — which is what keeps the `-ate`
+ *     guardrails out of reach, since none of them ends in a sonorant. The same
+ *     limit costs the rule the inflections: `gruels` (`G R UW1 AH0 L Z`) keeps
+ *     its schwa, because no complaint asks for it yet and every phoneme past
+ *     the sonorant is a fresh claim about what stays audible.
  *
- * A word with a droppable schwa therefore ends up with two Rhyme Keys and reads
- * as ambiguous, which bars it from being a Seed Word without an explicit key.
+ * The shape it fires on is any vowel, then the schwa, then the sonorant — so it
+ * reaches `lion` (`L AY1 AH0 N`) exactly as it reaches `gruel`, and `lion` gains
+ * a reading that rhymes with `line`. That is the widest the perceptual claim
+ * goes, and it is stated here rather than hidden: a reviewer who thinks `lion`
+ * is audibly two syllables where `gruel` is not is challenging the claim, which
+ * is the argument worth having.
+ *
+ * A word with a droppable schwa ends up with two Rhyme Keys and so reads as
+ * ambiguous, which bars it from being a Seed Word without an explicit key.
  * Accepted: the affected words are ones the game was previously getting wrong as
  * Submissions, and Seed Words are curated by hand anyway (ADR-0004).
  */
@@ -150,7 +164,7 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
   const sonorant = reading.at(-1);
   const schwa = reading.at(-2);
   if (sonorant === undefined || schwa === undefined) return [];
-  if (!SYLLABIC_CONSONANTS.has(sonorant)) return [];
+  if (!SYLLABIFIABLE_SONORANTS.has(sonorant)) return [];
   if (bareSound(schwa) !== SCHWA || stressOf(schwa) !== 0) return [];
 
   // A variant with no stressed vowel left has no Rhyme Key, so it could never

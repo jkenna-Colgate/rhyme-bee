@@ -1,7 +1,8 @@
 /**
- * The syllabic-consonant rule of the normalisation stage (ADR-0010): the schwa
- * before a word-final `L`, `N` or `M` is optional in ordinary General American,
- * so a reading that carries it gains a second reading without it.
+ * The schwa before a word-final `L`, `N` or `M` is optional in ordinary General
+ * American — `gruel` is two syllables in the data and one out of most mouths —
+ * so normalisation gives a reading that carries it a second reading without it
+ * (ADR-0010).
  *
  * The rule *appends*, so it can only ever turn a rejection into an acceptance —
  * every reading the index had before is still there, still first. That is what
@@ -43,6 +44,20 @@ describe("a schwa before a word-final L, N or M", () => {
     applyNormalisation(data);
 
     expect(data.pronunciations.get("album")).toContainEqual(["AE1", "L", "B", "M"]);
+  });
+
+  it("reaches a schwa sitting after a vowel — the widest the claim goes", () => {
+    // `lion` has the same shape as `gruel`: vowel, schwa, sonorant. So it gains
+    // a reading that rhymes with `line`, and that is stated in the suite rather
+    // than left to be discovered. Narrowing the rule to exclude it would take
+    // `gruel` with it, since nothing distinguishes the two.
+    const data = target([["lion", [["L", "AY1", "AH0", "N"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("lion")).toEqual([
+      ["L", "AY1", "AH0", "N"],
+      ["L", "AY1", "N"],
+    ]);
   });
 
   it("appends variants after every base reading, in the order they arrived", () => {
