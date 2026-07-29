@@ -221,11 +221,14 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
 const REDUCED_VOWELS = new Set([SCHWA, "IH", "ER"]);
 
 /**
- * The codas that are only ever a regular inflection stuck on a vowel-final stem.
- * After a vowel the regular `-s` is voiced to `Z` and the regular `-ed` to `D`,
- * so a coda of exactly one of these is `arrow` + `s`, not a closed syllable.
+ * True for a coda that is only ever a regular inflection stuck on a vowel-final
+ * stem: after a vowel the regular `-s` is voiced to `Z` and the regular `-ed` to
+ * `D`, so a coda of exactly one of those is `arrow` + `s` rather than a closed
+ * syllable. Anything longer holds a consonant of the stem before the ending.
  */
-const INFLECTIONAL_CODAS = new Set(["Z", "D"]);
+function isLoneInflectionalCoda(coda: Pronunciation): boolean {
+  return coda.length === 1 && (coda[0] === "Z" || coda[0] === "D");
+}
 
 /**
  * Rule 3 — stress promotion, the full vowel in a closed final syllable.
@@ -244,8 +247,8 @@ const INFLECTIONAL_CODAS = new Set(["Z", "D"]);
  * not loosen the Rhyme rule — it repairs the reading the rule is applied to.
  *
  * Like the syllabic consonant this **appends**, and that is the whole of its
- * safety argument: the base reading survives, first and untouched, so the rule
- * can only turn a rejection into an acceptance.
+ * safety argument: the base reading survives, first and untouched, so no
+ * Submission the game used to accept is refused now.
  *
  * Three limits keep the claim honest. The first two are the substance of the
  * rule; the third was measured. Every figure below is over the playable lexicon
@@ -253,7 +256,10 @@ const INFLECTIONAL_CODAS = new Set(["Z", "D"]);
  * is not a name, after the supplement, coverage derivation and rules 1 and 2 —
  * and mean rhyme-family size is the size of the family the *average word* sees.
  * Reproduce by ablating a limit and rebuilding; the raw data is uncommitted
- * (ADR-0003), so this cannot be a test in the suite.
+ * (ADR-0003), so this cannot be a test in the suite. The figures are larger than
+ * the ones quoted in the originating issue (54.6 rising to 485.6), which were
+ * taken over a lexicon scoped before the supplement, coverage and rules 1 and 2;
+ * these are the ones the implementation reproduces.
  *
  *   - **Never a word-final vowel.** Promoting one yields a Rhyme Key of a single
  *     phoneme, and the `-y` ending admitted that way is a catastrophe: dropping
@@ -273,27 +279,36 @@ const INFLECTIONAL_CODAS = new Set(["Z", "D"]);
  *     537.8. It also leaves the hand-authored `bratwurst` correction
  *     (`ER0` -> `ER2`, ADR-0009) a deliberate judgement about one loanword rather
  *     than something this rule silently duplicates.
- *   - **Never a coda of one lone `Z` or `D`.** Measured, not reasoned. With the
- *     first two limits in place the rule still reached 1,719 words and got about
- *     945 of them wrong, and the errors sorted themselves by the coda: after a
- *     vowel the regular `-s` is always voiced to `Z` and the regular `-ed` always
- *     to `D`, so a lone one of those is an ending stuck on a word whose own final
- *     vowel *was* word-final. Inflection does not license stress. `arrow` is
- *     `AE1 R OW0`, so `arrows` must not rhyme with `nose`; without the limit the
- *     rule had `cities` rhyming with `bees` (652 words in that one key),
- *     `married` with `deed` (84) and `values` with `shoes` (19). A coda of two
- *     consonants is a consonant of the stem *before* the ending, so `modules`
- *     (`L Z`) is promoted where `arrows` (`Z`) is not.
+ *   - **Never a coda of one lone `Z` or `D`.** Measured, not reasoned, and the
+ *     only limit here whose claim is morphological rather than about the ear —
+ *     it does not say a contrast is inaudible, it says the first limit was
+ *     leaking. With the first two in place the rule still reached 1,719 words and
+ *     got about 945 of them wrong, and the errors sorted themselves by the coda:
+ *     after a vowel the regular `-s` is always voiced to `Z` and the regular
+ *     `-ed` always to `D`, so a lone one of those is an ending stuck on a word
+ *     whose own final vowel *was* word-final — the reduction position the first
+ *     limit refuses. Inflection does not license stress. `arrow` is `AE1 R OW0`,
+ *     so `arrows` must not rhyme with `nose`; without the limit the rule had
+ *     `cities` rhyming with `bees` (652 words in that one key), `married` with
+ *     `deed` (84) and `values` with `shoes` (19). A coda of two consonants holds
+ *     a consonant of the stem *before* the ending, so `modules` (`L Z`) is
+ *     promoted where `arrows` (`Z`) is not.
  *
  *     The limit is bought, not free. It excludes 991 words, and about 45 of them
- *     would have been right: the rule cannot tell `thyroid` from `married`
- *     without morphology it does not have, so `thyroid ~ void`, `victimize ~
- *     size`, `chloride ~ side` and `forehead ~ bed` stay refused.
+ *     would have been right: judged from the reading alone, `thyroid` and
+ *     `married` are the same shape, so `thyroid ~ void`, `victimize ~ size`,
+ *     `chloride ~ side` and `forehead ~ bed` stay refused. Deciding it properly
+ *     means asking whether the word *is* an inflection, which `inflectionalVariants`
+ *     in `src/inflections.ts` could answer — but a rule sees only readings, never
+ *     the word, and widening that signature is a change to a seam other work
+ *     builds on. Left as the follow-up it is.
  *
  * Together the three leave 729 words in the playable lexicon gaining a new Rhyme
  * Key across 211 keys, and mean rhyme-family size at 71.3 against a baseline of
- * 69.3 — the largest key grows by one member, from 872 to 873. No word gains its
- * *first* Rhyme Key, so the rule never invents a rhyme where the data had none.
+ * 69.3 — the largest key grows by one member, from 872 to 873. Measured, not
+ * enforced: no word in that lexicon gains its *first* Rhyme Key, because a
+ * reading with no stressed vowel at all is a function word whose final vowel is a
+ * schwa. The rule carries no guard for it, so a future reading could.
  * The bulk of the gain is `-ate` verbs and nouns joining `ate` (+61, `candidate`,
  * `phosphate`, `template`, `vibrate`), `-ule`/`-ual` joining `cool` (+42,
  * `module`, `schedule`, `ritual`), `-on` joining `on` (+35, `python`,
@@ -312,13 +327,17 @@ const INFLECTIONAL_CODAS = new Set(["Z", "D"]);
  *     `sucrose`, `duress` — so the data error is left visible.
  *   - Composed with the syllabic consonant, the rule reaches a few `-yman`
  *     compounds (`clergyman`, `ferryman`, `assemblyman`) and small closed sets
- *     like `dutiful ~ undutiful`. Each lands in a key of its own kind, so the
- *     effect is confined to words that were always near-rhymes of one another.
+ *     like `dutiful ~ undutiful`. Each lands in a key holding only words of its
+ *     own shape, so the effect is confined to words that already shared a family.
  *
- * A promoted word carries two Rhyme Keys and so reads as ambiguous, which bars it
- * from being a Seed Word without an explicit key. Accepted, on the same terms as
- * the syllabic consonant: the affected words are ones the game was getting wrong
- * as Submissions, and Seed Words are curated by hand (ADR-0004).
+ * Appending is monotone for *adjudication* and only for adjudication. Each of
+ * those 729 words now carries two Rhyme Keys, so it reads as ambiguous:
+ * `isAmbiguous` flips, `pinSeed` demands an explicit key where it used to infer
+ * one, and curation's `multiplePronunciations` flag lights up. That is a genuine
+ * reversal, not an addition. Accepted on the same terms as the syllabic
+ * consonant — the affected words are ones the game was getting wrong as
+ * Submissions, and Seed Words are curated by hand (ADR-0004) — but it is the part
+ * of this rule a caller can feel.
  */
 const stressPromotion: NormalisationRule = {
   name: "stress-promotion",
@@ -327,21 +346,21 @@ const stressPromotion: NormalisationRule = {
 
 /** The promoted reading of one reading, or none if its final vowel is not eligible. */
 function promotedVariantsOf(reading: Pronunciation): Pronunciation[] {
-  const at = lastVowelIndex(reading);
-  if (at === null) return [];
+  const vowelIndex = lastVowelIndex(reading);
+  if (vowelIndex === null) return [];
 
-  const vowel = reading[at]!;
+  const vowel = reading[vowelIndex]!;
   if (stressOf(vowel) !== 0) return [];
   if (REDUCED_VOWELS.has(bareSound(vowel))) return [];
 
   // A word-final vowel sits in the reduction position, and a lone `Z` or `D` is
   // an inflection rather than a closed syllable — see the limits above.
-  const coda = reading.slice(at + 1);
+  const coda = reading.slice(vowelIndex + 1);
   if (coda.length === 0) return [];
-  if (coda.length === 1 && INFLECTIONAL_CODAS.has(coda[0]!)) return [];
+  if (isLoneInflectionalCoda(coda)) return [];
 
   const variant = [...reading];
-  variant[at] = withStress(vowel, 2);
+  variant[vowelIndex] = withStress(vowel, 2);
   return [variant];
 }
 

@@ -45,11 +45,11 @@ export function withSound(phoneme: Phoneme, sound: Phoneme): Phoneme {
 /**
  * Swap a vowel's stress while keeping its sound: `withStress("UW0", 2)` is
  * `"UW2"`. The other counterpart to `bareSound` — `withSound` rewrites what a
- * phoneme sounds like, this rewrites how loudly it is said. A consonant carries
- * no stress digit and is returned untouched.
+ * phoneme sounds like, this rewrites how loudly it is said. Call it on a vowel:
+ * a consonant carries no stress digit, so stressing one is meaningless.
  */
 export function withStress(phoneme: Phoneme, stress: 0 | 1 | 2): Phoneme {
-  return isVowel(phoneme) ? bareSound(phoneme) + String(stress) : phoneme;
+  return bareSound(phoneme) + String(stress);
 }
 
 /**

@@ -7,19 +7,32 @@
  * The rule *appends*, so it can only ever turn a rejection into an acceptance —
  * every reading the index had before is still there, still first.
  *
- * These tests assert a reading or a verdict, never the rule's internals. The
- * limits pinned below were measured against the pinned dictionary, not reasoned;
- * the figures are in the rule's docblock in `src/normalise.ts`.
+ * These tests assert a reading or a verdict, never the rule's internals. Each
+ * limit pinned below is stated in full, with its measurement, in the rule's
+ * docblock in `src/normalise.ts` — that is where the figures live, so they cannot
+ * drift between two copies.
  */
 
 import { describe, expect, it } from "vitest";
 import { applyNormalisation } from "../normalise.ts";
 import { makeTestIndex } from "../__fixtures__/index.ts";
-import type { Pronunciation } from "../phonology.ts";
+import type { Pronunciation, RhymeKey } from "../phonology.ts";
+import type { RhymeIndex } from "../rhymeIndex.ts";
 import { isAccepted } from "../verdict.ts";
 
 function target(entries: [string, Pronunciation[]][] = []) {
   return { pronunciations: new Map(entries) };
+}
+
+/** Every Rhyme Key in an index, with the wordhood-valid words that share it. */
+function familiesOf(index: RhymeIndex): Map<RhymeKey, string[]> {
+  const families = new Map<RhymeKey, string[]>();
+  for (const [word] of index.wordhoodEntries()) {
+    for (const key of index.rhymeKeysOf(word)) {
+      families.set(key, [...(families.get(key) ?? []), word]);
+    }
+  }
+  return families;
 }
 
 describe("a final unstressed full vowel in a closed syllable", () => {
@@ -70,11 +83,9 @@ describe("a final unstressed full vowel in a closed syllable", () => {
 
 describe("a word-final vowel is never promoted", () => {
   // The load-bearing limit. Promoting a word-final vowel yields a Rhyme Key of a
-  // single phoneme, and admitting the `-y` ending that way was measured to take
-  // mean rhyme-family size in the playable lexicon from 69.3 to 348.2, with the
-  // bare key `IY` reaching 4,325 members — every `-y` word rhyming with every
-  // other. A closed final syllable is genuinely unreduced; a word-final
-  // unstressed vowel is the classic reduction position.
+  // single phoneme, and admitting the `-y` ending that way collapses every `-y`
+  // word into one family. A closed final syllable is genuinely unreduced; a
+  // word-final unstressed vowel is the classic reduction position.
 
   it("leaves `happy` alone, so it keeps a Rhyme Key of its own", () => {
     const data = target([["happy", [["HH", "AE1", "P", "IY0"]]]]);
@@ -105,6 +116,28 @@ describe("a word-final vowel is never promoted", () => {
       outcome: "rejected",
       reason: "does-not-rhyme",
     });
+  });
+
+  it("leaves no single-phoneme Rhyme Key in the index but the legitimate `AY`", () => {
+    // The regression that pins the blow-up. Its signature is a bare-vowel key
+    // swallowing a whole ending, so assert the shape directly: every
+    // single-phoneme key in the index, and who is in it.
+    const single = [...familiesOf(makeTestIndex())].filter(([key]) => !key.includes(" "));
+
+    expect(single.map(([key]) => key)).toEqual(["AY"]);
+    expect(single[0]?.[1].slice().sort()).toEqual(["buy", "eye", "high"]);
+  });
+
+  it("keeps every family far below the scale the unconstrained rule reached", () => {
+    // The scale half of the same claim: unconstrained, one key held most of the
+    // words in the lexicon. The fixture is small, so this is the loose guard and
+    // the single-phoneme assertion above is the sharp one — but a family that
+    // ever swallows a quarter of the words is the blow-up returning.
+    const families = familiesOf(makeTestIndex());
+    const largest = Math.max(...[...families.values()].map((m) => m.length));
+    const lexicon = new Set([...families.values()].flat()).size;
+
+    expect(largest / lexicon).toBeLessThan(0.25);
   });
 
   it("keeps the legitimate one-phoneme key `AY` shared by `high`, `buy` and `eye`", () => {
@@ -169,8 +202,8 @@ describe("a lone inflectional coda does not close a syllable", () => {
   // Measured, not reasoned. After a vowel the regular `-s` is always voiced to
   // `Z` and the regular `-ed` to `D`, so a lone one of those is an ending stuck
   // on a word whose own final vowel was word-final — the reduction position the
-  // rule refuses. Without the limit, 991 more words were promoted and about 945
-  // of them wrongly: `arrows ~ nose`, `cities ~ bees`, `married ~ deed`.
+  // rule refuses. Without the limit the rule had `arrows` rhyming with `nose`,
+  // `cities` with `bees` and `married` with `deed`.
 
   it("does not let `arrows` rhyme with `nose`", () => {
     const data = target([["arrows", [["AE1", "R", "OW0", "Z"]]]]);
