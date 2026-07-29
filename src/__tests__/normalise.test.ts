@@ -11,7 +11,7 @@
 import { describe, expect, it } from "vitest";
 import { applyNormalisation } from "../normalise.ts";
 import { applySupplement } from "../supplement.ts";
-import { buildTestIndex, makeTestData } from "../__fixtures__/index.ts";
+import { buildTestIndex, makeTestData, makeTestIndex } from "../__fixtures__/index.ts";
 import type { Pronunciation } from "../phonology.ts";
 import { isAccepted } from "../verdict.ts";
 
@@ -81,7 +81,7 @@ describe("applyNormalisation", () => {
 });
 
 describe("a normalised index adjudicates", () => {
-  const index = buildTestIndex(makeTestData());
+  const index = makeTestIndex();
   const docked = index.pinSeed("docked");
 
   it.each(["talked", "walked", "balked", "stalked", "hawked"])(
@@ -107,7 +107,7 @@ describe("a normalised index adjudicates", () => {
 });
 
 describe("a normalised respelling", () => {
-  const index = buildTestIndex(makeTestData());
+  const index = makeTestIndex();
   const docked = index.pinSeed("docked");
 
   it("shows the merged vowel, so an acceptance reads as a rhyme", () => {

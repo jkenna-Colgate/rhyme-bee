@@ -12,9 +12,9 @@
  *   - the `-ate` group guards ADR-0001. A full vowel versus an unstressed schwa
  *     is a contrast everybody hears; it is the case the Rhyme rule was built on
  *     and the lesson the Tutorial teaches. Nobody has ever complained about it.
- *   - the pre-rhotic group guards the cot–caught merger's one exclusion. 55% of
- *     `AO` tokens in the playable lexicon sit before `R`; merging them too takes
- *     the `far` family from 104 members to 236.
+ *   - the pre-rhotic group guards the cot–caught merger's one exclusion. Most
+ *     `AO` tokens in the playable lexicon sit before `R`, so merging them too
+ *     would roughly double the `far` family — ADR-0010 carries the measurement.
  *
  * A row here failing is not a broken test. It is a normalisation that has
  * overreached, and the rule goes, not the row.
@@ -48,7 +48,14 @@ const guardrails: Guardrail[] = [
 ];
 
 describe("normalisation guardrails", () => {
-  for (const { seed, submission, claim } of guardrails) {
+  // Each pair is asserted both ways round, as its own `it`, so a regression
+  // names the row that broke rather than the block it sits in.
+  const rows = guardrails.flatMap(({ seed, submission, claim }) => [
+    { seed, submission, claim },
+    { seed: submission, submission: seed, claim },
+  ]);
+
+  for (const { seed, submission, claim } of rows) {
     it(`${seed} + ${submission} -> does-not-rhyme (${claim})`, () => {
       expect(index.adjudicate(index.pinSeed(seed), submission)).toMatchObject({
         outcome: "rejected",
@@ -56,13 +63,4 @@ describe("normalisation guardrails", () => {
       });
     });
   }
-
-  it("holds in both directions — the guarded pairs are symmetric", () => {
-    for (const { seed, submission } of guardrails) {
-      expect(index.adjudicate(index.pinSeed(submission), seed)).toMatchObject({
-        outcome: "rejected",
-        reason: "does-not-rhyme",
-      });
-    }
-  });
 });

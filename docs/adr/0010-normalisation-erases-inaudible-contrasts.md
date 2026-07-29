@@ -20,7 +20,25 @@ That table, not this prose, is the enforcement mechanism. A rule that breaks a r
 
 **Append the merged reading as a variant rather than replacing it.** Rejected for a merge specifically. A variant makes every affected word an accidental homograph: `talked` would carry two Rhyme Keys, so `isAmbiguous` reports true and `pinSeed` demands disambiguation for hundreds of words that are not ambiguous at all. The base reading also stays first, so a Seed Word would still be spoken and respelled with the unmerged vowel. Appending remains the right shape for a normalisation that only *adds* a possible reading; a merge is a claim about which vowel is actually there.
 
-**Merge `AO` into `AA` everywhere, including before `R`.** Rejected on measurement. 55% of all `AO` tokens in the playable lexicon sit before `R` (2,556 of 4,636), so a blanket merge is mostly *not* the cot–caught merger at all. It takes the `far` family from 104 members to 236, admitting `for`, `car` and `jar` as rhymes for one another, and collapses `born`/`barn` and `cord`/`card` outright. Pre-lateral position is a different matter and is deliberately included — `ball` rhymes with `doll`.
+**Merge `AO` into `AA` everywhere, including before `R`.** Rejected on measurement (see below). 55% of all `AO` tokens in the playable lexicon sit before `R`, so a blanket merge is mostly *not* the cot–caught merger at all. It takes the `far` family from 104 members to 236, admitting `for`, `car` and `jar` as rhymes for one another, and collapses `born`/`barn` and `cord`/`card` outright. Pre-lateral position is a different matter and is deliberately included — `ball` rhymes with `doll`.
+
+### The measurement
+
+Over the playable lexicon — every surface form in `data/cmudict.dict` that passes the wordhood gate and is not a name, after the committed supplement — counting `AO` tokens across all readings:
+
+| | tokens | share |
+|---|---|---|
+| `AO` total | 4,636 | |
+| `AO` immediately before `R` | 2,556 | **55.1%** |
+
+And the `far` family (Rhyme Key `AA R`), built with `buildPuzzle`:
+
+| | members |
+|---|---|
+| with the pre-rhotic exclusion (shipped) | 104 |
+| blanket merge | 236 |
+
+Reproduce by parsing `data/cmudict.dict`, applying `applySupplement`, and counting phonemes where `bareSound(p) === "AO"` against those whose successor is `"R"`. The raw data is uncommitted (ADR-0003), so this cannot be a test in the suite; the shipped behaviour it justifies *is* tested, in `src/__tests__/normalisation-guardrails.test.ts`. The figures differ slightly from the ones quoted in the originating issue (57%, a 125-word family), which were derived over a differently-scoped lexicon; these are the ones the implementation reproduces.
 
 ## Consequences
 

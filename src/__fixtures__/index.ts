@@ -79,11 +79,16 @@ export function makeTestData(): RhymeIndexData {
 }
 
 /**
- * The tail of the real index build: normalise the readings (ADR-0010), then
- * construct. Tests go through here rather than calling `new RhymeIndex` so the
- * verdicts they assert are the verdicts `npm run build:index` would produce.
+ * The tail of the real index build: normalise the readings in place (ADR-0010),
+ * then construct. Tests go through here rather than calling `new RhymeIndex` so
+ * the verdicts they assert are the verdicts `npm run build:index` would produce.
+ * `data` is left normalised, so a caller that also needs the data — serialising
+ * it, say — sees what the build would have written.
  */
-export function buildTestIndex(data: RhymeIndexData): RhymeIndex {
+export function buildTestIndex(
+  data: RhymeIndexData,
+  knownnessThreshold: number = KNOWNNESS_THRESHOLD,
+): RhymeIndex {
   applyNormalisation(data);
-  return new RhymeIndex(data, { knownnessThreshold: KNOWNNESS_THRESHOLD });
+  return new RhymeIndex(data, { knownnessThreshold });
 }

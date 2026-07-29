@@ -8,11 +8,11 @@
 import { describe, expect, it } from "vitest";
 import { isAccepted } from "../verdict.ts";
 import {
+  buildTestIndex,
   KNOWNNESS_THRESHOLD,
   makeTestData,
   makeTestIndex,
 } from "../__fixtures__/index.ts";
-import { RhymeIndex } from "../rhymeIndex.ts";
 
 const index = makeTestIndex();
 const ate = index.pinSeed("ate");
@@ -54,9 +54,7 @@ describe("the knownness threshold is configuration, not a constant", () => {
     // collate scores 1.8. At the default threshold (1.0) it is an Answer; raise
     // the cutoff above it and the same word becomes a Bonus Word.
     expect(index.adjudicate(ate, "collate").outcome).toBe("answer");
-    const strict = new RhymeIndex(makeTestData(), {
-      knownnessThreshold: KNOWNNESS_THRESHOLD + 1.0,
-    });
+    const strict = buildTestIndex(makeTestData(), KNOWNNESS_THRESHOLD + 1.0);
     expect(strict.adjudicate(strict.pinSeed("ate"), "collate").outcome).toBe("bonus");
   });
 });
