@@ -16,7 +16,11 @@ Two words rhyme when they share a Rhyme Key. Spelling is irrelevant: `eight` rhy
 _Avoid_: Perfect rhyme, slant rhyme, near rhyme (this game has only one kind of rhyme)
 
 **General American**:
-The single accent the game adjudicates in. Rhyme is a property of a word pair *in an accent*, so the game commits to one and says so. Under any other accent some verdicts will be wrong, and that is an accepted cost.
+The single accent the game adjudicates in — specifically *merged* General American, which has the cot–caught merger, so `stalk` rhymes with `stock` and `ball` with `doll`. Rhyme is a property of a word pair *in an accent*, so the game commits to one and says so. Under any other accent some verdicts will be wrong, and that is an accepted cost. See [ADR-0002](./docs/adr/0002-general-american-is-the-only-accent.md).
+
+**Normalisation**:
+The build stage that erases contrasts a General American listener cannot hear, by rewriting pronunciations before any Rhyme Key is computed — so the game does not reject `talked` for `docked` over a difference nobody can resolve. It is *not* a loosening of the Rhyme rule, which is unchanged: it changes the reading, not the test. A normalisation is admissible only if the contrast it erases is genuinely inaudible and a committed guardrail set survives intact. See [ADR-0010](./docs/adr/0010-normalisation-erases-inaudible-contrasts.md).
+_Avoid_: Fuzzy matching, near rhyme, tolerance (all imply the rhyme test got looser — it did not)
 
 **Homophone**:
 A word that sounds identical to another but is spelled differently. Homophones of the Seed Word rhyme with it and count as valid.

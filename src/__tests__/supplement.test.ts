@@ -7,7 +7,7 @@
 import { describe, expect, it } from "vitest";
 import { applySupplement } from "../supplement.ts";
 import { RhymeIndex } from "../rhymeIndex.ts";
-import { makeTestData, KNOWNNESS_THRESHOLD } from "../__fixtures__/index.ts";
+import { buildTestIndex, makeTestData } from "../__fixtures__/index.ts";
 import type { Pronunciation } from "../phonology.ts";
 
 function target(overrides: {
@@ -67,7 +67,9 @@ describe("a supplemented index adjudicates", () => {
   function indexWith(supplement: string): RhymeIndex {
     const data = makeTestData();
     applySupplement(supplement, data);
-    return new RhymeIndex(data, { knownnessThreshold: KNOWNNESS_THRESHOLD });
+    // Through the build's tail, so these are the verdicts a real build produces
+    // — the supplement's readings reach the index via normalisation (ADR-0010).
+    return buildTestIndex(data);
   }
 
   it("accepts an added word, absent upstream, as a Bonus rhyme", () => {

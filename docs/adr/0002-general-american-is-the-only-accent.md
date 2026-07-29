@@ -10,6 +10,12 @@ Rhyme is not a property of a word pair; it is a property of a word pair **in an 
 
 There is no accent-neutral position available. "Correct" is a dialect chosen and imposed.
 
+## Which General American
+
+**Amended by [ADR-0010](./0010-normalisation-erases-inaudible-contrasts.md).** "General American" alone does not settle the cot–caught question above, and CMUdict does not settle it either — it records both vowels. The accent is therefore specified as **merged** General American: `AO` ≡ `AA` outside pre-rhotic position. `stock` rhymes with `stalk`, and `ball` with `doll`; before `R` the contrast survives, so `for` does not rhyme with `far`.
+
+This is a specification of *which* General American, not an override of the decision to have one. A player who does not have the merger will meet verdicts they disagree with — exactly the declared cost this ADR already accepts, now named rather than left to whichever vowel CMUdict happened to record.
+
 ## Considered Options
 
 **Accept anything that rhymes in any major accent.** Rejected. It sounds generous but means `bet` is a valid answer for `ate`, which to an American player is not generosity — it is evidence the game is broken. It also destroys any fixed answer count, and the shared, stable denominator is most of what makes a daily word game work.
