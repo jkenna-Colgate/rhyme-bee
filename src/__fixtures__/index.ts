@@ -38,6 +38,10 @@ const words = new Set<string>([
   // no-pronunciation verdict (a player hears it rhyming with `plates`, but the
   // engine has nothing to rhyme-test) — issue #28.
   "grates",
+  // Stress promotion (issue #73): `module` gains a promoted reading; the rest
+  // are what the rule must not reach — a word-final vowel and a lone
+  // inflectional coda.
+  "module", "happy", "smelly", "high", "buy", "eye", "arrows", "nose",
   // Coverage derivation (issue #76): both are real words with wordhood and a
   // prevalence score but no CMUdict reading, so the build composes one from a
   // stem it already reads — `docked` and `walked`. They sit in the `AA K T`
@@ -76,6 +80,9 @@ const prevalence = new Map<string, number>([
   // `crewel` is a kind of yarn almost nobody knows — a Bonus Word, so the
   // syllabic variant is exercised on both sides of the knownness threshold.
   ["crewel", 0.4], ["renewal", 2.3], ["crane", 2.4], ["crayon", 2.4],
+  // Stress promotion (issue #73), all common enough to tier as Answers.
+  ["module", 2.3], ["happy", 2.5], ["smelly", 2.2],
+  ["high", 2.5], ["buy", 2.5], ["eye", 2.5], ["arrows", 2.4], ["nose", 2.5],
 ]);
 
 export const KNOWNNESS_THRESHOLD = 1.0;
