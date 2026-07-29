@@ -13,6 +13,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../src/cmudict.ts";
+import { applyNormalisation } from "../src/normalise.ts";
 import { parsePrevalenceCsv, parseWordList } from "../src/pipeline.ts";
 import { serialise } from "../src/serialise.ts";
 import { applySupplement } from "../src/supplement.ts";
@@ -42,6 +43,12 @@ const prevalence = parsePrevalenceCsv(read("prevalence.csv"));
 // inputs: it adds missing words (with a reading) and corrects mis-marked stress,
 // and — unlike everything else in data/ — it survives this rebuild.
 applySupplement(read("supplement.dict"), { pronunciations, words, names });
+
+// The accent specification (ADR-0010), applied to every reading before any Rhyme
+// Key is computed. It runs *after* the supplement so a hand-authored reading is
+// an input to the accent rather than an exemption from it; Tier 1 coverage
+// derivation, when it lands, inserts between the two. See src/normalise.ts.
+applyNormalisation({ pronunciations });
 
 const data: RhymeIndexData = { pronunciations, words, names, prevalence };
 

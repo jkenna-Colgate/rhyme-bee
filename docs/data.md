@@ -21,6 +21,29 @@ the pinned inputs, so its adds and stress corrections survive the rebuild.
 
 Build with `npm run build:index`, then `npm run histogram` to answer ADR-0004.
 
+## Build stages
+
+The pinned inputs pass through an ordered sequence of stages before the index is
+constructed. The **order is a contract**, not an implementation detail — adding a
+stage means choosing a position in this list and saying why:
+
+| # | Stage | Code | What it asserts |
+|---|---|---|---|
+| 1 | Committed supplement | `src/supplement.ts` | *readings* — hand-authored adds and stress corrections (ADR-0009) |
+| 2 | Coverage derivation | — *not built yet* | *readings* — derived for well-known words CMUdict has none for |
+| 3 | Normalisation | `src/normalise.ts` | the *accent* — contrasts a General American listener cannot hear are erased (ADR-0010) |
+
+Normalisation runs **last** because the stages before it assert readings while it
+asserts the accent those readings are spoken in. A hand-authored correction is
+therefore an input to the accent specification, never an exemption from it, and
+the same is true of a derived reading when stage 2 lands. Normalisation also runs
+**before any Rhyme Key is computed**, so a verdict and the respelling shown
+beside it are derived from the same reading and cannot disagree.
+
+Nothing downstream of stage 3 knows the stages exist: Rhyme Key computation,
+respelling, tiering, Puzzle building, adjudication and curation all receive
+ordinary pronunciations.
+
 ## Inputs
 
 | File | Format | Purpose |

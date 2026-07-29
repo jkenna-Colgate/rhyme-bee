@@ -34,6 +34,15 @@ export function bareSound(phoneme: Phoneme): Phoneme {
 }
 
 /**
+ * Swap a phoneme's sound while keeping its stress: `withSound("AO1", "AA")` is
+ * `"AA1"`. The counterpart to `bareSound` — one reads the sound off, this writes
+ * a new one back without disturbing what the stress digit locates.
+ */
+export function withSound(phoneme: Phoneme, sound: Phoneme): Phoneme {
+  return sound + (phoneme.match(/[0-2]$/)?.[0] ?? "");
+}
+
+/**
  * The Rhyme Key of a single pronunciation: scan back to the last vowel marked
  * primary or secondary, then take every phoneme from there to the end with
  * stress digits removed. Returns null if the pronunciation has no stressed

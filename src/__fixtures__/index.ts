@@ -7,6 +7,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../cmudict.ts";
+import { applyNormalisation } from "../normalise.ts";
 import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
 
 const cmudictText = readFileSync(
@@ -19,6 +20,12 @@ const words = new Set<string>([
   "ate", "eight", "late", "collate", "impregnate", "adjudicate",
   "defenestrate", "objurgate", "chocolate", "commensurate", "hat",
   "read", "bed", "tear", "beer", "care", "gate", "gates", "plates",
+  // The `-ate` guardrails: `chocolate` and `commensurate` above, plus the rest
+  // of the set ADR-0001 rejected "final syllable, stress ignored" over.
+  "private", "climate", "senate", "accurate",
+  // The cot-caught merger and its pre-rhotic exclusion (ADR-0010).
+  "docked", "talked", "walked", "balked", "stalked", "hawked",
+  "ball", "doll", "for", "far", "born", "barn", "cord", "card",
   // `sate` is a real word we deliberately leave out of the prevalence data,
   // to exercise the absent-from-knownness -> Bonus default (ADR-0003).
   "sate",
@@ -44,20 +51,24 @@ const prevalence = new Map<string, number>([
   ["objurgate", 0.2], ["chocolate", 2.5], ["commensurate", 1.2],
   ["hat", 2.5], ["read", 2.5], ["bed", 2.5], ["tear", 2.5],
   ["beer", 2.5], ["care", 2.5], ["gate", 2.4], ["plates", 2.4],
+  ["private", 2.5], ["climate", 2.5], ["senate", 2.4], ["accurate", 2.4],
+  ["docked", 2.0], ["talked", 2.5], ["walked", 2.5], ["balked", 1.6],
+  ["stalked", 1.9], ["hawked", 1.5], ["ball", 2.5], ["doll", 2.4],
+  ["for", 2.5], ["far", 2.5], ["born", 2.5], ["barn", 2.4],
+  ["cord", 2.4], ["card", 2.5],
 ]);
 
 export const KNOWNNESS_THRESHOLD = 1.0;
 
 export function makeTestIndex(): RhymeIndex {
-  const data: RhymeIndexData = {
-    pronunciations: parseCmudict(cmudictText),
-    words,
-    names,
-    prevalence,
-  };
-  return new RhymeIndex(data, { knownnessThreshold: KNOWNNESS_THRESHOLD });
+  return buildTestIndex(makeTestData());
 }
 
+/**
+ * The raw inputs, as the index build sees them before any stage has run — the
+ * fixture's stand-in for the pinned upstream files. A test that exercises a
+ * build stage starts here, applies the stage, then calls `buildTestIndex`.
+ */
 export function makeTestData(): RhymeIndexData {
   return {
     pronunciations: parseCmudict(cmudictText),
@@ -65,4 +76,19 @@ export function makeTestData(): RhymeIndexData {
     names,
     prevalence,
   };
+}
+
+/**
+ * The tail of the real index build: normalise the readings in place (ADR-0010),
+ * then construct. Tests go through here rather than calling `new RhymeIndex` so
+ * the verdicts they assert are the verdicts `npm run build:index` would produce.
+ * `data` is left normalised, so a caller that also needs the data — serialising
+ * it, say — sees what the build would have written.
+ */
+export function buildTestIndex(
+  data: RhymeIndexData,
+  knownnessThreshold: number = KNOWNNESS_THRESHOLD,
+): RhymeIndex {
+  applyNormalisation(data);
+  return new RhymeIndex(data, { knownnessThreshold });
 }

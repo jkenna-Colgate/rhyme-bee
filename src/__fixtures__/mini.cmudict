@@ -1,6 +1,6 @@
 ;;; Mini CMUdict fixture. Same format as the real dictionary (BSD-2-Clause):
 ;;; WORD  P1 P2 P3, two spaces before the phonemes; WORD(n) for alternates.
-;;; Every entry here backs a row in the verdict table.
+;;; Every entry here backs a row in the verdict table or the guardrail table.
 ATE  EY1 T
 EIGHT  EY1 T
 LATE  L EY1 T
@@ -24,3 +24,26 @@ KATE  K EY1 T
 GATE  G EY1 T
 GATES  G EY1 T S
 PLATES  P L EY1 T S
+;;; The `-ate` guardrails: an unstressed schwa in the final syllable, which no
+;;; normalisation may erase (see docs/adr/0010, and CHOCOLATE/COMMENSURATE above).
+PRIVATE  P R AY1 V AH0 T
+CLIMATE  K L AY1 M AH0 T
+SENATE  S EH1 N AH0 T
+ACCURATE  AE1 K Y ER0 AH0 T
+;;; The cot-caught merger: AO words that must join their AA counterparts.
+DOCKED  D AA1 K T
+TALKED  T AO1 K T
+WALKED  W AO1 K T
+BALKED  B AO1 K T
+STALKED  S T AO1 K T
+HAWKED  HH AO1 K T
+;;; Pre-lateral position is merged too — `ball` rhymes with `doll`.
+BALL  B AO1 L
+DOLL  D AA1 L
+;;; Pre-rhotic position is not merged. These three pairs are the guardrail.
+FOR  F AO1 R
+FAR  F AA1 R
+BORN  B AO1 R N
+BARN  B AA1 R N
+CORD  K AO1 R D
+CARD  K AA1 R D

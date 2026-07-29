@@ -20,3 +20,13 @@ There is no accent-neutral position available. "Correct" is a dialect chosen and
 
 - The Seed Word is **spoken aloud** before play begins. This is load-bearing, not a convenience: it establishes the canonical pronunciation up front instead of letting the player discover it through an unjust-feeling rejection, and it tells a non-American player immediately which accent they are playing in.
 - Accent-unstable words make poor Seed Words and should be avoided when curating. `ate` is retained as the tutorial seed regardless, on the strength of playtesting.
+
+## Amendment (2026-07-29): which General American
+
+**The accent is specified as _merged_ General American: `AO` ≡ `AA` outside pre-rhotic position.** Added by [ADR-0010](./0010-normalisation-erases-inaudible-contrasts.md).
+
+The cot–caught bullet above names the merger as a thing that "decides whether `stock` rhymes with `stalk`" — and then leaves it undecided. CMUdict does not decide it either: it records both vowels, so reading it literally means the game's answer to `stock`/`stalk` is whatever a lexicographer happened to type. That is not an accent; it is the absence of one.
+
+So: `stock` rhymes with `stalk`, and `ball` with `doll`. Before `R` the contrast survives, so `for` does not rhyme with `far`, nor `born` with `barn`.
+
+This is a specification of *which* General American, **not an override of the decision to have one**. Everything above stands. A player without the merger will meet verdicts they disagree with — exactly the cost this ADR already accepts, now named rather than left to the data.
