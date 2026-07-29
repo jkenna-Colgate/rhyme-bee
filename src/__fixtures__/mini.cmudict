@@ -47,3 +47,15 @@ BORN  B AO1 R N
 BARN  B AA1 R N
 CORD  K AO1 R D
 CARD  K AA1 R D
+;;; Syllabic consonants: the schwa before a word-final L/N/M is optional in
+;;; ordinary speech, so `gruel` is heard as a rhyme for `cool` (ADR-0010).
+COOL  K UW1 L
+POOL  P UW1 L
+GRUEL  G R UW1 AH0 L
+DUEL  D UW1 AH0 L
+CREWEL  K R UW1 AH0 L
+RENEWAL  R IH0 N UW1 AH0 L
+;;; A full unstressed vowel is not a schwa and is never dropped: `crayon` must
+;;; not become `crane`.
+CRANE  K R EY1 N
+CRAYON  K R EY1 AA0 N

@@ -41,7 +41,14 @@
  * a decision recorded with the rule.
  */
 
-import { bareSound, withSound, type Pronunciation } from "./phonology.ts";
+import {
+  bareSound,
+  isVowel,
+  rhymeKeyOf,
+  stressOf,
+  withSound,
+  type Pronunciation,
+} from "./phonology.ts";
 
 /**
  * The part of the index build's data this stage touches — the same
@@ -94,8 +101,118 @@ function mergeCotCaught(reading: Pronunciation): Pronunciation {
   );
 }
 
+/** The schwa, and the sonorants that can carry a syllable without one. */
+const SCHWA = "AH";
+const SYLLABIFIABLE_SONORANTS = new Set(["L", "N", "M"]);
+
+/** After a vowel, the one sonorant that absorbs the schwa. */
+const VOWEL_ABSORBING_SONORANT = "L";
+
+/** The one vowel that keeps its own syllable in front of the schwa. */
+const UNABSORBING_VOWEL = "IY";
+
+/**
+ * Rule 2 — the syllabic consonant, the optional schwa before a final sonorant.
+ *
+ * A reading ending in an unstressed schwa followed by `L`, `N` or `M` gains a
+ * second reading with the schwa gone and the consonant left syllabic. `gruel` is
+ * `G R UW1 AH0 L` in the data and `G R UW1 L` out of most mouths; the two are
+ * the same utterance at different speech rates, and a listener asked which one
+ * they just heard cannot answer. The data picks one and the ear hears both, so
+ * the game must read both — otherwise `gruel`, `duel`, `crewel` and `renewal`
+ * are all refused for a Seed Word on `UW L`, which is four of the twelve queued
+ * complaints this layer closes.
+ *
+ * This **appends** rather than replaces, and that is the whole of its safety
+ * argument: the base reading survives, first and untouched, so the rule can only
+ * turn a rejection into an acceptance. Unlike the merge, neither reading is
+ * wrong — a two-syllable `gruel` is as real as a one-syllable one — so there is
+ * no single reading to collapse to, and a Seed Word is still spoken and
+ * respelled in the reading the data asserts.
+ *
+ * Four limits keep the claim honest, and each is the difference between a
+ * contrast nobody can hear and one everybody can:
+ *
+ *   - **Only a schwa.** `AH0` alone. A full unstressed vowel is not reducible,
+ *     so `crayon` (`K R EY1 AA0 N`) does not become `crane`. `ER0` is left out
+ *     too, though it is reduced: it is *already* a syllabic consonant, and
+ *     dropping it would turn `modern` into `M AA1 D N`. `IH0` is left out on the
+ *     evidence discipline ADR-0010 applies throughout — no complaint turns on
+ *     it, and admissibility is a floor, not a mandate.
+ *   - **Only unstressed.** A stressed vowel is what a Rhyme Key hangs from, so
+ *     dropping one would not restate a word's sound, it would erase it.
+ *   - **Only at the very end of the reading.** The schwa in `chocolate` sits
+ *     mid-word before an `L`, and dropping *that* is a claim about a different
+ *     speech habit this rule does not make — which is what keeps the `-ate`
+ *     guardrails out of reach, since none of them ends in a sonorant. The same
+ *     limit costs the rule the inflections: `gruels` (`G R UW1 AH0 L Z`) keeps
+ *     its schwa, because no complaint asks for it yet and every phoneme past
+ *     the sonorant is a fresh claim about what stays audible.
+ *   - **After a vowel, only `L`, and never after `IY`.** This limit was
+ *     measured rather than reasoned. Unconstrained, the rule reached 99 words
+ *     in the playable lexicon and got roughly half of them wrong, and the
+ *     errors sorted themselves cleanly by what sits either side of the schwa.
+ *
+ *     A *consonant* before the schwa stays in the Rhyme Key and keeps it
+ *     distinctive: `button` becomes `B AH1 T N`, key `AH T N`, which still
+ *     picks out `mutton` and `glutton`. That is the textbook syllabic
+ *     consonant and it is safe for all three sonorants.
+ *
+ *     A *vowel* before the schwa leaves a key just two phonemes long, so the
+ *     word lands in whatever large family already owns it — and there the
+ *     sonorant decides. `L` genuinely absorbs a preceding schwa: `cruel` is
+ *     `/kruːl/`, `towel` `/taʊl/`, `trial` `/traɪl/`, `royal` `/rɔɪl/`. The
+ *     nasals do not, which is why the unconstrained rule had `ruin` rhyming
+ *     with `moon`, `urine` with `burn`, `protozoan` with `bone` and
+ *     `jeroboam` with `home`. All 18 such words were wrong; all 33 in `L`
+ *     were right.
+ *
+ *     `IY` is then excluded even before `L`, because unlike the offglide
+ *     vowels it is a full front vowel holding its own syllable, and the schwa
+ *     after it survives into casual speech: `museum` would otherwise rhyme
+ *     with `dream`, `librarian` with `green`, `serial` with `feel`.
+ *
+ * Together those limits leave 35 words in the playable lexicon gaining a new
+ * Rhyme Key, down from 99. The widest the perceptual claim now goes is `trial`
+ * rhyming with `mile` and `betrayal` with `pale` — stated here rather than
+ * hidden, so a reviewer who hears two syllables where this rule hears one is
+ * challenging the claim, which is the argument worth having. `lion` is *not*
+ * reached: it is a nasal after a vowel, so the schwa stays.
+ *
+ * A word with a droppable schwa ends up with two Rhyme Keys and so reads as
+ * ambiguous, which bars it from being a Seed Word without an explicit key.
+ * Accepted: the affected words are ones the game was previously getting wrong as
+ * Submissions, and Seed Words are curated by hand anyway (ADR-0004).
+ */
+const syllabicConsonant: NormalisationRule = {
+  name: "syllabic-consonant",
+  apply: (readings) => [...readings, ...readings.flatMap(syllabicVariantsOf)],
+};
+
+/** The syllabic reading of one reading, or none if the schwa is not droppable. */
+function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
+  const sonorant = reading.at(-1);
+  const schwa = reading.at(-2);
+  if (sonorant === undefined || schwa === undefined) return [];
+  if (!SYLLABIFIABLE_SONORANTS.has(sonorant)) return [];
+  if (bareSound(schwa) !== SCHWA || stressOf(schwa) !== 0) return [];
+
+  // After a vowel, only `L` absorbs the schwa, and not even `L` after `IY`.
+  // After a consonant every sonorant does — see the fourth limit above.
+  const preceding = reading.at(-3);
+  if (preceding !== undefined && isVowel(preceding)) {
+    if (sonorant !== VOWEL_ABSORBING_SONORANT) return [];
+    if (bareSound(preceding) === UNABSORBING_VOWEL) return [];
+  }
+
+  // A variant with no stressed vowel left has no Rhyme Key, so it could never
+  // match anything — carrying it would only bloat the index.
+  const variant = [...reading.slice(0, -2), sonorant];
+  return rhymeKeyOf(variant) === null ? [] : [variant];
+}
+
 /** Every rule, in application order. Dropping one here disables it wholesale. */
-const RULES: readonly NormalisationRule[] = [cotCaughtMerger];
+const RULES: readonly NormalisationRule[] = [cotCaughtMerger, syllabicConsonant];
 
 /**
  * The readings of one word, after every rule. Duplicates are collapsed: a rule
