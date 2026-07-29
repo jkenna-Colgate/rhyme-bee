@@ -104,6 +104,9 @@ function mergeCotCaught(reading: Pronunciation): Pronunciation {
 const SCHWA = "AH";
 const SYLLABIFIABLE_SONORANTS = new Set(["L", "N", "M"]);
 
+/** The one vowel that keeps its own syllable in front of the schwa. */
+const UNABSORBING_VOWEL = "IY";
+
 /**
  * Rule 2 — the syllabic consonant, the optional schwa before a final sonorant.
  *
@@ -123,7 +126,7 @@ const SYLLABIFIABLE_SONORANTS = new Set(["L", "N", "M"]);
  * no single reading to collapse to, and a Seed Word is still spoken and
  * respelled in the reading the data asserts.
  *
- * Three limits keep the claim honest, and each is the difference between a
+ * Four limits keep the claim honest, and each is the difference between a
  * contrast nobody can hear and one everybody can:
  *
  *   - **Only a schwa.** `AH0` alone. A full unstressed vowel is not reducible,
@@ -141,13 +144,23 @@ const SYLLABIFIABLE_SONORANTS = new Set(["L", "N", "M"]);
  *     limit costs the rule the inflections: `gruels` (`G R UW1 AH0 L Z`) keeps
  *     its schwa, because no complaint asks for it yet and every phoneme past
  *     the sonorant is a fresh claim about what stays audible.
+ *   - **Never after `IY`.** This is the limit measured rather than reasoned:
+ *     without it the rule reaches 99 words in the playable lexicon and gets
+ *     roughly half of them wrong, every error sitting behind `IY`. `museum`
+ *     would rhyme with `dream`, `librarian` and `european` with `green`,
+ *     `serial` with `feel`. The other vowels that reach the schwa end in an
+ *     offglide that absorbs it — `gruel` is `/gruːl/`, `towel` is `/taʊl/`,
+ *     `trial` is `/traɪl/` — but `/iː/` is already a full front vowel holding
+ *     its own syllable, and the schwa after it stays a syllable of its own in
+ *     careless speech as much as in careful. So the contrast survives, and a
+ *     rule that erases it is erasing something audible.
  *
- * The shape it fires on is any vowel, then the schwa, then the sonorant — so it
- * reaches `lion` (`L AY1 AH0 N`) exactly as it reaches `gruel`, and `lion` gains
- * a reading that rhymes with `line`. That is the widest the perceptual claim
- * goes, and it is stated here rather than hidden: a reviewer who thinks `lion`
- * is audibly two syllables where `gruel` is not is challenging the claim, which
- * is the argument worth having.
+ * The shape it fires on is otherwise any vowel, then the schwa, then the
+ * sonorant — so it reaches `lion` (`L AY1 AH0 N`) exactly as it reaches `gruel`,
+ * and `lion` gains a reading that rhymes with `line`. That is the widest the
+ * perceptual claim goes, and it is stated here rather than hidden: a reviewer
+ * who thinks `lion` is audibly two syllables where `gruel` is not is challenging
+ * the claim, which is the argument worth having.
  *
  * A word with a droppable schwa ends up with two Rhyme Keys and so reads as
  * ambiguous, which bars it from being a Seed Word without an explicit key.
@@ -166,6 +179,11 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
   if (sonorant === undefined || schwa === undefined) return [];
   if (!SYLLABIFIABLE_SONORANTS.has(sonorant)) return [];
   if (bareSound(schwa) !== SCHWA || stressOf(schwa) !== 0) return [];
+
+  // `IY` holds its own syllable, so the schwa after it is genuinely audible.
+  const preceding = reading.at(-3);
+  if (preceding !== undefined && bareSound(preceding) === UNABSORBING_VOWEL)
+    return [];
 
   // A variant with no stressed vowel left has no Rhyme Key, so it could never
   // match anything — carrying it would only bloat the index.

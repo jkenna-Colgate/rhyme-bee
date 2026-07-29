@@ -186,3 +186,63 @@ describe("a full vowel still separates two words", () => {
     });
   });
 });
+
+describe("`IY` keeps its own syllable", () => {
+  // Measured, not reasoned: without this limit the rule reached 99 words in the
+  // playable lexicon and got roughly half of them wrong, every error behind
+  // `IY`. The other vowels that reach the schwa end in an offglide that absorbs
+  // it; `/iː/` does not, so the schwa after it stays audible.
+
+  it("does not let `museum` rhyme with `dream`", () => {
+    const data = target([["museum", [["M", "Y", "UW0", "Z", "IY1", "AH0", "M"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("museum")).toEqual([
+      ["M", "Y", "UW0", "Z", "IY1", "AH0", "M"],
+    ]);
+  });
+
+  it("does not let `librarian` rhyme with `green`", () => {
+    const data = target([
+      ["librarian", [["L", "AY0", "B", "R", "EH1", "R", "IY2", "AH0", "N"]]],
+    ]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("librarian")).not.toContainEqual([
+      "L", "AY0", "B", "R", "EH1", "R", "IY2", "N",
+    ]);
+  });
+
+  it("does not let `serial` rhyme with `feel`", () => {
+    const data = target([["serial", [["S", "IH1", "R", "IY0", "AH0", "L"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("serial")).toEqual([
+      ["S", "IH1", "R", "IY0", "AH0", "L"],
+    ]);
+  });
+
+  it("still absorbs the schwa after the offglide vowels", () => {
+    // The limit is `IY` alone — it must not cost the rule its target words, nor
+    // the uncontroversial cases behind `AW` and `AY`.
+    const data = target([
+      ["gruel", [["G", "R", "UW1", "AH0", "L"]]],
+      ["towel", [["T", "AW1", "AH0", "L"]]],
+      ["trial", [["T", "R", "AY1", "AH0", "L"]]],
+    ]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("gruel")).toContainEqual(["G", "R", "UW1", "L"]);
+    expect(data.pronunciations.get("towel")).toContainEqual(["T", "AW1", "L"]);
+    expect(data.pronunciations.get("trial")).toContainEqual(["T", "R", "AY1", "L"]);
+  });
+
+  it("still makes the consonant syllabic after a consonant", () => {
+    // `IY` is checked only where it actually precedes the schwa; the textbook
+    // syllabic-consonant case is untouched.
+    const data = target([["ribbon", [["R", "IH1", "B", "AH0", "N"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("ribbon")).toContainEqual(["R", "IH1", "B", "N"]);
+  });
+});
