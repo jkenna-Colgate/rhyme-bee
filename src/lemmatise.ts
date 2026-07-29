@@ -13,6 +13,8 @@
  * without changing the contract.
  */
 
+import { PREFIX_SPELLINGS } from "./affixes.ts";
+
 function dedupe(candidates: string[]): string[] {
   return [...new Set(candidates.filter((c) => c.length > 0))];
 }
@@ -48,13 +50,17 @@ export function lemmaCandidates(word: string): string[] {
 }
 
 /**
- * Common derivational prefixes (ADR-0008). Deliberately short: a prefix only
- * counts when it strips down to a real base word, so a longer list buys little
- * and risks stripping a native word to a coincidental base.
+ * Common derivational prefixes (ADR-0008), read from the one affix inventory
+ * the build configures — the same list the coverage stage composes readings
+ * with. They must not drift apart: a prefix that can give a word a reading puts
+ * that word in a Rhyme Key family, and a detector that did not know the prefix
+ * would score it as native content and let a Shadow Key stand as a Seed.
+ *
+ * The minimum stem length is deliberately *not* shared. Inventing a reading for
+ * a two-letter stem is a bad bet, so `src/affixes.ts` refuses it; merely
+ * recognising `redo` as `re` + `do` is safe and stays here.
  */
-const DERIVATIONAL_PREFIXES = [
-  "un", "re", "out", "over", "mis", "non", "under", "inter",
-];
+const DERIVATIONAL_PREFIXES = PREFIX_SPELLINGS;
 
 /**
  * True if `word` is a regular inflection of some *other* dictionary word — the

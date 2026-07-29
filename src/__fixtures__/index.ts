@@ -7,6 +7,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../cmudict.ts";
+import { applyCoverage } from "../coverage.ts";
 import { applyNormalisation } from "../normalise.ts";
 import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
 
@@ -34,6 +35,11 @@ const words = new Set<string>([
   // no-pronunciation verdict (a player hears it rhyming with `plates`, but the
   // engine has nothing to rhyme-test) — issue #28.
   "grates",
+  // Coverage derivation (issue #76): both are real words with wordhood and a
+  // prevalence score but no CMUdict reading, so the build composes one from a
+  // stem it already reads — `docked` and `walked`. They sit in the `AA K T`
+  // family on purpose, which no other suite counts.
+  "undocked", "outwalked",
 ]);
 
 /** Names, used only to label a rejection as a Proper Noun. */
@@ -56,6 +62,13 @@ const prevalence = new Map<string, number>([
   ["stalked", 1.9], ["hawked", 1.5], ["ball", 2.5], ["doll", 2.4],
   ["for", 2.5], ["far", 2.5], ["born", 2.5], ["barn", 2.4],
   ["cord", 2.4], ["card", 2.5],
+  // The two derived words (issue #76), scored either side of the threshold so
+  // the tier split falls out of the ordinary rule and not a special case.
+  ["undocked", 2.0], ["outwalked", 0.4],
+  // `unwalked` is scored but deliberately withheld from the wordhood set above:
+  // derivation supplies readings and never wordhood, so it stays underived and
+  // still rejects as not a known word.
+  ["unwalked", 2.0],
 ]);
 
 export const KNOWNNESS_THRESHOLD = 1.0;
@@ -79,16 +92,20 @@ export function makeTestData(): RhymeIndexData {
 }
 
 /**
- * The tail of the real index build: normalise the readings in place (ADR-0010),
- * then construct. Tests go through here rather than calling `new RhymeIndex` so
- * the verdicts they assert are the verdicts `npm run build:index` would produce.
- * `data` is left normalised, so a caller that also needs the data — serialising
- * it, say — sees what the build would have written.
+ * The tail of the real index build, in the build's own order: derive readings
+ * for known words that have none (issue #76), then normalise every reading
+ * (ADR-0010), then construct. Tests go through here rather than calling
+ * `new RhymeIndex` so the verdicts they assert are the verdicts
+ * `npm run build:index` would produce — including the guardrail table, which
+ * every stage has to survive. `data` is left as the build would leave it, so a
+ * caller that also needs the data — serialising it, say — sees what the build
+ * would have written.
  */
 export function buildTestIndex(
   data: RhymeIndexData,
   knownnessThreshold: number = KNOWNNESS_THRESHOLD,
 ): RhymeIndex {
+  applyCoverage(data);
   applyNormalisation(data);
   return new RhymeIndex(data, { knownnessThreshold });
 }

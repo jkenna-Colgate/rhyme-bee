@@ -4,15 +4,16 @@
  *   npm run build:index
  *
  * Reads the raw inputs from `data/` (uncommitted — see .gitignore and
- * data/README.md), writes the built artifact and a dropped-words report to
- * `dist-data/`. Rebuilding from the same pinned inputs yields the same verdicts
- * (story 35); nothing here touches the network.
+ * data/README.md), writes the built artifact and the dropped-words and
+ * derived-words reports to `dist-data/`. Rebuilding from the same pinned inputs
+ * yields the same verdicts (story 35); nothing here touches the network.
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../src/cmudict.ts";
+import { applyCoverage } from "../src/coverage.ts";
 import { applyNormalisation } from "../src/normalise.ts";
 import { parsePrevalenceCsv, parseWordList } from "../src/pipeline.ts";
 import { serialise } from "../src/serialise.ts";
@@ -44,10 +45,15 @@ const prevalence = parsePrevalenceCsv(read("prevalence.csv"));
 // and — unlike everything else in data/ — it survives this rebuild.
 applySupplement(read("supplement.dict"), { pronunciations, words, names });
 
+// Tier 1 coverage (issue #76): a known word with no reading is given one,
+// composed from a stem the build already reads. It runs *after* the supplement,
+// so a hand-authored reading always beats a composed one, and supplies readings
+// only — never wordhood. See src/coverage.ts.
+const derived = applyCoverage({ pronunciations, words, names, prevalence });
+
 // The accent specification (ADR-0010), applied to every reading before any Rhyme
-// Key is computed. It runs *after* the supplement so a hand-authored reading is
-// an input to the accent rather than an exemption from it; Tier 1 coverage
-// derivation, when it lands, inserts between the two. See src/normalise.ts.
+// Key is computed. It runs *last* so a hand-authored or derived reading is an
+// input to the accent rather than an exemption from it. See src/normalise.ts.
 applyNormalisation({ pronunciations });
 
 const data: RhymeIndexData = { pronunciations, words, names, prevalence };
@@ -68,8 +74,13 @@ writeFileSync(
 );
 writeFileSync(resolve(outDir, "dropped-report.json"), JSON.stringify(dropped, null, 2));
 
+// Derived-words report (issue #76): every word coverage derivation gave a
+// reading to, its stem, and the rule that produced it — so over-generation is
+// visible rather than buried in the index.
+writeFileSync(resolve(outDir, "derived-report.json"), JSON.stringify(derived, null, 2));
+
 console.log(
   `Built index: ${pronunciations.size} pronunciations, ${words.size} words, ` +
-    `${prevalence.size} prevalence entries, ${dropped.length} dropped. ` +
-    `Threshold ${KNOWNNESS_THRESHOLD}.`,
+    `${prevalence.size} prevalence entries, ${derived.length} derived, ` +
+    `${dropped.length} dropped. Threshold ${KNOWNNESS_THRESHOLD}.`,
 );

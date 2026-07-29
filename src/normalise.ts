@@ -13,7 +13,7 @@
  *
  *     pinned upstream inputs      data/cmudict.dict, words.txt, names.txt
  *       -> committed supplement   hand-authored readings (ADR-0009)
- *       -> coverage derivation    not built yet — it inserts *here*
+ *       -> coverage derivation    readings composed from a stem (src/coverage.ts)
  *       -> normalisation          this stage: the accent specification
  *       -> Rhyme Index
  *
@@ -21,7 +21,9 @@
  * against. Normalisation runs last because the supplement asserts *readings*
  * while this stage asserts the *accent*: a hand-authored correction is an input
  * to the accent specification, never an exemption from it. Coverage derivation
- * produces readings too, so it belongs on the supplement's side of the line.
+ * produces readings too, so it sits on the supplement's side of the line — a
+ * reading composed from `walked` arrives here with the unmerged vowel and is
+ * merged like any other.
  *
  * Nothing downstream is aware this stage exists. Rhyme Key computation,
  * respelling, tiering, Puzzle building, adjudication and curation all receive
