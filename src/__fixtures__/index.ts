@@ -27,6 +27,9 @@ const words = new Set<string>([
   // The cot-caught merger and its pre-rhotic exclusion (ADR-0010).
   "docked", "talked", "walked", "balked", "stalked", "hawked",
   "ball", "doll", "for", "far", "born", "barn", "cord", "card",
+  // The syllabic-consonant variant and the two vowels it must not touch: a
+  // stressed one (`pool`) and a full unstressed one (`crayon`) — issue #74.
+  "cool", "pool", "gruel", "duel", "crewel", "renewal", "crane", "crayon",
   // `sate` is a real word we deliberately leave out of the prevalence data,
   // to exercise the absent-from-knownness -> Bonus default (ADR-0003).
   "sate",
@@ -69,6 +72,10 @@ const prevalence = new Map<string, number>([
   // derivation supplies readings and never wordhood, so it stays underived and
   // still rejects as not a known word.
   ["unwalked", 2.0],
+  ["cool", 2.5], ["pool", 2.5], ["gruel", 1.6], ["duel", 2.0],
+  // `crewel` is a kind of yarn almost nobody knows — a Bonus Word, so the
+  // syllabic variant is exercised on both sides of the knownness threshold.
+  ["crewel", 0.4], ["renewal", 2.3], ["crane", 2.4], ["crayon", 2.4],
 ]);
 
 export const KNOWNNESS_THRESHOLD = 1.0;
