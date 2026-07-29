@@ -46,20 +46,6 @@ describe("a schwa before a word-final L, N or M", () => {
     expect(data.pronunciations.get("album")).toContainEqual(["AE1", "L", "B", "M"]);
   });
 
-  it("reaches a schwa sitting after a vowel — the widest the claim goes", () => {
-    // `lion` has the same shape as `gruel`: vowel, schwa, sonorant. So it gains
-    // a reading that rhymes with `line`, and that is stated in the suite rather
-    // than left to be discovered. Narrowing the rule to exclude it would take
-    // `gruel` with it, since nothing distinguishes the two.
-    const data = target([["lion", [["L", "AY1", "AH0", "N"]]]]);
-    applyNormalisation(data);
-
-    expect(data.pronunciations.get("lion")).toEqual([
-      ["L", "AY1", "AH0", "N"],
-      ["L", "AY1", "N"],
-    ]);
-  });
-
   it("appends variants after every base reading, in the order they arrived", () => {
     // Load-bearing: a Seed Word is spoken and respelled in its first reading, so
     // a variant must never displace the reading the data actually asserts.
@@ -244,5 +230,65 @@ describe("`IY` keeps its own syllable", () => {
     applyNormalisation(data);
 
     expect(data.pronunciations.get("ribbon")).toContainEqual(["R", "IH1", "B", "N"]);
+  });
+});
+
+describe("after a vowel, only L absorbs the schwa", () => {
+  // A consonant before the schwa stays in the Rhyme Key and keeps it
+  // distinctive. A vowel leaves a two-phoneme key, and there the sonorant
+  // decides: L genuinely absorbs the schwa, the nasals do not.
+
+  it("does not let `ruin` rhyme with `moon`", () => {
+    const data = target([["ruin", [["R", "UW1", "AH0", "N"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("ruin")).toEqual([["R", "UW1", "AH0", "N"]]);
+  });
+
+  it("does not let `urine` rhyme with `burn`", () => {
+    const data = target([["urine", [["Y", "ER1", "AH0", "N"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("urine")).toEqual([["Y", "ER1", "AH0", "N"]]);
+  });
+
+  it("does not let `jeroboam` rhyme with `home`", () => {
+    const data = target([
+      ["jeroboam", [["JH", "EH2", "R", "AH0", "B", "OW1", "AH0", "M"]]],
+    ]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("jeroboam")).toEqual([
+      ["JH", "EH2", "R", "AH0", "B", "OW1", "AH0", "M"],
+    ]);
+  });
+
+  it("does not let `lion` rhyme with `line`", () => {
+    const data = target([["lion", [["L", "AY1", "AH0", "N"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("lion")).toEqual([["L", "AY1", "AH0", "N"]]);
+  });
+
+  it("still absorbs the schwa into an L after a vowel", () => {
+    const data = target([["betrayal", [["B", "IH0", "T", "R", "EY1", "AH0", "L"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("betrayal")).toContainEqual([
+      "B", "IH0", "T", "R", "EY1", "L",
+    ]);
+  });
+
+  it("still makes a nasal syllabic after a consonant", () => {
+    // The nasal limit is about what precedes the schwa, not the nasal itself:
+    // `button` and `rhythm` are the textbook case and must survive.
+    const data = target([
+      ["button", [["B", "AH1", "T", "AH0", "N"]]],
+      ["rhythm", [["R", "IH1", "DH", "AH0", "M"]]],
+    ]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("button")).toContainEqual(["B", "AH1", "T", "N"]);
+    expect(data.pronunciations.get("rhythm")).toContainEqual(["R", "IH1", "DH", "M"]);
   });
 });

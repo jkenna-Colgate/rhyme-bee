@@ -43,6 +43,7 @@
 
 import {
   bareSound,
+  isVowel,
   rhymeKeyOf,
   stressOf,
   withSound,
@@ -104,6 +105,9 @@ function mergeCotCaught(reading: Pronunciation): Pronunciation {
 const SCHWA = "AH";
 const SYLLABIFIABLE_SONORANTS = new Set(["L", "N", "M"]);
 
+/** After a vowel, the one sonorant that absorbs the schwa. */
+const VOWEL_ABSORBING_SONORANT = "L";
+
 /** The one vowel that keeps its own syllable in front of the schwa. */
 const UNABSORBING_VOWEL = "IY";
 
@@ -144,23 +148,36 @@ const UNABSORBING_VOWEL = "IY";
  *     limit costs the rule the inflections: `gruels` (`G R UW1 AH0 L Z`) keeps
  *     its schwa, because no complaint asks for it yet and every phoneme past
  *     the sonorant is a fresh claim about what stays audible.
- *   - **Never after `IY`.** This is the limit measured rather than reasoned:
- *     without it the rule reaches 99 words in the playable lexicon and gets
- *     roughly half of them wrong, every error sitting behind `IY`. `museum`
- *     would rhyme with `dream`, `librarian` and `european` with `green`,
- *     `serial` with `feel`. The other vowels that reach the schwa end in an
- *     offglide that absorbs it — `gruel` is `/gruːl/`, `towel` is `/taʊl/`,
- *     `trial` is `/traɪl/` — but `/iː/` is already a full front vowel holding
- *     its own syllable, and the schwa after it stays a syllable of its own in
- *     careless speech as much as in careful. So the contrast survives, and a
- *     rule that erases it is erasing something audible.
+ *   - **After a vowel, only `L`, and never after `IY`.** This limit was
+ *     measured rather than reasoned. Unconstrained, the rule reached 99 words
+ *     in the playable lexicon and got roughly half of them wrong, and the
+ *     errors sorted themselves cleanly by what sits either side of the schwa.
  *
- * The shape it fires on is otherwise any vowel, then the schwa, then the
- * sonorant — so it reaches `lion` (`L AY1 AH0 N`) exactly as it reaches `gruel`,
- * and `lion` gains a reading that rhymes with `line`. That is the widest the
- * perceptual claim goes, and it is stated here rather than hidden: a reviewer
- * who thinks `lion` is audibly two syllables where `gruel` is not is challenging
- * the claim, which is the argument worth having.
+ *     A *consonant* before the schwa stays in the Rhyme Key and keeps it
+ *     distinctive: `button` becomes `B AH1 T N`, key `AH T N`, which still
+ *     picks out `mutton` and `glutton`. That is the textbook syllabic
+ *     consonant and it is safe for all three sonorants.
+ *
+ *     A *vowel* before the schwa leaves a key just two phonemes long, so the
+ *     word lands in whatever large family already owns it — and there the
+ *     sonorant decides. `L` genuinely absorbs a preceding schwa: `cruel` is
+ *     `/kruːl/`, `towel` `/taʊl/`, `trial` `/traɪl/`, `royal` `/rɔɪl/`. The
+ *     nasals do not, which is why the unconstrained rule had `ruin` rhyming
+ *     with `moon`, `urine` with `burn`, `protozoan` with `bone` and
+ *     `jeroboam` with `home`. All 18 such words were wrong; all 33 in `L`
+ *     were right.
+ *
+ *     `IY` is then excluded even before `L`, because unlike the offglide
+ *     vowels it is a full front vowel holding its own syllable, and the schwa
+ *     after it survives into casual speech: `museum` would otherwise rhyme
+ *     with `dream`, `librarian` with `green`, `serial` with `feel`.
+ *
+ * Together those limits leave 35 words in the playable lexicon gaining a new
+ * Rhyme Key, down from 99. The widest the perceptual claim now goes is `trial`
+ * rhyming with `mile` and `betrayal` with `pale` — stated here rather than
+ * hidden, so a reviewer who hears two syllables where this rule hears one is
+ * challenging the claim, which is the argument worth having. `lion` is *not*
+ * reached: it is a nasal after a vowel, so the schwa stays.
  *
  * A word with a droppable schwa ends up with two Rhyme Keys and so reads as
  * ambiguous, which bars it from being a Seed Word without an explicit key.
@@ -180,10 +197,13 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
   if (!SYLLABIFIABLE_SONORANTS.has(sonorant)) return [];
   if (bareSound(schwa) !== SCHWA || stressOf(schwa) !== 0) return [];
 
-  // `IY` holds its own syllable, so the schwa after it is genuinely audible.
+  // After a vowel, only `L` absorbs the schwa, and not even `L` after `IY`.
+  // After a consonant every sonorant does — see the fourth limit above.
   const preceding = reading.at(-3);
-  if (preceding !== undefined && bareSound(preceding) === UNABSORBING_VOWEL)
-    return [];
+  if (preceding !== undefined && isVowel(preceding)) {
+    if (sonorant !== VOWEL_ABSORBING_SONORANT) return [];
+    if (bareSound(preceding) === UNABSORBING_VOWEL) return [];
+  }
 
   // A variant with no stressed vowel left has no Rhyme Key, so it could never
   // match anything — carrying it would only bloat the index.
