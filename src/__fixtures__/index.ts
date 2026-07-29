@@ -43,6 +43,19 @@ const words = new Set<string>([
   // stem it already reads — `docked` and `walked`. They sit in the `AA K T`
   // family on purpose, which no other suite counts.
   "undocked", "outwalked",
+  // Suffix derivation (issue #77). Each stem carries a reading; each suffixed
+  // form has none, so the build composes it. They are paired so that every
+  // composed reading has something to be adjudicated against: `-er` on
+  // `abolish`/`polish`, `-ness` on `youthful`/`truthful`, `-ly` on
+  // `zestful`/`restful` (the degemination case) and `abashed`/`unabashed`, and
+  // `-er` on `yodel` through both its spellings — `yodeller` is the undoubling
+  // stem candidate. Each pair is its own Rhyme Key family, which no other suite
+  // counts.
+  "abolish", "abolisher", "polish", "polisher",
+  "youthful", "youthfulness", "truthful", "truthfulness",
+  "zestful", "zestfully", "restful", "restfully",
+  "abashed", "abashedly", "unabashed", "unabashedly",
+  "yodel", "yodeler", "yodeller",
 ]);
 
 /** Names, used only to label a rejection as a Proper Noun. */
@@ -76,6 +89,16 @@ const prevalence = new Map<string, number>([
   // `crewel` is a kind of yarn almost nobody knows — a Bonus Word, so the
   // syllabic variant is exercised on both sides of the knownness threshold.
   ["crewel", 0.4], ["renewal", 2.3], ["crane", 2.4], ["crayon", 2.4],
+  // Suffix derivation (issue #77). Every derived word needs a knownness of its
+  // own: `-er` and `-ly` forms are not lemmas the prevalence data would carry,
+  // so the derivation target set requires them here. `yodeler` and `yodeller`
+  // sit below the threshold, so the pair tiers as Bonus Words on the ordinary
+  // rule — the same split #76 exercised, on this slice's suffixes.
+  ["abolish", 2.0], ["abolisher", 1.4], ["polish", 2.3], ["polisher", 1.5],
+  ["youthful", 2.2], ["youthfulness", 1.8], ["truthful", 2.3], ["truthfulness", 1.9],
+  ["zestful", 1.5], ["zestfully", 1.3], ["restful", 2.0], ["restfully", 1.7],
+  ["abashed", 1.4], ["abashedly", 1.1], ["unabashed", 1.6], ["unabashedly", 1.5],
+  ["yodel", 1.6], ["yodeler", 0.6], ["yodeller", 0.5],
 ]);
 
 export const KNOWNNESS_THRESHOLD = 1.0;
