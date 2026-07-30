@@ -241,3 +241,55 @@ function makeSyntheticIndex(): RhymeIndex {
   // a separate line, so `vroog`/`yog` are rare Answers, not Bonus Words.
   return new RhymeIndex(data, { knownnessThreshold: 0 });
 }
+
+// --- Choosing the representative: the Seed the player is shown and spoken -----
+
+/**
+ * One family under `EY N`, holding the three things that compete to represent
+ * it: an abbreviation with wordhood (`ln`), a derived form that is better known
+ * than any base (`gained`), and the base words themselves.
+ */
+function makeRepresentativeIndex(): RhymeIndex {
+  const p = (...phonemes: string[]): Pronunciation[] => [phonemes];
+  const pronunciations = new Map<string, Pronunciation[]>([
+    ["ln", p("L", "EY1", "N")],
+    ["gained", p("G", "EY1", "N", "D")],
+    ["gain", p("G", "EY1", "N")],
+    ["lane", p("L", "EY1", "N")],
+    ["drain", p("D", "R", "EY1", "N")],
+  ]);
+  const data: RhymeIndexData = {
+    pronunciations: new Map([...pronunciations, ["gaining", p("G", "EY1", "N", "IH0", "NG")]]),
+    words: new Set(["ln", "gained", "gain", "lane", "drain", "gaining"]),
+    names: new Set(),
+    prevalence: new Map([
+      // `ln` is shortest and `gained` is best known — under the old
+      // shortest-first rule the Seed was `ln`, under knownness alone it is
+      // `gained`. Native-first picks neither.
+      ["ln", 1.0],
+      ["gained", 3.0],
+      ["gain", 2.0],
+      ["lane", 1.5],
+      ["drain", 1.4],
+    ]),
+  };
+  return new RhymeIndex(data, { knownnessThreshold: 0 });
+}
+
+describe("the representative is the best-known native word", () => {
+  const family = curate(makeRepresentativeIndex(), { sizeBand: { min: 1, max: 100 } }).families.find(
+    (f) => f.rhymeKey === "EY N",
+  );
+
+  it("picks the best-known native word, not the shortest", () => {
+    // `ln` holds wordhood and is shortest; a Seed is shown *and spoken*
+    // (ADR-0002), so an abbreviation is the worst possible choice.
+    expect(family?.representative).toBe("gain");
+  });
+
+  it("prefers a native word to a better-known derived one", () => {
+    // `gained` outranks `gain` on prevalence but is an inflection of it
+    // (ADR-0008), and an inflected Seed reads oddly when spoken aloud.
+    expect(family?.representative).not.toBe("gained");
+  });
+});
