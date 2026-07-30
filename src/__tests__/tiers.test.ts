@@ -13,6 +13,7 @@ import {
   makeTestData,
   makeTestIndex,
 } from "../__fixtures__/index.ts";
+import { makeShortPluralIndex } from "../__fixtures__/shortPlurals.ts";
 
 const index = makeTestIndex();
 const ate = index.pinSeed("ate");
@@ -38,6 +39,51 @@ describe("lemmatise before the knownness lookup, not before rhyme matching", () 
     // drives the rhyme, but knownness is looked up on the lemma `gate`.
     const verdict = index.adjudicate(index.pinSeed("plates"), "gates");
     expect(verdict.outcome).toBe("answer");
+  });
+});
+
+describe("a three-letter plural tiers on its base, when the sound agrees (issue #97)", () => {
+  const shortPlurals = makeShortPluralIndex();
+
+  it.each([
+    ["ups", "up"],
+    ["ins", "in"],
+  ])("tiers %j as an Answer on %j's knownness, not as a Bonus Word", (form, base) => {
+    // The prevalence norms list the lemma, so a plural that never reaches it
+    // takes no knownness at all and defaults to Bonus — the celebration
+    // reserved for `objurgate`, handed to a word everybody knows.
+    const tier = shortPlurals.tierOf(form);
+    expect(tier.tier).toBe("answer");
+    expect(tier.knownness).toBe(shortPlurals.tierOf(base).knownness);
+  });
+
+  it("leaves has where it was — absent from the norms, not tiered on ha", () => {
+    // `ha` scores 1.28 and is an Answer. `has` is absent from the norms, as it
+    // is from the real ones: if the rule took `ha` as its base it would jump to
+    // Answer on knownness that is not its own.
+    expect(shortPlurals.tierOf("ha").tier).toBe("answer");
+    expect(shortPlurals.tierOf("has")).toEqual({ tier: "bonus", knownness: null });
+  });
+
+  it.each([
+    ["gas", "ga"],
+    ["was", "wa"],
+    ["yes", "ye"],
+  ])("leaves %j its own knownness rather than %j's", (form, base) => {
+    expect(shortPlurals.tierOf(form).knownness).not.toBe(
+      shortPlurals.tierOf(base).knownness,
+    );
+  });
+
+  it("leaves bus its own knownness — there is no `bu` to be a plural of", () => {
+    expect(shortPlurals.tierOf("bus").knownness).toBe(1.9);
+  });
+
+  it("still accepts a demoted word wherever it rhymes", () => {
+    // Demotion bears on Seed selection only. `ups` is no longer native content,
+    // and is still an Answer on the board its Rhyme Key belongs to.
+    const cups = shortPlurals.pinSeed("cups");
+    expect(shortPlurals.adjudicate(cups, "ups").outcome).toBe("answer");
   });
 });
 

@@ -12,7 +12,7 @@
 
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
-import { lemmaCandidates } from "./lemmatise.ts";
+import { lemmaCandidatesBySound } from "./lemmatise.ts";
 import { respell } from "./respelling.ts";
 import type { Tier, Verdict } from "./verdict.ts";
 
@@ -93,6 +93,16 @@ export class RhymeIndex {
    */
   hasWord(word: string): boolean {
     return this.#data.words.has(normaliseWord(word));
+  }
+
+  /**
+   * The readings of a surface form, empty if it has none. Exposed beside
+   * `hasWord` because a derivation question needs both: wordhood says whether a
+   * base exists, and the reading says whether the form sounds like an inflection
+   * of it — the test that keeps `ups` off `up` but `has` off `ha` (issue #97).
+   */
+  readingsOf(word: string): Pronunciation[] {
+    return this.#data.pronunciations.get(normaliseWord(word)) ?? [];
   }
 
   /**
@@ -256,9 +266,13 @@ export class RhymeIndex {
    * Tier a rhyming, wordhood-valid word by knownness. Lemmatise before the
    * lookup (never before rhyme matching). A word absent from the prevalence data
    * defaults to Bonus, so a coverage gap never refuses a real word (ADR-0003).
+   *
+   * Lemmatised through the readings, not the spelling alone: `ups` tiers on `up`
+   * because it sounds like `up` + S, and `has` keeps its own standing because it
+   * does not sound like `ha` + Z.
    */
   #tier(word: string): { tier: Tier; knownness: number | null } {
-    for (const candidate of lemmaCandidates(word)) {
+    for (const candidate of lemmaCandidatesBySound(word, (w) => this.readingsOf(w))) {
       const score = this.#data.prevalence.get(candidate);
       if (score !== undefined) {
         return {
