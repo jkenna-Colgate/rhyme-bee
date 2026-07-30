@@ -84,16 +84,43 @@ export interface CurationReport {
 }
 
 /**
- * Choose the representative surface form for a Rhyme Key: prefer an unambiguous
- * word (one pronunciation), then shortest, then alphabetical — deterministic.
+ * Choose the representative surface form for a Rhyme Key. The representative is
+ * the Seed Word the player is *shown and spoken* (ADR-0002), so the only thing
+ * that really matters is that it is a word they recognise.
+ *
+ * Ranked: **native** first (not an inflection or affixation of a word in another
+ * key — ADR-0008), then **unambiguous** (one pronunciation, so ADR-0001's pin to
+ * exactly one Rhyme Key is honest), then **best known** (ADR-0003 prevalence),
+ * then shortest and alphabetical as a deterministic floor.
+ *
+ * Shortest used to lead, which is why 170 members of `EY N` — `gain`, `drain`,
+ * `plane`, `complain` — were represented by `ln`: abbreviations and fragments
+ * that hold wordhood are always shorter than the words they abbreviate, so a
+ * length-first rule selects for exactly the wrong thing. Knownness alone would
+ * fix that but prefers `messed` to `best` and `crowned` to `round`, since an
+ * inflected form can out-rank its own stem; native-first settles that.
  */
-function chooseRepresentative(words: string[], index: RhymeIndex): string {
+function chooseRepresentative(
+  words: string[],
+  index: RhymeIndex,
+  isWord: (word: string) => boolean,
+): string {
+  const rank = (word: string) => ({
+    derived: isDerived(word, isWord) ? 1 : 0,
+    ambiguous: index.isAmbiguous(word) ? 1 : 0,
+    // Absent from the prevalence norms sorts last, not first.
+    knownness: index.tierOf(word).knownness ?? -Infinity,
+  });
   return [...words].sort((a, b) => {
-    const ambiguityA = index.isAmbiguous(a) ? 1 : 0;
-    const ambiguityB = index.isAmbiguous(b) ? 1 : 0;
-    if (ambiguityA !== ambiguityB) return ambiguityA - ambiguityB;
-    if (a.length !== b.length) return a.length - b.length;
-    return a.localeCompare(b);
+    const rankA = rank(a);
+    const rankB = rank(b);
+    return (
+      rankA.derived - rankB.derived ||
+      rankA.ambiguous - rankB.ambiguous ||
+      rankB.knownness - rankA.knownness ||
+      a.length - b.length ||
+      a.localeCompare(b)
+    );
   })[0]!;
 }
 
@@ -150,7 +177,7 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
   const dropped: DroppedEntry[] = [];
 
   for (const [rhymeKey, words] of wordsByKey) {
-    const representative = chooseRepresentative(words, index);
+    const representative = chooseRepresentative(words, index, isWord);
     // Tally the family straight from its grouped words rather than rebuilding a
     // full Puzzle per Rhyme Key. `buildPuzzle` re-scans every wordhood word on
     // each call (O(keys × words)); `wordsByKey` already holds each key's members.

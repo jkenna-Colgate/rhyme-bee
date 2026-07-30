@@ -9,6 +9,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:index": "tsx scripts/build-index.ts",
+    "build:schedule": "tsx scripts/build-schedule.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
     "supplement:candidates": "tsx scripts/supplement-candidates.ts"
