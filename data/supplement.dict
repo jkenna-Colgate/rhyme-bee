@@ -11,6 +11,15 @@
 #     OVERRIDES the upstream reading, it does not add a variant alongside it.
 #
 # A correction is a rhyme-verdict change, so keep it deliberate and note why.
+#
+# THIS FILE IS WHERE A WRONG PRONUNCIATION GETS FIXED — not a new rule.
+# Reading manufacture (normalisation, coverage derivation) is frozen as of
+# 2026-07-30: three normalisation rules, thirty affix rules, closed sets. See
+# ADR-0011. A verdict that comes out wrong is corrected here, or in
+# data/names.txt (a name that reached the word list) or data/words.txt (junk
+# with wordhood). All three are global — a fix applies to every Puzzle the word
+# appears in, which is what makes the nightly workload decay instead of recur.
+# Per-puzzle answer-set overlays are barred for the same reason.
 
 # --- Adds (word valid, but absent from CMUdict so it had no reading) ---
 
