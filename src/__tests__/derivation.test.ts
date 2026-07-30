@@ -17,6 +17,8 @@ const dictionary = new Set<string>([
   // The three-letter `-s` forms and their candidate bases (issue #97). Whether
   // each is an inflection is settled by the readings below, not by this list.
   "ups", "up", "has", "ha", "gas", "ga",
+  // `inn` reaches `in` by de-doubling, a candidate the plural rule never made.
+  "inn", "in",
 ]);
 const isWord = (w: string): boolean => dictionary.has(w);
 
@@ -30,8 +32,12 @@ const readings = new Map<string, Pronunciation[]>([
   ["ha", [["HH", "AA1"]]],
   ["gas", [["G", "AE1", "S"]]],
   ["ga", [["G", "AA1"]]],
+  ["inn", [["IH1", "N"]]],
+  ["in", [["IH1", "N"]]],
 ]);
 const readingsOf = (w: string): Pronunciation[] => readings.get(w) ?? [];
+/** The behaviour before the sound test: no reading, so no `-s` base agrees. */
+const noReadings = (): Pronunciation[] => [];
 
 describe("isDerived — inflection pass", () => {
   it.each(["downs", "kings", "books"])(
@@ -81,6 +87,14 @@ describe("isDerived — a three-letter plural, when the sound agrees (issue #97)
 
   it("leaves gas native, on the same vowel contrast", () => {
     expect(isDerived("gas", isWord, readingsOf)).toBe(false);
+  });
+
+  it("leaves a three-letter word that is not an `-s` form exactly as it was", () => {
+    // `inn` reaches `in` by de-doubling, not by the plural rule, and always
+    // did. The sound test is about the base an `-s` form gains, so it must not
+    // reach a candidate no `-s` ever produced — `IH1 N` is not `IH1 N` + Z.
+    expect(isDerived("inn", isWord, readingsOf)).toBe(true);
+    expect(isDerived("inn", isWord, noReadings)).toBe(true);
   });
 
   it("leaves a longer plural derived with no reading in sight", () => {

@@ -79,6 +79,12 @@ describe("a three-letter plural tiers on its base, when the sound agrees (issue 
     expect(shortPlurals.tierOf("bus").knownness).toBe(1.9);
   });
 
+  it("still tiers a de-doubled three-letter word on its base (inn ← in)", () => {
+    // `inn` is not an `-s` form and reaches `in` by de-doubling, as it always
+    // did. The sound test adds a candidate to `-s` forms; it takes none away.
+    expect(shortPlurals.tierOf("inn")).toEqual(shortPlurals.tierOf("in"));
+  });
+
   it("still accepts a demoted word wherever it rhymes", () => {
     // Demotion bears on Seed selection only. `ups` is no longer native content,
     // and is still an Answer on the board its Rhyme Key belongs to.

@@ -25,7 +25,7 @@ import type { Pronunciation } from "../phonology.ts";
 import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
 
 /** The committed threshold, so `el` (below zero) tiers as the data says. */
-export const SHORT_PLURAL_THRESHOLD = 0.0;
+const KNOWNNESS_THRESHOLD = 0.0;
 
 const p = (...phonemes: string[]): Pronunciation[] => [phonemes];
 
@@ -58,6 +58,9 @@ const pronunciations = new Map<string, Pronunciation[]>([
   ["yes", p("Y", "EH1", "S")],
   ["mess", p("M", "EH1", "S")],
   ["bless", p("B", "L", "EH1", "S")],
+  // IH N — `inn` reaches `in` by de-doubling, a candidate no `-s` rule made and
+  // no sound test may take away.
+  ["inn", p("IH1", "N")],
   // AH S — `bus` has no base to be a plural of, so it stays native.
   ["bus", p("B", "AH1", "S")],
   ["plus", p("P", "L", "AH1", "S")],
@@ -115,7 +118,5 @@ export function makeShortPluralData(): RhymeIndexData {
 }
 
 export function makeShortPluralIndex(): RhymeIndex {
-  return new RhymeIndex(makeShortPluralData(), {
-    knownnessThreshold: SHORT_PLURAL_THRESHOLD,
-  });
+  return new RhymeIndex(makeShortPluralData(), { knownnessThreshold: KNOWNNESS_THRESHOLD });
 }

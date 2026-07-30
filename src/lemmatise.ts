@@ -12,9 +12,9 @@
  * prevalence data knows. A richer morphological lemmatiser can replace this
  * without changing the contract.
  *
- * A three-letter `-s` form is a candidate here but *not* on its spelling alone:
- * a caller that holds readings takes it through `lemmaCandidatesBySound`, which
- * keeps it only when the sound agrees. See that function for why.
+ * A three-letter `-s` form gets no base here, because on spelling alone it does
+ * not deserve one: `lemmaCandidatesBySound` adds it for the callers that hold
+ * readings and can check that it sounds like one. See that function for why.
  */
 
 import { PREFIX_SPELLINGS } from "./affixes.ts";
@@ -24,15 +24,19 @@ function dedupe(candidates: string[]): string[] {
   return [...new Set(candidates.filter((c) => c.length > 0))];
 }
 
-/**
- * The shortest `-s` form allowed a base. Two-letter forms are still refused:
- * that is where the word list's junk lives, and nothing in the Seed pool depends
- * on them.
- */
-const SHORTEST_PLURAL = 3;
-
 /** The phonemes a regular plural or third-person `-s` is realised as. */
-const PLURAL_PHONEMES = new Set(["S", "Z"]);
+const S_SUFFIX_PHONEMES = new Set(["S", "Z"]);
+
+/**
+ * The base of a three-letter `-s` form — `up` for `ups` — or null if the word is
+ * not one. Two-letter forms have none: that is where the word list's junk lives,
+ * and nothing in the Seed pool depends on them.
+ */
+function shortSFormBase(w: string): string | null {
+  if (w.length !== 3) return null;
+  if (!w.endsWith("s") || w.endsWith("ss")) return null;
+  return w.slice(0, -1);
+}
 
 export function lemmaCandidates(word: string): string[] {
   const w = word.trim().toLowerCase();
@@ -41,9 +45,7 @@ export function lemmaCandidates(word: string): string[] {
   // plural / third-person: -ies -> -y, -es, -s
   if (w.endsWith("ies") && w.length > 4) candidates.push(w.slice(0, -3) + "y");
   if (w.endsWith("es") && w.length > 3) candidates.push(w.slice(0, -2));
-  if (w.endsWith("s") && !w.endsWith("ss") && w.length >= SHORTEST_PLURAL) {
-    candidates.push(w.slice(0, -1));
-  }
+  if (w.endsWith("s") && !w.endsWith("ss") && w.length > 3) candidates.push(w.slice(0, -1));
 
   // past / progressive: -ied -> -y, -ed, -ing, with de-doubling and +e restore
   if (w.endsWith("ied") && w.length > 4) candidates.push(w.slice(0, -3) + "y");
@@ -74,7 +76,7 @@ function soundsInflected(form: string, base: string, readingsOf: ReadingsOf): bo
   const baseReadings = readingsOf(base);
   if (baseReadings.length === 0) return false;
   for (const reading of readingsOf(form)) {
-    if (!PLURAL_PHONEMES.has(reading[reading.length - 1] ?? "")) continue;
+    if (!S_SUFFIX_PHONEMES.has(reading[reading.length - 1] ?? "")) continue;
     const stem = reading.slice(0, -1);
     for (const baseReading of baseReadings) {
       if (baseReading.length !== stem.length) continue;
@@ -86,9 +88,10 @@ function soundsInflected(form: string, base: string, readingsOf: ReadingsOf): bo
 
 /**
  * `lemmaCandidates`, for a caller that holds readings: a three-letter `-s` form
- * keeps its base only when the *sound* agrees — the form's reading must be the
- * base's reading plus a final S or Z. Above three letters the list is returned
- * untouched, so the blast radius is bounded by construction.
+ * gains its base when the *sound* agrees — the form's reading must be the base's
+ * reading plus a final S or Z. It adds a candidate and removes none, and the
+ * only word it can add one to is a three-letter `-s` form, so the blast radius
+ * is bounded by construction and every other caller is untouched.
  *
  * Spelling alone cannot do this job. Admitting every three-letter `-s` form
  * whose base holds wordhood reaches 142 words, against this rule's 24, and calls
@@ -108,7 +111,7 @@ function soundsInflected(form: string, base: string, readingsOf: ReadingsOf): bo
  * Known misses, documented rather than special-cased. `was` is `wa` + `Z` and
  * `yes` is `ye(2)` + `S` in the dictionary's own transcription, so both are read
  * as inflections. Measured cost: `AA Z` falls from 17 native members to 13 and
- * `EH S` from 84 to 80, neither leaves the Seed pool, neither is represented by
+ * `EH S` from 82 to 78, neither leaves the Seed pool, neither is represented by
  * the demoted word, and both words keep their own knownness because they are in
  * the prevalence norms and the surface form is consulted first. An exception
  * list for two words that change no outcome would be pure cost.
@@ -116,8 +119,11 @@ function soundsInflected(form: string, base: string, readingsOf: ReadingsOf): bo
 export function lemmaCandidatesBySound(word: string, readingsOf: ReadingsOf): string[] {
   const w = word.trim().toLowerCase();
   const candidates = lemmaCandidates(w);
-  if (w.length > SHORTEST_PLURAL) return candidates;
-  return candidates.filter((c) => c === w || soundsInflected(w, c, readingsOf));
+  const base = shortSFormBase(w);
+  if (base === null || !soundsInflected(w, base, readingsOf)) return candidates;
+  // Last, because the surface form is still consulted first: `was` is in the
+  // prevalence norms and keeps its own knownness, whatever `wa` scores.
+  return dedupe([...candidates, base]);
 }
 
 /**

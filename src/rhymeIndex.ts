@@ -99,7 +99,7 @@ export class RhymeIndex {
    * The readings of a surface form, empty if it has none. Exposed beside
    * `hasWord` because a derivation question needs both: wordhood says whether a
    * base exists, and the reading says whether the form sounds like an inflection
-   * of it — the test that keeps `ups` off `up` but `has` off `ha` (issue #97).
+   * of it — the test that puts `ups` on `up` but keeps `has` off `ha` (#97).
    */
   readingsOf(word: string): Pronunciation[] {
     return this.#data.pronunciations.get(normaliseWord(word)) ?? [];
