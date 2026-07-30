@@ -20,6 +20,9 @@ desktop.ini
 # The schedule is dealt once, reviewed by hand and then fixed (ADR-0012), so it
 # is an authored input like the supplement — not a regenerable artifact.
 !/data/schedule.json
+# The demotion list corrects the upstream word list's proper nouns and junk
+# (ADR-0011, amended). Hand-authored, so it is kept for the same reason.
+!/data/demotions.txt
 *.csv
 *.xlsx
 

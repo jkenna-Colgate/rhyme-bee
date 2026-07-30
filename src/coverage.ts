@@ -8,6 +8,7 @@
  * ## Where this sits in the index build
  *
  *     pinned upstream inputs      data/cmudict.dict, words.txt, names.txt
+ *       -> committed demotions    hand-read wordhood corrections (#90)
  *       -> committed supplement   hand-authored readings (ADR-0009)
  *       -> coverage derivation    this stage
  *       -> normalisation          the accent specification (ADR-0010)

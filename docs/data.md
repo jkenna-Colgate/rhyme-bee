@@ -13,11 +13,16 @@ data/            (uncommitted)         dist-data/         (uncommitted)
   prevalence.csv knownness
   sources.json   pinned versions
   supplement.dict human overrides  (committed — see below)
+  demotions.txt   human overrides  (committed — see below)
 ```
 
-`supplement.dict` is the one hand-authored input and the only committed file in
-`data/` — the permanent human override layer (ADR-0009). The build merges it over
-the pinned inputs, so its adds and stress corrections survive the rebuild.
+`supplement.dict` and `demotions.txt` are the hand-authored inputs and the only
+committed files in `data/` — the permanent human override layer. The build merges
+them over the pinned inputs, so they survive the rebuild: the supplement's adds
+and stress corrections assert *readings* (ADR-0009), the demotion list corrects
+*wordhood* (ADR-0011, amended). The rest of `data/` is regenerable, so a hand-edit
+to `words.txt` or `names.txt` is lost on the next fresh clone; that is the whole
+reason the demotion list exists rather than an edit in place.
 
 Build with `npm run build:index`, then `npm run histogram` to answer ADR-0004.
 
@@ -29,9 +34,19 @@ stage means choosing a position in this list and saying why:
 
 | # | Stage | Code | What it asserts |
 |---|---|---|---|
+| 0 | Committed demotions | `src/demotions.ts` | *wordhood* — proper nouns and junk the upstream word list wrongly holds (#90) |
 | 1 | Committed supplement | `src/supplement.ts` | *readings* — hand-authored adds and stress corrections (ADR-0009) |
 | 2 | Coverage derivation | `src/coverage.ts` | *readings* — composed from a known stem, for well-known words CMUdict has none for |
 | 3 | Normalisation | `src/normalise.ts` | the *accent* — contrasts a General American listener cannot hear are erased (ADR-0010) |
+
+Demotion runs **first**, and is the only stage that *withdraws* wordhood. Placing
+it ahead of the supplement makes it a correction to the pinned word list rather
+than an override of the override: every stage below reads a corrected list, and
+the supplement's standing refusal to launder a name into a word (stage 1) then
+covers demoted names without knowing this stage exists. It is hand-curated and
+bounded to words a human read — 9,133 words are in *both* upstream lists,
+`heart`, `faith` and `joy` among them, so name-hood can never be allowed to
+outrank wordhood wholesale.
 
 Normalisation runs **last** because the stages before it assert readings while it
 asserts the accent those readings are spoken in. A hand-authored correction is
@@ -75,10 +90,18 @@ ordinary pronunciations.
 | `prevalence.csv` | header with `Word`,`Prevalence` | knownness (lemma → score) |
 | `sources.json` | `{ "<name>": "<version/url>" }` | pinned provenance |
 | `supplement.dict` | CMUdict text, `#` comments | **committed** human adds + stress corrections (ADR-0009) |
+| `demotions.txt` | `<word> <reason>`, `#` comments | **committed** human wordhood corrections (#90) |
 
 `words.txt` is the wordhood authority and must exclude proper nouns, so CMUdict's
 surnames do not leak in (ADR-0003). `names.txt` only affects the *reason* a
 rejection carries, never whether a name is accepted — names are never valid.
+
+The upstream word list does *not* honour that contract: it holds `heinz`,
+`algiers`, `marx`, and `kate`. Because the gate tests wordhood before name-hood,
+such a word was accepted as an ordinary Answer even when `names.txt` also held
+it — being a known name never saved it. `demotions.txt` is where that is
+corrected, one hand-read word per line, with the rejection reason the player will
+receive.
 
 ## Sources and licences
 
