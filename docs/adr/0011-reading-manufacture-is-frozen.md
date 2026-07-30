@@ -124,3 +124,44 @@ evidence that the tail is empty, and this ADR does not claim it is.
   corrections; approving one day ahead is what makes it visible.
 - **`RULES` and the affix inventory are closed sets.** Adding to either is a
   change to this ADR, not a change to a list.
+
+## Amendment, 2026-07-30 — the correction sites are four, and one of them is new
+
+Naming `data/names.txt` and `data/words.txt` as correction sites was a mistake of
+fact: **both are gitignored**, regenerable from pinned upstream sources
+(ADR-0003), so a correction made there exists on one machine and no other. It
+survives `npm run build:index` and nothing else — not a fresh clone, not a
+second agent's clone, not review. That is the precise problem ADR-0009 wrote the
+supplement to solve, and the supplement solves it only for *readings*: it adds
+and overrides, and has no way to withdraw wordhood.
+
+Attempting #90 against those two files surfaced this immediately, along with the
+reason the correction is needed at all: the wordhood gate tests `words` **before**
+`names`, so a word in both upstream lists is served to the player as an ordinary
+Answer. `heinz`, `marx`, `rhodes`, `troy` and `kate` are all in both today —
+`kate` being CONTEXT.md's own illustration of a Proper Noun, and `ate` the
+Tutorial's Seed.
+
+The fourth site is **`data/demotions.txt`** (`src/demotions.ts`, stage 0 of the
+build): one hand-read word per line with the rejection reason it earns,
+`proper-noun` or `not-a-known-word`. Committed, so the correction outlives the
+data it corrects.
+
+**The reordering this looks like was considered and rejected on measurement.**
+Letting `names.txt` supersede `words.txt` in the gate is a one-line change and
+would fix every leaked name at once. It also demotes **9,133 words that are in
+both lists** — 6,565 of which have readings and reach adjudication, 2,476 of them
+Answer-tier — because the names source is SSA baby names, which is every string
+given to five babies in a year: `add`, `air`, `apple`, `autumn`, `child`,
+`faith`, `heart`, `hero`, `joy`, `you`, `young`. Restricting it to names absent
+from the prevalence norms still sweeps 3,855 words, unreviewed, many of them
+legitimate Bonus Words. The gate is words-first for a reason; only a curated list
+may override it.
+
+This amendment does not loosen the freeze. A demotion is data, it is global
+(ADR-0011's own rule), and it manufactures no reading — the closed sets in
+`src/normalise.ts` and `src/affixes.ts` are untouched. The demotion list is
+**bounded by measurement**, not by taste: its entries are the names the #89
+measurement surfaced and the one #51 reported. Widening it means measuring
+again, and "make the names filter correct" remains barred as the unbounded
+backlog it is.

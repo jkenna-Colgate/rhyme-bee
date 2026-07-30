@@ -1,0 +1,66 @@
+# Committed demotion list — the human override layer for the WORDHOOD gate.
+#
+# `<word> <reason>`, `#` comments, merged over the pinned upstream inputs by
+# `npm run build:index` before every other stage (ADR-0011, amended). Unlike
+# words.txt and names.txt — which are regenerable and uncommitted — this file is
+# committed and survives a fresh clone.
+#
+#   - `proper-noun`      the word is a name. It loses wordhood and joins the
+#                        names list, so it is rejected AS a name: `Kate`
+#                        obviously rhymes with `ate` and a silent refusal reads
+#                        as a bug (CONTEXT.md).
+#   - `not-a-known-word` the word is junk with wordhood — an abbreviation, a
+#                        misspelling, a Latin fragment. It loses wordhood and is
+#                        rejected as a non-word. It is NOT called a name.
+#
+# The list is deliberately BOUNDED: these are the words a human read, surfaced by
+# the #89 measurement (in-band Seed families surviving on three or fewer native
+# words, plus every Seed representative of three characters or fewer) and by #51.
+# It is not, and must not become, "make the names filter correct" — there is
+# always another surname in the word list. Widening it means measuring again.
+#
+# A word is left alone unless it is clearly not an English word. Ambiguous cases
+# stay: `hertz` is the SI unit, `laird` a Scottish landowner, `schmalz` a variant
+# of `schmaltz`, `bortz` an industrial diamond, `els` the plural of `el`,
+# `schilling` a currency. All are surnames too; all are also words, so all keep
+# their wordhood. Likewise the foreign forms and interjections ADR-0008 groups
+# with names — `mesdames`, `messieurs`, `zounds`, `congrats` — are real words.
+
+# --- Proper nouns (#51, #90) ---
+
+# The canonical example, and the worst of them: the Tutorial is seeded `ate`, so
+# a first-run player could submit `Kate` — CONTEXT.md's own illustration of a
+# Proper Noun — and be told it is a valid rhyme.
+kate proper-noun
+troy proper-noun          # #51, reported from play against the `oy` Seed
+
+# Surnames.
+batz proper-noun
+byard proper-noun
+fels proper-noun
+franz proper-noun
+heinz proper-noun
+marx proper-noun
+niels proper-noun
+schelling proper-noun
+schmelz proper-noun
+schwarz proper-noun
+sheard proper-noun
+
+# Placenames.
+aix proper-noun
+algiers proper-noun
+azores proper-noun
+rhodes proper-noun
+versailles proper-noun
+storting proper-noun      # the Norwegian parliament
+
+# --- Junk with wordhood (#90) ---
+
+arx not-a-known-word         # Latin for citadel; English only inside `marx`
+ers not-a-known-word         # letter-name plural, not a headword
+hiems not-a-known-word       # Latin for winter
+lapides not-a-known-word     # Latin plural of `lapis`
+lbs not-a-known-word         # abbreviation of `pounds`
+oct not-a-known-word         # abbreviation of `October`
+preceeding not-a-known-word  # misspelling of `preceding`

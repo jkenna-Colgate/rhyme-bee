@@ -14,6 +14,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../src/cmudict.ts";
 import { applyCoverage } from "../src/coverage.ts";
+import { applyDemotions } from "../src/demotions.ts";
 import { applyNormalisation } from "../src/normalise.ts";
 import { parsePrevalenceCsv, parseWordList } from "../src/pipeline.ts";
 import { serialise } from "../src/serialise.ts";
@@ -39,6 +40,14 @@ const pronunciations = parseCmudict(read("cmudict.dict"));
 const words = parseWordList(read("words.txt"));
 const names = parseWordList(read("names.txt"));
 const prevalence = parsePrevalenceCsv(read("prevalence.csv"));
+
+// The committed demotion list (#90), applied *first*, so every stage below reads
+// a corrected word list rather than working around it: the upstream wordhood
+// list carries surnames and placenames, and the gate tests wordhood before
+// name-hood, so `algiers` was being served as an ordinary Answer. Running here
+// means the supplement's standing refusal to launder a name into a word covers
+// demoted names too. See src/demotions.ts.
+const demoted = applyDemotions(read("demotions.txt"), { words, names });
 
 // The committed human override layer (ADR-0009), merged over the pinned upstream
 // inputs: it adds missing words (with a reading) and corrects mis-marked stress,
@@ -83,4 +92,12 @@ console.log(
   `Built index: ${pronunciations.size} pronunciations, ${words.size} words, ` +
     `${prevalence.size} prevalence entries, ${derived.length} derived, ` +
     `${dropped.length} dropped. Threshold ${KNOWNNESS_THRESHOLD}.`,
+);
+
+// A demotion whose word the upstream list no longer holds is dead weight, and
+// the file is hand-maintained, so say so rather than letting it accumulate.
+const stale = demoted.filter((d) => !d.hadWordhood);
+console.log(
+  `Demoted ${demoted.length} words (${demoted.filter((d) => d.reason === "proper-noun").length} ` +
+    `proper nouns)${stale.length > 0 ? `; ${stale.length} stale: ${stale.map((d) => d.word).join(", ")}` : ""}.`,
 );
