@@ -88,7 +88,11 @@ describe("the vowels the rule must not drop", () => {
     const data = target([["crayon", [["K", "R", "EY1", "AA0", "N"]]]]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("crayon")).toEqual([["K", "R", "EY1", "AA0", "N"]]);
+    // Stated as "the vowel is still there" rather than as the whole reading
+    // list, because stress promotion (issue #73) appends a reading that marks
+    // that vowel `AA2`. What *this* rule must never do is delete it.
+    expect(data.pronunciations.get("crayon")?.[0]).toEqual(["K", "R", "EY1", "AA0", "N"]);
+    expect(data.pronunciations.get("crayon")).not.toContainEqual(["K", "R", "EY1", "N"]);
   });
 
   it("leaves a schwa before any other consonant alone", () => {
@@ -162,11 +166,15 @@ describe("a full vowel still separates two words", () => {
   it("does not turn `crayon` into `crane`", () => {
     // `AA0` is unstressed but not reduced. Dropping it would be a claim about
     // the ear that no General American listener would recognise.
+    //
+    // `crayon` is pinned explicitly because stress promotion (issue #73) gives
+    // it a second Rhyme Key on `AA N` — "cray-ON", which is how the real
+    // dictionary marks it — so it now reads as ambiguous.
     expect(index.adjudicate(index.pinSeed("crane"), "crayon")).toMatchObject({
       outcome: "rejected",
       reason: "does-not-rhyme",
     });
-    expect(index.adjudicate(index.pinSeed("crayon"), "crane")).toMatchObject({
+    expect(index.adjudicate(index.pinSeed("crayon", "EY AA N"), "crane")).toMatchObject({
       outcome: "rejected",
       reason: "does-not-rhyme",
     });

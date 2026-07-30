@@ -43,6 +43,16 @@ export function withSound(phoneme: Phoneme, sound: Phoneme): Phoneme {
 }
 
 /**
+ * Swap a vowel's stress while keeping its sound: `withStress("UW0", 2)` is
+ * `"UW2"`. The other counterpart to `bareSound` — `withSound` rewrites what a
+ * phoneme sounds like, this rewrites how loudly it is said. Call it on a vowel:
+ * a consonant carries no stress digit, so stressing one is meaningless.
+ */
+export function withStress(phoneme: Phoneme, stress: 0 | 1 | 2): Phoneme {
+  return bareSound(phoneme) + String(stress);
+}
+
+/**
  * The Rhyme Key of a single pronunciation: scan back to the last vowel marked
  * primary or secondary, then take every phoneme from there to the end with
  * stress digits removed. Returns null if the pronunciation has no stressed
