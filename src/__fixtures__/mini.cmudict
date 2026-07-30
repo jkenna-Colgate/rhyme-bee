@@ -81,3 +81,19 @@ UNABASHEDLY  AH2 N AH0 B AE1 SH IH0 D L IY0
 CUSS  K AH1 S
 JUSTLY  JH AH1 S T L IY0
 YODEL  Y OW1 D AH0 L
+;;; Stress promotion (issue #73): a final unstressed *full* vowel in a closed
+;;; syllable really carries secondary stress, so `module` rhymes with `cool`.
+;;; The rest of this block is what the rule must NOT reach: a word-final vowel
+;;; (`happy`, `smelly`, and the legitimate one-phoneme key of `high`/`buy`/`eye`)
+;;; and a lone inflectional coda (`arrows`/`nose`). No `-ate` word is added here
+;;; on purpose — the `EY T` family is the baseline the session and curation
+;;; suites do their arithmetic against, and the `-ate` promotion is pinned at the
+;;; seam instead, in stress-promotion.test.ts.
+MODULE  M AA1 JH UW0 L
+HAPPY  HH AE1 P IY0
+SMELLY  S M EH1 L IY0
+HIGH  HH AY1
+BUY  B AY1
+EYE  AY1
+ARROWS  AE1 R OW0 Z
+NOSE  N OW1 Z
