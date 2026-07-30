@@ -54,7 +54,10 @@ const words = new Set<string>([
   "abolish", "abolisher", "polish", "polisher",
   "youthful", "youthfulness", "truthful", "truthfulness",
   "zestful", "zestfully", "restful", "restfully",
-  "abashed", "abashedly", "unabashed", "unabashedly",
+  "abash", "abashed", "abashedly", "unabashed", "unabashedly",
+  // `cussedly` is the regression: it must be derived from `cuss`, not from the
+  // participle, or it rhymes with `justly`.
+  "cuss", "cussed", "cussedly", "justly",
   "yodel", "yodeler", "yodeller",
 ]);
 
@@ -97,7 +100,9 @@ const prevalence = new Map<string, number>([
   ["abolish", 2.0], ["abolisher", 1.4], ["polish", 2.3], ["polisher", 1.5],
   ["youthful", 2.2], ["youthfulness", 1.8], ["truthful", 2.3], ["truthfulness", 1.9],
   ["zestful", 1.5], ["zestfully", 1.3], ["restful", 2.0], ["restfully", 1.7],
-  ["abashed", 1.4], ["abashedly", 1.1], ["unabashed", 1.6], ["unabashedly", 1.5],
+  ["abash", 1.3], ["abashed", 1.4], ["abashedly", 1.1],
+  ["unabashed", 1.6], ["unabashedly", 1.5],
+  ["cuss", 1.9], ["cussed", 1.5], ["cussedly", 1.1], ["justly", 2.0],
   ["yodel", 1.6], ["yodeler", 0.6], ["yodeller", 0.5],
 ]);
 

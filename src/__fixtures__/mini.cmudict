@@ -69,6 +69,15 @@ YOUTHFUL  Y UW1 TH F AH0 L
 TRUTHFUL  T R UW1 TH F AH0 L
 ZESTFUL  Z EH1 S T F AH0 L
 RESTFUL  R EH1 S T F AH0 L
+ABASH  AH0 B AE1 SH
 ABASHED  AH0 B AE1 SH T
 UNABASHED  AH2 N AH0 B AE1 SH T
+# `unabashedly` is carried with the reading CMUdict actually gives it, so the
+# `abashedly` assertion is anchored to the dictionary rather than to a second
+# derivation making the same mistake. Its syllabic `IH0 D` is the whole point.
+UNABASHEDLY  AH2 N AH0 B AE1 SH IH0 D L IY0
+# `cuss`/`justly` pin the false accept the participle route produced: composing
+# `-ly` onto `cussed` (`K AH1 S T`) lands `cussedly` in the `justly` family.
+CUSS  K AH1 S
+JUSTLY  JH AH1 S T L IY0
 YODEL  Y OW1 D AH0 L

@@ -298,8 +298,24 @@ describe("a derived index adjudicates the words the issue names", () => {
     expect(index.adjudicate(index.pinSeed("restfully"), "zestfully").outcome).toBe("answer");
   });
 
-  it("accepts `abashedly` for a Seed Word on `AE SH T L IY`", () => {
+  it("accepts `abashedly` for a Seed Word on `AE SH IH D L IY`", () => {
+    // `unabashedly` carries the dictionary's own reading here, so this asserts
+    // agreement with CMUdict rather than two derivations sharing a mistake.
     expect(index.adjudicate(index.pinSeed("unabashedly"), "abashedly").outcome).toBe("answer");
+  });
+
+  it("gives `abashedly` the syllabic `-ed` the dictionary gives it", () => {
+    expect(index.rhymeKeysOf("abashedly")).toEqual(["AE SH IH D L IY"]);
+  });
+
+  it("does not let `cussedly` rhyme with `justly`", () => {
+    // The participle route composed `-ly` onto `cussed` (`K AH1 S T`) and landed
+    // `cussedly` on `AH S T L IY`. Deriving from `cuss` keeps the two apart.
+    expect(index.rhymeKeysOf("cussedly")).toEqual(["AH S IH D L IY"]);
+    expect(index.adjudicate(index.pinSeed("justly"), "cussedly")).toMatchObject({
+      outcome: "rejected",
+      reason: "does-not-rhyme",
+    });
   });
 
   it("accepts `yodeler`, tiered a Bonus Word by the ordinary threshold", () => {
@@ -322,5 +338,24 @@ describe("a derived index adjudicates the words the issue names", () => {
     if (verdict.outcome === "answer") {
       expect(verdict.respelling.toLowerCase()).toContain(tail);
     }
+  });
+});
+
+describe("a participle base belongs only to the `-ed` suffix variants", () => {
+  // Adverbial `-ed` is syllabic where the participle's is not, so `-ly` and
+  // `-ness` refuse a base spelled `…ed` outright. Where `-edly`/`-edness` cannot
+  // reach a stem either, the word stays underived rather than wrongly read.
+  const index = makeTestIndex();
+
+  it("leaves a word underived rather than reading it from the participle", () => {
+    // `absentmindedly` has no `absentmind` stem, so nothing derives it — and it
+    // must not fall through to `-ly` on `absentminded`.
+    expect(index.adjudicate(index.pinSeed("justly"), "absentmindedly")).toMatchObject({
+      outcome: "rejected",
+    });
+  });
+
+  it("still derives an ordinary `-ly` word whose base is not a participle", () => {
+    expect(index.rhymeKeysOf("zestfully")).toEqual(["EH S T F AH L IY"]);
   });
 });

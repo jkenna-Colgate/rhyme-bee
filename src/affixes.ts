@@ -186,11 +186,29 @@ function prefixRule({ spelling, phonemes }: Prefix): AffixRule {
  * live one, because none of the 2,505 keys this slice creates reaches the playable
  * Answer band (the largest has 14 members, the band starts at 20).
  *
+ * `-edly` and `-edness` are configured separately from `-ly` and `-ness`, and
+ * they are the one place a suffix's phonemes restate a sound the stem's own
+ * spelling already implies. Adverbial `-ed` is **syllabic** where the bare
+ * participle's is not: `unabashed` is `AH2 N AH0 B AE1 SH T`, but CMUdict's own
+ * `unabashedly` is `AH2 N AH0 B AE1 SH IH0 D L IY0`, and 41 of its 48 `-edly`
+ * entries agree. Composing `-ly` onto the participle instead would append to the
+ * `T`, and because a suffix sits *inside* the Rhyme Key that is a wrong verdict
+ * rather than a wrong respelling: `cussed` is `K AH1 S T`, so `cussedly` would
+ * land on `AH S T L IY` — the `justly` and `robustly` family. Measured against
+ * the pinned data, routing 100 targets through the participle got all 100 wrong.
+ *
+ * Composing from the *bare* stem instead gets them right: `abash` + `IH0 D L IY0`
+ * is `AH0 B AE1 SH IH0 D L IY0`, which rhymes with the dictionary's own
+ * `unabashedly` as it should. Longest-spelling-first ordering in `AFFIX_RULES`
+ * is what makes this work — `edly` is tried before `ly`, `edness` before `ness`.
+ *
  * Order here is immaterial — `AFFIX_RULES` sorts by spelling length.
  */
 export const SUFFIXES: readonly Suffix[] = [
   { spelling: "ly", phonemes: ["L", "IY0"] },
   { spelling: "ness", phonemes: ["N", "AH0", "S"] },
+  { spelling: "edly", phonemes: ["IH0", "D", "L", "IY0"] },
+  { spelling: "edness", phonemes: ["IH0", "D", "N", "AH0", "S"] },
   { spelling: "er", phonemes: ["ER0"] },
   { spelling: "est", phonemes: ["AH0", "S", "T"] },
   { spelling: "ing", phonemes: ["IH0", "NG"] },
@@ -199,6 +217,12 @@ export const SUFFIXES: readonly Suffix[] = [
   { spelling: "less", phonemes: ["L", "AH0", "S"] },
   { spelling: "ment", phonemes: ["M", "AH0", "N", "T"] },
 ];
+
+/**
+ * The configured suffix spellings, so a suffix can tell whether its own
+ * `ed`-prefixed variant exists and refuse a participle base accordingly.
+ */
+const SUFFIX_SPELLINGS = new Set(SUFFIXES.map((suffix) => suffix.spelling));
 
 /** True when the two phonemes are the same consonant — a geminate at the seam. */
 function geminates(stemEnd: Phoneme | undefined, suffixStart: Phoneme): boolean {
@@ -336,6 +360,15 @@ function suffixRule({ spelling, phonemes }: Suffix): AffixRule {
     stemsOf(word) {
       if (!word.endsWith(spelling)) return [];
       const base = word.slice(0, -spelling.length);
+      // A participle base belongs to this suffix's `ed`-prefixed variant where
+      // one is configured, and to nothing else. `-ly` must not claim `cussedly`
+      // from `cussed`: adverbial `-ed` is syllabic, so composing onto the `T`
+      // puts the word in the `justly` family. Where `-edly` cannot reach a stem
+      // either, the word stays underived — the honest outcome, because a suffix
+      // sits inside the Rhyme Key and a wrong reading here is a wrong verdict.
+      // Reading the refusal off the inventory keeps it true as suffixes are
+      // added: configuring `-edness` is what makes `-ness` refuse.
+      if (base.endsWith("ed") && SUFFIX_SPELLINGS.has(`ed${spelling}`)) return [];
       const start = phonemes[0];
       if (start === undefined) return [];
       // A candidate equal to the word itself would derive the word from itself:
