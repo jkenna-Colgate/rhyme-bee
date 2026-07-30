@@ -20,6 +20,29 @@ Decisions already made live in `docs/adr/`. ADR-0001 and ADR-0003 in particular
 were reversed mid-design — read the rejected options before proposing
 alternatives.
 
+## Context hygiene
+
+Sessions here run out of room on tool output, not on documentation. Four rules,
+in order of what actually costs:
+
+- **Never `Read` `CLAUDE.md`, `AGENTS.md`, or `CONTEXT.md`** — they are already
+  in context via the imports above. Re-reading `CONTEXT.md` costs more than
+  every ADR put together.
+- **Browser work gets its own session.** Screenshots are the single largest
+  consumer; a browser QA pass will not leave room for implementation. Capture
+  one at the end of a flow, not per step, and when you need *facts* rather than
+  *appearance* prefer `read_page`, `get_page_text`, or `read_console_messages`
+  with a `pattern` filter.
+- **`Grep` for the symbol, then read the range around it.** `session.test.ts`,
+  `normalise.ts`, `affixes.ts`, `session.ts` and `web/src/PuzzleView.tsx` are
+  each thousands of tokens to open whole, and get opened repeatedly.
+- **Filter output at the source** — `gh issue view N --json title,body` over the
+  full render, and pipe verbose commands through `tail` or `grep`. `npm test` is
+  already quiet on success; keep it that way.
+
+Read the one ADR the task turns on, not the set. They are deliberately not
+imported here, so they cost nothing until opened.
+
 ## Agent skills
 
 ### Issue tracker
