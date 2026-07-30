@@ -49,6 +49,18 @@ yet. It is a single pass, so a derived reading is never itself a stem in the
 same build. Everything it produced is listed in `derived-report.json`, with the
 stem and the rule, so over-generation is visible.
 
+The inventory holds **prefixes** (`un-`, `re-`, …) and **stress-neutral
+suffixes** (`-ly`, `-ness`, `-er`, …), and the two carry different risk. A
+prefix's phonemes sit *outside* the Rhyme Key, so a prefixed reading cannot
+change a rhyme verdict; a stress-neutral suffix leaves the stem's stress alone,
+which means the key runs *through* the suffix and a wrong suffix reading is a
+wrong verdict. Suffix rules therefore refuse anything they cannot vouch for: the
+composed key must be the stem's key extended, a geminate at the seam collapses
+to one sound (`zestful` + `-ly` has one `L`), and a stem whose readings disagree
+about where the stress falls is declined outright, because `articulate` the verb
+and `articulate` the adjective are two words and `-ly` attaches to one of them.
+The voicing-conditioned `-ed` and `-s` are not in the inventory yet.
+
 Nothing downstream of stage 3 knows the stages exist: Rhyme Key computation,
 respelling, tiering, Puzzle building, adjudication and curation all receive
 ordinary pronunciations.

@@ -116,7 +116,9 @@ function dedupe(readings: Pronunciation[]): Pronunciation[] {
  * The first rule that reaches `word` from a stem the build already reads, with
  * every reading that stem carries. A stem with several pronunciations yields
  * several derived pronunciations, because a Submission rhymes if *any* of its
- * readings rhymes (ADR-0001).
+ * readings rhymes (ADR-0001) — unless the rule declines the stem outright, which
+ * is what `admits` is for: a suffix lands inside the Rhyme Key, so it refuses a
+ * stem whose readings are two different words (`articulate`, issue #77).
  *
  * The stem must carry wordhood, not merely appear in the raw dictionary: a
  * surname or a dictionary artefact would otherwise father a whole family of
@@ -131,6 +133,7 @@ function derive(
       if (!target.words.has(stem) || target.names.has(stem)) continue;
       const stemReadings = target.pronunciations.get(stem);
       if (!stemReadings || stemReadings.length === 0) continue;
+      if (!rule.admits(stemReadings)) continue;
 
       const readings = dedupe(
         stemReadings

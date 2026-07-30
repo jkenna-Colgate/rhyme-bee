@@ -59,6 +59,28 @@ RENEWAL  R IH0 N UW1 AH0 L
 ;;; not become `crane`.
 CRANE  K R EY1 N
 CRAYON  K R EY1 AA0 N
+;;; Suffix derivation (issue #77): the stems the build composes the five words
+;;; the issue names from, each paired with a stem whose derived form rhymes, so
+;;; the derived reading can be adjudicated rather than merely inspected. Every
+;;; suffixed form is deliberately absent — that is what makes it a target.
+ABOLISH  AH0 B AA1 L IH0 SH
+POLISH  P AA1 L IH0 SH
+YOUTHFUL  Y UW1 TH F AH0 L
+TRUTHFUL  T R UW1 TH F AH0 L
+ZESTFUL  Z EH1 S T F AH0 L
+RESTFUL  R EH1 S T F AH0 L
+ABASH  AH0 B AE1 SH
+ABASHED  AH0 B AE1 SH T
+UNABASHED  AH2 N AH0 B AE1 SH T
+# `unabashedly` is carried with the reading CMUdict actually gives it, so the
+# `abashedly` assertion is anchored to the dictionary rather than to a second
+# derivation making the same mistake. Its syllabic `IH0 D` is the whole point.
+UNABASHEDLY  AH2 N AH0 B AE1 SH IH0 D L IY0
+# `cuss`/`justly` pin the false accept the participle route produced: composing
+# `-ly` onto `cussed` (`K AH1 S T`) lands `cussedly` in the `justly` family.
+CUSS  K AH1 S
+JUSTLY  JH AH1 S T L IY0
+YODEL  Y OW1 D AH0 L
 ;;; Stress promotion (issue #73): a final unstressed *full* vowel in a closed
 ;;; syllable really carries secondary stress, so `module` rhymes with `cool`.
 ;;; The rest of this block is what the rule must NOT reach: a word-final vowel
