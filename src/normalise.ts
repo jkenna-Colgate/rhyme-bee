@@ -12,6 +12,7 @@
  * ## Where this sits in the index build
  *
  *     pinned upstream inputs      data/cmudict.dict, words.txt, names.txt
+ *       -> committed demotions    hand-read wordhood corrections (src/demotions.ts)
  *       -> committed supplement   hand-authored readings (ADR-0009)
  *       -> coverage derivation    readings composed from a stem (src/coverage.ts)
  *       -> normalisation          this stage: the accent specification
