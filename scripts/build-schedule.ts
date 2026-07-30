@@ -47,7 +47,7 @@ const artifact = JSON.parse(
 const index = deserialise(artifact);
 
 const seeds = playableSeeds(index, DEFAULT_PLAYABLE_BAND);
-const { days, unplaced } = dealSchedule(seeds, startDate);
+const { days, finalWeekLength } = dealSchedule(seeds, startDate);
 
 writeFileSync(
   out,
@@ -77,13 +77,14 @@ writeFileSync(
 // The schedule only works if someone reads it, so print what a reviewer needs
 // to decide, not just a success line.
 
-const weeks = days.length / DAYS_PER_WEEK;
+const weeks = Math.ceil(days.length / DAYS_PER_WEEK);
 console.log(`Wrote ${out}`);
 console.log(`  pool ${seeds.length} -> ${days.length} days (${weeks} weeks), from ${startDate}`);
-if (unplaced.length > 0) {
+if (finalWeekLength > 0) {
+  const tail = days.slice(-finalWeekLength);
   console.log(
-    `  ${unplaced.length} unplaced (pool is not a multiple of ${DAYS_PER_WEEK}), hardest first: ` +
-      unplaced.map((u) => u.representative).join(", "),
+    `  week ${weeks} is short (${finalWeekLength} days, ends ${tail[tail.length - 1]!.weekday} ` +
+      `${tail[tail.length - 1]!.date}): ${tail.map((d) => d.entry.representative).join(", ")}`,
   );
 }
 

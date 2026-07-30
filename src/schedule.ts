@@ -43,11 +43,10 @@ export interface ScheduledDay<T extends Schedulable> {
 export interface Deal<T extends Schedulable> {
   days: ScheduledDay<T>[];
   /**
-   * Pool members the deal could not place: a pool that is not a multiple of
-   * seven leaves a remainder, and a partial week would break the ramp. Returned
-   * rather than dropped silently, so the caller can say what was left out.
+   * Days in the final week, when the pool is not a multiple of seven. Fewer than
+   * `DAYS_PER_WEEK` means the run ends mid-week; 0 means it ends on a Sunday.
    */
-  unplaced: T[];
+  finalWeekLength: number;
 }
 
 /**
@@ -96,21 +95,31 @@ export function dealSchedule<T extends Schedulable>(
     (a, b) => a.difficulty - b.difficulty || a.rhymeKey.localeCompare(b.rhymeKey),
   );
 
-  const weeks = Math.floor(sorted.length / DAYS_PER_WEEK);
-  const placeable = weeks * DAYS_PER_WEEK;
-  // The remainder comes off the hard end: dropping the easiest entries would
-  // raise the floor of the whole run, while dropping the hardest only shortens
-  // the top of the Sunday band.
-  const unplaced = sorted.slice(placeable);
+  // A pool that is not a multiple of seven ends on a short final week rather
+  // than losing its remainder — the four families that fall off a whole number
+  // of weeks include some of the best boards in the set, and a run that stops on
+  // a Thursday costs nothing but tidiness. The short week still ramps: it runs
+  // Monday onward, so it holds the *front* of the ramp and simply stops early.
+  //
+  // Weekdays that occur in the short week therefore get one more entry than
+  // those that do not, and the bands are cut to those sizes.
+  const fullWeeks = Math.floor(sorted.length / DAYS_PER_WEEK);
+  const finalWeekLength = sorted.length % DAYS_PER_WEEK;
 
-  const bands = WEEKDAYS.map((_, i) =>
-    sorted
-      .slice(i * weeks, (i + 1) * weeks)
-      .sort((a, b) => hash(a.rhymeKey) - hash(b.rhymeKey) || a.rhymeKey.localeCompare(b.rhymeKey)),
-  );
+  const bands: T[][] = [];
+  let cut = 0;
+  for (let i = 0; i < DAYS_PER_WEEK; i++) {
+    const size = fullWeeks + (i < finalWeekLength ? 1 : 0);
+    bands.push(
+      sorted
+        .slice(cut, cut + size)
+        .sort((a, b) => hash(a.rhymeKey) - hash(b.rhymeKey) || a.rhymeKey.localeCompare(b.rhymeKey)),
+    );
+    cut += size;
+  }
 
   const days: ScheduledDay<T>[] = [];
-  for (let offset = 0; offset < placeable; offset++) {
+  for (let offset = 0; offset < sorted.length; offset++) {
     const weekdayIndex = offset % DAYS_PER_WEEK;
     const weekIndex = Math.floor(offset / DAYS_PER_WEEK);
     days.push({
@@ -121,5 +130,5 @@ export function dealSchedule<T extends Schedulable>(
     });
   }
 
-  return { days, unplaced };
+  return { days, finalWeekLength };
 }

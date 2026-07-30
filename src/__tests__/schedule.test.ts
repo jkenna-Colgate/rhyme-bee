@@ -77,18 +77,35 @@ describe("determinism", () => {
 });
 
 describe("a pool that is not a multiple of seven", () => {
-  it("returns the remainder unplaced rather than shipping a partial week", () => {
-    const { days, unplaced } = dealSchedule(pool(297), MONDAY);
-    expect(days).toHaveLength(294);
-    expect(unplaced).toHaveLength(3);
+  // 291 is the live pool: 41 whole weeks and a Monday-to-Thursday tail. The
+  // families that fall off a whole number of weeks include some of the best
+  // boards in the set, so the run ends mid-week rather than losing them.
+  const { days, finalWeekLength } = dealSchedule(pool(291), MONDAY);
+
+  it("places every entry, ending on a short final week", () => {
+    expect(days).toHaveLength(291);
+    expect(new Set(days.map((d) => d.entry.rhymeKey)).size).toBe(291);
+    expect(finalWeekLength).toBe(4);
   });
 
-  it("takes the remainder off the hard end, so the floor is unchanged", () => {
-    const { unplaced } = dealSchedule(pool(297), MONDAY);
-    const hardest = [...pool(297)].sort((a, b) => b.difficulty - a.difficulty).slice(0, 3);
-    expect(new Set(unplaced.map((u) => u.rhymeKey))).toEqual(
-      new Set(hardest.map((h) => h.rhymeKey)),
-    );
+  it("runs the short week from Monday, so it holds the front of the ramp", () => {
+    const finalWeek = days.slice(-finalWeekLength);
+    expect(finalWeek.map((d) => d.weekday)).toEqual(["Mon", "Tue", "Wed", "Thu"]);
+    const difficulties = finalWeek.map((d) => d.entry.difficulty);
+    expect(difficulties).toEqual([...difficulties].sort((a, b) => a - b));
+  });
+
+  it("still ramps in every whole week before it", () => {
+    const wholeWeeks = (days.length - finalWeekLength) / DAYS_PER_WEEK;
+    for (let week = 0; week < wholeWeeks; week++) {
+      const run = days.slice(week * DAYS_PER_WEEK, (week + 1) * DAYS_PER_WEEK);
+      const difficulties = run.map((d) => d.entry.difficulty);
+      expect(difficulties).toEqual([...difficulties].sort((a, b) => a - b));
+    }
+  });
+
+  it("reports a whole number of weeks as no short week at all", () => {
+    expect(dealSchedule(pool(294), MONDAY).finalWeekLength).toBe(0);
   });
 });
 
