@@ -175,16 +175,20 @@ function prefixRule({ spelling, phonemes }: Prefix): AffixRule {
  * it is. (Those pairs already fail to rhyme with each other in the shipped
  * index; that is a normalisation question, ADR-0010, not a derivation one.)
  *
- * Unlike `PREFIXES`, this list is deliberately *not* read by the derivation
- * detector `isDerived` (ADR-0008). The prefix list has to be shared because a
- * prefixed word lands in its stem's *own* Rhyme Key, so a detector blind to the
- * prefix would score it as native content and let a Shadow Key stand as a Seed.
- * A suffixed word lands in a different key from its stem — the suffix is inside
- * the key — so it cannot inflate the stem's key. Whether a key made *entirely* of
- * suffixed words is itself a Shadow Key is a fresh question for ADR-0008, which
- * names inflections and prefixes; measured against the pinned data it is not yet a
- * live one, because none of the 2,505 keys this slice creates reaches the playable
- * Answer band (the largest has 14 members, the band starts at 20).
+ * This list is **not yet** read by the derivation detector `isDerived`, and that
+ * is now a known gap rather than a decision — issue #88. A suffixed word lands in
+ * a different key from its stem (the suffix is inside the key), so unlike a prefix
+ * it cannot inflate the *stem's* key; but a key made entirely of suffixed words is
+ * a Shadow Key by ADR-0008's own rationale, and three such keys are in the Seed
+ * pool today. ADR-0008's Amendment (2026-07-30) widens *derived* to cover this
+ * inventory, so it wants sharing the way `PREFIX_SPELLINGS` is.
+ *
+ * An earlier draft of this docblock argued the question was not live "because none
+ * of the 2,505 keys this slice creates reaches the playable Answer band (the
+ * largest has 14 members)". That counts the wrong population: it measures keys
+ * this slice *creates*, and the three live ones — `essentially`, `parentally`,
+ * `dominatingly` — were already in CMUdict. This slice lifted them over the band
+ * floor by composing the rest of their families.
  *
  * `-edly` and `-edness` are configured separately from `-ly` and `-ness`, and
  * they are the one place a suffix's phonemes restate a sound the stem's own
