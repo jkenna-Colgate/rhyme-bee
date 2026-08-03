@@ -6,20 +6,28 @@
  *   - forms built *on* the word, treating it as a lemma (`overjoy` → `overjoyed`,
  *     `overjoys`, `overjoying`), so a missing lemma can borrow a present
  *     inflection's reading;
- *   - the base forms *under* the word (`overjoyed` → `overjoy`), reusing the same
- *     stemming `lemmaCandidates` applies for the knownness lookup.
+ *   - the base forms *under* the word (`overjoyed` → `overjoy`), reusing the very
+ *     rule the engine reduces by.
  *
- * These are purely orthographic guesses — a wide, cheap net. The caller keeps
- * only the ones the dictionary actually holds; a guess like `overjoyes` that no
- * dictionary contains simply falls away. It never returns the word itself.
+ * The two directions are asymmetric on purpose. A forward guess invents a form
+ * that may not exist, so there is no reading to gate it against and it stays
+ * orthographic — a wide, cheap net, and the caller keeps only what the
+ * dictionary holds. The backward guess is a claim about a word that *does*
+ * exist, and the engine now settles those by sound: a short plural reaches its
+ * lemma only when the reading agrees, which is why `ups`, `ins` and `els`
+ * stopped propping up their families (#97). So it goes through `Derivation`,
+ * and the judge's evidence and the engine's verdict come from one rule rather
+ * than two that can disagree about the same word (#105).
+ *
+ * It never returns the word itself.
  */
 
-import { lemmaCandidates } from "./lemmatise.ts";
+import type { Derivation } from "./derivation.ts";
 
 const VOWEL = /[aeiou]/;
 const DOUBLES = /[bcdfghjklmnpqrstvwxz]/;
 
-export function inflectionalVariants(word: string): string[] {
+export function inflectionalVariants(word: string, derivation: Derivation): string[] {
   const w = word.trim().toLowerCase();
   const out: string[] = [];
   const add = (v: string) => {
@@ -47,8 +55,9 @@ export function inflectionalVariants(word: string): string[] {
     }
   }
 
-  // Base forms under the word (it is an inflection; find its lemma).
-  for (const base of lemmaCandidates(w)) if (base !== w) add(base);
+  // Base forms under the word (it is an inflection; find its lemma) — under the
+  // sound gate, so a base the engine would refuse is never offered as evidence.
+  for (const base of derivation.lemmaCandidates(w)) if (base !== w) add(base);
 
   return [...new Set(out)].filter((v) => v !== w);
 }

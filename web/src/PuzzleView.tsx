@@ -10,16 +10,18 @@
  *
  * The Reveal (#62) is the same story: the view owns only the give-up gate — the
  * button, the confirmation, and dropping the entry control once the Session is
- * over. Whether a Session has ended, and what was missed, are read from
- * `session.ended` / `missedAnswers()` / `missedBonusWords()`; nothing here
- * subtracts one word list from another.
+ * over. Whether a Session has ended, how it stands, and what was missed are read
+ * from `session.ended` / `outcome()` / `missedAnswers()` / `missedBonusWords()`;
+ * nothing here subtracts one word list from another. The plain-English rejection
+ * lines come from `REJECTION_MESSAGE`, which sits with the closed reason set so
+ * the REPL says the same thing.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { playableSeeds } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
-import { isAccepted, type RejectionReason } from "../../src/verdict.ts";
+import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
@@ -42,8 +44,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // Session — a rising edge on "every Answer found" — so it does not reappear on
   // the Bonus Words a player keeps submitting afterwards, and resets for the
   // fresh Session a new Puzzle starts (completion falls back to false there).
-  const { found, totalAnswers } = session.progress();
-  const isComplete = totalAnswers > 0 && found >= totalAnswers;
+  const isComplete = session.outcome() === "complete";
   const wasComplete = useRef(false);
   const [showComplete, setShowComplete] = useState(false);
   useEffect(() => {
@@ -147,7 +148,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
           rather than rendering a refusal for every word typed after the fact. */}
       {session.ended ? (
         <EndedNotice
-          gaveUp={!isComplete}
+          gaveUp={session.outcome() === "given-up"}
           score={session.score()}
           rankLabel={session.rank().label}
         />
@@ -354,10 +355,10 @@ function GiveUpConfirm({
 }
 
 /**
- * What stands where the entry form was once the Session is over. `gaveUp` is read
- * off the Reveal itself — Answers still missing means the player gave up; none
- * means they had already finished and only asked for the Bonus Words, which is
- * not giving up and should not be worded as if it were.
+ * What stands where the entry form was once the Session is over. `gaveUp` is the
+ * Session's own outcome, not a sum done here — a player who had already found
+ * every Answer and only asked for the Bonus Words has not given up, and must not
+ * be worded as if they had.
  */
 function EndedNotice({
   gaveUp,
@@ -460,15 +461,6 @@ function Stat({ label, value }: { label: string; value: string }) {
 // --- Per-Submission feedback: every Verdict rendered distinctly (ADR-0005) -----
 
 /** Plain-English messages for the closed rejection set — one distinct line each. */
-const REJECTION_MESSAGE: Record<RejectionReason, string> = {
-  "does-not-rhyme": "doesn’t rhyme with the Seed Word",
-  "is-the-seed-word": "that’s the Seed Word itself",
-  "already-submitted": "you’ve already found that",
-  "proper-noun": "proper nouns don’t count",
-  "not-a-known-word": "not a word we know",
-  malformed: "letters only, please",
-};
-
 function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }) {
   const { verdict, word, scoreDelta } = result;
 

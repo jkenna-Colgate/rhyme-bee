@@ -10,8 +10,7 @@
 
 import { describe, expect, it } from "vitest";
 import { applyNormalisation } from "../normalise.ts";
-import { applySupplement } from "../supplement.ts";
-import { buildTestIndex, makeTestData, makeTestIndex } from "../__fixtures__/index.ts";
+import { makeTestIndex } from "../__fixtures__/index.ts";
 import type { Pronunciation } from "../phonology.ts";
 import { isAccepted } from "../verdict.ts";
 
@@ -138,9 +137,7 @@ describe("normalisation runs after the committed supplement", () => {
     // A supplement entry asserts a *reading*; normalisation asserts the accent.
     // `chalked` arrives with AO from the human override and is still merged, so
     // the override is an input to the accent spec, not an exemption from it.
-    const data = makeTestData();
-    applySupplement("chalked  CH AO1 K T", data);
-    const index = buildTestIndex(data);
+    const index = makeTestIndex({ supplement: "chalked  CH AO1 K T" });
 
     expect(index.adjudicate(index.pinSeed("docked"), "chalked").outcome).toBe("bonus");
   });

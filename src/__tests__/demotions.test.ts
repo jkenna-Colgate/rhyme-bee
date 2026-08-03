@@ -11,9 +11,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { applyDemotions, parseDemotions } from "../demotions.ts";
-import { buildTestIndex, makeTestData } from "../__fixtures__/index.ts";
+import { makeTestIndex, type TestInputs } from "../__fixtures__/index.ts";
 import type { Pronunciation } from "../phonology.ts";
-import type { RhymeIndexData } from "../rhymeIndex.ts";
 
 function target(overrides: { words?: string[]; names?: string[] } = {}) {
   return {
@@ -98,29 +97,26 @@ describe("a demoted index adjudicates", () => {
     ["congrats", ["K", "AH0", "N", "G", "R", "AE1", "T", "S"]],
   ];
 
-  function leakedData(): RhymeIndexData {
-    const data = makeTestData();
-    for (const [word, pron] of [...LEAKED, ...KEPT]) {
-      data.pronunciations.set(word, [pron]);
-      data.words.add(word);
-    }
-    return data;
-  }
+  /** The leak as pinned inputs: every one of them a word with a reading. */
+  const leak: TestInputs = {
+    pronunciations: [...LEAKED, ...KEPT].map(([word, pron]) => [word, [pron]]),
+    words: [...LEAKED, ...KEPT].map(([word]) => word),
+  };
 
   const demotions = LEAKED.map(([word]) => `${word} proper-noun`).join("\n");
 
   it("serves a leaked name as a valid rhyme until it is demoted", () => {
     // The defect itself (#51, #90), asserted so the fix cannot be mistaken for a
     // test that was always green: `kate` rhymes with `ate`, the Tutorial's Seed.
-    const index = buildTestIndex(leakedData());
+    const index = makeTestIndex(leak);
 
     expect(index.adjudicate(index.pinSeed("ate"), "kate").outcome).not.toBe("rejected");
   });
 
   it.each(LEAKED.map(([word]) => word))("rejects %s with reason proper-noun", (word) => {
-    const data = leakedData();
-    applyDemotions(demotions, data);
-    const index = buildTestIndex(data);
+    // Through the composed build, so the demotion stage runs where it really
+    // runs — first, ahead of the supplement's refusal to launder a name (#106).
+    const index = makeTestIndex({ ...leak, demotions });
 
     expect(index.adjudicate(index.pinSeed("ate"), word)).toMatchObject({
       outcome: "rejected",
@@ -129,9 +125,7 @@ describe("a demoted index adjudicates", () => {
   });
 
   it.each(KEPT.map(([word]) => word))("leaves %s alone — it is not a name", (word) => {
-    const data = leakedData();
-    applyDemotions(demotions, data);
-    const index = buildTestIndex(data);
+    const index = makeTestIndex({ ...leak, demotions });
 
     expect(index.hasWord(word)).toBe(true);
   });

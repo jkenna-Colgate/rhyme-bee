@@ -22,7 +22,8 @@
  */
 
 import type { Pronunciation } from "../phonology.ts";
-import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
+import type { RhymeIndex } from "../rhymeIndex.ts";
+import { buildSlice } from "./build.ts";
 
 /** The committed threshold, so `el` (below zero) tiers as the data says. */
 const KNOWNNESS_THRESHOLD = 0.0;
@@ -108,15 +109,11 @@ const prevalence = new Map<string, number>([
   ["bell", 1.9], ["cell", 2.0],
 ]);
 
-export function makeShortPluralData(): RhymeIndexData {
-  return {
-    pronunciations: new Map([...pronunciations, ...baseReadings]),
-    words: new Set([...pronunciations.keys(), ...baseReadings.keys()]),
-    names: new Set(),
-    prevalence: new Map(prevalence),
-  };
-}
-
+/** Built by the same call the real build makes, all four stages (#106). */
 export function makeShortPluralIndex(): RhymeIndex {
-  return new RhymeIndex(makeShortPluralData(), { knownnessThreshold: KNOWNNESS_THRESHOLD });
+  const readings = new Map([...pronunciations, ...baseReadings]);
+  return buildSlice(
+    { pronunciations: readings, words: readings.keys(), prevalence },
+    KNOWNNESS_THRESHOLD,
+  ).index;
 }

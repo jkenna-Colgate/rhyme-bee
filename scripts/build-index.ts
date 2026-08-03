@@ -12,14 +12,8 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { parseCmudict } from "../src/cmudict.ts";
-import { applyCoverage } from "../src/coverage.ts";
-import { applyDemotions } from "../src/demotions.ts";
-import { applyNormalisation } from "../src/normalise.ts";
-import { parsePrevalenceCsv, parseWordList } from "../src/pipeline.ts";
+import { manufactureIndexData } from "../src/manufacture.ts";
 import { serialise } from "../src/serialise.ts";
-import { applySupplement } from "../src/supplement.ts";
-import type { RhymeIndexData } from "../src/rhymeIndex.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
@@ -36,45 +30,17 @@ function read(name: string): string {
 
 const sources = JSON.parse(read("sources.json")) as Record<string, string>;
 
-const pronunciations = parseCmudict(read("cmudict.dict"));
-const words = parseWordList(read("words.txt"));
-const names = parseWordList(read("names.txt"));
-const prevalence = parsePrevalenceCsv(read("prevalence.csv"));
-
-// The committed demotion list (#90), applied *first*, so every stage below reads
-// a corrected word list rather than working around it: the upstream wordhood
-// list carries surnames and placenames, and the gate tests wordhood before
-// name-hood, so `algiers` was being served as an ordinary Answer. Running here
-// means the supplement's standing refusal to launder a name into a word covers
-// demoted names too. See src/demotions.ts.
-const demoted = applyDemotions(read("demotions.txt"), { words, names });
-
-// The committed human override layer (ADR-0009), merged over the pinned upstream
-// inputs: it adds missing words (with a reading) and corrects mis-marked stress,
-// and — unlike everything else in data/ — it survives this rebuild.
-applySupplement(read("supplement.dict"), { pronunciations, words, names });
-
-// Tier 1 coverage (issue #76): a known word with no reading is given one,
-// composed from a stem the build already reads. It runs *after* the supplement,
-// so a hand-authored reading always beats a composed one, and supplies readings
-// only — never wordhood. See src/coverage.ts.
-const derived = applyCoverage({ pronunciations, words, names, prevalence });
-
-// The accent specification (ADR-0010), applied to every reading before any Rhyme
-// Key is computed. It runs *last* so a hand-authored or derived reading is an
-// input to the accent rather than an exemption from it. See src/normalise.ts.
-applyNormalisation({ pronunciations });
-
-const data: RhymeIndexData = { pronunciations, words, names, prevalence };
-
-// Dropped-words report (story 40): every CMUdict surface form that will never be
-// a valid Submission, and why — so over-aggressive filtering is visible.
-const dropped: { word: string; reason: "proper-noun" | "not-in-word-list" }[] = [];
-for (const word of pronunciations.keys()) {
-  if (words.has(word)) continue;
-  dropped.push({ word, reason: names.has(word) ? "proper-noun" : "not-in-word-list" });
-}
-dropped.sort((a, b) => a.word.localeCompare(b.word));
+// The whole stage order lives behind this one call — demotions, supplement,
+// coverage, normalisation — so the script cannot run them out of turn, twice, or
+// not at all. Its job from here is files in, files out. See src/manufacture.ts.
+const { data, demoted, derived, dropped } = manufactureIndexData({
+  cmudict: read("cmudict.dict"),
+  words: read("words.txt"),
+  names: read("names.txt"),
+  prevalence: read("prevalence.csv"),
+  demotions: read("demotions.txt"),
+  supplement: read("supplement.dict"),
+});
 
 mkdirSync(outDir, { recursive: true });
 writeFileSync(
@@ -89,8 +55,8 @@ writeFileSync(resolve(outDir, "dropped-report.json"), JSON.stringify(dropped, nu
 writeFileSync(resolve(outDir, "derived-report.json"), JSON.stringify(derived, null, 2));
 
 console.log(
-  `Built index: ${pronunciations.size} pronunciations, ${words.size} words, ` +
-    `${prevalence.size} prevalence entries, ${derived.length} derived, ` +
+  `Built index: ${data.pronunciations.size} pronunciations, ${data.words.size} words, ` +
+    `${data.prevalence.size} prevalence entries, ${derived.length} derived, ` +
     `${dropped.length} dropped. Threshold ${KNOWNNESS_THRESHOLD}.`,
 );
 

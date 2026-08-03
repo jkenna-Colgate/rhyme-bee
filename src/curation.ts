@@ -1,16 +1,20 @@
 /**
  * Curation: answer ADR-0004's open question by exercising the production path.
- * Running `buildPuzzle` over every distinct Rhyme Key yields both the family-size
- * distribution and the candidate Seed Word list — there is no separate analysis
- * tool.
+ * Reading every Rhyme Key's family off the index's single traversal yields both
+ * the family-size distribution and the candidate Seed Word list — there is no
+ * separate analysis tool, and no second opinion about who belongs to a key.
+ *
+ * What stays here is curation's own work: the ordered exclusion gates, the
+ * representative choice, and the Difficulty sum. Membership, tier judgement and
+ * Seed Word exclusion belong to `rhymeIndex.ts`, which is where `buildPuzzle`
+ * gets them too.
  *
  * Seed Words are keyed by Rhyme Key, not spelling: `late` and `great` are the
  * same Puzzle and appear once, under a chosen representative.
  */
 
-import { rhymeKeyOf, type RhymeKey } from "./phonology.ts";
-import { isDerived, type ReadingsOf } from "./lemmatise.ts";
-import type { RhymeIndex } from "./rhymeIndex.ts";
+import type { RhymeKey } from "./phonology.ts";
+import { splitFamily, type RhymeIndex } from "./rhymeIndex.ts";
 import {
   DEFAULT_SCORING_CONFIG,
   isRare,
@@ -100,14 +104,9 @@ export interface CurationReport {
  * fix that but prefers `messed` to `best` and `crowned` to `round`, since an
  * inflected form can out-rank its own stem; native-first settles that.
  */
-function chooseRepresentative(
-  words: string[],
-  index: RhymeIndex,
-  isWord: (word: string) => boolean,
-  readingsOf: ReadingsOf,
-): string {
+function chooseRepresentative(words: string[], index: RhymeIndex): string {
   const rank = (word: string) => ({
-    derived: isDerived(word, isWord, readingsOf) ? 1 : 0,
+    derived: index.derivation.isDerived(word) ? 1 : 0,
     ambiguous: index.isAmbiguous(word) ? 1 : 0,
     // Absent from the prevalence norms sorts last, not first.
     knownness: index.tierOf(word).knownness ?? -Infinity,
@@ -153,68 +152,55 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
   const accentUnstable = options.accentUnstable ?? new Set<RhymeKey>();
   const blocked = options.blocked ?? new Map<string, string>();
   const scoring = options.scoring ?? DEFAULT_SCORING_CONFIG;
-  // Derivation is tested against the wordhood word list — a member is derived
-  // only relative to other real words (ADR-0008).
-  const isWord = (word: string): boolean => index.hasWord(word);
-  // …and against the readings the index holds, because the shortest inflections
-  // are settled by sound rather than by spelling (issue #97).
-  const readingsOf: ReadingsOf = (word) => index.readingsOf(word);
+  // Derivation is asked of the index rather than assembled here: a member is
+  // derived only relative to the very words and readings this index holds
+  // (ADR-0008, and the sound gate of issue #97).
+  const derivation = index.derivation;
 
-  // Group wordhood-valid words by Rhyme Key (a word contributes to each of its
-  // keys). Names are already excluded by `wordhoodEntries`, so no Seed is a name.
-  const wordsByKey = new Map<RhymeKey, string[]>();
-  for (const [word, prons] of index.wordhoodEntries()) {
-    const seen = new Set<RhymeKey>();
-    for (const pron of prons) {
-      const key = rhymeKeyOf(pron);
-      if (key === null || seen.has(key)) continue;
-      seen.add(key);
-      const bucket = wordsByKey.get(key);
-      if (bucket) bucket.push(word);
-      else wordsByKey.set(key, [word]);
-    }
-  }
-
+  // One traversal, one family per Rhyme Key. Membership, tier judgement and Seed
+  // Word exclusion are the index's to define — this used to hand-inline an
+  // equivalent pass, because building a Puzzle per key re-scans every wordhood
+  // word (O(keys × words)), and the two were kept in agreement by a comment.
+  // Names are already excluded upstream, so no Seed is a name.
   const families: FamilyEntry[] = [];
   const histogram = new Map<number, number>();
   const candidates: FamilyEntry[] = [];
   const dropped: DroppedEntry[] = [];
 
-  for (const [rhymeKey, words] of wordsByKey) {
-    const representative = chooseRepresentative(words, index, isWord, readingsOf);
-    // Tally the family straight from its grouped words rather than rebuilding a
-    // full Puzzle per Rhyme Key. `buildPuzzle` re-scans every wordhood word on
-    // each call (O(keys × words)); `wordsByKey` already holds each key's members.
-    // Membership, tier judgement and Seed exclusion match buildPuzzle exactly.
-    // Difficulty rides along the same pass: each Answer's points (from the shared
-    // `scoreEntry`, so the `1 − difficulty` identity is exact) feed a running
-    // maxScore and the rare-only rareMass. length is the word's length, knownness
-    // is the tier judgement's — no Puzzle build, and no second rare line.
-    let answerCount = 0;
-    let bonusCount = 0;
+  for (const rhymeFamily of index.families().values()) {
+    const { rhymeKey, members } = rhymeFamily;
+    const representative = chooseRepresentative(
+      members.map((member) => member.word),
+      index,
+    );
+    const { answers, bonusWords } = splitFamily(rhymeFamily, representative);
+
+    // Native content counts every member — including the representative —
+    // since a Shadow Key is one whose *whole* family is derived, Seed included.
+    let nativeCount = 0;
+    for (const member of members) {
+      if (!derivation.isDerived(member.word)) nativeCount++;
+    }
+
+    // Difficulty from the shared per-Answer points (`scoreEntry`, so the
+    // `1 − difficulty` identity stays exact): the rare-only mass over the
+    // whole maximum achievable Score (ADR-0007).
     let maxScore = 0;
     let rareMass = 0;
-    let nativeCount = 0;
-    for (const word of words) {
-      // Native content counts every member — including the representative — a
-      // Shadow Key is one whose *whole* family is derived, Seed included.
-      if (!isDerived(word, isWord, readingsOf)) nativeCount++;
-      if (word === representative) continue; // buildPuzzle skips the Seed Word
-      const { tier, knownness } = index.tierOf(word);
-      if (tier !== "answer") {
-        bonusCount++;
-        continue;
-      }
-      answerCount++;
-      const points = scoreEntry({ length: word.length, knownness }, scoring);
+    for (const answer of answers) {
+      const points = scoreEntry(
+        { length: answer.length, knownness: answer.knownness },
+        scoring,
+      );
       maxScore += points;
-      if (isRare(knownness, scoring)) rareMass += points;
+      if (isRare(answer.knownness, scoring)) rareMass += points;
     }
+
     const family: FamilyEntry = {
       rhymeKey,
       representative,
-      answerCount,
-      bonusCount,
+      answerCount: answers.length,
+      bonusCount: bonusWords.length,
       multiplePronunciations: index.isAmbiguous(representative),
       difficulty: maxScore === 0 ? 0 : rareMass / maxScore,
       nativeCount,

@@ -46,7 +46,7 @@ import { fileURLToPath } from "node:url";
 import { DEFAULT_PLAYABLE_BAND, playableSeeds, type FamilyEntry } from "../src/curation.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import type { SeedWord } from "../src/rhymeIndex.ts";
-import { isAccepted } from "../src/verdict.ts";
+import { isAccepted, REJECTION_MESSAGE } from "../src/verdict.ts";
 import { DAYS, parsePlayArgs, type PlayArgs } from "./playArgs.ts";
 import { Session, type SubmissionResult } from "../src/session.ts";
 
@@ -199,7 +199,9 @@ function tierLine(family: FamilyEntry | undefined): string {
 function printSubmission(session: Session, result: SubmissionResult): void {
   const { verdict, word, scoreDelta } = result;
   if (!isAccepted(verdict)) {
-    console.log(`  ✗ ${word} — rejected: ${verdict.reason}`);
+    // The player-facing line, from the one table both clients share — not the
+    // machine reason, which this used to print at whoever was playing.
+    console.log(`  ✗ ${word} — ${REJECTION_MESSAGE[verdict.reason]}`);
     return;
   }
 
@@ -227,7 +229,7 @@ function printFinish(session: Session): void {
   console.log(`  Answers:     ${result.found}/${result.totalAnswers}`);
 
   const missed = session.missedAnswers();
-  if (missed.length === 0) {
+  if (session.outcome() === "complete") {
     console.log(`  You found every Answer. Perfect game.`);
   } else {
     console.log(`  Missed Answers (${missed.length}):`);

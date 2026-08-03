@@ -97,6 +97,22 @@ export interface Progress {
   foundBonus: number;
 }
 
+/**
+ * Where a Session stands as a whole (CONTEXT.md). Derived, never stored —
+ * `PlayState` keeps the finds and the `ended` flag, and this reads them.
+ *
+ * `complete` means every Answer is found, whether or not the player has since
+ * taken the Reveal: finishing the Puzzle and then asking to see the Bonus Words
+ * is not giving up, and must not be worded as if it were. `given-up` is the
+ * Reveal taken with Answers still missing. Everything else is `in-progress`,
+ * including a fresh Session on a Puzzle with no Answers at all — nobody has
+ * completed anything there.
+ *
+ * Bonus Words never enter it. They are celebrated, not counted (CONTEXT.md), so
+ * collecting one after the last Answer leaves the outcome exactly where it was.
+ */
+export type SessionOutcome = "in-progress" | "complete" | "given-up";
+
 /** A Rank crossing: the rung left and the rung reached. */
 export interface RankChange {
   from: Rank;
@@ -239,6 +255,19 @@ export function progress(context: PuzzleContext, state: PlayState): Progress {
 }
 
 /**
+ * How the Session stands: in progress, complete, or given up. Derived here once,
+ * beside Score, Rank and progress, because both clients were computing it and
+ * neither by the same formula — the shell compared found Answers against the
+ * total, the REPL asked whether anything was missed. Those are the same question
+ * with two answers waiting to disagree.
+ */
+export function outcome(context: PuzzleContext, state: PlayState): SessionOutcome {
+  const { found, totalAnswers } = progress(context, state);
+  if (totalAnswers > 0 && found >= totalAnswers) return "complete";
+  return state.ended ? "given-up" : "in-progress";
+}
+
+/**
  * The Answers the player has not found — the Puzzle's Answers minus the found
  * ones, in the Puzzle's own order. The reveal shown at the end of a game; a
  * derivation over play-state that belongs in the core, not in a client.
@@ -375,6 +404,15 @@ export class Session {
   /** How far through the Puzzle: Answers found of the total, Bonus collected. */
   progress(): Progress {
     return progress(this.context, this.state);
+  }
+
+  /**
+   * Where the Session stands: `in-progress`, `complete` or `given-up`. Clients
+   * read this rather than reconstructing it from progress or from what the
+   * Reveal has left over.
+   */
+  outcome(): SessionOutcome {
+    return outcome(this.context, this.state);
   }
 
   /** The Answers not yet found, in the Puzzle's order — half of the Reveal. */

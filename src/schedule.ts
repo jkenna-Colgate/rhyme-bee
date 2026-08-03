@@ -132,3 +132,107 @@ export function dealSchedule<T extends Schedulable>(
 
   return { days, finalWeekLength };
 }
+
+// --- The review ---------------------------------------------------------------
+
+/**
+ * What the review needs from a dealt entry, over and above what the deal needed.
+ * `FamilyEntry` satisfies it.
+ */
+export interface Reviewable extends Schedulable {
+  answerCount: number;
+  nativeCount: number;
+}
+
+/** One weekday's Difficulty band across the whole run: the ramp, one rung. */
+export interface WeekdayBand {
+  weekday: Weekday;
+  min: number;
+  max: number;
+}
+
+/** The tail of the run, when the pool is not a multiple of seven. */
+export interface ShortFinalWeek<T extends Reviewable> {
+  /** 1-based week number, matching `ScheduledDay.week`. */
+  week: number;
+  length: number;
+  days: ScheduledDay<T>[];
+}
+
+export interface ScheduleReview<T extends Reviewable> {
+  totalDays: number;
+  weeks: number;
+  /**
+   * One band per weekday that the deal actually fills, in Monday-to-Sunday
+   * order. Monotonic by construction — the deal cuts non-overlapping Difficulty
+   * bands — and asserted so, because that construction is the whole ramp.
+   */
+  ramp: WeekdayBand[];
+  /** The short tail, or null when the pool divides exactly into weeks. */
+  shortFinalWeek: ShortFinalWeek<T> | null;
+  /** The days worth reading first, in schedule order. See `isFlagged`. */
+  flagged: ScheduledDay<T>[];
+}
+
+/**
+ * A Seed Word this short is unlikely to be a word the player recognises when it
+ * is spoken to them — abbreviations and fragments hold wordhood and are always
+ * short.
+ */
+const FLAG_MAX_SEED_LENGTH = 3;
+
+/**
+ * Native content this thin means the family is barely more than a Shadow Key —
+ * ADR-0008's gray band, measured in #89. It passed the gate, but only just, so a
+ * person should look.
+ */
+const FLAG_MAX_NATIVE_COUNT = 3;
+
+/**
+ * Whether a dealt day is worth reading first. A Seed Word is shown *and spoken*
+ * to the player (ADR-0002), so a representative that is not a recognisable word
+ * is exactly the failure the review exists to catch. Flagging is advisory: it
+ * points the reviewer at the likeliest offenders rather than deciding anything.
+ */
+function isFlagged<T extends Reviewable>(day: ScheduledDay<T>): boolean {
+  return (
+    day.entry.representative.length <= FLAG_MAX_SEED_LENGTH ||
+    day.entry.nativeCount <= FLAG_MAX_NATIVE_COUNT
+  );
+}
+
+/**
+ * The review of a dealt schedule, as values.
+ *
+ * The schedule is a reviewed artifact — a person reading it is the gate, not an
+ * automated check (ADR-0012) — which makes the summary they read load-bearing.
+ * It lived inside a print loop in an untested script; here it is data, so its
+ * judgement can be tested. This does *not* automate the gate: nothing here
+ * passes or fails a schedule, and the artifact stays hand-reviewed.
+ */
+export function reviewSchedule<T extends Reviewable>(deal: Deal<T>): ScheduleReview<T> {
+  const { days, finalWeekLength } = deal;
+  const weeks = Math.ceil(days.length / DAYS_PER_WEEK);
+
+  const ramp: WeekdayBand[] = [];
+  for (const weekday of WEEKDAYS) {
+    const band = days.filter((d) => d.weekday === weekday).map((d) => d.entry.difficulty);
+    // A pool shorter than a week leaves later weekdays unfilled; a band with no
+    // members has no range to report, so it is absent rather than infinite.
+    if (band.length === 0) continue;
+    ramp.push({ weekday, min: Math.min(...band), max: Math.max(...band) });
+  }
+
+  const shortFinalWeek =
+    finalWeekLength > 0
+      ? { week: weeks, length: finalWeekLength, days: days.slice(-finalWeekLength) }
+      : null;
+
+  return {
+    totalDays: days.length,
+    weeks,
+    ramp,
+    shortFinalWeek,
+    flagged: days.filter(isFlagged),
+  };
+}

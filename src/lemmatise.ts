@@ -13,29 +13,13 @@
  * without changing the contract.
  *
  * A three-letter `-s` form gets no base here, because on spelling alone it does
- * not deserve one: `lemmaCandidatesBySound` adds it for the callers that hold
- * readings and can check that it sounds like one. See that function for why.
+ * not deserve one: `Derivation.lemmaCandidates` adds it for the callers that
+ * hold readings and can check that it sounds like one. See `derivation.ts` for
+ * why — and go through it rather than here whenever readings are available.
  */
-
-import { PREFIX_SPELLINGS } from "./affixes.ts";
-import type { Pronunciation } from "./phonology.ts";
 
 function dedupe(candidates: string[]): string[] {
   return [...new Set(candidates.filter((c) => c.length > 0))];
-}
-
-/** The phonemes a regular plural or third-person `-s` is realised as. */
-const S_SUFFIX_PHONEMES = new Set(["S", "Z"]);
-
-/**
- * The base of a three-letter `-s` form — `up` for `ups` — or null if the word is
- * not one. Two-letter forms have none: that is where the word list's junk lives,
- * and nothing in the Seed pool depends on them.
- */
-function shortSFormBase(w: string): string | null {
-  if (w.length !== 3) return null;
-  if (!w.endsWith("s") || w.endsWith("ss")) return null;
-  return w.slice(0, -1);
 }
 
 export function lemmaCandidates(word: string): string[] {
@@ -66,122 +50,4 @@ export function lemmaCandidates(word: string): string[] {
   }
 
   return dedupe(candidates);
-}
-
-/** A word's readings, as the index holds them. Empty if it has none. */
-export type ReadingsOf = (word: string) => Pronunciation[];
-
-/** True if a reading of `form` is exactly a reading of `base` plus S or Z. */
-function soundsInflected(form: string, base: string, readingsOf: ReadingsOf): boolean {
-  const baseReadings = readingsOf(base);
-  if (baseReadings.length === 0) return false;
-  for (const reading of readingsOf(form)) {
-    if (!S_SUFFIX_PHONEMES.has(reading[reading.length - 1] ?? "")) continue;
-    const stem = reading.slice(0, -1);
-    for (const baseReading of baseReadings) {
-      if (baseReading.length !== stem.length) continue;
-      if (baseReading.every((phoneme, i) => phoneme === stem[i])) return true;
-    }
-  }
-  return false;
-}
-
-/**
- * `lemmaCandidates`, for a caller that holds readings: a three-letter `-s` form
- * gains its base when the *sound* agrees — the form's reading must be the base's
- * reading plus a final S or Z. It adds a candidate and removes none, and the
- * only word it can add one to is a three-letter `-s` form, so the blast radius
- * is bounded by construction and every other caller is untouched.
- *
- * Spelling alone cannot do this job. Admitting every three-letter `-s` form
- * whose base holds wordhood reaches 142 words, against this rule's 24, and calls
- * `has` an inflection of `ha`, `yes` of `ye`, `gas` of `ga`. Neither can
- * knownness: `els` must be demoted, which needs `el` (prevalence −0.324) to
- * count as a base, while `has` must not be, which needs `ha` (1.280) not to — no
- * floor separates that pair, so the whole family of threshold rules is ruled out
- * by measurement rather than by taste. The vowel does what neither can: `ups` is
- * `AH1 P` + `S` and is an inflection of `up`; `has` is `HH AE1 Z` where `ha` is
- * `HH AA1`, and is an inflection of nothing.
- *
- * Refusing the whole class is what the bug was (#89's third cause, #97): `ups`
- * never yielded `up`, so `AH P S` scored as native rhyme content and stood as a
- * Seed — a board whose every Answer is a plural — while `ups`, `ads`, `ohs` and
- * `ons` took no knownness at all and were celebrated as Bonus Words.
- *
- * Known misses, documented rather than special-cased. `was` is `wa` + `Z` and
- * `yes` is `ye(2)` + `S` in the dictionary's own transcription, so both are read
- * as inflections. Measured cost: `AA Z` falls from 17 native members to 13 and
- * `EH S` from 82 to 78, neither leaves the Seed pool, neither is represented by
- * the demoted word, and both words keep their own knownness because they are in
- * the prevalence norms and the surface form is consulted first. An exception
- * list for two words that change no outcome would be pure cost.
- */
-export function lemmaCandidatesBySound(word: string, readingsOf: ReadingsOf): string[] {
-  const w = word.trim().toLowerCase();
-  const candidates = lemmaCandidates(w);
-  const base = shortSFormBase(w);
-  if (base === null || !soundsInflected(w, base, readingsOf)) return candidates;
-  // Last, because the surface form is still consulted first: `was` is in the
-  // prevalence norms and keeps its own knownness, whatever `wa` scores.
-  return dedupe([...candidates, base]);
-}
-
-/**
- * Common derivational prefixes (ADR-0008), read from the one affix inventory
- * the build configures — the same list the coverage stage composes readings
- * with. They must not drift apart: a prefix that can give a word a reading puts
- * that word in a Rhyme Key family, and a detector that did not know the prefix
- * would score it as native content and let a Shadow Key stand as a Seed.
- *
- * The minimum stem length is deliberately *not* shared. Inventing a reading for
- * a two-letter stem is a bad bet, so `src/affixes.ts` refuses it; merely
- * recognising `redo` as `re` + `do` is safe and stays here.
- */
-const DERIVATIONAL_PREFIXES = PREFIX_SPELLINGS;
-
-/**
- * True if `word` is a regular inflection of some *other* dictionary word — the
- * inflectional bases the lemmatiser already yields, kept only when the
- * dictionary actually holds one. The word standing in for its own base (a word
- * that is its own only candidate) is not an inflection.
- */
-function isInflection(
-  word: string,
-  isWord: (w: string) => boolean,
-  readingsOf: ReadingsOf,
-): boolean {
-  return lemmaCandidatesBySound(word, readingsOf)
-    .some((base) => base !== word && isWord(base));
-}
-
-/**
- * True if `word` is *derived* — a regular inflection (`-s/-es/-ies/-ed/-ing`) or
- * a common-prefix affixation (`un-/re-/out-/…`) of a dictionary word (ADR-0008).
- * A word that is neither is *native*: it carries rhyme content of its own, and
- * only native content makes a Rhyme Key eligible to be a Seed.
- *
- * Both passes are required. Suffix stripping alone lets `unaided`/`outstanding`
- * masquerade as native, so the shadow keys they sit in wrongly survive. A prefix
- * counts only when what remains is itself a real word or an inflection of one, so
- * a prefix that merely happens to start a native word — the `re` in `read` — is
- * not a false positive.
- *
- * `readingsOf` sits beside `isWord` because the shortest inflections cannot be
- * judged on spelling: see `lemmaCandidatesBySound`. Wordhood answers "is there a
- * base?", readings answer "does it sound like one?", and a word needs both.
- */
-export function isDerived(
-  word: string,
-  isWord: (w: string) => boolean,
-  readingsOf: ReadingsOf,
-): boolean {
-  const w = word.trim().toLowerCase();
-  if (isInflection(w, isWord, readingsOf)) return true;
-  for (const prefix of DERIVATIONAL_PREFIXES) {
-    if (!w.startsWith(prefix)) continue;
-    const base = w.slice(prefix.length);
-    if (base.length < 2) continue;
-    if (isWord(base) || isInflection(base, isWord, readingsOf)) return true;
-  }
-  return false;
 }

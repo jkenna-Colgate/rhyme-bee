@@ -18,7 +18,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEFAULT_PLAYABLE_BAND, playableSeeds } from "../src/curation.ts";
-import { dealSchedule, DAYS_PER_WEEK } from "../src/schedule.ts";
+import { dealSchedule, reviewSchedule } from "../src/schedule.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
 
@@ -48,7 +48,8 @@ const artifact = JSON.parse(
 const index = deserialise(artifact);
 
 const seeds = playableSeeds(index, DEFAULT_PLAYABLE_BAND);
-const { days, finalWeekLength } = dealSchedule(seeds, startDate);
+const deal = dealSchedule(seeds, startDate);
+const { days } = deal;
 
 writeFileSync(
   out,
@@ -81,36 +82,35 @@ writeFileSync(
 );
 
 // --- Review summary -------------------------------------------------------
-// The schedule only works if someone reads it, so print what a reviewer needs
-// to decide, not just a success line.
+// The schedule only works if someone reads it, so print what a reviewer needs to
+// decide, not just a success line. The judgement — the ramp, the short final
+// week, which days to read first — is `reviewSchedule`, so it is tested; this
+// formats what it is handed and does no filtering or arithmetic of its own.
 
-const weeks = Math.ceil(days.length / DAYS_PER_WEEK);
+const review = reviewSchedule(deal);
+
 console.log(`Wrote ${out}`);
-console.log(`  pool ${seeds.length} -> ${days.length} days (${weeks} weeks), from ${startDate}`);
-if (finalWeekLength > 0) {
-  const tail = days.slice(-finalWeekLength);
+console.log(
+  `  pool ${seeds.length} -> ${review.totalDays} days (${review.weeks} weeks), from ${startDate}`,
+);
+if (review.shortFinalWeek) {
+  const { week, length, days: tail } = review.shortFinalWeek;
+  const last = tail[tail.length - 1]!;
   console.log(
-    `  week ${weeks} is short (${finalWeekLength} days, ends ${tail[tail.length - 1]!.weekday} ` +
-      `${tail[tail.length - 1]!.date}): ${tail.map((d) => d.entry.representative).join(", ")}`,
+    `  week ${week} is short (${length} days, ends ${last.weekday} ` +
+      `${last.date}): ${tail.map((d) => d.entry.representative).join(", ")}`,
   );
 }
 
 console.log("\nDifficulty band per weekday (the ramp):");
-for (const weekday of ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]) {
-  const band = days.filter((d) => d.weekday === weekday).map((d) => d.entry.difficulty);
-  const lo = Math.min(...band);
-  const hi = Math.max(...band);
-  console.log(`  ${weekday}  ${lo.toFixed(3)} – ${hi.toFixed(3)}`);
+for (const { weekday, min, max } of review.ramp) {
+  console.log(`  ${weekday}  ${min.toFixed(3)} – ${max.toFixed(3)}`);
 }
 
 // A Seed is shown *and spoken* to the player (ADR-0002), so a representative
 // that is not a recognisable word is the failure the review exists to catch.
-// Flag the likeliest offenders rather than making the reviewer find them: very
-// short forms, and families propped up by almost no native content (ADR-0008's
-// gray band, measured in #89).
-const suspect = days.filter((d) => d.entry.representative.length <= 3 || d.entry.nativeCount <= 3);
-console.log(`\nReview first — ${suspect.length} of ${days.length} days:`);
-for (const day of suspect) {
+console.log(`\nReview first — ${review.flagged.length} of ${review.totalDays} days:`);
+for (const day of review.flagged) {
   console.log(
     `  ${day.date} ${day.weekday}  ${day.entry.representative.padEnd(14)}` +
       `${String(day.entry.answerCount).padStart(4)} answers  ` +
