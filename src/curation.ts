@@ -9,7 +9,7 @@
  */
 
 import { rhymeKeyOf, type RhymeKey } from "./phonology.ts";
-import { isDerived } from "./lemmatise.ts";
+import { isDerived, type ReadingsOf } from "./lemmatise.ts";
 import type { RhymeIndex } from "./rhymeIndex.ts";
 import {
   DEFAULT_SCORING_CONFIG,
@@ -104,9 +104,10 @@ function chooseRepresentative(
   words: string[],
   index: RhymeIndex,
   isWord: (word: string) => boolean,
+  readingsOf: ReadingsOf,
 ): string {
   const rank = (word: string) => ({
-    derived: isDerived(word, isWord) ? 1 : 0,
+    derived: isDerived(word, isWord, readingsOf) ? 1 : 0,
     ambiguous: index.isAmbiguous(word) ? 1 : 0,
     // Absent from the prevalence norms sorts last, not first.
     knownness: index.tierOf(word).knownness ?? -Infinity,
@@ -155,6 +156,9 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
   // Derivation is tested against the wordhood word list — a member is derived
   // only relative to other real words (ADR-0008).
   const isWord = (word: string): boolean => index.hasWord(word);
+  // …and against the readings the index holds, because the shortest inflections
+  // are settled by sound rather than by spelling (issue #97).
+  const readingsOf: ReadingsOf = (word) => index.readingsOf(word);
 
   // Group wordhood-valid words by Rhyme Key (a word contributes to each of its
   // keys). Names are already excluded by `wordhoodEntries`, so no Seed is a name.
@@ -177,7 +181,7 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
   const dropped: DroppedEntry[] = [];
 
   for (const [rhymeKey, words] of wordsByKey) {
-    const representative = chooseRepresentative(words, index, isWord);
+    const representative = chooseRepresentative(words, index, isWord, readingsOf);
     // Tally the family straight from its grouped words rather than rebuilding a
     // full Puzzle per Rhyme Key. `buildPuzzle` re-scans every wordhood word on
     // each call (O(keys × words)); `wordsByKey` already holds each key's members.
@@ -194,7 +198,7 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
     for (const word of words) {
       // Native content counts every member — including the representative — a
       // Shadow Key is one whose *whole* family is derived, Seed included.
-      if (!isDerived(word, isWord)) nativeCount++;
+      if (!isDerived(word, isWord, readingsOf)) nativeCount++;
       if (word === representative) continue; // buildPuzzle skips the Seed Word
       const { tier, knownness } = index.tierOf(word);
       if (tier !== "answer") {
