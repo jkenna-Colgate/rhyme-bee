@@ -18,6 +18,7 @@ import { readFileSync, writeFileSync, appendFileSync, existsSync } from "node:fs
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCmudict, normaliseWord } from "../src/cmudict.ts";
+import { Derivation, IndexDataSource } from "../src/derivation.ts";
 import { parseWordList } from "../src/pipeline.ts";
 import { rhymeKeyOf } from "../src/phonology.ts";
 import { inflectionalVariants } from "../src/inflections.ts";
@@ -46,6 +47,11 @@ if (candidates.length === 0) {
 const pronunciations = parseCmudict(read("cmudict.dict"));
 const words = parseWordList(read("words.txt"));
 const names = parseWordList(read("names.txt"));
+
+// The judge's related-forms evidence is answered under the engine's own rule,
+// against these very inputs — so a base the engine would refuse to reduce to is
+// never offered to a human as though it were one (#105).
+const derivation = new Derivation(new IndexDataSource({ words, pronunciations }));
 
 /** The Rhyme Keys of every reading a surface form has in CMUdict. */
 function keysOf(word: string): string[] {
@@ -85,7 +91,7 @@ for (const c of candidates) {
     console.log(`      current reading ${rhymes ? "ALREADY rhymes" : "does NOT rhyme"} with target ${target}`);
   } else {
     console.log(`  absent from CMUdict → an ADD (hand-author, or derive from an inflection below):`);
-    const relatives = inflectionalVariants(word).filter((v) => pronunciations.has(v));
+    const relatives = inflectionalVariants(word, derivation).filter((v) => pronunciations.has(v));
     if (relatives.length === 0) {
       console.log(`      no inflectional relative found in CMUdict — hand-author the reading, or DEFER.`);
     } else {

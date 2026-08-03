@@ -20,6 +20,29 @@ export type RejectionReason =
   | "proper-noun"
   | "does-not-rhyme";
 
+/**
+ * Each rejection reason in words a player can read. It sits here, beside the
+ * closed set it covers, rather than inside a view: two clients render rejections
+ * — the web shell and the `play` REPL — and while this table lived in the shell
+ * the REPL printed the machine reason at the player instead.
+ *
+ * `Record<RejectionReason, string>` is what keeps it honest. The table is
+ * exhaustive by construction, so adding a reason to the union above does not
+ * compile until it has been given words, which is the only way a closed set
+ * stays closed in practice (ADR-0005).
+ *
+ * Phrased as a sentence fragment completing "…", so a client can pair it with
+ * the submitted word however it likes.
+ */
+export const REJECTION_MESSAGE: Record<RejectionReason, string> = {
+  "does-not-rhyme": "doesn’t rhyme with the Seed Word",
+  "is-the-seed-word": "that’s the Seed Word itself",
+  "already-submitted": "you’ve already found that",
+  "proper-noun": "proper nouns don’t count",
+  "not-a-known-word": "not a word we know",
+  malformed: "letters only, please",
+};
+
 /** How a Submission that rhymes and is a word is tiered (ADR-0003). */
 export type Tier = "answer" | "bonus";
 

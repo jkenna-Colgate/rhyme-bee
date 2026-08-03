@@ -12,7 +12,7 @@
 
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
-import { lemmaCandidatesBySound } from "./lemmatise.ts";
+import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
 import type { Tier, Verdict } from "./verdict.ts";
 
@@ -29,6 +29,57 @@ export interface PuzzleEntry {
   knownness: number | null;
   pronunciation: Pronunciation;
   respelling: string;
+}
+
+/**
+ * One member of a Rhyme Key's family: a wordhood-valid word that rhymes on the
+ * key, the reading that put it there, and the tier it holds. It is a
+ * `PuzzleEntry` without the respelling — respelling is how a Puzzle *presents* a
+ * member, and curation, which only counts, should not pay for it 133,000 times.
+ */
+export interface FamilyMember {
+  word: string;
+  length: number;
+  knownness: number | null;
+  /** The reading whose Rhyme Key put this word in the family. */
+  pronunciation: Pronunciation;
+  tier: Tier;
+}
+
+/**
+ * Every wordhood-valid word that rhymes on one Rhyme Key, tiered — the shared
+ * answer to the question `buildPuzzle` and curation were each answering for
+ * themselves. Members are sorted by word, so anything built from a family is
+ * deterministic.
+ *
+ * No Seed Word has been excluded yet: which member is the Seed is a decision
+ * made *about* a family, not a property of it, and curation picks a
+ * representative only after seeing the whole membership. `splitFamily` is where
+ * exclusion happens, once, for both callers.
+ */
+export interface RhymeFamily {
+  rhymeKey: RhymeKey;
+  members: FamilyMember[];
+}
+
+/**
+ * Split a family into disjoint Answers and Bonus Words for a given Seed Word.
+ * The Seed Word is excluded from its own Puzzle — the single definition of that
+ * rule, which `buildPuzzle` and curation used to each state separately and keep
+ * in agreement by a comment. Member order (by word) is preserved.
+ */
+export function splitFamily(
+  family: RhymeFamily,
+  seedWord: string,
+): { answers: FamilyMember[]; bonusWords: FamilyMember[] } {
+  const seed = normaliseWord(seedWord);
+  const answers: FamilyMember[] = [];
+  const bonusWords: FamilyMember[] = [];
+  for (const member of family.members) {
+    if (member.word === seed) continue;
+    (member.tier === "answer" ? answers : bonusWords).push(member);
+  }
+  return { answers, bonusWords };
 }
 
 export interface Puzzle {
@@ -61,13 +112,24 @@ export interface RhymeIndexConfig {
 
 const VALID_SUBMISSION = /^[a-z]+$/;
 
+const byMemberWord = (a: FamilyMember, b: FamilyMember) => a.word.localeCompare(b.word);
+
 export class RhymeIndex {
   readonly #data: RhymeIndexData;
   readonly #config: RhymeIndexConfig;
 
+  /**
+   * Derivation questions — is this word derived, what lemmas could it reduce to
+   * — answered against this index's own data (ADR-0008). Reached as a property
+   * so a caller never assembles the lookups itself, and the index's own tier
+   * judgement uses this same instance rather than a second closure over itself.
+   */
+  readonly derivation: Derivation;
+
   constructor(data: RhymeIndexData, config: RhymeIndexConfig) {
     this.#data = data;
     this.#config = config;
+    this.derivation = new Derivation(new IndexDataSource(data));
   }
 
   /** All Rhyme Keys of a surface form (one per pronunciation). */
@@ -93,16 +155,6 @@ export class RhymeIndex {
    */
   hasWord(word: string): boolean {
     return this.#data.words.has(normaliseWord(word));
-  }
-
-  /**
-   * The readings of a surface form, empty if it has none. Exposed beside
-   * `hasWord` because a derivation question needs both: wordhood says whether a
-   * base exists, and the reading says whether the form sounds like an inflection
-   * of it — the test that puts `ups` on `up` but keeps `has` off `ha` (#97).
-   */
-  readingsOf(word: string): Pronunciation[] {
-    return this.#data.pronunciations.get(normaliseWord(word)) ?? [];
   }
 
   /**
@@ -203,53 +255,104 @@ export class RhymeIndex {
   }
 
   /**
+   * The family of one Rhyme Key: one scan of the word list, for one key. What
+   * `buildPuzzle` needs, and nothing more — a caller that wants every key should
+   * ask `families()` rather than call this in a loop, which is the O(keys ×
+   * words) trap curation used to hand-inline its way around.
+   */
+  familyOf(rhymeKey: RhymeKey): RhymeFamily {
+    const members: FamilyMember[] = [];
+    for (const [word, prons] of this.wordhoodEntries()) {
+      const member = this.#memberOf(word, prons, rhymeKey);
+      if (member) members.push(member);
+    }
+    members.sort(byMemberWord);
+    return { rhymeKey, members };
+  }
+
+  /**
+   * A family per Rhyme Key, in a *single* pass over the word list — the traversal
+   * curation is built on. Building a Puzzle per key would re-scan every wordhood
+   * word each time; this visits each word once and files it under every key it
+   * rhymes on (a word with two readings joins two families).
+   */
+  families(): Map<RhymeKey, RhymeFamily> {
+    const families = new Map<RhymeKey, RhymeFamily>();
+    for (const [word, prons] of this.wordhoodEntries()) {
+      const seen = new Set<RhymeKey>();
+      for (const pron of prons) {
+        const key = rhymeKeyOf(pron);
+        if (key === null || seen.has(key)) continue;
+        seen.add(key);
+        const member = this.#memberOf(word, prons, key);
+        if (member === null) continue;
+        const family = families.get(key);
+        if (family) family.members.push(member);
+        else families.set(key, { rhymeKey: key, members: [member] });
+      }
+    }
+    for (const family of families.values()) family.members.sort(byMemberWord);
+    return families;
+  }
+
+  /**
    * Build the complete Puzzle for a Seed Word: every wordhood-valid rhyming word,
    * split into disjoint Answers and Bonus Words, each carrying length and
    * knownness. Deterministic — members are sorted, so the same Seed Word always
    * yields an identical Puzzle.
+   *
+   * Membership, tier and Seed exclusion all come from the shared family; the
+   * only thing added here is the respelling, which is how a Puzzle presents a
+   * member rather than part of deciding who its members are.
    */
   buildPuzzle(seed: SeedWord): Puzzle {
-    const answers: PuzzleEntry[] = [];
-    const bonusWords: PuzzleEntry[] = [];
-    const seedWord = normaliseWord(seed.word);
-
-    for (const [word, prons] of this.wordhoodEntries()) {
-      if (word === seedWord) continue;
-      const match = this.#matchingPronunciation(seed.rhymeKey, prons);
-      if (!match) continue;
-
-      const { tier, knownness } = this.#tier(word);
-      const entry: PuzzleEntry = {
-        word,
-        length: word.length,
-        knownness,
-        pronunciation: match,
-        respelling: respell(match),
-      };
-      (tier === "answer" ? answers : bonusWords).push(entry);
-    }
-
-    const byWord = (a: PuzzleEntry, b: PuzzleEntry) => a.word.localeCompare(b.word);
-    answers.sort(byWord);
-    bonusWords.sort(byWord);
+    const { answers, bonusWords } = splitFamily(this.familyOf(seed.rhymeKey), seed.word);
+    const toEntry = (member: FamilyMember): PuzzleEntry => ({
+      word: member.word,
+      length: member.length,
+      knownness: member.knownness,
+      pronunciation: member.pronunciation,
+      respelling: respell(member.pronunciation),
+    });
 
     // Respell the Seed Word in its own pinned reading, so the Puzzle can announce
     // how the Seed sounds before play (a homograph like `bass` is spoken in the
     // one reading its Rhyme Key fixes, never the other).
-    const seedProns = this.#data.pronunciations.get(seedWord) ?? [];
+    const seedProns = this.#data.pronunciations.get(normaliseWord(seed.word)) ?? [];
     const seedMatch = this.#matchingPronunciation(seed.rhymeKey, seedProns);
     const seedRespelling = seedMatch ? respell(seedMatch) : "";
 
-    return { seed, seedRespelling, answers, bonusWords };
+    return {
+      seed,
+      seedRespelling,
+      answers: answers.map(toEntry),
+      bonusWords: bonusWords.map(toEntry),
+    };
   }
 
   /**
    * The tier and knownness of a wordhood-valid word — the same judgement
-   * `buildPuzzle` and `adjudicate` apply. Public so curation can tally family
-   * sizes directly, without rebuilding a full Puzzle for every Rhyme Key.
+   * `buildPuzzle` and `adjudicate` apply. Public so curation can rank a
+   * representative on knownness without going back through a family.
    */
   tierOf(word: string): { tier: Tier; knownness: number | null } {
     return this.#tier(normaliseWord(word));
+  }
+
+  /**
+   * The one definition of family membership: does this word rhyme on the key,
+   * and if so, what does it bring? Both traversals go through here, so
+   * `buildPuzzle` and curation cannot drift on who belongs or how they tier.
+   */
+  #memberOf(
+    word: string,
+    prons: Pronunciation[],
+    rhymeKey: RhymeKey,
+  ): FamilyMember | null {
+    const match = this.#matchingPronunciation(rhymeKey, prons);
+    if (!match) return null;
+    const { tier, knownness } = this.#tier(word);
+    return { word, length: word.length, knownness, pronunciation: match, tier };
   }
 
   #matchingPronunciation(
@@ -269,10 +372,11 @@ export class RhymeIndex {
    *
    * Lemmatised through the readings, not the spelling alone: `ups` tiers on `up`
    * because it sounds like `up` + S, and `has` keeps its own standing because it
-   * does not sound like `ha` + Z.
+   * does not sound like `ha` + Z. Through `this.derivation`, so the tier a word
+   * gets here and the derivation verdict curation reads are one rule.
    */
   #tier(word: string): { tier: Tier; knownness: number | null } {
-    for (const candidate of lemmaCandidatesBySound(word, (w) => this.readingsOf(w))) {
+    for (const candidate of this.derivation.lemmaCandidates(word)) {
       const score = this.#data.prevalence.get(candidate);
       if (score !== undefined) {
         return {
