@@ -7,6 +7,7 @@
 
 import { describe, expect, it } from "vitest";
 import { makeTestIndex } from "../__fixtures__/index.ts";
+import { makeShortPluralIndex } from "../__fixtures__/shortPlurals.ts";
 import { curate, DEFAULT_PLAYABLE_BAND, playableSeeds } from "../curation.ts";
 import type { Pronunciation } from "../phonology.ts";
 import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
@@ -132,6 +133,53 @@ function makeShadowIndex(): RhymeIndex {
   };
   return new RhymeIndex(data, { knownnessThreshold: 0 });
 }
+
+// --- Shadow Keys made of three-letter plurals (issue #97) -----------------------
+
+describe("a key whose only native member is a three-letter plural (issue #97)", () => {
+  const shortPlurals = makeShortPluralIndex();
+  const report = curate(shortPlurals, { sizeBand: { min: 1, max: 100 } });
+  const family = (key: string) => report.families.find((f) => f.rhymeKey === key);
+
+  it.each([
+    ["AH P S", "ups"],
+    ["IH N Z", "ins"],
+    ["EH L Z", "els"],
+  ])("reports %j as a Shadow Key, now %j reaches its lemma", (key, plural) => {
+    // Every member of the key is the base family with an `s` on it, the plural
+    // included: `AH P S` is the `up` family and offers no Seed of its own.
+    expect(shortPlurals.rhymeKeysOf(plural)).toContain(key);
+    expect(family(key)?.nativeCount).toBe(0);
+    expect(report.dropped.find((d) => d.rhymeKey === key)?.reason).toBe("shadow-key");
+    expect(report.candidates).not.toContainEqual(expect.objectContaining({ rhymeKey: key }));
+  });
+
+  it.each([
+    ["AE Z", "has"],
+    ["AE S", "gas"],
+  ])("keeps %j a candidate — %j is native, because its vowel disagrees", (key, native) => {
+    expect(shortPlurals.rhymeKeysOf(native)).toContain(key);
+    expect(family(key)?.nativeCount).toBe(3);
+    expect(report.candidates).toContainEqual(expect.objectContaining({ rhymeKey: key }));
+  });
+
+  it.each([
+    ["AA Z", "was"],
+    ["EH S", "yes"],
+  ])("keeps %j a candidate though the rule misreads %j as an inflection", (key, missed) => {
+    // The known misses: `was` is `wa` + Z and `yes` is `ye` + S in the
+    // dictionary's own transcription. Both families keep native content, so
+    // neither miss costs a Seed.
+    expect(shortPlurals.rhymeKeysOf(missed)).toContain(key);
+    expect(family(key)?.nativeCount).toBe(2);
+    expect(report.candidates).toContainEqual(expect.objectContaining({ rhymeKey: key }));
+  });
+
+  it("leaves a family with no short plural in it untouched", () => {
+    // `AH S`: `bus` has no base to be a plural of, `plus` and `thus` are longer.
+    expect(family("AH S")?.nativeCount).toBe(3);
+  });
+});
 
 // --- playableSeeds: the shared in-band Seed pool (issue #33) --------------------
 
