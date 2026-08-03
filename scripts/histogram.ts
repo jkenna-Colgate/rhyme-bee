@@ -5,8 +5,9 @@
  *
  *   npm run histogram
  *
- * The candidate size band is set by the BAND_MIN / BAND_MAX env vars (default
- * 20 / 120); a Rhyme Key counts as a candidate when its Answer count falls in
+ * The candidate size band is set by the BAND_MIN / BAND_MAX env vars, defaulting
+ * to the shared `DEFAULT_PLAYABLE_BAND` rather than a second copy of the numbers;
+ * a Rhyme Key counts as a candidate when its Answer count falls in
  * [BAND_MIN, BAND_MAX].
  *
  * Requires the built artifact from `npm run build:index`.
@@ -17,7 +18,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { RhymeIndex } from "../src/rhymeIndex.ts";
 import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
-import { curate } from "../src/curation.ts";
+import { curate, DEFAULT_PLAYABLE_BAND } from "../src/curation.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const artifact = JSON.parse(
@@ -26,8 +27,8 @@ const artifact = JSON.parse(
 
 const index: RhymeIndex = deserialise(artifact);
 
-const MIN = Number(process.env.BAND_MIN ?? "20");
-const MAX = Number(process.env.BAND_MAX ?? "120");
+const MIN = Number(process.env.BAND_MIN ?? DEFAULT_PLAYABLE_BAND.min);
+const MAX = Number(process.env.BAND_MAX ?? DEFAULT_PLAYABLE_BAND.max);
 
 const report = curate(index, { sizeBand: { min: MIN, max: MAX } });
 

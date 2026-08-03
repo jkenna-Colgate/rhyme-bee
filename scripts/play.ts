@@ -13,9 +13,9 @@
  *   npm run play -- --day=3           # equals form — works in PowerShell
  *   npx tsx scripts/play.ts --day 3   # bypasses npm's `--` handling entirely
  *
- * The playable size band is set by the BAND_MIN / BAND_MAX env vars (default
- * 20 / 120), mirroring `histogram`; narrow or widen it to change the candidate
- * pool the Seed Word is drawn from.
+ * The playable size band is set by the BAND_MIN / BAND_MAX env vars, defaulting
+ * to the shared `DEFAULT_PLAYABLE_BAND` and mirroring `histogram`; narrow or
+ * widen it to change the candidate pool the Seed Word is drawn from.
  *
  * Deserialises the built index (from `npm run build:index`), picks a Seed Word —
  * by precedence `--seed` > `--day` > random — announces it (respelled, with its
