@@ -2,14 +2,21 @@
  * Builds a RhymeIndex over the mini fixtures. This fixture IS the pinned data
  * for the test suite, so it is the source of truth for the verdicts below — the
  * tests assert verdicts, never the mechanism that produces them.
+ *
+ * It builds them the way the shipped build does: one call to
+ * `manufactureIndexData`, which runs all four stages in the committed order
+ * (#106). The alternative was a helper that ran only the tail, which left two
+ * compositions of the stage order in the repo — and the one the tests exercised
+ * was not the one that ships.
  */
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../cmudict.ts";
-import { applyCoverage } from "../coverage.ts";
-import { applyNormalisation } from "../normalise.ts";
+import { manufactureIndexData, type PinnedInputs } from "../manufacture.ts";
+import type { Pronunciation } from "../phonology.ts";
 import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
+import { toCmudictText, toPrevalenceCsv, toWordListText } from "./pinned.ts";
 
 const cmudictText = readFileSync(
   fileURLToPath(new URL("./mini.cmudict", import.meta.url)),
@@ -115,39 +122,86 @@ const prevalence = new Map<string, number>([
 
 export const KNOWNNESS_THRESHOLD = 1.0;
 
-export function makeTestIndex(): RhymeIndex {
-  return buildTestIndex(makeTestData());
+/**
+ * What a test adds to the fixture's pinned inputs before the build runs.
+ *
+ * The fixture keeps its data as maps and sets because that is how it is legible,
+ * and everything here is folded into those and then serialised back to the
+ * upstream text formats — because the build parses its own inputs (#100), and a
+ * caller that handed over parsed structures would be back to holding the stages
+ * in the right order itself. A reading given here *replaces* the fixture's, the
+ * way `set` did when tests assembled the data by hand.
+ */
+export interface TestInputs {
+  /** Readings to add or correct, replacing the fixture's for that word. */
+  pronunciations?: [string, Pronunciation[]][];
+  /** Words to grant wordhood to, beyond the set above. */
+  words?: string[];
+  /** Names to add, beyond `kate`. */
+  names?: string[];
+  /** Knownness scores to add or override. */
+  prevalence?: [string, number][];
+  /** The demotion list (#90) this build runs. Absent means the stage runs empty. */
+  demotions?: string;
+  /** The supplement (ADR-0009) this build runs. Likewise. */
+  supplement?: string;
+  /** The tier cutoff, for a test that needs to move it. */
+  knownnessThreshold?: number;
 }
 
 /**
- * The raw inputs, as the index build sees them before any stage has run — the
- * fixture's stand-in for the pinned upstream files. A test that exercises a
- * build stage starts here, applies the stage, then calls `buildTestIndex`.
+ * The fixture's pinned inputs as text — its stand-in for the files in `data/`,
+ * in the formats the build reads them from.
  */
-export function makeTestData(): RhymeIndexData {
+export function makeTestInputs(inputs: TestInputs = {}): PinnedInputs {
+  const readings = parseCmudict(cmudictText);
+  for (const [word, prons] of inputs.pronunciations ?? []) readings.set(word, prons);
+
   return {
-    pronunciations: parseCmudict(cmudictText),
-    words,
-    names,
-    prevalence,
+    cmudict: toCmudictText(readings),
+    words: toWordListText([...words, ...(inputs.words ?? [])]),
+    names: toWordListText([...names, ...(inputs.names ?? [])]),
+    prevalence: toPrevalenceCsv(new Map([...prevalence, ...(inputs.prevalence ?? [])])),
+    demotions: inputs.demotions ?? "",
+    supplement: inputs.supplement ?? "",
   };
 }
 
 /**
- * The tail of the real index build, in the build's own order: derive readings
- * for known words that have none (issue #76), then normalise every reading
- * (ADR-0010), then construct. Tests go through here rather than calling
- * `new RhymeIndex` so the verdicts they assert are the verdicts
- * `npm run build:index` would produce — including the guardrail table, which
- * every stage has to survive. `data` is left as the build would leave it, so a
- * caller that also needs the data — serialising it, say — sees what the build
- * would have written.
+ * A test index, built by the same call `npm run build:index` makes: all four
+ * stages — demotions, supplement, coverage, normalisation — in the committed
+ * order, over this fixture's inputs (#106). Tests go through here rather than
+ * calling `new RhymeIndex` so the verdicts they assert are the verdicts a real
+ * build would produce, including the guardrail table, which every stage has to
+ * survive. The finished `data` comes back too, because it is what the build
+ * would have serialised.
  */
-export function buildTestIndex(
-  data: RhymeIndexData,
-  knownnessThreshold: number = KNOWNNESS_THRESHOLD,
-): RhymeIndex {
-  applyCoverage(data);
-  applyNormalisation(data);
-  return new RhymeIndex(data, { knownnessThreshold });
+export function buildTestIndex(inputs: TestInputs = {}): {
+  index: RhymeIndex;
+  data: RhymeIndexData;
+} {
+  const { data } = manufactureIndexData(makeTestInputs(inputs));
+  const knownnessThreshold = inputs.knownnessThreshold ?? KNOWNNESS_THRESHOLD;
+  return { index: new RhymeIndex(data, { knownnessThreshold }), data };
+}
+
+/** `buildTestIndex` for the callers that want only the index. */
+export function makeTestIndex(inputs: TestInputs = {}): RhymeIndex {
+  return buildTestIndex(inputs).index;
+}
+
+/**
+ * The raw inputs *parsed but unbuilt*, as a stage sees them before it runs —
+ * for a test that exercises one stage directly and asserts on what that stage
+ * did to the data. A test that wants the verdicts of a finished index wants
+ * `buildTestIndex` instead. Copies throughout, so a stage's mutations stay in
+ * the test that made them.
+ */
+export function makeTestData(): RhymeIndexData {
+  return {
+    pronunciations: parseCmudict(cmudictText),
+    words: new Set(words),
+    names: new Set(names),
+    prevalence: new Map(prevalence),
+  };
 }

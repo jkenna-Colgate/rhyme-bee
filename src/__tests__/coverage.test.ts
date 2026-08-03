@@ -14,7 +14,7 @@ import { describe, expect, it } from "vitest";
 import { applyCoverage, derivationTargets } from "../coverage.ts";
 import { applySupplement } from "../supplement.ts";
 import { rhymeKeyOf, type Pronunciation } from "../phonology.ts";
-import { buildTestIndex, makeTestData, makeTestIndex } from "../__fixtures__/index.ts";
+import { makeTestIndex } from "../__fixtures__/index.ts";
 
 function target(
   overrides: {
@@ -268,8 +268,7 @@ describe("coverage derivation runs before normalisation", () => {
     // `outwalked` is composed from `walked` (W AO1 K T) while the reading still
     // carries the unmerged vowel; normalisation then merges it, so the derived
     // word lands on the same Rhyme Key as `docked` rather than beside it.
-    const data = makeTestData();
-    const index = buildTestIndex(data);
+    const index = makeTestIndex();
 
     expect(index.rhymeKeysOf("outwalked")).toEqual(["AA K T"]);
   });

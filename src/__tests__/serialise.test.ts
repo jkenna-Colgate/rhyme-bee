@@ -4,15 +4,14 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { buildTestIndex, makeTestData, KNOWNNESS_THRESHOLD } from "../__fixtures__/index.ts";
+import { buildTestIndex, KNOWNNESS_THRESHOLD } from "../__fixtures__/index.ts";
 import { deserialise, serialise } from "../serialise.ts";
 
 describe("serialise / deserialise", () => {
-  const data = makeTestData();
   const config = { knownnessThreshold: KNOWNNESS_THRESHOLD };
-  // Through the build's tail, so `data` below is what a real build serialises —
+  // Through the whole build, so `data` is what a real build serialises —
   // normalised readings, not the raw fixture (ADR-0010).
-  const direct = buildTestIndex(data);
+  const { index: direct, data } = buildTestIndex();
   const roundTripped = deserialise(
     // A JSON.parse(JSON.stringify(...)) hop proves it survives a real write/read.
     JSON.parse(JSON.stringify(serialise(data, config, { cmudict: "test" }))),

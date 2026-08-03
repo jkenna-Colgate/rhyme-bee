@@ -21,8 +21,10 @@
  * where the real index puts it.
  */
 
+import { manufactureIndexData, type PinnedInputs } from "../manufacture.ts";
 import type { Pronunciation } from "../phonology.ts";
-import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
+import { RhymeIndex } from "../rhymeIndex.ts";
+import { toCmudictText, toPrevalenceCsv, toWordListText } from "./pinned.ts";
 
 /** The committed threshold, so `el` (below zero) tiers as the data says. */
 const KNOWNNESS_THRESHOLD = 0.0;
@@ -108,15 +110,21 @@ const prevalence = new Map<string, number>([
   ["bell", 1.9], ["cell", 2.0],
 ]);
 
-export function makeShortPluralData(): RhymeIndexData {
+/** This slice as pinned text. No names, no demotions, no supplement to run. */
+export function makeShortPluralInputs(): PinnedInputs {
+  const readings = new Map([...pronunciations, ...baseReadings]);
   return {
-    pronunciations: new Map([...pronunciations, ...baseReadings]),
-    words: new Set([...pronunciations.keys(), ...baseReadings.keys()]),
-    names: new Set(),
-    prevalence: new Map(prevalence),
+    cmudict: toCmudictText(readings),
+    words: toWordListText(readings.keys()),
+    names: "",
+    prevalence: toPrevalenceCsv(prevalence),
+    demotions: "",
+    supplement: "",
   };
 }
 
+/** Built by the same call the real build makes, all four stages (#106). */
 export function makeShortPluralIndex(): RhymeIndex {
-  return new RhymeIndex(makeShortPluralData(), { knownnessThreshold: KNOWNNESS_THRESHOLD });
+  const { data } = manufactureIndexData(makeShortPluralInputs());
+  return new RhymeIndex(data, { knownnessThreshold: KNOWNNESS_THRESHOLD });
 }

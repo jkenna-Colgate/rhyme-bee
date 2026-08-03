@@ -9,8 +9,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { applySupplement } from "../supplement.ts";
 import { parseCmudict } from "../cmudict.ts";
-import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
-import { buildTestIndex, makeTestData } from "../__fixtures__/index.ts";
+import type { RhymeIndex } from "../rhymeIndex.ts";
+import { makeTestData, makeTestIndex, type TestInputs } from "../__fixtures__/index.ts";
 import type { Pronunciation } from "../phonology.ts";
 
 function target(overrides: {
@@ -68,11 +68,10 @@ describe("applySupplement", () => {
 
 describe("a supplemented index adjudicates", () => {
   function indexWith(supplement: string): RhymeIndex {
-    const data = makeTestData();
-    applySupplement(supplement, data);
-    // Through the build's tail, so these are the verdicts a real build produces
-    // — the supplement's readings reach the index via normalisation (ADR-0010).
-    return buildTestIndex(data);
+    // Through the composed build, so these are the verdicts a real build
+    // produces — the supplement runs after demotions and before coverage, and
+    // its readings reach the index via normalisation (ADR-0010).
+    return makeTestIndex({ supplement });
   }
 
   it("accepts an added word, absent upstream, as a Bonus rhyme", () => {
@@ -118,35 +117,28 @@ describe("the hurricane correction (#96)", () => {
   ].join("\n");
 
   /** `cane` (EY N) and `planes` (EY N Z) — one key either side of the defect. */
-  function upstreamData(): RhymeIndexData {
-    const data = makeTestData();
-    for (const [word, pron, knownness] of [
-      ["hurricane", UPSTREAM[0]!, 2.4],
-      ["cane", ["K", "EY1", "N"], 2.3],
-      ["planes", ["P", "L", "EY1", "N", "Z"], 2.4],
-    ] as [string, Pronunciation, number][]) {
-      data.pronunciations.set(word, [pron]);
-      data.words.add(word);
-      data.prevalence.set(word, knownness);
-    }
-    data.pronunciations.set("hurricane", UPSTREAM);
-    return data;
-  }
+  const upstream: TestInputs = {
+    pronunciations: [
+      ["hurricane", UPSTREAM],
+      ["cane", [["K", "EY1", "N"]]],
+      ["planes", [["P", "L", "EY1", "N", "Z"]]],
+    ],
+    words: ["hurricane", "cane", "planes"],
+    prevalence: [["hurricane", 2.4], ["cane", 2.3], ["planes", 2.4]],
+  };
 
   it("serves hurricane as a rhyme for planes, until the supplement corrects it", () => {
     // The defect itself, asserted so the fix cannot be mistaken for a test that
     // was always green: the spurious reading is enough on its own, because a
     // Submission rhymes if *any* of its Rhyme Keys matches (ADR-0001).
-    const index = buildTestIndex(upstreamData());
+    const index = makeTestIndex(upstream);
 
     expect(index.adjudicate(index.pinSeed("planes"), "hurricane").outcome)
       .not.toBe("rejected");
   });
 
   it("stops hurricane rhyming with planes, and leaves cane alone", () => {
-    const data = upstreamData();
-    applySupplement(CORRECTION, data);
-    const index = buildTestIndex(data);
+    const index = makeTestIndex({ ...upstream, supplement: CORRECTION });
 
     expect(index.adjudicate(index.pinSeed("planes"), "hurricane")).toMatchObject({
       outcome: "rejected",
@@ -156,7 +148,10 @@ describe("the hurricane correction (#96)", () => {
   });
 
   it("keeps both readings — it removes the Z, it does not pick a first syllable", () => {
-    const data = upstreamData();
+    // The stage on its own: what the supplement did to the readings, before any
+    // later stage has had a chance to touch them.
+    const data = makeTestData();
+    data.pronunciations.set("hurricane", UPSTREAM);
     applySupplement(CORRECTION, data);
 
     expect(data.pronunciations.get("hurricane")).toEqual([
