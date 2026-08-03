@@ -42,3 +42,14 @@ viceroy V AY1 S R OY2
 # the rhyme wrongly anchored on AE. The loanword's final syllable carries real
 # secondary stress; ER0 -> ER2 makes it rhyme on ER S T, with `burst`.
 bratwurst B R AE1 T W ER2 S T
+
+# --- Corrections (wrong upstream phonemes) ---
+
+# hurricane (#96): upstream carries a second reading with a spurious trailing Z
+# — `HH AH1 R AH0 K EY2 N Z`, which looks like a `hurricanes` line that lost its
+# s. It put `hurricane` in the plural key EY N Z, so it was accepted as a rhyme
+# for `canes` and `planes`. Both readings are asserted here, Z removed: the
+# `AH1 R` first syllable is a legitimate US variant and is kept, so this drops
+# the Z without picking one of the two pronunciations. EY N, with `cane`.
+hurricane HH ER1 AH0 K EY2 N
+hurricane(1) HH AH1 R AH0 K EY2 N
