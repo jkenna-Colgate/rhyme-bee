@@ -19,6 +19,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEFAULT_PLAYABLE_BAND, playableSeeds } from "../src/curation.ts";
 import { dealSchedule, DAYS_PER_WEEK } from "../src/schedule.ts";
+import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -56,6 +57,12 @@ writeFileSync(
       generated: new Date().toISOString().slice(0, 10),
       startDate,
       band: DEFAULT_PLAYABLE_BAND,
+      // Every day's Difficulty is a share of a Puzzle's maximum achievable
+      // Score, so it means nothing without the configuration that scored it
+      // (ADR-0007): retune the rare bonus or the rarity cutoff and every figure
+      // below silently describes a different ramp. Recorded as it was passed to
+      // curation, whole, so a reviewer can tell which ramp they approved.
+      scoring: DEFAULT_SCORING_CONFIG,
       sources: artifact.sources,
       note: "Reviewed artifact (ADR-0012). Edit by hand; do not regenerate.",
       days: days.map((day) => ({
