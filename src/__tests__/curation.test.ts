@@ -6,11 +6,12 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { buildSlice } from "../__fixtures__/build.ts";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 import { makeShortPluralIndex } from "../__fixtures__/shortPlurals.ts";
 import { curate, DEFAULT_PLAYABLE_BAND, playableSeeds } from "../curation.ts";
 import type { Pronunciation } from "../phonology.ts";
-import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
+import type { RhymeIndex } from "../rhymeIndex.ts";
 import { DEFAULT_SCORING_CONFIG, type ScoringConfig } from "../scoring.ts";
 import { score, startSession } from "../session.ts";
 
@@ -117,21 +118,19 @@ function makeShadowIndex(): RhymeIndex {
     ["blind", p("B", "L", "AY1", "N", "D")],
     ["combined", p("K", "AH0", "M", "B", "AY1", "N", "D")],
   ]);
-  const data: RhymeIndexData = {
+  return buildSlice({
     pronunciations,
-    words: new Set([
+    words: [
       "crowns", "frowns", "gowns", "find", "mind", "blind", "combined",
       // Bases present for the derivation detector, absent from pronunciations so
       // they are not family members themselves.
       "crown", "frown", "gown", "combine",
-    ]),
-    names: new Set(),
+    ],
     prevalence: new Map([
       ["crowns", 2.0], ["frowns", 2.0], ["gowns", 2.0],
       ["find", 2.0], ["mind", 2.0], ["blind", 2.0], ["combined", 2.0],
     ]),
-  };
-  return new RhymeIndex(data, { knownnessThreshold: 0 });
+  }, 0).index;
 }
 
 // --- Shadow Keys made of three-letter plurals (issue #97) -----------------------
@@ -259,10 +258,14 @@ describe("Difficulty of a candidate Seed Word (ADR-0007)", () => {
 });
 
 /**
- * A synthetic Rhyme Index: one family under the Rhyme Key `AO G`, with each
- * word's length (spelling) and knownness (prevalence) hand-chosen so the
- * Difficulty arithmetic is exact. Pronunciations are built directly — no CMUdict
- * text needed — each ending in a stressed `AO` + `G` so all share the key.
+ * A synthetic Rhyme Index: one family, with each word's length (spelling) and
+ * knownness (prevalence) hand-chosen so the Difficulty arithmetic is exact.
+ * Readings are written here rather than drawn from CMUdict — each ending in a
+ * stressed `AO` + `G`, so all five share a key whatever that key turns out to
+ * be. It comes out `AA G`: the slice goes through the whole build (#106), so
+ * the cot–caught merger reaches these readings like any other (ADR-0010). No
+ * assertion here names the key, and none should — this family is about the
+ * Difficulty sum, not the accent.
  */
 function makeSyntheticIndex(): RhymeIndex {
   const p = (...phonemes: string[]): Pronunciation[] => [phonemes];
@@ -273,10 +276,11 @@ function makeSyntheticIndex(): RhymeIndex {
     ["vroog", p("V", "R", "AO1", "G")],
     ["yog", p("Y", "AO1", "G")],
   ]);
-  const data: RhymeIndexData = {
+  // Threshold 0 so every rhyming word tiers to Answer; rarity (the 0.7 cutoff) is
+  // a separate line, so `vroog`/`yog` are rare Answers, not Bonus Words.
+  return buildSlice({
     pronunciations,
-    words: new Set(["og", "quag", "shabog", "vroog", "yog"]),
-    names: new Set(),
+    words: ["og", "quag", "shabog", "vroog", "yog"],
     prevalence: new Map([
       ["og", 2.0],
       ["quag", 2.0],
@@ -284,10 +288,7 @@ function makeSyntheticIndex(): RhymeIndex {
       ["vroog", 0.2],
       ["yog", 0.1],
     ]),
-  };
-  // Threshold 0 so every rhyming word tiers to Answer; rarity (the 0.7 cutoff) is
-  // a separate line, so `vroog`/`yog` are rare Answers, not Bonus Words.
-  return new RhymeIndex(data, { knownnessThreshold: 0 });
+  }, 0).index;
 }
 
 // --- Choosing the representative: the Seed the player is shown and spoken -----
@@ -306,10 +307,9 @@ function makeRepresentativeIndex(): RhymeIndex {
     ["lane", p("L", "EY1", "N")],
     ["drain", p("D", "R", "EY1", "N")],
   ]);
-  const data: RhymeIndexData = {
+  return buildSlice({
     pronunciations: new Map([...pronunciations, ["gaining", p("G", "EY1", "N", "IH0", "NG")]]),
-    words: new Set(["ln", "gained", "gain", "lane", "drain", "gaining"]),
-    names: new Set(),
+    words: ["ln", "gained", "gain", "lane", "drain", "gaining"],
     prevalence: new Map([
       // `ln` is shortest and `gained` is best known — under the old
       // shortest-first rule the Seed was `ln`, under knownness alone it is
@@ -320,8 +320,7 @@ function makeRepresentativeIndex(): RhymeIndex {
       ["lane", 1.5],
       ["drain", 1.4],
     ]),
-  };
-  return new RhymeIndex(data, { knownnessThreshold: 0 });
+  }, 0).index;
 }
 
 describe("the representative is the best-known native word", () => {

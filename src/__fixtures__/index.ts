@@ -13,10 +13,9 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../cmudict.ts";
-import { manufactureIndexData, type PinnedInputs } from "../manufacture.ts";
 import type { Pronunciation } from "../phonology.ts";
-import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
-import { toCmudictText, toPrevalenceCsv, toWordListText } from "./pinned.ts";
+import type { RhymeIndex, RhymeIndexData } from "../rhymeIndex.ts";
+import { buildSlice, type FixtureSlice } from "./build.ts";
 
 const cmudictText = readFileSync(
   fileURLToPath(new URL("./mini.cmudict", import.meta.url)),
@@ -149,21 +148,18 @@ export interface TestInputs {
   knownnessThreshold?: number;
 }
 
-/**
- * The fixture's pinned inputs as text — its stand-in for the files in `data/`,
- * in the formats the build reads them from.
- */
-export function makeTestInputs(inputs: TestInputs = {}): PinnedInputs {
+/** This fixture's slice, with a test's additions folded in. */
+function testSlice(inputs: TestInputs): FixtureSlice {
   const readings = parseCmudict(cmudictText);
   for (const [word, prons] of inputs.pronunciations ?? []) readings.set(word, prons);
 
   return {
-    cmudict: toCmudictText(readings),
-    words: toWordListText([...words, ...(inputs.words ?? [])]),
-    names: toWordListText([...names, ...(inputs.names ?? [])]),
-    prevalence: toPrevalenceCsv(new Map([...prevalence, ...(inputs.prevalence ?? [])])),
-    demotions: inputs.demotions ?? "",
-    supplement: inputs.supplement ?? "",
+    pronunciations: readings,
+    words: [...words, ...(inputs.words ?? [])],
+    names: [...names, ...(inputs.names ?? [])],
+    prevalence: new Map([...prevalence, ...(inputs.prevalence ?? [])]),
+    demotions: inputs.demotions,
+    supplement: inputs.supplement,
   };
 }
 
@@ -180,9 +176,7 @@ export function buildTestIndex(inputs: TestInputs = {}): {
   index: RhymeIndex;
   data: RhymeIndexData;
 } {
-  const { data } = manufactureIndexData(makeTestInputs(inputs));
-  const knownnessThreshold = inputs.knownnessThreshold ?? KNOWNNESS_THRESHOLD;
-  return { index: new RhymeIndex(data, { knownnessThreshold }), data };
+  return buildSlice(testSlice(inputs), inputs.knownnessThreshold ?? KNOWNNESS_THRESHOLD);
 }
 
 /** `buildTestIndex` for the callers that want only the index. */
