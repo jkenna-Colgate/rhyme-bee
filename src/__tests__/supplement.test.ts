@@ -4,9 +4,12 @@
  * corrects upstream pronunciations, and its entries must survive a rebuild.
  */
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { applySupplement } from "../supplement.ts";
-import { RhymeIndex } from "../rhymeIndex.ts";
+import { parseCmudict } from "../cmudict.ts";
+import { RhymeIndex, type RhymeIndexData } from "../rhymeIndex.ts";
 import { buildTestIndex, makeTestData } from "../__fixtures__/index.ts";
 import type { Pronunciation } from "../phonology.ts";
 
@@ -93,5 +96,90 @@ describe("a supplemented index adjudicates", () => {
       outcome: "rejected",
       reason: "does-not-rhyme",
     });
+  });
+});
+
+describe("the hurricane correction (#96)", () => {
+  /**
+   * The upstream pair, reproduced. The second reading's `AH1 R` first syllable
+   * is a legitimate US variant; only its trailing `Z` is wrong, and that `Z`
+   * puts `hurricane` in the plural key `EY N Z`, where it is the lone native
+   * member (ADR-0008).
+   */
+  const UPSTREAM: Pronunciation[] = [
+    ["HH", "ER1", "AH0", "K", "EY2", "N"],
+    ["HH", "AH1", "R", "AH0", "K", "EY2", "N", "Z"],
+  ];
+
+  /** The correction, as `data/supplement.dict` carries it. */
+  const CORRECTION = [
+    "hurricane HH ER1 AH0 K EY2 N",
+    "hurricane(1) HH AH1 R AH0 K EY2 N",
+  ].join("\n");
+
+  /** `cane` (EY N) and `planes` (EY N Z) — one key either side of the defect. */
+  function upstreamData(): RhymeIndexData {
+    const data = makeTestData();
+    for (const [word, pron, knownness] of [
+      ["hurricane", UPSTREAM[0]!, 2.4],
+      ["cane", ["K", "EY1", "N"], 2.3],
+      ["planes", ["P", "L", "EY1", "N", "Z"], 2.4],
+    ] as [string, Pronunciation, number][]) {
+      data.pronunciations.set(word, [pron]);
+      data.words.add(word);
+      data.prevalence.set(word, knownness);
+    }
+    data.pronunciations.set("hurricane", UPSTREAM);
+    return data;
+  }
+
+  it("serves hurricane as a rhyme for planes, until the supplement corrects it", () => {
+    // The defect itself, asserted so the fix cannot be mistaken for a test that
+    // was always green: the spurious reading is enough on its own, because a
+    // Submission rhymes if *any* of its Rhyme Keys matches (ADR-0001).
+    const index = buildTestIndex(upstreamData());
+
+    expect(index.adjudicate(index.pinSeed("planes"), "hurricane").outcome)
+      .not.toBe("rejected");
+  });
+
+  it("stops hurricane rhyming with planes, and leaves cane alone", () => {
+    const data = upstreamData();
+    applySupplement(CORRECTION, data);
+    const index = buildTestIndex(data);
+
+    expect(index.adjudicate(index.pinSeed("planes"), "hurricane")).toMatchObject({
+      outcome: "rejected",
+      reason: "does-not-rhyme",
+    });
+    expect(index.adjudicate(index.pinSeed("cane"), "hurricane").outcome).toBe("answer");
+  });
+
+  it("keeps both readings — it removes the Z, it does not pick a first syllable", () => {
+    const data = upstreamData();
+    applySupplement(CORRECTION, data);
+
+    expect(data.pronunciations.get("hurricane")).toEqual([
+      ["HH", "ER1", "AH0", "K", "EY2", "N"],
+      ["HH", "AH1", "R", "AH0", "K", "EY2", "N"],
+    ]);
+  });
+});
+
+describe("the committed supplement", () => {
+  const entries = parseCmudict(
+    readFileSync(
+      fileURLToPath(new URL("../../data/supplement.dict", import.meta.url)),
+      "utf8",
+    ).replace(/^#.*$/gm, ""),
+  );
+
+  it("carries the hurricane correction, both readings, neither ending in Z", () => {
+    const readings = entries.get("hurricane");
+
+    expect(readings).toHaveLength(2);
+    for (const reading of readings ?? []) {
+      expect(reading.at(-1)).toBe("N");
+    }
   });
 });
