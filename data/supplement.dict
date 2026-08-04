@@ -53,3 +53,29 @@ bratwurst B R AE1 T W ER2 S T
 # the Z without picking one of the two pronunciations. EY N, with `cane`.
 hurricane HH ER1 AH0 K EY2 N
 hurricane(1) HH AH1 R AH0 K EY2 N
+
+# anglos, altos, bimbos, bios, burritos, campesinos, centavos, cheerios,
+# cruzados, latinos, lobos, narcos, winos (#85): thirteen `-os` plurals CMUdict
+# transcribes with a final S where the real sound is Z — an /oʊz/ plural, like
+# `heroes`, not the genuine /oʊs/ singular `dose`/`sucrose` end in. Eleven reach
+# the `dose` family (`OW S`) only through stress promotion, because their bad
+# reading is unstressed (`OW0 S`); `altos` and `centavos` carry the bad `S`
+# already stressed (`OW2 S`), so they reach `OW S` with no promotion at all.
+# Every one is corrected to end Z. `anglos`'s upstream second reading duplicates
+# its first once the S is fixed, so it collapses to one reading here; `altos`'s
+# two readings stay genuinely distinct pronunciations, so both are asserted,
+# the second corrected in place.
+anglos AE1 NG G L OW0 Z
+altos AE1 L T OW0 Z
+altos(1) AO1 L T OW2 Z
+bimbos B IH1 M B OW0 Z
+bios B AY1 OW0 Z
+burritos B ER0 IY1 T OW0 Z
+campesinos K AE2 M P EH0 S IY1 N OW0 Z
+centavos S EH0 N T AA1 V OW2 Z
+cheerios CH IH1 R IY0 OW0 Z
+cruzados K R UW2 Z AA1 D OW0 Z
+latinos L AA0 T IY1 N OW0 Z
+lobos L OW1 B OW0 Z
+narcos N AA1 R K OW0 Z
+winos W IY1 N OW0 Z

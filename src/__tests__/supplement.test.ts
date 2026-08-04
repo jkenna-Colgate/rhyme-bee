@@ -161,6 +161,65 @@ describe("the hurricane correction (#96)", () => {
   });
 });
 
+describe("the -os plurals correction (#85)", () => {
+  /**
+   * Two representative upstream defects, reproduced. `burritos` reaches the
+   * `OW S` family (representative word `dose`) only via stress promotion — its
+   * bad reading is unstressed, `OW0 S`. `altos`'s bad reading is its *second*
+   * upstream reading, and it is already stressed (`OW2 S`), so it reaches
+   * `OW S` without any promotion at all — the case the issue's stress-promotion
+   * story doesn't cover, and why it is pinned separately from `burritos`.
+   */
+  const BURRITOS_UPSTREAM: Pronunciation[] = [["B", "ER0", "IY1", "T", "OW0", "S"]];
+  const ALTOS_UPSTREAM: Pronunciation[] = [
+    ["AE1", "L", "T", "OW0", "Z"],
+    ["AO1", "L", "T", "OW2", "S"],
+  ];
+
+  /** The correction, as `data/supplement.dict` carries it. */
+  const CORRECTION = [
+    "burritos B ER0 IY1 T OW0 Z",
+    "altos AE1 L T OW0 Z",
+    "altos(1) AO1 L T OW2 Z",
+  ].join("\n");
+
+  const upstream: TestInputs = {
+    pronunciations: [
+      ["burritos", BURRITOS_UPSTREAM],
+      ["altos", ALTOS_UPSTREAM],
+      ["dose", [["D", "OW1", "S"]]],
+      ["sucrose", [["S", "UW1", "K", "R", "OW0", "S"]]],
+    ],
+    words: ["burritos", "altos", "dose", "sucrose"],
+    prevalence: [["burritos", 2.2], ["altos", 1.0], ["dose", 2.4], ["sucrose", 1.8]],
+  };
+
+  it("serves burritos and altos as rhymes for dose, until the supplement corrects them", () => {
+    // The defect itself, asserted so the fix cannot be mistaken for a test that
+    // was always green.
+    const index = makeTestIndex(upstream);
+    const dose = index.pinSeed("dose");
+
+    expect(index.adjudicate(dose, "burritos").outcome).not.toBe("rejected");
+    expect(index.adjudicate(dose, "altos").outcome).not.toBe("rejected");
+  });
+
+  it("stops burritos and altos rhyming with dose, and leaves sucrose alone", () => {
+    const index = makeTestIndex({ ...upstream, supplement: CORRECTION });
+    const dose = index.pinSeed("dose");
+
+    expect(index.adjudicate(dose, "burritos")).toMatchObject({
+      outcome: "rejected",
+      reason: "does-not-rhyme",
+    });
+    expect(index.adjudicate(dose, "altos")).toMatchObject({
+      outcome: "rejected",
+      reason: "does-not-rhyme",
+    });
+    expect(index.adjudicate(dose, "sucrose").outcome).toBe("answer");
+  });
+});
+
 describe("the committed supplement", () => {
   const entries = parseCmudict(
     readFileSync(
@@ -176,5 +235,29 @@ describe("the committed supplement", () => {
     for (const reading of readings ?? []) {
       expect(reading.at(-1)).toBe("N");
     }
+  });
+
+  it("carries all thirteen -os plural corrections, every reading ending in Z (#85)", () => {
+    const OS_PLURALS = [
+      "anglos", "altos", "bimbos", "bios", "burritos", "campesinos",
+      "centavos", "cheerios", "cruzados", "latinos", "lobos", "narcos", "winos",
+    ];
+
+    for (const word of OS_PLURALS) {
+      const readings = entries.get(word);
+      expect(readings, word).toBeDefined();
+      for (const reading of readings ?? []) {
+        expect(reading.at(-1), `${word}: ${reading.join(" ")}`).toBe("Z");
+      }
+    }
+  });
+
+  it("keeps anglos and altos to the reading count the fix claims (#85)", () => {
+    // `anglos`'s upstream second reading duplicates its first once the S is
+    // fixed, so it collapses to one; `altos`'s two readings stay genuinely
+    // distinct pronunciations, so both survive — the same shape the hurricane
+    // correction above is pinned on (`toHaveLength`, not just the tail phoneme).
+    expect(entries.get("anglos")).toHaveLength(1);
+    expect(entries.get("altos")).toHaveLength(2);
   });
 });
