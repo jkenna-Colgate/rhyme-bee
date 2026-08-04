@@ -20,6 +20,22 @@ rhyme with), why the engine rejected it, its wordhood/name status, any direct
 CMUdict reading, and its inflectional relatives that CMUdict holds with their
 Rhyme Keys. Judge from this; the script decides nothing.
 
+**Family sweeps** — a batch of words that never went through play, so there is
+no captured queue entry to drive them (e.g. "these 38 words end in `-ule`,
+judge them all against `UW L`") — skip the queue and name the words and their
+shared target directly:
+
+```
+npm run supplement:candidates -- --words ule,rule,fluke --target="UW L"
+```
+
+`--words` takes a comma-separated list; `--target` is the one Rhyme Key every
+supplied word is judged against. This prints exactly the same evidence per
+word as the queue path (wordhood/name status, direct reading or inflectional
+relatives), just without a captured Seed/rejection-reason line, since none was
+recorded. `--archive` only applies to the queue (there is nothing queued to
+archive from a supplied list).
+
 ## 2. Decide each candidate
 
 Walk these in order; the first that applies wins.
