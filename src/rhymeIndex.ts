@@ -21,6 +21,7 @@ import {
 import { normaliseWord } from "./cmudict.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
+import { schwaTwinOf } from "./schwaTwins.ts";
 import type { Tier, Verdict } from "./verdict.ts";
 
 /** A curated Seed Word: the word itself plus its single pinned Rhyme Key. */
@@ -67,6 +68,15 @@ export interface FamilyMember {
 export interface RhymeFamily {
   rhymeKey: RhymeKey;
   members: FamilyMember[];
+  /**
+   * Other Rhyme Keys folded into this one because they are its Schwa Twin —
+   * differing only by the optional schwa before a word-final syllabic `L`,
+   * `N` or `M` (`schwaTwins.ts`, issue #110). `members` already holds the
+   * union; this is provenance, so a caller like curation can report which
+   * keys merged rather than the merge happening invisibly. Empty when this
+   * family absorbed nothing.
+   */
+  mergedKeys: RhymeKey[];
 }
 
 /**
@@ -180,6 +190,56 @@ function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation):
     isSyllabicConsonantVariantOf(candidate, earlier) ||
     isStressPromotionVariantOf(candidate, earlier)
   );
+}
+
+/**
+ * Fold every Schwa Twin pair in a freshly-built family map into one entry
+ * under the schwa-ful key, with the union of both keys' members (issue #110).
+ * `families()`'s own pass files a word under each of its *own* readings'
+ * literal keys, so a pair like `EH K SH AH N` / `EH K SH N` still lands as two
+ * separate map entries there — this is the second half that makes it agree
+ * with `#matchingPronunciation`'s twin fallback, which a single word's own
+ * per-reading traversal cannot express (a word with no reading at all on the
+ * schwa-ful key, like `subsection`, never asks to be filed under it there).
+ *
+ * The schwa-ful key is always the survivor: it is the one the pinned data
+ * actually transcribes, the schwa-less key exists only because normalisation
+ * appended it (ADR-0010), and curation picks Seeds from survivors. Told apart
+ * by token count — a Schwa Twin pair differs by exactly the one `AH` token,
+ * so whichever of the two keys is longer is the schwa-ful one.
+ */
+function mergeSchwaTwins(raw: Map<RhymeKey, RhymeFamily>): Map<RhymeKey, RhymeFamily> {
+  const schwalessOf = new Map<RhymeKey, RhymeKey>(); // schwa-ful key -> schwa-less key
+  const absorbed = new Set<RhymeKey>(); // every schwa-less key folded elsewhere
+  for (const key of raw.keys()) {
+    const twin = schwaTwinOf(key);
+    if (twin === null || !raw.has(twin)) continue;
+    if (key.split(" ").length > twin.split(" ").length) {
+      schwalessOf.set(key, twin);
+      absorbed.add(twin);
+    }
+  }
+
+  const merged = new Map<RhymeKey, RhymeFamily>();
+  for (const [key, family] of raw) {
+    if (absorbed.has(key)) continue; // folded into its schwa-ful sibling below
+    const schwaless = schwalessOf.get(key);
+    if (schwaless === undefined) {
+      merged.set(key, family);
+      continue;
+    }
+    const twinFamily = raw.get(schwaless)!;
+    const byWord = new Map(family.members.map((m) => [m.word, m]));
+    for (const member of twinFamily.members) {
+      if (!byWord.has(member.word)) byWord.set(member.word, member);
+    }
+    merged.set(key, {
+      rhymeKey: key,
+      members: [...byWord.values()].sort(byMemberWord),
+      mergedKeys: [schwaless],
+    });
+  }
+  return merged;
 }
 
 export class RhymeIndex {
@@ -363,6 +423,16 @@ export class RhymeIndex {
    * `buildPuzzle` needs, and nothing more — a caller that wants every key should
    * ask `families()` rather than call this in a loop, which is the O(keys ×
    * words) trap curation used to hand-inline its way around.
+   *
+   * Membership already includes a Schwa Twin's members: `#memberOf` matches a
+   * word through `#matchingPronunciation`, which falls back to the twin key
+   * (issue #110), so a word like `subsection` — no reading of its own ever
+   * lands on `EH K SH AH N` — still turns up here for that key, through the
+   * `EH K SH N` reading it does have. `mergedKeys` says so, on the same terms
+   * `#matchingPronunciation` does: whenever `rhymeKey` has a twin at all, not
+   * only when a member happened to need it this time, because the fallback is
+   * always live for this key, and a caller reading `mergedKeys` should be told
+   * the truth about the matching rule in force, not just today's result.
    */
   familyOf(rhymeKey: RhymeKey): RhymeFamily {
     const members: FamilyMember[] = [];
@@ -371,7 +441,8 @@ export class RhymeIndex {
       if (member) members.push(member);
     }
     members.sort(byMemberWord);
-    return { rhymeKey, members };
+    const twin = schwaTwinOf(rhymeKey);
+    return { rhymeKey, members, mergedKeys: twin === null ? [] : [twin] };
   }
 
   /**
@@ -379,6 +450,14 @@ export class RhymeIndex {
    * curation is built on. Building a Puzzle per key would re-scan every wordhood
    * word each time; this visits each word once and files it under every key it
    * rhymes on (a word with two readings joins two families).
+   *
+   * Unlike `familyOf`, this pass files each word under its *own* readings'
+   * literal keys, so a Schwa Twin pair still comes out as two separate map
+   * entries here — `mergeSchwaTwins` folds them together afterwards, unioning
+   * membership under the schwa-ful key (issue #110). Both paths agree because
+   * `#matchingPronunciation`'s twin fallback and this merge encode the same
+   * equivalence from two directions: fixing one without the other would leave
+   * curation and adjudication answering differently for the same Seed.
    */
   families(): Map<RhymeKey, RhymeFamily> {
     const families = new Map<RhymeKey, RhymeFamily>();
@@ -392,11 +471,11 @@ export class RhymeIndex {
         if (member === null) continue;
         const family = families.get(key);
         if (family) family.members.push(member);
-        else families.set(key, { rhymeKey: key, members: [member] });
+        else families.set(key, { rhymeKey: key, members: [member], mergedKeys: [] });
       }
     }
     for (const family of families.values()) family.members.sort(byMemberWord);
-    return families;
+    return mergeSchwaTwins(families);
   }
 
   /**
@@ -459,12 +538,30 @@ export class RhymeIndex {
     return { word, length: word.length, knownness, pronunciation: match, tier };
   }
 
+  /**
+   * A literal match always wins first — every reading the data ever asserted
+   * or a rule generated is checked before anything else is consulted, so a
+   * Submission that already rhymed keeps rhyming on exactly the reading it
+   * always matched (never the Schwa Twin fallback below), no verdict this
+   * index has ever returned changes.
+   *
+   * Only when no reading matches literally do we ask whether `seedKey` has a
+   * Schwa Twin (issue #110) and try that instead — the same "append, never
+   * replace" shape ADR-0010's own rule uses: this can only turn a past
+   * rejection into an acceptance, never the reverse.
+   */
   #matchingPronunciation(
     seedKey: RhymeKey,
     prons: Pronunciation[],
   ): Pronunciation | null {
     for (const pron of prons) {
       if (rhymeKeyOf(pron) === seedKey) return pron;
+    }
+    const twin = schwaTwinOf(seedKey);
+    if (twin !== null) {
+      for (const pron of prons) {
+        if (rhymeKeyOf(pron) === twin) return pron;
+      }
     }
     return null;
   }

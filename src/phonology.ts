@@ -21,6 +21,22 @@ export function isVowel(phoneme: Phoneme): boolean {
   return /[0-2]$/.test(phoneme);
 }
 
+/**
+ * ARPABET's fixed vowel symbols, bare (no stress digit). `isVowel` above
+ * answers the same question for a live phoneme, but needs a stress digit to
+ * do it — a Rhyme Key strips every digit, vowels included, so a caller
+ * working from key strings alone (`schwaTwins.ts`) has nothing for `isVowel`
+ * to read and must ask by symbol instead.
+ */
+const VOWEL_SOUNDS = new Set([
+  "AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", "EY", "IH", "IY", "OW", "OY", "UH", "UW",
+]);
+
+/** True for an ARPABET vowel symbol with its stress digit already stripped. */
+export function isVowelSound(sound: Phoneme): boolean {
+  return VOWEL_SOUNDS.has(sound);
+}
+
 /** The stress digit of a vowel phoneme (0/1/2), or null for a consonant. */
 export function stressOf(phoneme: Phoneme): 0 | 1 | 2 | null {
   const match = phoneme.match(/([0-2])$/);

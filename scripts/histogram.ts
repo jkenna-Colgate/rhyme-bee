@@ -35,6 +35,13 @@ const report = curate(index, { sizeBand: { min: MIN, max: MAX } });
 console.log(`Distinct Rhyme Keys: ${report.families.length}`);
 console.log(`Candidate Seed Words in band [${MIN}, ${MAX}]: ${report.candidates.length}`);
 console.log("");
+
+const merged = report.families.filter((f) => f.mergedKeys.length > 0);
+console.log(`Schwa Twin merges (issue #110): ${merged.length}`);
+for (const family of merged) {
+  console.log(`  ${family.rhymeKey} absorbed ${family.mergedKeys.join(", ")} (${family.representative})`);
+}
+console.log("");
 console.log("Answers  Families");
 for (const count of [...report.histogram.keys()].sort((a, b) => a - b)) {
   const families = report.histogram.get(count)!;
