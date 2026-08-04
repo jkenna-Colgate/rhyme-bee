@@ -220,6 +220,77 @@ describe("the -os plurals correction (#85)", () => {
   });
 });
 
+describe("the -ule family sweep (#71)", () => {
+  /**
+   * The six Answer-tier words from the 38-word `-ule` sweep, as
+   * `data/supplement.dict` carries them. All 38 were absent from CMUdict
+   * entirely (not a stress defect, a missing reading), so every Submission
+   * below is `not-a-known-word` until the supplement is applied.
+   */
+  const ADDITIONS = [
+    "macromolecule M AE2 K R OW0 M AA1 L AH0 K Y UW2 L",
+    "globule G L AA1 B Y UW0 L",
+    "pustule P AH1 S CH UW0 L",
+    "reticule R EH1 T AH0 K Y UW0 L",
+    "glandule G L AE1 N JH UW0 L",
+    "ampoule AE1 M P UW2 L",
+    // A Bonus-tier word from the same sweep, carried with no prevalence
+    // override below — it should rhyme, but never outrank a Bonus verdict.
+    "bascule B AE1 S K Y UW0 L",
+  ].join("\n");
+
+  const ANSWER_TIER = [
+    "macromolecule", "globule", "pustule", "reticule", "glandule", "ampoule",
+  ];
+
+  const upstream: TestInputs = {
+    words: [...ANSWER_TIER, "bascule"],
+    // Above the fixture's KNOWNNESS_THRESHOLD (1.0), so each tiers as an
+    // Answer once it has a reading at all. `bascule` is deliberately absent
+    // here — it has wordhood but no prevalence, the ordinary Bonus default.
+    prevalence: ANSWER_TIER.map((word): [string, number] => [word, 2.0]),
+  };
+
+  it("rejects every one of the six as not a known word before the supplement", () => {
+    const index = makeTestIndex(upstream);
+    const pool = index.pinSeed("pool");
+
+    for (const word of ANSWER_TIER) {
+      expect(index.adjudicate(pool, word), word).toMatchObject({
+        outcome: "rejected",
+        reason: "not-a-known-word",
+      });
+    }
+  });
+
+  it("accepts all six as Answers against a UW L seed, once added", () => {
+    const index = makeTestIndex({ ...upstream, supplement: ADDITIONS });
+    const pool = index.pinSeed("pool");
+
+    for (const word of ANSWER_TIER) {
+      expect(index.adjudicate(pool, word), word).toMatchObject({ outcome: "answer" });
+    }
+  });
+
+  it("tiers the un-prevalenced bascule as a Bonus Word, not an Answer", () => {
+    const index = makeTestIndex({ ...upstream, supplement: ADDITIONS });
+    const pool = index.pinSeed("pool");
+
+    expect(index.adjudicate(pool, "bascule")).toMatchObject({ outcome: "bonus" });
+  });
+
+  it("leaves the chocolate/ate guardrail alone", () => {
+    // The addition touches only the `-ule` words; it must not perturb the
+    // guardrail ADR-0001 is built on.
+    const index = makeTestIndex({ ...upstream, supplement: ADDITIONS });
+
+    expect(index.adjudicate(index.pinSeed("ate"), "chocolate")).toMatchObject({
+      outcome: "rejected",
+      reason: "does-not-rhyme",
+    });
+  });
+});
+
 describe("the committed supplement", () => {
   const entries = parseCmudict(
     readFileSync(
