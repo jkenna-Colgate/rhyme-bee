@@ -79,3 +79,149 @@ latinos L AA0 T IY1 N OW0 Z
 lobos L OW1 B OW0 Z
 narcos N AA1 R K OW0 Z
 winos W IY1 N OW0 Z
+
+# --- Adds (family sweep: `-ule` words against target `UW L`, #71) ---
+#
+# The prevalence norms hold 60 words ending in `-ule`; CMUdict has readings for
+# only 22 of them (`capsule`, `granule`, `module`, `molecule`, `ridicule`,
+# `vestibule`, `mule`, `yule`, `joule`, `tubule`, `nodule`, `ovule`, `boule`,
+# `saccule`, `minuscule`, `virgule`, and a handful more). The other 38 are
+# invisible to the game: wordhood is already granted (`words.txt` says yes for
+# every one, per `npm run supplement:candidates -- --words ... --target "UW
+# L"`), so the only defect is the missing reading. None is a name.
+#
+# Every reading below either (a) is spliced onto a stem CMUdict already reads
+# (`duct`, `barb`, `gem`, `plume`, `sphere`, `mount`, `gallus`, `hierarchy`,
+# `amygdala`, `schedule`), (b) copies an existing supplement-family word's own
+# stored digits verbatim (`molecule`, `saccule`, `minuscule`), or (c) is a
+# plain hand-authored reading for a suffix this file already has direct
+# precedent for (`globule` next to `capsule`/`module`; the loanwords `ampoule`,
+# `cagoule`). Where the final `-ule` syllable's stress is not independently
+# confirmed, it is left `UW0` rather than guessed `UW2` — the engine's own
+# stress-promotion rule (ADR-0009, `normalise.ts`) reaches a full unstressed
+# vowel in a closed final syllable regardless, so the rhyme verdict is
+# identical either way and no digit is asserted that isn't earned.
+#
+# Three words on the original 38-word list are deliberately left out —
+# `tule`, `gule`, `guayule` — because the judgement came out "genuinely
+# unsure", not "yes": see the #71 report for the specific doubt on each.
+
+# macromolecule: absent from CMUdict, but `molecule` is (`M AA1 L AH0 K Y
+# UW2 L`) and its own final syllable's stress is reused unchanged. `macro-` is
+# not one of this repo's configured prefixes (affixes.ts), so this is
+# hand-authored rather than derived, by direct analogy to how `over-`/`under-`
+# are composed there: an unstressed/secondary prefix, never primary.
+macromolecule M AE2 K R OW0 M AA1 L AH0 K Y UW2 L
+
+# globule: hand-authored. Real `/ˈɡlɑːbjuːl/`, the same shape as `capsule`/
+# `module` (stressed first syllable, closed final syllable) but with the full
+# vowel `capsule` lacks — `capsule`'s final schwa (`AH0 L`) is a genuinely
+# different, unrelated sound, not evidence against this reading.
+globule G L AA1 B Y UW0 L
+
+# pustule: hand-authored. Real `/ˈpʌstʃuːl/` (also `/ˈpʌstjuːl/`); the
+# palatalised `-chuul` variant is at least as common in US speech as `-tyool`.
+pustule P AH1 S CH UW0 L
+
+# reticule: hand-authored, same shape as `ridicule` (`R IH1 D AH0 K Y UW2 L`,
+# already upstream) but the final digit is not copied — left `UW0`,
+# stress-promotion reaches it the same way.
+reticule R EH1 T AH0 K Y UW0 L
+
+# glandule: hand-authored, real `/ˈɡlændʒuːl/`, the `d`+`y` palatalising to
+# `jh` the way `graduate`/`individual` do. Same closed-final-syllable shape as
+# `module`.
+glandule G L AE1 N JH UW0 L
+
+# ampoule: hand-authored. Common medical term, real `/ˈæmpuːl/`, `AM-pool`
+# with clearly audible stress on both syllables (not a diminutive suffix
+# reading at all, so given its own explicit secondary rather than left `UW0`).
+ampoule AE1 M P UW2 L
+
+# papule, stipule, cellule, pinnule, barbule, ductule, floccule, bascule,
+# amygdule, plumule, noctule, monticule, fascicule, animalcule, frustule,
+# pilule, gemmule, gallinule, hierodule, spherule, crepuscule: hand-authored,
+# the same closed-final-syllable shape as `globule` above (stressed stem +
+# `Y UW0 L`, promotable). `ductule` (duct `D AH1 K T`), `barbule` (barb
+# `B AA1 R B`), `gemmule` (gem `JH EH1 M`), `plumule` (plume `P L UW1 M`),
+# `spherule` (sphere `S F IH1 R`), `noctule` (nocturnal's `N AA0 K T` root),
+# `amygdule` (amygdala's `AE2 M IH0 G D` root, independently stressed here
+# since `amygdule` is a shorter word than `amygdala`), and `hierodule`
+# (hierarchy's `HH AY1 ER0` root) each build on a stem CMUdict already reads;
+# `monticule`'s first syllable is anchored on `monarch`/`montage` (`M AA1
+# N...`) rather than `mount` — despite the shared Latin root, English "mount"
+# diphthongised while this learned borrowing kept the short vowel, the same
+# split as `monument`/`monarch` — and the rest have no CMUdict stem to build
+# on and are authored directly from the real pronunciation: `papule`
+# (/ˈpæpjuːl/, dermatology), `stipule` (/ˈstɪpjuːl/, botany), `cellule`
+# (/ˈsɛljuːl/, "small cell"), `pinnule` (/ˈpɪnjuːl/, biology), `floccule`
+# (/ˈflɑːkjuːl/, chemistry), `bascule` (/ˈbæskjuːl/, as in a bascule bridge),
+# `fascicule` (/ˈfæsɪkjuːl/, a part-issued volume), `animalcule`
+# (/ˌænɪˈmælkjuːl/, the historical "microscopic organism" term), `frustule`
+# (/ˈfrʌstjuːl/, a diatom's shell), `pilule` (/ˈpɪljuːl/, "small pill"),
+# `gallinule` (/ˈɡælɪnjuːl/, the marsh bird), `crepuscule` (/krɪˈpʌskjuːl/,
+# "twilight").
+papule P AE1 P Y UW0 L
+stipule S T IH1 P Y UW0 L
+cellule S EH1 L Y UW0 L
+pinnule P IH1 N Y UW0 L
+barbule B AA1 R B Y UW0 L
+ductule D AH1 K T Y UW0 L
+floccule F L AA1 K Y UW0 L
+bascule B AE1 S K Y UW0 L
+amygdule AH0 M IH1 G D Y UW0 L
+plumule P L UW1 M Y UW0 L
+noctule N AA1 K T Y UW0 L
+monticule M AA1 N T AH0 K Y UW0 L
+fascicule F AE1 S AH0 K Y UW0 L
+animalcule AE2 N AH0 M AE1 L K Y UW0 L
+frustule F R AH1 S T Y UW0 L
+pilule P IH1 L Y UW0 L
+gemmule JH EH1 M Y UW0 L
+gallinule G AE1 L AH0 N Y UW0 L
+hierodule HH AY1 ER0 AH0 D Y UW0 L
+spherule S F IH1 R UW0 L
+crepuscule K R IH0 P AH1 S K Y UW0 L
+
+# spicule: hand-authored, digits copied verbatim from `saccule` (already
+# upstream, `S AE1 K Y UW2 L`) — same shape, initial cluster and vowel swapped.
+spicule S P IH1 K Y UW2 L
+
+# majuscule: hand-authored, digits copied verbatim from `minuscule` (already
+# upstream, `M IH1 N AH0 S K Y UW2 L`) — its own antonym, same shape.
+majuscule M AE1 JH AH0 S K Y UW2 L
+
+# ferrule, ferule: hand-authored. Near-homophones (a metal collar; a flat
+# rod), each independently attested with two GA pronunciations — one with the
+# final vowel reduced to a schwa (`FER-uhl`, not on the target and not
+# asserted here), and one with the full `/uːl/` this asserts: `ferrule`
+# stress-final (`fe-ROOL`), `ferule` stress-initial with the final syllable
+# carrying secondary (`FER-ool`). Both are genuine alternate readings, not
+# inventions — this does not say the schwa reading is wrong, only that the
+# `/uːl/ one is also real.
+ferrule F ER0 UW1 L
+ferule F EH1 R UW2 L
+
+# lobule: derived from the upstream inflection `lobules L AA1 B Y UW2 L Z` by
+# dropping the final `Z` — rhymes on UW L, with `pool`.
+lobule L AA1 B Y UW2 L
+
+# cagoule: hand-authored. French loanword (a hooded rain jacket), real
+# `/kəˈɡuːl/`, `kuh-GOOL` — unstressed first syllable, primary stress on the
+# final, no promotion needed.
+cagoule K AH0 G UW1 L
+
+# pule: hand-authored. A live (if rare) modern dictionary headword — "to cry
+# weakly or querulously" — despite looking, at a glance, like it might be a
+# prevalence-norm artefact; same monosyllabic shape as `mule`/`yule` already
+# upstream.
+pule P Y UW1 L
+
+# enschedule: hand-authored, compositional. Archaic ("to insert in a
+# schedule; to enroll" — Webster's 1913 Unabridged) but real, not a
+# prevalence-norm artefact. `en-` is not one of this repo's configured
+# prefixes (affixes.ts), so this is hand-authored rather than derived, by
+# direct analogy to how `un-`/`re-`/`mis-` are composed there — an unstressed
+# prefix, never primary — prepended to `schedule`'s own second upstream
+# reading (`S K EH1 JH UW0 L`) unchanged.
+enschedule EH0 N S K EH1 JH UW0 L
