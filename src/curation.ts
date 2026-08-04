@@ -60,6 +60,15 @@ export interface FamilyEntry {
    * it is barred from the Seed pool.
    */
   nativeCount: number;
+  /**
+   * Other Rhyme Keys folded into this one as its Schwa Twin — differing only
+   * by the optional schwa before a word-final syllabic `L`, `N` or `M`, a
+   * contrast nobody can hear (ADR-0010, issue #110). `answerCount` and
+   * `bonusCount` already reflect the union; this is provenance, so a report
+   * can say which keys merged rather than the drop from 274 to 260 candidates
+   * happening invisibly. Empty when this family absorbed nothing.
+   */
+  mergedKeys: RhymeKey[];
 }
 
 export type DropReason =
@@ -204,6 +213,7 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
       multiplePronunciations: index.isAmbiguous(representative),
       difficulty: maxScore === 0 ? 0 : rareMass / maxScore,
       nativeCount,
+      mergedKeys: rhymeFamily.mergedKeys,
     };
     families.push(family);
     histogram.set(family.answerCount, (histogram.get(family.answerCount) ?? 0) + 1);

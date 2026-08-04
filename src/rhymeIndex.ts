@@ -10,10 +10,18 @@
  * passed in by the caller, never held here.
  */
 
-import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
+import {
+  bareSound,
+  rhymeKeyOf,
+  stressOf,
+  withStress,
+  type Pronunciation,
+  type RhymeKey,
+} from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
+import { schwaTwinOf } from "./schwaTwins.ts";
 import type { Tier, Verdict } from "./verdict.ts";
 
 /** A curated Seed Word: the word itself plus its single pinned Rhyme Key. */
@@ -60,6 +68,15 @@ export interface FamilyMember {
 export interface RhymeFamily {
   rhymeKey: RhymeKey;
   members: FamilyMember[];
+  /**
+   * Other Rhyme Keys folded into this one because they are its Schwa Twin —
+   * differing only by the optional schwa before a word-final syllabic `L`,
+   * `N` or `M` (`schwaTwins.ts`, issue #110). `members` already holds the
+   * union; this is provenance, so a caller like curation can report which
+   * keys merged rather than the merge happening invisibly. Empty when this
+   * family absorbed nothing.
+   */
+  mergedKeys: RhymeKey[];
 }
 
 /**
@@ -113,6 +130,117 @@ export interface RhymeIndexConfig {
 const VALID_SUBMISSION = /^[a-z]+$/;
 
 const byMemberWord = (a: FamilyMember, b: FamilyMember) => a.word.localeCompare(b.word);
+
+/**
+ * True if `candidate` is exactly `earlier` with its final unstressed schwa
+ * dropped and the sonorant that followed it left to carry the syllable alone —
+ * the shape `src/normalise.ts`'s `syllabic-consonant` rule appends (`gruel`'s
+ * `G R UW1 AH0 L` gains `G R UW1 L`). Recognised by shape, not tracked with a
+ * second piece of data: the rule only ever *appends*, so a generated reading is
+ * always a later entry in the word's own list, and it is always exactly this
+ * transform (or `isStressPromotionVariantOf`, below) of an earlier one (#75).
+ *
+ * Deliberately looser than the rule it recognises: it does not re-check that
+ * the sonorant is one the rule would have acted on, or the vowel-before-the-
+ * schwa restrictions that decide whether the rule *fires*. Those restrictions
+ * only ever narrow which readings get a variant generated in the first place;
+ * skipping them here can only make this function say "generated" about a
+ * reading that is, in fact, base — refusing a pin the data would have allowed,
+ * never permitting one it would have refused. Pinning fails safe.
+ */
+function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  if (candidate.length !== earlier.length - 1) return false;
+  const schwa = earlier.at(-2);
+  const sonorant = earlier.at(-1);
+  if (schwa === undefined || sonorant === undefined) return false;
+  if (bareSound(schwa) !== "AH" || stressOf(schwa) !== 0) return false;
+  if (candidate.at(-1) !== sonorant) return false;
+  return candidate.slice(0, -1).every((phoneme, i) => phoneme === earlier[i]);
+}
+
+/**
+ * True if `candidate` is exactly `earlier` with one unstressed vowel promoted
+ * to secondary stress and nothing else changed — the shape `src/normalise.ts`'s
+ * `stress-promotion` rule appends (`module`'s `M AA1 JH UW0 L` gains
+ * `M AA1 JH UW2 L`). See `isSyllabicConsonantVariantOf` for why shape, not a
+ * schema field, is what pinning reads.
+ */
+function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  if (candidate.length !== earlier.length) return false;
+  let diffIndex = -1;
+  for (let i = 0; i < earlier.length; i++) {
+    if (candidate[i] === earlier[i]) continue;
+    if (diffIndex !== -1) return false; // more than one phoneme differs
+    diffIndex = i;
+  }
+  if (diffIndex === -1) return false; // identical readings, not a variant
+  const original = earlier[diffIndex]!;
+  return stressOf(original) === 0 && candidate[diffIndex] === withStress(original, 2);
+}
+
+/**
+ * True if `candidate` is a generated variant of `earlier` — a reading
+ * normalisation appended alongside it, rather than one the pinned data ever
+ * transcribed. The two shapes above are the whole of the frozen rule set that
+ * appends (ADR-0011); the rule that replaces (the cot-caught merger) never
+ * grows a word's reading count, so it needs no shape here.
+ */
+function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  return (
+    isSyllabicConsonantVariantOf(candidate, earlier) ||
+    isStressPromotionVariantOf(candidate, earlier)
+  );
+}
+
+/**
+ * Fold every Schwa Twin pair in a freshly-built family map into one entry
+ * under the schwa-ful key, with the union of both keys' members (issue #110).
+ * `families()`'s own pass files a word under each of its *own* readings'
+ * literal keys, so a pair like `EH K SH AH N` / `EH K SH N` still lands as two
+ * separate map entries there — this is the second half that makes it agree
+ * with `#matchingPronunciation`'s twin fallback, which a single word's own
+ * per-reading traversal cannot express (a word with no reading at all on the
+ * schwa-ful key, like `subsection`, never asks to be filed under it there).
+ *
+ * The schwa-ful key is always the survivor: it is the one the pinned data
+ * actually transcribes, the schwa-less key exists only because normalisation
+ * appended it (ADR-0010), and curation picks Seeds from survivors. Told apart
+ * by token count — a Schwa Twin pair differs by exactly the one `AH` token,
+ * so whichever of the two keys is longer is the schwa-ful one.
+ */
+function mergeSchwaTwins(raw: Map<RhymeKey, RhymeFamily>): Map<RhymeKey, RhymeFamily> {
+  const schwalessOf = new Map<RhymeKey, RhymeKey>(); // schwa-ful key -> schwa-less key
+  const absorbed = new Set<RhymeKey>(); // every schwa-less key folded elsewhere
+  for (const key of raw.keys()) {
+    const twin = schwaTwinOf(key);
+    if (twin === null || !raw.has(twin)) continue;
+    if (key.split(" ").length > twin.split(" ").length) {
+      schwalessOf.set(key, twin);
+      absorbed.add(twin);
+    }
+  }
+
+  const merged = new Map<RhymeKey, RhymeFamily>();
+  for (const [key, family] of raw) {
+    if (absorbed.has(key)) continue; // folded into its schwa-ful sibling below
+    const schwaless = schwalessOf.get(key);
+    if (schwaless === undefined) {
+      merged.set(key, family);
+      continue;
+    }
+    const twinFamily = raw.get(schwaless)!;
+    const byWord = new Map(family.members.map((m) => [m.word, m]));
+    for (const member of twinFamily.members) {
+      if (!byWord.has(member.word)) byWord.set(member.word, member);
+    }
+    merged.set(key, {
+      rhymeKey: key,
+      members: [...byWord.values()].sort(byMemberWord),
+      mergedKeys: [schwaless],
+    });
+  }
+  return merged;
+}
 
 export class RhymeIndex {
   readonly #data: RhymeIndexData;
@@ -174,6 +302,12 @@ export class RhymeIndex {
    * caller must pass `rhymeKey` to disambiguate. An explicit key must be one of
    * the word's own Rhyme Keys, or a mistyped key would silently yield an
    * incoherent Puzzle.
+   *
+   * Either way, the key must be backed by a *base* reading — one the pinned
+   * data actually transcribed, never one normalisation manufactured alongside
+   * it (`#requireBaseKey`). ADR-0002 makes the Seed's spoken audio and
+   * respelling load-bearing, so a Seed can never be pinned to a pronunciation
+   * no dictionary source ever asserted (#75).
    */
   pinSeed(word: string, rhymeKey?: RhymeKey): SeedWord {
     const keys = this.rhymeKeysOf(word);
@@ -183,15 +317,45 @@ export class RhymeIndex {
           `Cannot pin seed "${word}" to ${rhymeKey}: not one of its Rhyme Keys (${keys.join(", ") || "none"}).`,
         );
       }
+      this.#requireBaseKey(word, rhymeKey);
       return { word: normaliseWord(word), rhymeKey };
     }
-    if (keys.length === 1) return { word: normaliseWord(word), rhymeKey: keys[0]! };
+    if (keys.length === 1) {
+      this.#requireBaseKey(word, keys[0]!);
+      return { word: normaliseWord(word), rhymeKey: keys[0]! };
+    }
     if (keys.length === 0) {
       throw new Error(`Cannot pin seed "${word}": no pronunciation found.`);
     }
     throw new Error(
       `Cannot pin seed "${word}": ${keys.length} pronunciations (${keys.join(", ")}). Pass a rhymeKey.`,
     );
+  }
+
+  /**
+   * Refuse a Rhyme Key no base reading of the word carries — one reachable only
+   * through a reading normalisation generated. A word's first reading is always
+   * a base reading (a generated variant is always appended after at least one
+   * reading already exists), so this only ever bites a *later* reading that
+   * turns out to be wholly a generated variant's doing — currently only
+   * possible via an explicit `rhymeKey`, since an automatically-picked single
+   * key already traces to the first reading. Guarded here too, defensively:
+   * `src/normalise.ts` itself notes stress promotion carries no *structural*
+   * guard against ever minting a word's first Rhyme Key, only an empirical one.
+   */
+  #requireBaseKey(word: string, rhymeKey: RhymeKey): void {
+    const prons = this.#data.pronunciations.get(normaliseWord(word)) ?? [];
+    const hasBaseReading = prons.some(
+      (pron, i) =>
+        rhymeKeyOf(pron) === rhymeKey &&
+        !prons.slice(0, i).some((earlier) => isGeneratedVariantOf(pron, earlier)),
+    );
+    if (!hasBaseReading) {
+      throw new Error(
+        `Cannot pin seed "${word}" to ${rhymeKey}: every reading on that key is a generated ` +
+          `variant, and a Seed must be spoken in a reading the dictionary actually transcribed.`,
+      );
+    }
   }
 
   /**
@@ -259,6 +423,16 @@ export class RhymeIndex {
    * `buildPuzzle` needs, and nothing more — a caller that wants every key should
    * ask `families()` rather than call this in a loop, which is the O(keys ×
    * words) trap curation used to hand-inline its way around.
+   *
+   * Membership already includes a Schwa Twin's members: `#memberOf` matches a
+   * word through `#matchingPronunciation`, which falls back to the twin key
+   * (issue #110), so a word like `subsection` — no reading of its own ever
+   * lands on `EH K SH AH N` — still turns up here for that key, through the
+   * `EH K SH N` reading it does have. `mergedKeys` says so, on the same terms
+   * `#matchingPronunciation` does: whenever `rhymeKey` has a twin at all, not
+   * only when a member happened to need it this time, because the fallback is
+   * always live for this key, and a caller reading `mergedKeys` should be told
+   * the truth about the matching rule in force, not just today's result.
    */
   familyOf(rhymeKey: RhymeKey): RhymeFamily {
     const members: FamilyMember[] = [];
@@ -267,7 +441,8 @@ export class RhymeIndex {
       if (member) members.push(member);
     }
     members.sort(byMemberWord);
-    return { rhymeKey, members };
+    const twin = schwaTwinOf(rhymeKey);
+    return { rhymeKey, members, mergedKeys: twin === null ? [] : [twin] };
   }
 
   /**
@@ -275,6 +450,14 @@ export class RhymeIndex {
    * curation is built on. Building a Puzzle per key would re-scan every wordhood
    * word each time; this visits each word once and files it under every key it
    * rhymes on (a word with two readings joins two families).
+   *
+   * Unlike `familyOf`, this pass files each word under its *own* readings'
+   * literal keys, so a Schwa Twin pair still comes out as two separate map
+   * entries here — `mergeSchwaTwins` folds them together afterwards, unioning
+   * membership under the schwa-ful key (issue #110). Both paths agree because
+   * `#matchingPronunciation`'s twin fallback and this merge encode the same
+   * equivalence from two directions: fixing one without the other would leave
+   * curation and adjudication answering differently for the same Seed.
    */
   families(): Map<RhymeKey, RhymeFamily> {
     const families = new Map<RhymeKey, RhymeFamily>();
@@ -288,11 +471,11 @@ export class RhymeIndex {
         if (member === null) continue;
         const family = families.get(key);
         if (family) family.members.push(member);
-        else families.set(key, { rhymeKey: key, members: [member] });
+        else families.set(key, { rhymeKey: key, members: [member], mergedKeys: [] });
       }
     }
     for (const family of families.values()) family.members.sort(byMemberWord);
-    return families;
+    return mergeSchwaTwins(families);
   }
 
   /**
@@ -355,12 +538,30 @@ export class RhymeIndex {
     return { word, length: word.length, knownness, pronunciation: match, tier };
   }
 
+  /**
+   * A literal match always wins first — every reading the data ever asserted
+   * or a rule generated is checked before anything else is consulted, so a
+   * Submission that already rhymed keeps rhyming on exactly the reading it
+   * always matched (never the Schwa Twin fallback below), no verdict this
+   * index has ever returned changes.
+   *
+   * Only when no reading matches literally do we ask whether `seedKey` has a
+   * Schwa Twin (issue #110) and try that instead — the same "append, never
+   * replace" shape ADR-0010's own rule uses: this can only turn a past
+   * rejection into an acceptance, never the reverse.
+   */
   #matchingPronunciation(
     seedKey: RhymeKey,
     prons: Pronunciation[],
   ): Pronunciation | null {
     for (const pron of prons) {
       if (rhymeKeyOf(pron) === seedKey) return pron;
+    }
+    const twin = schwaTwinOf(seedKey);
+    if (twin !== null) {
+      for (const pron of prons) {
+        if (rhymeKeyOf(pron) === twin) return pron;
+      }
     }
     return null;
   }

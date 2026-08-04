@@ -39,6 +39,45 @@ describe("pinning a Seed Word", () => {
   });
 });
 
+describe("a Seed is never pinned to a generated variant (#75)", () => {
+  // `gruel` (syllabic-consonant, issue #74) and `module` (stress-promotion,
+  // issue #73) each carry one dictionary reading and one normalisation
+  // appended alongside it, so each is ambiguous the same way `tear` is — but
+  // only one of the two keys was ever actually transcribed. ADR-0002 makes the
+  // Seed's spoken audio load-bearing, so pinning must never land on the other.
+
+  it("pins `gruel` to its dictionary reading", () => {
+    expect(index.pinSeed("gruel", "UW AH L").rhymeKey).toBe("UW AH L");
+  });
+
+  it("refuses to pin `gruel` to the syllabic-consonant variant", () => {
+    expect(() => index.pinSeed("gruel", "UW L")).toThrow(/generated variant/);
+  });
+
+  it("pins `module` to its dictionary reading", () => {
+    expect(index.pinSeed("module", "AA JH UW L").rhymeKey).toBe("AA JH UW L");
+  });
+
+  it("refuses to pin `module` to the stress-promotion variant", () => {
+    expect(() => index.pinSeed("module", "UW L")).toThrow(/generated variant/);
+  });
+
+  it("still lets `gruel` and `module` rhyme wherever they are Submissions, not Seeds", () => {
+    // The restriction is on the Seed's pronunciation choice only — adjudication
+    // for every other Submission is unchanged.
+    const cool = index.pinSeed("cool", "UW L");
+    expect(index.adjudicate(cool, "gruel").outcome).toBe("answer");
+    expect(index.adjudicate(cool, "module").outcome).toBe("answer");
+  });
+
+  it("is deterministic — the same pinned inputs refuse the same variant on every rebuild", () => {
+    const again = makeTestIndex();
+    expect(() => index.pinSeed("gruel", "UW L")).toThrow(/generated variant/);
+    expect(() => again.pinSeed("gruel", "UW L")).toThrow(/generated variant/);
+    expect(again.pinSeed("gruel", "UW AH L")).toEqual(index.pinSeed("gruel", "UW AH L"));
+  });
+});
+
 describe("asymmetric matching", () => {
   it("accepts a homophone (eight for ate)", () => {
     expect(index.adjudicate(index.pinSeed("ate"), "eight").outcome).toBe("answer");
