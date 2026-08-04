@@ -10,7 +10,14 @@
  * passed in by the caller, never held here.
  */
 
-import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
+import {
+  bareSound,
+  rhymeKeyOf,
+  stressOf,
+  withStress,
+  type Pronunciation,
+  type RhymeKey,
+} from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
@@ -114,6 +121,67 @@ const VALID_SUBMISSION = /^[a-z]+$/;
 
 const byMemberWord = (a: FamilyMember, b: FamilyMember) => a.word.localeCompare(b.word);
 
+/**
+ * True if `candidate` is exactly `earlier` with its final unstressed schwa
+ * dropped and the sonorant that followed it left to carry the syllable alone —
+ * the shape `src/normalise.ts`'s `syllabic-consonant` rule appends (`gruel`'s
+ * `G R UW1 AH0 L` gains `G R UW1 L`). Recognised by shape, not tracked with a
+ * second piece of data: the rule only ever *appends*, so a generated reading is
+ * always a later entry in the word's own list, and it is always exactly this
+ * transform (or `isStressPromotionVariantOf`, below) of an earlier one (#75).
+ *
+ * Deliberately looser than the rule it recognises: it does not re-check that
+ * the sonorant is one the rule would have acted on, or the vowel-before-the-
+ * schwa restrictions that decide whether the rule *fires*. Those restrictions
+ * only ever narrow which readings get a variant generated in the first place;
+ * skipping them here can only make this function say "generated" about a
+ * reading that is, in fact, base — refusing a pin the data would have allowed,
+ * never permitting one it would have refused. Pinning fails safe.
+ */
+function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  if (candidate.length !== earlier.length - 1) return false;
+  const schwa = earlier.at(-2);
+  const sonorant = earlier.at(-1);
+  if (schwa === undefined || sonorant === undefined) return false;
+  if (bareSound(schwa) !== "AH" || stressOf(schwa) !== 0) return false;
+  if (candidate.at(-1) !== sonorant) return false;
+  return candidate.slice(0, -1).every((phoneme, i) => phoneme === earlier[i]);
+}
+
+/**
+ * True if `candidate` is exactly `earlier` with one unstressed vowel promoted
+ * to secondary stress and nothing else changed — the shape `src/normalise.ts`'s
+ * `stress-promotion` rule appends (`module`'s `M AA1 JH UW0 L` gains
+ * `M AA1 JH UW2 L`). See `isSyllabicConsonantVariantOf` for why shape, not a
+ * schema field, is what pinning reads.
+ */
+function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  if (candidate.length !== earlier.length) return false;
+  let diffIndex = -1;
+  for (let i = 0; i < earlier.length; i++) {
+    if (candidate[i] === earlier[i]) continue;
+    if (diffIndex !== -1) return false; // more than one phoneme differs
+    diffIndex = i;
+  }
+  if (diffIndex === -1) return false; // identical readings, not a variant
+  const original = earlier[diffIndex]!;
+  return stressOf(original) === 0 && candidate[diffIndex] === withStress(original, 2);
+}
+
+/**
+ * True if `candidate` is a generated variant of `earlier` — a reading
+ * normalisation appended alongside it, rather than one the pinned data ever
+ * transcribed. The two shapes above are the whole of the frozen rule set that
+ * appends (ADR-0011); the rule that replaces (the cot-caught merger) never
+ * grows a word's reading count, so it needs no shape here.
+ */
+function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  return (
+    isSyllabicConsonantVariantOf(candidate, earlier) ||
+    isStressPromotionVariantOf(candidate, earlier)
+  );
+}
+
 export class RhymeIndex {
   readonly #data: RhymeIndexData;
   readonly #config: RhymeIndexConfig;
@@ -174,6 +242,12 @@ export class RhymeIndex {
    * caller must pass `rhymeKey` to disambiguate. An explicit key must be one of
    * the word's own Rhyme Keys, or a mistyped key would silently yield an
    * incoherent Puzzle.
+   *
+   * Either way, the key must be backed by a *base* reading — one the pinned
+   * data actually transcribed, never one normalisation manufactured alongside
+   * it (`#requireBaseKey`). ADR-0002 makes the Seed's spoken audio and
+   * respelling load-bearing, so a Seed can never be pinned to a pronunciation
+   * no dictionary source ever asserted (#75).
    */
   pinSeed(word: string, rhymeKey?: RhymeKey): SeedWord {
     const keys = this.rhymeKeysOf(word);
@@ -183,15 +257,45 @@ export class RhymeIndex {
           `Cannot pin seed "${word}" to ${rhymeKey}: not one of its Rhyme Keys (${keys.join(", ") || "none"}).`,
         );
       }
+      this.#requireBaseKey(word, rhymeKey);
       return { word: normaliseWord(word), rhymeKey };
     }
-    if (keys.length === 1) return { word: normaliseWord(word), rhymeKey: keys[0]! };
+    if (keys.length === 1) {
+      this.#requireBaseKey(word, keys[0]!);
+      return { word: normaliseWord(word), rhymeKey: keys[0]! };
+    }
     if (keys.length === 0) {
       throw new Error(`Cannot pin seed "${word}": no pronunciation found.`);
     }
     throw new Error(
       `Cannot pin seed "${word}": ${keys.length} pronunciations (${keys.join(", ")}). Pass a rhymeKey.`,
     );
+  }
+
+  /**
+   * Refuse a Rhyme Key no base reading of the word carries — one reachable only
+   * through a reading normalisation generated. A word's first reading is always
+   * a base reading (a generated variant is always appended after at least one
+   * reading already exists), so this only ever bites a *later* reading that
+   * turns out to be wholly a generated variant's doing — currently only
+   * possible via an explicit `rhymeKey`, since an automatically-picked single
+   * key already traces to the first reading. Guarded here too, defensively:
+   * `src/normalise.ts` itself notes stress promotion carries no *structural*
+   * guard against ever minting a word's first Rhyme Key, only an empirical one.
+   */
+  #requireBaseKey(word: string, rhymeKey: RhymeKey): void {
+    const prons = this.#data.pronunciations.get(normaliseWord(word)) ?? [];
+    const hasBaseReading = prons.some(
+      (pron, i) =>
+        rhymeKeyOf(pron) === rhymeKey &&
+        !prons.slice(0, i).some((earlier) => isGeneratedVariantOf(pron, earlier)),
+    );
+    if (!hasBaseReading) {
+      throw new Error(
+        `Cannot pin seed "${word}" to ${rhymeKey}: every reading on that key is a generated ` +
+          `variant, and a Seed must be spoken in a reading the dictionary actually transcribed.`,
+      );
+    }
   }
 
   /**
