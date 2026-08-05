@@ -63,8 +63,19 @@ function openingPuzzle(index: RhymeIndex, pool: readonly FamilyEntry[]): Opening
     try {
       index.pinSeed(scheduled.word, scheduled.rhymeKey);
       return { date, seed: scheduled };
-    } catch {
-      // Fall through to free play.
+    } catch (err) {
+      // Silent in production — one free-play Puzzle beats a white screen. But in
+      // development this means the schedule and the built index disagree, which
+      // is a bug in the pair and not something to discover from a player.
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[rhyme-bee] schedule/index mismatch for ${date}: the index does not carry ` +
+            `Seed Word "${scheduled.word}" on Rhyme Key ${scheduled.rhymeKey}. ` +
+            `Falling back to free play. Rebuild the index, or rebuild the schedule ` +
+            `against this index.`,
+          err,
+        );
+      }
     }
   }
   return { date: null, seed: drawFreeSeed(pool) };
