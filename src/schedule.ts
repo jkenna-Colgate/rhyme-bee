@@ -18,6 +18,8 @@
  * Rhyme Key: decorrelated from Difficulty, and identical on every run.
  */
 
+import type { SeedWord } from "./rhymeIndex.ts";
+
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 export type Weekday = (typeof WEEKDAYS)[number];
 
@@ -131,6 +133,98 @@ export function dealSchedule<T extends Schedulable>(
   }
 
   return { days, finalWeekLength };
+}
+
+// --- Reading the artifact back ------------------------------------------------
+
+/**
+ * One day of the committed schedule artifact. The deal above holds a whole
+ * `Schedulable` per day; the artifact flattens it, because the only things a
+ * player's browser needs are the Seed Word and the Rhyme Key it is pinned to.
+ * The rest is there so a person can read the file.
+ */
+export interface ScheduleDay {
+  /** ISO date, `YYYY-MM-DD`. */
+  date: string;
+  weekday: Weekday;
+  week: number;
+  seed: string;
+  rhymeKey: string;
+  answerCount: number;
+  difficulty: number;
+}
+
+/** The artifact, once it has been recognised as one. */
+export interface Schedule {
+  startDate: string;
+  days: ScheduleDay[];
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function isScheduleDay(value: unknown): value is ScheduleDay {
+  if (typeof value !== "object" || value === null) return false;
+  const day = value as Partial<ScheduleDay>;
+  return (
+    typeof day.date === "string" &&
+    ISO_DATE.test(day.date) &&
+    typeof day.weekday === "string" &&
+    (WEEKDAYS as readonly string[]).includes(day.weekday) &&
+    typeof day.week === "number" &&
+    typeof day.seed === "string" &&
+    typeof day.rhymeKey === "string" &&
+    typeof day.answerCount === "number" &&
+    typeof day.difficulty === "number"
+  );
+}
+
+/**
+ * Read the committed artifact. The schedule is a reviewed file the deploy ships
+ * whole, so this is not defending against an attacker — it is refusing to
+ * half-read a file that has changed shape, which would otherwise surface as a
+ * player being served a Puzzle on `undefined`. Null means "there is no schedule
+ * here"; the caller falls back to free play, which is where an out-of-range date
+ * lands anyway.
+ */
+export function parseSchedule(raw: unknown): Schedule | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const artifact = raw as { startDate?: unknown; days?: unknown };
+  if (typeof artifact.startDate !== "string") return null;
+  if (!Array.isArray(artifact.days) || artifact.days.length === 0) return null;
+  if (!artifact.days.every(isScheduleDay)) return null;
+  return { startDate: artifact.startDate, days: artifact.days };
+}
+
+/**
+ * The Seed Word for a calendar date, pinned to the Rhyme Key the schedule
+ * records — exactly as the free-play draw pins a Seed to its family's key, so an
+ * ambiguous representative cannot misfire into the wrong Puzzle.
+ *
+ * Null for any date the run does not cover: an early visit before the start
+ * date, a visit after the 260 days are up, or a date that is not a date. All
+ * three mean the same thing to the shell — there is no Puzzle of the day, so
+ * play a free one.
+ */
+export function seedForDate(schedule: Schedule | null, isoDate: string): SeedWord | null {
+  if (schedule === null || !ISO_DATE.test(isoDate)) return null;
+  const day = schedule.days.find((d) => d.date === isoDate);
+  return day === undefined ? null : { word: day.seed, rhymeKey: day.rhymeKey };
+}
+
+/**
+ * The player's own calendar date, as the artifact spells it. The rollover is
+ * local midnight (ADR-0013): with no server there is no authoritative clock, and
+ * local rollover is what every daily puzzle a player has already met does.
+ *
+ * Built from the local-time getters rather than `toISOString`, which would hand
+ * a player west of Greenwich yesterday's Puzzle all evening and one east of it
+ * tomorrow's all morning.
+ */
+export function localCalendarDate(now: Date = new Date()): string {
+  const year = String(now.getFullYear()).padStart(4, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 // --- The review ---------------------------------------------------------------

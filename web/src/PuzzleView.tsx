@@ -18,23 +18,68 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { FamilyEntry } from "../../src/curation.ts";
 import { playableSeeds } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
+import scheduleArtifact from "../../data/schedule.json";
+import { localCalendarDate, parseSchedule, seedForDate } from "../../src/schedule.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
 import { speak, speechSupported } from "./speech.ts";
-import { usePuzzleSession } from "./usePuzzleSession.ts";
+import { usePuzzleSession, type OpeningPuzzle } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
 
 /** The unscored first-run Puzzle is always seeded with `ate` (CONTEXT.md). */
 const TUTORIAL_SEED = "ate";
 
-export function PuzzleView({ index }: { index: RhymeIndex }) {
-  const { session, last, seq, submit, reveal, newPuzzle } = usePuzzleSession(index, TUTORIAL_SEED);
+/**
+ * The reviewed schedule, read once at module load. It is committed data that
+ * ships inside the bundle, so there is no fetch and no waiting for it.
+ */
+const SCHEDULE = parseSchedule(scheduleArtifact);
 
-  // The shared in-band Seed pool (#33). The boot Seed stays the fixed tutorial
-  // word `ate`; only the "new puzzle" button draws from this pool.
+/** A free-play draw from the shared in-band Seed pool (#33). */
+function drawFreeSeed(pool: readonly FamilyEntry[]): string | SeedWord {
+  if (pool.length === 0) return TUTORIAL_SEED;
+  const family = pool[Math.floor(Math.random() * pool.length)]!;
+  // Read the Seed off the drawn family, pinned to the family's own Rhyme Key
+  // so an ambiguous representative can't misfire.
+  return { word: family.representative, rhymeKey: family.rhymeKey };
+}
+
+/**
+ * The Puzzle a player lands on: the scheduled one for *their* local calendar
+ * date, and free play when the date falls outside the run — an early visit
+ * before the start date, or a visit after the 260 days are up. An early click is
+ * not a dead end.
+ */
+function openingPuzzle(index: RhymeIndex, pool: readonly FamilyEntry[]): OpeningPuzzle {
+  const date = localCalendarDate();
+  const scheduled = seedForDate(SCHEDULE, date);
+  if (scheduled !== null) {
+    // A rebuilt index that no longer carries the day's Seed would otherwise take
+    // the whole game down rather than one Puzzle. Free play is the same fallback
+    // an out-of-range date gets.
+    try {
+      index.pinSeed(scheduled.word, scheduled.rhymeKey);
+      return { date, seed: scheduled };
+    } catch {
+      // Fall through to free play.
+    }
+  }
+  return { date: null, seed: drawFreeSeed(pool) };
+}
+
+export function PuzzleView({ index }: { index: RhymeIndex }) {
+  // The shared in-band Seed pool (#33), which both the opening fallback and the
+  // free-play button draw from.
   const pool = useMemo(() => playableSeeds(index), [index]);
+  const opening = useMemo(() => openingPuzzle(index, pool), [index, pool]);
+
+  const { session, last, seq, isDaily, submit, reveal, newPuzzle } = usePuzzleSession(
+    index,
+    opening,
+  );
 
   const [field, setField] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -78,14 +123,13 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
     inputRef.current?.focus();
   }
 
+  // Free play, the explicit extra after today's Puzzle: a fresh draw from the
+  // pool, unscheduled and unsaved. The daily Session stays where it is and comes
+  // back on the next load. Auto-speak follows for free: Seed's speak effect is
+  // keyed on the Seed Word (#36).
   function onNewPuzzle() {
     if (pool.length === 0) return;
-    const family = pool[Math.floor(Math.random() * pool.length)]!;
-    // Read the Seed off the drawn family, pinned to the family's own Rhyme Key
-    // so an ambiguous representative can't misfire. Auto-speak follows for free:
-    // Seed's speak effect is keyed on the Seed Word (#36).
-    const seed: SeedWord = { word: family.representative, rhymeKey: family.rhymeKey };
-    newPuzzle(seed);
+    newPuzzle(drawFreeSeed(pool));
     setField("");
     setConfirming(false);
     inputRef.current?.focus();
@@ -109,10 +153,10 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
           </button>
         )}
         <button type="button" className="new-puzzle" onClick={onNewPuzzle}>
-          🎲 New puzzle
+          🎲 Free play
         </button>
       </div>
-      <Seed session={session} />
+      <Seed session={session} isDaily={isDaily} />
       <Stats session={session} />
       {/* Both per-Submission flashes are re-keyed on `seq` so each new Submission
           genuinely remounts them (that is what restarts the banner's dismissal
@@ -186,7 +230,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
 
 // --- The Seed Word -------------------------------------------------------------
 
-function Seed({ session }: { session: Session }) {
+function Seed({ session, isDaily }: { session: Session; isDaily: boolean }) {
   const { puzzle } = session;
   const word = puzzle.seed.word;
 
@@ -199,7 +243,10 @@ function Seed({ session }: { session: Session }) {
 
   return (
     <header className="seed">
-      <p className="seed__label">Seed Word</p>
+      {/* Which Puzzle this is. Today's is the one that is saved and shared with
+          everybody else; a free-play draw is nobody else's and is not kept, so a
+          player should be able to tell them apart without reloading. */}
+      <p className="seed__label">{isDaily ? "Today’s Seed Word" : "Free play · Seed Word"}</p>
       <p className="seed__word">{word}</p>
       <p className="seed__respelling">“{puzzle.seedRespelling}”</p>
       {speechSupported() && (
