@@ -1,0 +1,34 @@
+# Cache directives for the static-asset deploy, in Cloudflare's `_headers`
+# format. Copied verbatim into `web/dist` by `deployHeadersPlugin.ts`, so it
+# ships at the root of the uploaded assets directory where Workers reads it.
+#
+# These are declared here rather than inherited from host defaults (#117): the
+# maintainer rebuilds the index and redeploys daily while people are playing,
+# and a host default that guesses wrong makes the refinement loop either
+# invisible (stale index) or unverifiable (cache-busting query string).
+
+# The Rhyme Index. `npm run build:index` names it by a hash of its contents, so
+# a rebuilt judge is always a new filename and this one can never go stale —
+# which is precisely what makes caching it forever safe.
+/index-*.json
+  Cache-Control: public, max-age=31536000, immutable
+
+# Vite's bundle assets are content-hashed too, for the same reason.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The index manifest is generated but unused by the client (see web/README.md
+# and scripts/indexArtifact.ts). It is the one mutable file of the set, so it is
+# deliberately off the immutable glob above: a split deploy that starts reading
+# it must see the current one.
+/index.manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The entry point is the only mutable thing the player fetches by a fixed name.
+# It names the current bundle, which names the current index, so revalidating it
+# on every load is what makes a deploy land at all.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

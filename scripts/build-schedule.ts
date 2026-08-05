@@ -21,6 +21,7 @@ import { DEFAULT_PLAYABLE_BAND, playableSeeds } from "../src/curation.ts";
 import { dealSchedule, reviewSchedule } from "../src/schedule.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
+import { indexArtifactPath } from "./indexArtifact.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = resolve(root, "data", "schedule.json");
@@ -43,7 +44,7 @@ if (existsSync(out) && !force) {
 }
 
 const artifact = JSON.parse(
-  readFileSync(resolve(root, "dist-data", "index.json"), "utf8"),
+  readFileSync(indexArtifactPath(resolve(root, "dist-data")), "utf8"),
 ) as SerialisedIndex;
 const index = deserialise(artifact);
 

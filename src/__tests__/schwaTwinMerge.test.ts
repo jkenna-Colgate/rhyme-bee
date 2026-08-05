@@ -9,7 +9,7 @@
  * untouched by this fix) composes stress promotion with the syllabic-consonant
  * rule to give it exactly the three Rhyme Keys the real index carries —
  * `AH B S EH K SH AH N`, `AH B S EH K SH N`, `EH K SH N` — verified against
- * the shipped `dist-data/index.json` before writing this fixture. None of the
+ * the shipped `dist-data/` index artifact before writing this fixture. None of the
  * three is `EH K SH AH N`, which is the whole of the bug: on a Seed pinned
  * there, `subsection` had nothing to match.
  */

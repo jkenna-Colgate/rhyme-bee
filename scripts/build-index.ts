@@ -7,6 +7,10 @@
  * data/README.md), writes the built artifact and the dropped-words and
  * derived-words reports to `dist-data/`. Rebuilding from the same pinned inputs
  * yields the same verdicts (story 35); nothing here touches the network.
+ *
+ * The index itself is written content-addressed, as `index-<hash>.json` plus a
+ * manifest naming it — see `indexArtifact.ts` for why, and for why the manifest
+ * is generated but deliberately unread at runtime.
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -14,6 +18,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { manufactureIndexData } from "../src/manufacture.ts";
 import { serialise } from "../src/serialise.ts";
+import { MANIFEST_FILENAME, writeIndexArtifact } from "./indexArtifact.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
@@ -43,8 +48,8 @@ const { data, demoted, derived, dropped } = manufactureIndexData({
 });
 
 mkdirSync(outDir, { recursive: true });
-writeFileSync(
-  resolve(outDir, "index.json"),
+const manifest = writeIndexArtifact(
+  outDir,
   JSON.stringify(serialise(data, { knownnessThreshold: KNOWNNESS_THRESHOLD }, sources)),
 );
 writeFileSync(resolve(outDir, "dropped-report.json"), JSON.stringify(dropped, null, 2));
@@ -54,6 +59,9 @@ writeFileSync(resolve(outDir, "dropped-report.json"), JSON.stringify(dropped, nu
 // visible rather than buried in the index.
 writeFileSync(resolve(outDir, "derived-report.json"), JSON.stringify(derived, null, 2));
 
+// Name the artifact first: it is what the deploy uploads and what identifies
+// the judge a player is running, so it is the line worth reading off a rebuild.
+console.log(`Wrote ${manifest.index} (manifest: ${MANIFEST_FILENAME}).`);
 console.log(
   `Built index: ${data.pronunciations.size} pronunciations, ${data.words.size} words, ` +
     `${data.prevalence.size} prevalence entries, ${derived.length} derived, ` +

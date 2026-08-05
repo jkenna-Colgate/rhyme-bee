@@ -47,11 +47,12 @@ import { DEFAULT_PLAYABLE_BAND, playableSeeds, type FamilyEntry } from "../src/c
 import { loadRhymeIndex } from "../src/loader.ts";
 import type { SeedWord } from "../src/rhymeIndex.ts";
 import { isAccepted, REJECTION_MESSAGE } from "../src/verdict.ts";
+import { indexArtifactPath } from "./indexArtifact.ts";
 import { DAYS, parsePlayArgs, type PlayArgs } from "./playArgs.ts";
 import { Session, type SubmissionResult } from "../src/session.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const index = loadRhymeIndex(resolve(root, "dist-data/index.json"));
+const index = loadRhymeIndex(indexArtifactPath(resolve(root, "dist-data")));
 
 // The playable size band — the same knobs `histogram` exposes, defaulting to the
 // shared `DEFAULT_PLAYABLE_BAND` the web shell also draws from.
