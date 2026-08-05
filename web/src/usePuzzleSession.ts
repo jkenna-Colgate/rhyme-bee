@@ -33,7 +33,7 @@ export interface PuzzleSession {
   newPuzzle: (seed: string | SeedWord) => void;
 }
 
-export function usePuzzleSession(index: RhymeIndex, seed: string): PuzzleSession {
+export function usePuzzleSession(index: RhymeIndex, seed: string | SeedWord): PuzzleSession {
   const [session, setSession] = useState<Session>(() => Session.start(index, seed));
   const [last, setLast] = useState<SubmissionResult | null>(null);
   const [seq, setSeq] = useState(0);

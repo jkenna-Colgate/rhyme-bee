@@ -4,6 +4,14 @@
  * pinned Rhyme Key (a homograph, or a plain mispronunciation), so the on-screen
  * `seedRespelling` stays the source of truth. No pre-rendered or pinned per-Seed
  * audio — only live Web Speech API TTS (issue #36).
+ *
+ * iOS Safari refuses to synthesise anything unless the *first* `speak` of a
+ * visit is called from inside a user gesture, and it is that first call which
+ * unlocks synthesis for the rest of the visit. So the Puzzle is gated behind a
+ * start tap whose handler calls `speak` on the Seed Word synchronously (#116).
+ * Every later call — the replay button, the auto-speak on a free-play draw —
+ * rides on that unlock. Nothing here may be moved into an effect that runs
+ * before the tap, or the Seed goes unspoken on a phone.
  */
 
 /** True when the browser exposes the Web Speech API, so the shell can hide a dead button. */

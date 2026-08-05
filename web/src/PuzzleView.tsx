@@ -15,13 +15,22 @@
  * nothing here subtracts one word list from another. The plain-English rejection
  * lines come from `REJECTION_MESSAGE`, which sits with the closed reason set so
  * the REPL says the same thing.
+ *
+ * The boot path carries two things that look unrelated and are not (#116). A
+ * Puzzle does not begin until the player taps to start, because iOS Safari
+ * blocks speech synthesis outside a user gesture and the Seed Word being spoken
+ * is the mechanic, not a garnish — the tap *is* the audio unlock. And which
+ * Puzzle boots depends on whether this browser has ever been here: a first ever
+ * visit gets the Tutorial, once, and every visit after it goes straight to a
+ * Puzzle.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { playableSeeds } from "../../src/curation.ts";
+import { playableSeeds, type FamilyEntry } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
+import { isFirstVisit, markVisited } from "./firstVisit.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
@@ -29,15 +38,62 @@ import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
 /** The unscored first-run Puzzle is always seeded with `ate` (CONTEXT.md). */
 const TUTORIAL_SEED = "ate";
 
-export function PuzzleView({ index }: { index: RhymeIndex }) {
-  const { session, last, seq, submit, reveal, newPuzzle } = usePuzzleSession(index, TUTORIAL_SEED);
+/** Read a Seed off a randomly drawn family, pinned to that family's Rhyme Key. */
+function drawSeed(pool: FamilyEntry[]): SeedWord | null {
+  if (pool.length === 0) return null;
+  const family = pool[Math.floor(Math.random() * pool.length)]!;
+  // Pin to the family's own Rhyme Key so an ambiguous representative can't misfire.
+  return { word: family.representative, rhymeKey: family.rhymeKey };
+}
 
-  // The shared in-band Seed pool (#33). The boot Seed stays the fixed tutorial
-  // word `ate`; only the "new puzzle" button draws from this pool.
+export function PuzzleView({ index }: { index: RhymeIndex }) {
+  // The shared in-band Seed pool (#33), drawn from by the "new puzzle" button
+  // and by the boot Seed of a returning player.
   const pool = useMemo(() => playableSeeds(index), [index]);
+
+  // Read once, at mount, and held: `markVisited` fires when the player taps to
+  // start, and the Tutorial they are then playing must not change underneath
+  // them because the flag has since been written.
+  const [firstVisit] = useState(isFirstVisit);
+
+  // A first ever visit boots the Tutorial; anyone else gets a Puzzle. Lazy, so
+  // the draw happens once rather than on every render.
+  const [bootSeed] = useState<string | SeedWord>(
+    () => (firstVisit ? null : drawSeed(pool)) ?? TUTORIAL_SEED,
+  );
+
+  const { session, last, seq, submit, reveal, newPuzzle } = usePuzzleSession(index, bootSeed);
 
   const [field, setField] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // --- The start tap, and the spoken Seed that is its whole reason for being --
+  //
+  // The Seed Word most recently spoken aloud. The start tap speaks the first one
+  // *synchronously, inside the gesture* — that call is what unlocks synthesis
+  // for the rest of the visit on iOS — so the effect below must not say it a
+  // second time. Every later Seed (a free-play draw) is spoken by the effect,
+  // which is allowed to because the tap already unlocked it.
+  const [started, setStarted] = useState(false);
+  const spoken = useRef<string | null>(null);
+  const seedWord = session.puzzle.seed.word;
+
+  function start() {
+    speak(seedWord);
+    spoken.current = seedWord;
+    // The Tutorial has now actually been played, so spend the first visit here
+    // rather than on mount — a player who opens the link and never taps has not
+    // had their one Tutorial.
+    if (firstVisit) markVisited();
+    setStarted(true);
+  }
+
+  useEffect(() => {
+    if (!started) return;
+    if (spoken.current === seedWord) return;
+    spoken.current = seedWord;
+    speak(seedWord);
+  }, [started, seedWord]);
 
   // Puzzle-complete overlay (#49): fire once, on the Submission that finds the
   // *last* Answer. Bonus Words never gate completion. It is a one-shot per
@@ -79,17 +135,21 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   }
 
   function onNewPuzzle() {
-    if (pool.length === 0) return;
-    const family = pool[Math.floor(Math.random() * pool.length)]!;
-    // Read the Seed off the drawn family, pinned to the family's own Rhyme Key
-    // so an ambiguous representative can't misfire. Auto-speak follows for free:
-    // Seed's speak effect is keyed on the Seed Word (#36).
-    const seed: SeedWord = { word: family.representative, rhymeKey: family.rhymeKey };
+    // Auto-speak follows for free: the effect above is keyed on the Seed Word
+    // (#36), and the start tap has already unlocked synthesis for this visit.
+    const seed = drawSeed(pool);
+    if (seed === null) return;
     newPuzzle(seed);
     setField("");
     setConfirming(false);
     inputRef.current?.focus();
   }
+
+  // The Puzzle does not begin until the player taps. This is the audio unlock,
+  // not decoration: without a gesture the Seed Word is never spoken on a phone,
+  // and a game adjudicated against a pronunciation the player never heard is a
+  // game whose premise is discovered through rejection.
+  if (!started) return <StartGate tutorial={firstVisit} onStart={start} />;
 
   return (
     <section className="puzzle">
@@ -184,18 +244,43 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   );
 }
 
+// --- The start tap ------------------------------------------------------------
+
+/**
+ * The opening beat, and the gesture browsers demand before they will speak.
+ * Nothing about the Puzzle is on screen yet — the Seed Word arrives spoken and
+ * written at the same moment, which is the order the game means.
+ */
+function StartGate({ tutorial, onStart }: { tutorial: boolean; onStart: () => void }) {
+  return (
+    <section className="start-gate">
+      <h2 className="start-gate__title">{tutorial ? "Welcome to Rhyme Bee" : "Today’s puzzle"}</h2>
+      <p className="start-gate__body">
+        {tutorial
+          ? "One word, and every word you can find that rhymes with it. This first one is a quick warm-up and does not count — it is here to show you the game is about sound, not spelling."
+          : "One word, and every word you can find that rhymes with it."}
+      </p>
+      <button type="button" className="start-gate__start" onClick={onStart} autoFocus>
+        ▶ Tap to start
+      </button>
+      {speechSupported() && (
+        <p className="start-gate__note">
+          The Seed Word is read aloud when you start, so have the sound on.
+        </p>
+      )}
+    </section>
+  );
+}
+
 // --- The Seed Word -------------------------------------------------------------
 
 function Seed({ session }: { session: Session }) {
   const { puzzle } = session;
   const word = puzzle.seed.word;
 
-  // Speak the Seed aloud when the Puzzle starts. Keyed on the word, so #37's
-  // new-puzzle draw (a fresh session with a new Seed) auto-speaks for free. The
+  // Speaking lives in the boot path, not here: the first utterance of a visit
+  // has to come out of the start tap's own handler or iOS never plays it. The
   // visible respelling below stays the source of truth regardless of the audio.
-  useEffect(() => {
-    speak(word);
-  }, [word]);
 
   return (
     <header className="seed">
