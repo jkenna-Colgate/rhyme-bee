@@ -179,8 +179,9 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
       <FoundList session={session} />
       {session.ended && <MissedList answers={missed.answers} bonus={missed.bonus} />}
 
-      {/* Dev-only: dead-code-eliminated from the production build (#41). */}
-      {import.meta.env.DEV && <FeedbackButton session={session} />}
+      {/* Ships in production (#118). A playtester's only channel back is what
+          they can say from inside the game, so the note goes with them. */}
+      <FeedbackButton session={session} />
     </section>
   );
 }

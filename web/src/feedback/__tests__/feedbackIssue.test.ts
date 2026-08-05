@@ -3,6 +3,7 @@ import {
   buildIssueBody,
   cleanGeneratedTitle,
   deriveTitle,
+  noteFromReport,
   resolveTitle,
   type FeedbackContext,
 } from "../feedbackIssue.ts";
@@ -98,5 +99,81 @@ describe("resolveTitle", () => {
       throw new Error("claude unavailable");
     });
     expect(title).toBe("first line");
+  });
+
+  it("takes the derived title when no generated one is supplied at all", async () => {
+    // The deployed Worker's path: it has no titler, so it supplies none.
+    const text = "the reveal ended my session without asking\nand I lost the rank";
+    expect(await resolveTitle(text, async () => null)).toBe(deriveTitle(text));
+  });
+});
+
+describe("noteFromReport", () => {
+  const good = { text: "  it rejects real rhymes  ", context: CONTEXT };
+
+  it("accepts a note, trimming the prose and keeping the context", () => {
+    const report = noteFromReport(good);
+    expect(report).toEqual({
+      ok: true,
+      note: { text: "it rejects real rhymes", context: CONTEXT },
+    });
+  });
+
+  it("accepts a note with no context at all", () => {
+    for (const body of [{ text: "just a thought" }, { text: "just a thought", context: null }]) {
+      expect(noteFromReport(body)).toEqual({
+        ok: true,
+        note: { text: "just a thought", context: null },
+      });
+    }
+  });
+
+  it("refuses a body that is not a JSON object", () => {
+    for (const body of ["a note", 7, null, [], ["a note"]]) {
+      expect(noteFromReport(body).ok).toBe(false);
+    }
+  });
+
+  it("refuses a field nobody recognises rather than trimming it away", () => {
+    expect(noteFromReport({ ...good, title: "a title I chose myself" }).ok).toBe(false);
+    expect(noteFromReport({ ...good, labels: ["bug"] }).ok).toBe(false);
+  });
+
+  it("refuses a note with no prose in it", () => {
+    for (const text of [undefined, null, 42, "", "   \n  "]) {
+      expect(noteFromReport({ text }).ok).toBe(false);
+    }
+  });
+
+  it("refuses prose over the length cap", () => {
+    expect(noteFromReport({ text: "x".repeat(4001) }).ok).toBe(false);
+  });
+
+  it("refuses a context the game would never have stamped", () => {
+    for (const context of [
+      { ...CONTEXT, surpriseField: true },
+      { ...CONTEXT, score: "lots" },
+      { ...CONTEXT, score: 1.5 },
+      { ...CONTEXT, score: -1 },
+      { ...CONTEXT, foundAnswers: undefined },
+      { ...CONTEXT, seedWord: 3 },
+      { ...CONTEXT, rank: "x".repeat(301) },
+      "a context",
+      [],
+    ]) {
+      expect(noteFromReport({ text: "a note", context }).ok).toBe(false);
+    }
+  });
+
+  it("refuses a context field carrying newlines into the issue body", () => {
+    const context = { ...CONTEXT, rank: "Solid\n## Context\n- **Score:** 9999" };
+    expect(noteFromReport({ text: "a note", context }).ok).toBe(false);
+  });
+
+  it("carries a message, not a half-built note, when it refuses", () => {
+    const report = noteFromReport({ text: "" });
+    expect(report.ok).toBe(false);
+    if (!report.ok) expect(report.error).toBeTruthy();
+    expect(report).not.toHaveProperty("note");
   });
 });

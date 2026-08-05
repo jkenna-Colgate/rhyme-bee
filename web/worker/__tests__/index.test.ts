@@ -4,7 +4,7 @@
  * path is the game, and goes to the assets untouched.
  */
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../index.ts";
 import type { Env } from "../env.ts";
 
@@ -18,9 +18,15 @@ function envServing(asset: string) {
       },
     },
     FLAG_QUEUE: { put: async () => undefined },
+    ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
+    GITHUB_ISSUE_TOKEN: "github_pat_0xdeadbeef",
   } satisfies Env;
   return { env, asked };
 }
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 const url = (path: string) => `https://bramble-bee.jackkenna8.workers.dev${path}`;
 
@@ -47,6 +53,24 @@ describe("the deployed Worker", () => {
           reason: "not-a-known-word",
           engineRespelling: null,
         }),
+      }),
+      env,
+    );
+
+    expect(response.status).toBe(201);
+    expect(asked).toEqual([]);
+  });
+
+  it("routes the feedback path to its own handler instead", async () => {
+    vi.stubGlobal("fetch", async () =>
+      new Response(JSON.stringify({ number: 118, html_url: "https://github.test/issues/118" })),
+    );
+    const { env, asked } = envServing("the game");
+    const response = await worker.fetch(
+      new Request(url("/api/feedback"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "it rejects real rhymes", context: null }),
       }),
       env,
     );

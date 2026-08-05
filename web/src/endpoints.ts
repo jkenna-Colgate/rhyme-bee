@@ -14,3 +14,10 @@
  * judged it (ADR-0013).
  */
 export const FLAG_PATH = "/api/supplement-candidate";
+
+/**
+ * Where a general note is sent: whatever a playtester wanted to say, filed as an
+ * issue on the tracker. Like a flag it is a report and never a request for a
+ * verdict (ADR-0013) — the game has already judged everything it is going to.
+ */
+export const FEEDBACK_PATH = "/api/feedback";

@@ -23,56 +23,15 @@ import {
   serialiseCandidate,
   MAX_REPORT_BYTES,
 } from "../../src/supplementCandidate.ts";
+import { json, readCappedBody } from "./http.ts";
 import type { Env } from "./env.ts";
-
-function json(status: number, payload: unknown, headers?: Record<string, string>): Response {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: { "Content-Type": "application/json", ...headers },
-  });
-}
-
-/**
- * Read the body, or refuse it — counting bytes as they arrive and stopping at
- * the cap, rather than buffering whatever was sent and measuring afterwards.
- * `Content-Length` is taken as an early hint when it is offered, but never
- * trusted: a declared size is the sender's claim about the sender's own body,
- * and a request that does not declare one at all is still an ordinary request.
- */
-async function readCappedBody(request: Request): Promise<string | null> {
-  const declared = Number(request.headers.get("Content-Length"));
-  if (Number.isFinite(declared) && declared > MAX_REPORT_BYTES) return null;
-  if (request.body === null) return null;
-
-  const reader = request.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > MAX_REPORT_BYTES) {
-      await reader.cancel();
-      return null;
-    }
-    chunks.push(value);
-  }
-
-  const body = new Uint8Array(size);
-  let at = 0;
-  for (const chunk of chunks) {
-    body.set(chunk, at);
-    at += chunk.byteLength;
-  }
-  return new TextDecoder().decode(body);
-}
 
 export async function handleFlag(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") {
     return json(405, { error: "Send a flag with POST." }, { Allow: "POST" });
   }
 
-  const body = await readCappedBody(request);
+  const body = await readCappedBody(request, MAX_REPORT_BYTES);
   if (body === null) return json(413, { error: "That report is too large." });
 
   let parsed: unknown;

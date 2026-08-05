@@ -28,6 +28,7 @@ function bucket(onPut?: () => never) {
         return undefined;
       },
     },
+    ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
   } satisfies Env;
   return { env, writes };
 }

@@ -34,5 +34,17 @@
       "binding": "FLAG_QUEUE",
       "bucket_name": "rhyme-bee-flags"
     }
-  ]
+  ],
+
+  // The tracker a general note is filed on (#118). A plaintext var, not a
+  // secret: which repository this game reports to is not a confidence, and
+  // naming it here keeps the deployment fact out of the source.
+  //
+  // The credential that files it is deliberately absent from this file. The
+  // fine-grained token lives as the Worker secret `GITHUB_ISSUE_TOKEN`, set
+  // with `wrangler secret put GITHUB_ISSUE_TOKEN --name bramble-bee` and
+  // referenced by name only (#114, Step 7) — this file is committed.
+  "vars": {
+    "ISSUE_REPO": "jkenna-Colgate/rhyme-bee"
+  }
 }
