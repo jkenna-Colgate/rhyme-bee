@@ -12,7 +12,8 @@
     "build:schedule": "tsx scripts/build-schedule.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
-    "supplement:candidates": "tsx scripts/supplement-candidates.ts"
+    "supplement:candidates": "tsx scripts/supplement-candidates.ts",
+    "flags:pull": "tsx scripts/pull-flags.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
