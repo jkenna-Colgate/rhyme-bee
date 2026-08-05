@@ -1,0 +1,101 @@
+/**
+ * The should-have-counted endpoint: a player tapped "should count" on a
+ * rejection, and this writes that report to object storage for the supplement
+ * judge to work through later (ADR-0009).
+ *
+ * It is transport and nothing else. It does not judge — the verdict was reached
+ * in the browser before this was ever called, and adjudication never crosses the
+ * network (ADR-0013). It does not decide what a valid report is either: the
+ * record shape, the validation and the object key all live in the pure
+ * `src/supplementCandidate.ts`, which is where they can be tested without a
+ * runtime. What is left here is: read a capped body, hand it over, write or
+ * refuse.
+ *
+ * There is no rate limiting, deliberately (#114, Step 9). The URL is unlisted
+ * and the worst case is a bucket that can be emptied; a cap here would be
+ * reversing a recorded decision. Payload validation is a separate concern and is
+ * applied in full.
+ */
+
+import {
+  candidateFromReport,
+  candidateKey,
+  serialiseCandidate,
+  MAX_REPORT_BYTES,
+} from "../../src/supplementCandidate.ts";
+import type { Env } from "./env.ts";
+
+function json(status: number, payload: unknown, headers?: Record<string, string>): Response {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { "Content-Type": "application/json", ...headers },
+  });
+}
+
+/**
+ * Read the body, or refuse it — counting bytes as they arrive and stopping at
+ * the cap, rather than buffering whatever was sent and measuring afterwards.
+ * `Content-Length` is taken as an early hint when it is offered, but never
+ * trusted: a declared size is the sender's claim about the sender's own body,
+ * and a request that does not declare one at all is still an ordinary request.
+ */
+async function readCappedBody(request: Request): Promise<string | null> {
+  const declared = Number(request.headers.get("Content-Length"));
+  if (Number.isFinite(declared) && declared > MAX_REPORT_BYTES) return null;
+  if (request.body === null) return null;
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_REPORT_BYTES) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+
+  const body = new Uint8Array(size);
+  let at = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, at);
+    at += chunk.byteLength;
+  }
+  return new TextDecoder().decode(body);
+}
+
+export async function handleFlag(request: Request, env: Env): Promise<Response> {
+  if (request.method !== "POST") {
+    return json(405, { error: "Send a flag with POST." }, { Allow: "POST" });
+  }
+
+  const body = await readCappedBody(request);
+  if (body === null) return json(413, { error: "That report is too large." });
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return json(400, { error: "That report is not JSON." });
+  }
+
+  const report = candidateFromReport(parsed, new Date().toISOString());
+  // A refusal returns no candidate at all, so there is nothing partial to write
+  // and the bucket is never touched.
+  if (!report.ok) return json(400, { error: report.error });
+
+  try {
+    await env.FLAG_QUEUE.put(candidateKey(report.candidate), serialiseCandidate(report.candidate), {
+      httpMetadata: { contentType: "application/json" },
+    });
+  } catch {
+    // Whatever R2 said stays here. A caught error can carry a bucket name, an
+    // account id or a signed URL, and none of that belongs in a public response.
+    return json(500, { error: "Could not record that flag." });
+  }
+
+  return json(201, { word: report.candidate.word });
+}

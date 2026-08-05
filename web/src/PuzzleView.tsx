@@ -22,6 +22,7 @@ import { playableSeeds } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
+import { FLAG_PATH } from "./endpoints.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
@@ -470,16 +471,15 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
         <span className="feedback__badge">✗</span>
         <b className="feedback__word">{word}</b>
         <span className="feedback__note">{REJECTION_MESSAGE[verdict.reason]}</span>
-        {/* Dev-only: queue a wrongly-rejected word for the supplement judge (#54
-            follow-up). Dead-code-eliminated from the production build. */}
-        {import.meta.env.DEV && (
-          <ShouldCountButton
-            word={word}
-            seed={seed}
-            reason={verdict.reason}
-            engineRespelling={verdict.respelling ?? null}
-          />
-        )}
+        {/* Ships in production (#119). Nothing observes what players submit
+            (ADR-0013), so a rejection the player disagrees with is only ever
+            known because they said so — this control is the sensor. */}
+        <ShouldCountButton
+          word={word}
+          seed={seed}
+          reason={verdict.reason}
+          engineRespelling={verdict.respelling ?? null}
+        />
       </p>
     );
   }
@@ -503,11 +503,17 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
 }
 
 /**
- * Dev-only: flag a wrongly-rejected word for the supplement judge. It POSTs the
- * word with its Seed and Rhyme Key — what the judge needs to know *what it must
- * rhyme with* — to the dev-server queue; the judging (add / stress-correction /
- * derive-from-inflection / defer) happens later against that queue. Capture only
- * records, so this stays a thin fire-and-forget with a small status.
+ * Report a Submission the player believes should have counted as an Answer. One
+ * tap on the rejection sends the word with its Seed Word, the Seed's Rhyme Key,
+ * the reason it was refused and the reading the engine used — everything the
+ * supplement judge needs, so the player never retypes the word or explains
+ * themselves. The judging (add / stress-correction / derive-from-inflection /
+ * defer) happens later against the queue this feeds.
+ *
+ * Reporting is out of band and may fail freely: the verdict was already reached
+ * in the browser (ADR-0013), so an endpoint that is down or unreachable costs a
+ * report, never a Puzzle. That is why this is a thin fire-and-forget with a
+ * small status and no retry loop — the failure is shown, and play carries on.
  */
 function ShouldCountButton({
   word,
@@ -520,13 +526,13 @@ function ShouldCountButton({
   reason: RejectionReason;
   engineRespelling: string | null;
 }) {
-  const [status, setStatus] = useState<"idle" | "sending" | "queued" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   async function flag() {
-    if (status === "sending" || status === "queued") return;
+    if (status === "sending" || status === "sent") return;
     setStatus("sending");
     try {
-      const res = await fetch("/api/supplement-candidate", {
+      const res = await fetch(FLAG_PATH, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -537,14 +543,18 @@ function ShouldCountButton({
           engineRespelling,
         }),
       });
-      setStatus(res.ok ? "queued" : "error");
+      setStatus(res.ok ? "sent" : "error");
     } catch {
       setStatus("error");
     }
   }
 
-  if (status === "queued") {
-    return <span className="feedback__flagged">✓ queued for the supplement</span>;
+  if (status === "sent") {
+    return (
+      <span className="feedback__flagged" role="status" aria-live="polite">
+        ✓ thanks — sent
+      </span>
+    );
   }
 
   return (
@@ -553,9 +563,9 @@ function ShouldCountButton({
       className="feedback__flag"
       onClick={flag}
       disabled={status === "sending"}
-      title="Queue this word for the supplement judge"
+      title="Tell us this word should have counted"
     >
-      {status === "error" ? "⚠ retry" : "＋ should count"}
+      {status === "error" ? "⚠ didn’t send — retry" : "＋ should count"}
     </button>
   );
 }

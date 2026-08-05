@@ -1,0 +1,38 @@
+{
+  // The deployed game: one Worker serving the built static assets and the
+  // out-of-band reporting endpoints beside them.
+  //
+  // This file is committed on purpose. Bindings declared here come into
+  // existence on deploy, which is the only durable home for them — a binding
+  // added in the dashboard is clobbered by the next deploy from a config that
+  // does not declare it (#114, Step 4).
+  //
+  // Secrets are the opposite: they are set on the Worker with
+  // `wrangler secret put` and must never appear here, because this file is in
+  // git. Nothing below is a credential.
+  //
+  // The names are settled in #114 and are not ours to improve.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bramble-bee",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-05",
+
+  // The built bundle, with the content-addressed Rhyme Index alongside it —
+  // Vite's `publicDir` points at `../dist-data`, so `npm run build` lands both
+  // here. Assets are matched before the Worker runs, so loading the game never
+  // enters `worker/index.ts`.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+
+  // Where a should-have-counted flag is written, one object per flag (#119).
+  // A binding, not an access key: the Worker is handed the bucket itself, so
+  // there is no credential anywhere on the write path.
+  "r2_buckets": [
+    {
+      "binding": "FLAG_QUEUE",
+      "bucket_name": "rhyme-bee-flags"
+    }
+  ]
+}
