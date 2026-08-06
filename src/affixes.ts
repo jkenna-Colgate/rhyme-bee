@@ -175,13 +175,20 @@ function prefixRule({ spelling, phonemes }: Prefix): AffixRule {
  * it is. (Those pairs already fail to rhyme with each other in the shipped
  * index; that is a normalisation question, ADR-0010, not a derivation one.)
  *
- * This list is **not yet** read by the derivation detector `isDerived`, and that
- * is now a known gap rather than a decision — issue #88. A suffixed word lands in
- * a different key from its stem (the suffix is inside the key), so unlike a prefix
- * it cannot inflate the *stem's* key; but a key made entirely of suffixed words is
- * a Shadow Key by ADR-0008's own rationale, and three such keys are in the Seed
- * pool today. ADR-0008's Amendment (2026-07-30) widens *derived* to cover this
- * inventory, so it wants sharing the way `PREFIX_SPELLINGS` is.
+ * This list is **deliberately not** read by the derivation detector `isDerived`,
+ * unlike `PREFIX_SPELLINGS`. A suffixed word lands in a different key from its stem
+ * (the suffix is inside the key), so unlike a prefix it cannot inflate the *stem's*
+ * key; but a key made entirely of suffixed words is a Shadow Key by ADR-0008's own
+ * rationale, and ADR-0008's Amendment (2026-07-30) widens *derived* to say so.
+ *
+ * Sharing the inventory here would act on that — and was declined (issue #88). It
+ * drops the pool 294 → 291 and so forces the run to be dealt again, to spare three
+ * days out of 260. ADR-0008's Resolution (2026-08-06) names those three days as an
+ * accepted deviation: `devastatingly`, `essentially` and `experimentally` are
+ * scheduled Seed Words on keys the rule would bar — the same three keys the
+ * paragraph below names, under whichever representative the deal happened to pick.
+ * Read that section before "fixing" this: the mismatch between the definition and
+ * the detector is on purpose.
  *
  * An earlier draft of this docblock argued the question was not live "because none
  * of the 2,505 keys this slice creates reaches the playable Answer band (the

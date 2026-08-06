@@ -206,9 +206,18 @@ band floor of 20. None of them could have been a candidate before the coverage
 stage started composing `-ly` readings. So the suffix inventory did not merely
 inflate keys that were already in band; it lifted three shadows into the pool.
 
-The consequence is concrete rather than theoretical: `parentally` and
-`dominatingly` are currently eligible to be scheduled, and a Seed Word is *spoken*
-to the player at the start of a Puzzle — here from a composed reading.
+The consequence is concrete rather than theoretical, and it has since stopped being
+a matter of eligibility: the run dealt on 2026-08-04 **schedules all three keys**,
+each on a different representative from the same family.
+
+| date | Seed Word | Rhyme Key |
+|---|---|---|
+| 2026-10-09 | `devastatingly` | `EY T IH NG L IY` |
+| 2027-02-18 | `essentially` | `EH N SH AH L IY` |
+| 2027-03-29 | `experimentally` | `EH N T AH L IY` |
+
+A Seed Word is *spoken* to the player at the start of a Puzzle, so on those three
+days it is spoken from a composed reading.
 
 ### Why the relation is the same one
 
@@ -254,8 +263,8 @@ because a lexicographer typed a different schwa three syllables upstream.
 ### What is unchanged
 
 - **The eligibility rule.** Native content `== 0` → drop as Seed. Only the
-  membership of *derived* moves. The detector does not yet read the suffix
-  inventory; issue #88 is that change, and the pool falls 294 → 291 when it lands.
+  membership of *derived* moves. The detector does not read the suffix inventory,
+  and now will not — see the Resolution below.
 - **Answers.** Suffixed words remain fully valid Answers wherever they rhyme.
   `essentially` is still an Answer on the `EH N SH AH L IY` key; that key is
   merely barred from being a *Seed*.
@@ -263,6 +272,30 @@ because a lexicographer typed a different schwa three syllables upstream.
   This is still not a density test. `AY N D` stays a Puzzle.
 - **The 2026-07-26 Resolution's figures**, which record what was true then. The
   current build reads 294 candidates and 91 shadow drops.
+
+### Resolution (2026-08-06): the definition widens, the detector does not
+
+**Issue #88 — sharing the suffix inventory with `isDerived` — was declined, and the
+three scheduled days above stand.** The definition in this Amendment is unchanged
+and correct: those keys *are* Shadow Keys. The build simply does not act on it, and
+that is now a decision rather than a gap.
+
+The reason is cost, not doubt. Landing #88 drops the pool 294 → 291 and so forces
+the run to be dealt again; a re-deal moves the Seed Word under every date after the
+first change, and the schedule is a committed artifact the game ships inside its
+bundle. Three days out of 260 — the first of them 2026-10-09, months past the
+playtest — is not worth re-cutting the run and re-reviewing it.
+
+So this is a **known and accepted deviation**: for these three days the shipped
+schedule serves a Seed Word this ADR's own rule would bar. The days are named above
+so that a report of one reads as expected behaviour and not as a new bug. What
+makes them survivable is that the Puzzle is still *playable* — every member of the
+key genuinely rhymes, the answer set is in band, and the only loss is that the
+board is one family wearing a suffix rather than a fresh one.
+
+Reopening #88 is the fix if it is ever worth a re-deal — most cheaply while the
+schedule is being re-cut for some other reason anyway, when the marginal cost is
+the review rather than the deal.
 
 ### A larger neighbour, deliberately not fixed here
 
