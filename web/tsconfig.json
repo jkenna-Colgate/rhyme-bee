@@ -11,6 +11,9 @@
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
+    // The reviewed schedule artifact is committed data the bundle imports
+    // directly — it ships inside the bundle rather than being fetched.
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
