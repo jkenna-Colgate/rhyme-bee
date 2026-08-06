@@ -14,7 +14,7 @@
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
     "supplement:candidates": "tsx scripts/supplement-candidates.ts",
-    "flags:pull": "tsx scripts/pull-flags.ts"
+    "appeals:pull": "tsx scripts/pull-appeals.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

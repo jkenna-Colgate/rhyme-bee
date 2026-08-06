@@ -34,7 +34,7 @@ build/
 .env
 .env.local
 
-# Cloudflare deploy credentials — the read-only R2 token the flagged-word pull
+# Cloudflare deploy credentials — the read-only R2 token the Appeal pull
 # script uses (#114). Local only; the Worker's own secrets live on the Worker,
 # never in the repo.
 credentials.env

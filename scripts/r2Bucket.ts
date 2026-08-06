@@ -17,7 +17,7 @@
  */
 
 import { createHash, createHmac } from "node:crypto";
-import type { R2Credentials } from "./flagPull.ts";
+import type { R2Credentials } from "./appealPull.ts";
 
 const ALGORITHM = "AWS4-HMAC-SHA256";
 /** R2 has no regions, but SigV4 demands one and R2 documents this value. */

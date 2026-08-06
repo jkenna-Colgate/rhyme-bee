@@ -1,5 +1,5 @@
 /**
- * The pull's job is to land the bucket's flagged words in the existing queue
+ * The pull's job is to land the bucket's Appealed words in the existing queue
  * without changing what that queue is. So the tests that matter are: the format
  * is the one `parseCandidates` already reads, and running twice appends nothing
  * the second time.
@@ -21,8 +21,8 @@ import {
   parseEnvFile,
   readCredentials,
   selectNewCandidates,
-  type FlagObject,
-} from "../flagPull.ts";
+  type AppealObject,
+} from "../appealPull.ts";
 
 const airburst: SupplementCandidate = {
   word: "airburst",
@@ -43,7 +43,7 @@ const overjoy: SupplementCandidate = {
 };
 
 /** One object exactly as the deployed endpoint writes it. */
-function objectFor(candidate: SupplementCandidate): FlagObject {
+function objectFor(candidate: SupplementCandidate): AppealObject {
   return { key: candidateKey(candidate), body: serialiseCandidate(candidate) };
 }
 
@@ -193,7 +193,7 @@ describe("reading the local credentials", () => {
   });
 
   it("refuses loudly when a value is missing, naming what is missing", () => {
-    // Silence here would read as "no flags today" instead of "no credential".
+    // Silence here would read as "no Appeals today" instead of "no credential".
     expect(() => readCredentials({ R2_ACCOUNT_ID: "abc" })).toThrow(
       /R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY/,
     );

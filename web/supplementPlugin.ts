@@ -2,7 +2,7 @@
  * The dev-only supplement-candidate endpoint. A Vite plugin that, during
  * `npm run dev` only (`apply: "serve"`; `configureServer` never runs in a
  * production build), serves `POST /api/supplement-candidate`: it appends a word
- * a maintainer flagged as *should-have-counted* to an append-only JSON Lines
+ * a maintainer Appealed as *should-have-counted* to an append-only JSON Lines
  * queue (`data/supplement-candidates.jsonl`), for a later run to judge and format
  * into the committed supplement (ADR-0009).
  *
@@ -10,7 +10,7 @@
  * decision — that reasoning is the judge's, run against the queue offline. The
  * record shape, its validation and its serialisation are the pure
  * `src/supplementCandidate.ts`; this plugin is the thin IO over it, as is the
- * deployed Worker route in `web/worker/flagRoute.ts` that answers the same path
+ * deployed Worker route in `web/worker/appealRoute.ts` that answers the same path
  * for players.
  */
 
@@ -20,7 +20,7 @@ import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { candidateFromReport, serialiseCandidate } from "../src/supplementCandidate.ts";
-import { FLAG_PATH } from "./src/endpoints.ts";
+import { APPEAL_PATH } from "./src/endpoints.ts";
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
 const QUEUE_PATH = resolve(rootDir, "../data/supplement-candidates.jsonl");
@@ -51,7 +51,7 @@ export function supplementPlugin(): Plugin {
     name: "rhyme-bee-supplement-candidate",
     apply: "serve",
     configureServer(server) {
-      server.middlewares.use(FLAG_PATH, (req, res, next) => {
+      server.middlewares.use(APPEAL_PATH, (req, res, next) => {
         if (req.method !== "POST") return next();
         void (async () => {
           try {

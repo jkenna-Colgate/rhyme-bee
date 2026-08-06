@@ -13,16 +13,16 @@
  * handler of its own; the handlers do not know about each other.
  */
 
-import { FEEDBACK_PATH, FLAG_PATH } from "../src/endpoints.ts";
+import { FEEDBACK_PATH, APPEAL_PATH } from "../src/endpoints.ts";
 import { handleFeedback } from "./feedbackRoute.ts";
-import { handleFlag } from "./flagRoute.ts";
+import { handleAppeal } from "./appealRoute.ts";
 import type { Env } from "./env.ts";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const { pathname } = new URL(request.url);
 
-    if (pathname === FLAG_PATH) return handleFlag(request, env);
+    if (pathname === APPEAL_PATH) return handleAppeal(request, env);
     if (pathname === FEEDBACK_PATH) return handleFeedback(request, env);
 
     return env.ASSETS.fetch(request);

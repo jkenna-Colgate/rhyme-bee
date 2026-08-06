@@ -361,8 +361,8 @@ code {
   color: var(--bad);
 }
 
-/* Dev-only "should count" flag on a rejection (supplement-candidate capture). */
-.feedback__flag {
+/* Dev-only "should count" Appeal on a rejection (supplement-candidate capture). */
+.feedback__appeal {
   margin-left: auto;
   padding: 0.15rem 0.55rem;
   border: 1px dashed currentColor;
@@ -375,11 +375,11 @@ code {
   opacity: 0.75;
 }
 
-.feedback__flag:hover:not(:disabled) {
+.feedback__appeal:hover:not(:disabled) {
   opacity: 1;
 }
 
-.feedback__flagged {
+.feedback__appealed {
   margin-left: auto;
   font-size: 0.8rem;
   opacity: 0.8;

@@ -39,7 +39,7 @@ function tracker(reply: Response | (() => never), token: string | null = TOKEN) 
   });
   const env = {
     ASSETS: { fetch: async () => new Response("the game") },
-    FLAG_QUEUE: { put: async () => undefined },
+    APPEAL_QUEUE: { put: async () => undefined },
     ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
     GITHUB_ISSUE_TOKEN: token ?? undefined,
   } satisfies Env;

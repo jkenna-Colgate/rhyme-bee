@@ -17,8 +17,8 @@ export interface AssetsBinding {
   fetch(request: Request): Promise<Response>;
 }
 
-/** The R2 bucket a flagged word is written to, one object per flag. */
-export interface FlagBucket {
+/** The R2 bucket an Appealed word is written to, one object per Appeal. */
+export interface AppealBucket {
   put(
     key: string,
     value: string,
@@ -29,8 +29,8 @@ export interface FlagBucket {
 export interface Env {
   /** `assets.binding` in `wrangler.jsonc`. */
   ASSETS: AssetsBinding;
-  /** `FLAG_QUEUE` → the `rhyme-bee-flags` bucket (#114). */
-  FLAG_QUEUE: FlagBucket;
+  /** `APPEAL_QUEUE` → the `rhyme-bee-flags` bucket (#114). */
+  APPEAL_QUEUE: AppealBucket;
   /**
    * `owner/repo` of the tracker a general note is filed on — a plaintext `var`
    * in `wrangler.jsonc`, because which tracker this game reports to is not a

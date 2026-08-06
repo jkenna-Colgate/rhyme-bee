@@ -1,8 +1,8 @@
 /**
- * The pure half of the flagged-word pull: what counts as a credential, and which
+ * The pure half of the Appeal pull: what counts as a credential, and which
  * of the bucket's objects are new to the candidate queue.
  *
- * Deployed, a player tapping "should count" writes one R2 object per flag
+ * Deployed, a player tapping "should count" writes one R2 object per Appeal
  * (#119). This is the maintainer end of that: the objects come back down and
  * land in the *existing* queue, `data/supplement-candidates.jsonl`, exactly as
  * the dev-only button would have written them. Nothing new is invented on the
@@ -32,15 +32,15 @@ import {
   type SupplementCandidate,
 } from "../src/supplementCandidate.ts";
 
-/** The bucket the flagged words land in — settled by #114, not inferred. */
-export const FLAG_BUCKET = "rhyme-bee-flags";
+/** The bucket the Appealed words land in — settled by #114, not inferred. */
+export const APPEAL_BUCKET = "rhyme-bee-flags";
 
 /**
  * What the pull needs to read the bucket from this machine. A **scoped,
  * read-only R2 API token** (#114, Step 8), not the account login: the OAuth
  * scopes `wrangler login` grants cover Workers, KV, D1 and others but include no
  * R2 scope at all, so the login cannot read the bucket. The Worker's own
- * `FLAG_QUEUE` binding is no help either — a binding only exists inside the
+ * `APPEAL_QUEUE` binding is no help either — a binding only exists inside the
  * Worker, and this runs here.
  */
 export interface R2Credentials {
@@ -87,7 +87,7 @@ export function parseEnvFile(text: string): Record<string, string> {
  * Resolve the credentials, or refuse with an error that says where to get each
  * missing piece. Refusing loudly matters more here than usual: the pull's other
  * failure mode is silence, and a maintainer who cannot tell "no credential" from
- * "no flags today" will read an empty batch as good news.
+ * "no Appeals today" will read an empty batch as good news.
  */
 export function readCredentials(settings: Record<string, string | undefined>): R2Credentials {
   const value = (name: string): string => (settings[name] ?? "").trim();
@@ -114,12 +114,12 @@ export function readCredentials(settings: Record<string, string | undefined>): R
     accountId: value("R2_ACCOUNT_ID"),
     accessKeyId: value("R2_ACCESS_KEY_ID"),
     secretAccessKey: value("R2_SECRET_ACCESS_KEY"),
-    bucket: value("R2_BUCKET") || FLAG_BUCKET,
+    bucket: value("R2_BUCKET") || APPEAL_BUCKET,
   };
 }
 
 /** One object as it came out of the bucket. */
-export interface FlagObject {
+export interface AppealObject {
   /** The key it was listed under. */
   key: string;
   /** Its body: `serialiseCandidate` output, trailing newline and all. */
@@ -151,7 +151,7 @@ export interface PullSelection {
  * kept. The record is the report; the key is only where it was filed.
  */
 export function selectNewCandidates(
-  objects: readonly FlagObject[],
+  objects: readonly AppealObject[],
   held: ReadonlySet<string>,
 ): PullSelection {
   const added: SupplementCandidate[] = [];

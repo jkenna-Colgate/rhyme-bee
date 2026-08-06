@@ -4,8 +4,8 @@
  *
  * They live together rather than in one route because the cap in particular is
  * security-relevant and subtle, and a second copy-pasted copy is a second thing
- * to get wrong. Each route chooses its own limit — a flag is six short fields, a
- * note is prose — but they count bytes the same way.
+ * to get wrong. Each route chooses its own limit — an Appeal is six short
+ * fields, a note is prose — but they count bytes the same way.
  */
 
 export function json(

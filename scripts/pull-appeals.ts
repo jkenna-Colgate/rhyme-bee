@@ -1,7 +1,7 @@
 /**
- * Pull the day's flagged words down into the candidate queue.
+ * Pull the day's Appealed words down into the candidate queue.
  *
- *   npm run flags:pull
+ *   npm run appeals:pull
  *
  * The first step of the play-test refine loop: pull, judge into the pronunciation
  * supplement, rebuild the index, deploy. A player tapped "should count" on a
@@ -22,7 +22,7 @@
  *
  * This is a maintainer script. It runs here, never in the browser, and is no part
  * of the deployed bundle. It reads the bucket with the scoped read-only R2 API
- * token from #114 Step 8 (see `flagPull.ts` for why the account login will not
+ * token from #114 Step 8 (see `appealPull.ts` for why the account login will not
  * do), and it only ever reads: judged records are archived locally, and nothing
  * is deleted from the bucket.
  */
@@ -36,8 +36,8 @@ import {
   parseEnvFile,
   readCredentials,
   selectNewCandidates,
-  type FlagObject,
-} from "./flagPull.ts";
+  type AppealObject,
+} from "./appealPull.ts";
 import { getObject, listObjects } from "./r2Bucket.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -67,7 +67,7 @@ async function main(): Promise<void> {
   const keys = await listObjects(credentials, CANDIDATE_KEY_PREFIX);
 
   if (keys.length === 0) {
-    console.log("No flagged words in the bucket. Nothing to pull.");
+    console.log("No Appealed words in the bucket. Nothing to pull.");
     return;
   }
 
@@ -78,14 +78,14 @@ async function main(): Promise<void> {
   const fresh = keys.filter((key) => !held.has(key));
 
   console.log(
-    `${keys.length} flagged word(s) in the bucket; ${fresh.length} not yet in the queue.`,
+    `${keys.length} Appealed word(s) in the bucket; ${fresh.length} not yet in the queue.`,
   );
   if (fresh.length === 0) {
     console.log("Everything in the bucket has been pulled already. Queue unchanged.");
     return;
   }
 
-  const objects: FlagObject[] = [];
+  const objects: AppealObject[] = [];
   for (const key of fresh) {
     objects.push({ key, body: await getObject(credentials, key) });
   }
