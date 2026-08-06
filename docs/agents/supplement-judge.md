@@ -1,13 +1,40 @@
 # Supplement judge: turning play-test candidates into supplement entries
 
-When play-testing surfaces a word the game *should* have accepted, the dev-only
-"should count" button queues it in `data/supplement-candidates.jsonl`. This is
-the decision tree for judging that queue and formatting the survivors into the
+When play-testing surfaces a word the game *should* have accepted, the "should
+count" button queues it in `data/supplement-candidates.jsonl`. This is the
+decision tree for judging that queue and formatting the survivors into the
 committed override layer, `data/supplement.dict` (ADR-0009).
+
+The button reaches that queue by two paths. Playing locally, the dev server
+appends to it directly. Playing the deployed game, a player's tap writes one
+object to R2 (#119) and `npm run flags:pull` brings the batch down (#120). Both
+paths write the same record in the same format, so from here on there is no
+difference between them.
 
 The guiding rule is ADR-0009's: **fairness, not completeness**, and a stress
 change is a rhyme-verdict change, so stay deliberate. When you are genuinely
 unsure, **defer to the maintainer** — never invent a stress you cannot defend.
+
+## 0. Pull the play-test batch
+
+Only when judging flags from the deployed game — skip it if you played locally.
+
+```
+npm run flags:pull
+```
+
+This lists the flagged words in the `rhyme-bee-flags` bucket and appends the ones
+the queue does not already hold. It needs the scoped read-only R2 API token from
+#114 Step 8, as `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` in
+the git-ignored `credentials.env` or in the environment; it says so plainly if
+they are absent, so an empty batch always means an empty bucket.
+
+Safe to re-run. A record's object key is derived from the record, so the queue
+and its archive already say what has been pulled and a second run appends
+nothing. It only ever reads the bucket — nothing is deleted there, so keep the
+archive rather than discarding it after judging.
+
+The whole play-test loop is: pull, judge (below), `npm run build:index`, deploy.
 
 ## 1. Gather the evidence
 
