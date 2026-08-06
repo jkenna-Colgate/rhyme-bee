@@ -16,8 +16,9 @@
  * so a resume replays them through whatever judge shipped today and a word
  * wrongly refused last week starts counting on its own.
  *
- * Only the daily Puzzle persists. A free-play Seed is drawn at random and has no
- * stable date to key on, so a free-play Session is deliberately not saved.
+ * Only the Daily Puzzle persists. A Free Play Seed is drawn at random and the
+ * Tutorial is shown once ever; neither has a stable date to key on, so neither
+ * Session is saved.
  */
 
 import { useCallback, useState } from "react";
@@ -25,9 +26,22 @@ import type { RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import { Session, type SubmissionResult } from "../../src/session.ts";
 import { resume, snapshot, snapshotKey } from "../../src/sessionSnapshot.ts";
 
-/** The Puzzle the hook opens on: today's from the schedule, or a free-play draw. */
+/**
+ * Which of the three kinds of Puzzle this is. They are genuinely three and not
+ * two: the Tutorial and Free Play are both dateless, so a date alone cannot tell
+ * them apart, and telling a first-time player they are in Free Play is a lie the
+ * view was previously forced into.
+ */
+export type PuzzleKind = "daily" | "tutorial" | "free";
+
+/** The Puzzle the hook opens: the Daily Puzzle, the Tutorial, or a Free Play draw. */
 export interface OpeningPuzzle {
-  /** The schedule date this Puzzle belongs to. Null means free play — not saved. */
+  kind: PuzzleKind;
+  /**
+   * The calendar date this Puzzle is filed under, and the key its Session is
+   * saved beneath. Only a `daily` Puzzle has one; the other two kinds carry null
+   * and are deliberately not saved.
+   */
   date: string | null;
   seed: string | SeedWord;
 }
@@ -46,8 +60,8 @@ export interface PuzzleSession {
    * returning player is not shown a burst of stale verdicts.
    */
   seq: number;
-  /** Whether this is the scheduled Puzzle of the day, as opposed to a free one. */
-  isDaily: boolean;
+  /** Which kind of Puzzle is being played — what the view labels it as. */
+  kind: PuzzleKind;
   submit: (raw: string) => void;
   /**
    * Take the Reveal: end the Session, freezing Score and Rank. The view gates
@@ -55,8 +69,14 @@ export interface PuzzleSession {
    * is persisted, so a reload cannot un-end it and hand over the answer sheet.
    */
   reveal: () => void;
-  /** Start a fresh free-play Puzzle on `seed`, clearing the found words, Score and Rank. */
-  newPuzzle: (seed: string | SeedWord) => void;
+  /**
+   * Leave the current Puzzle for another one, clearing the found words, Score and
+   * Rank. It takes a whole `OpeningPuzzle` rather than a bare Seed because the
+   * kind and the date are what decide whether the Session that follows is saved:
+   * a Free Play draw is not, and the Daily Puzzle is — and resumes, if the player
+   * has already played some of it today.
+   */
+  newPuzzle: (opening: OpeningPuzzle) => void;
 }
 
 /**
@@ -68,6 +88,7 @@ export interface PuzzleSession {
 interface Play {
   session: Session;
   submissions: readonly string[];
+  kind: PuzzleKind;
   date: string | null;
 }
 
@@ -101,12 +122,17 @@ function save(play: Play): void {
 function open(index: RhymeIndex, opening: OpeningPuzzle): Play {
   const seed = typeof opening.seed === "string" ? index.pinSeed(opening.seed) : opening.seed;
   if (opening.date === null) {
-    return { session: Session.start(index, seed), submissions: [], date: null };
+    return { session: Session.start(index, seed), submissions: [], kind: opening.kind, date: null };
   }
   // `resume` is total: absent, corrupt and stale snapshots all come back as a
   // fresh Session, so there is nothing here to branch on.
   const resumed = resume(index, seed, read(snapshotKey(opening.date)));
-  return { session: resumed.session, submissions: resumed.submissions, date: opening.date };
+  return {
+    session: resumed.session,
+    submissions: resumed.submissions,
+    kind: opening.kind,
+    date: opening.date,
+  };
 }
 
 export function usePuzzleSession(index: RhymeIndex, opening: OpeningPuzzle): PuzzleSession {
@@ -153,12 +179,14 @@ export function usePuzzleSession(index: RhymeIndex, opening: OpeningPuzzle): Puz
   }, [play]);
 
   const newPuzzle = useCallback(
-    (nextSeed: string | SeedWord) => {
-      // A fresh Session replaces the whole context and starts empty; Score / Rank
-      // fall out because they are derived from the Session, never stored. Free
-      // play carries no date, so nothing about it is written down — and the saved
-      // daily Session is left exactly where it was, to be found on the next load.
-      setPlay(open(index, { date: null, seed: nextSeed }));
+    (next: OpeningPuzzle) => {
+      // A fresh Session replaces the whole context; Score / Rank fall out because
+      // they are derived from the Session, never stored. `open` decides from the
+      // date alone whether that Session is a resume or an empty one: a dateless
+      // Free Play draw starts empty and is never written down, leaving the saved
+      // daily Session exactly where it was, while opening the Daily Puzzle picks
+      // up whatever the player has already found today.
+      setPlay(open(index, next));
       setLast(null);
       setSeq((n) => n + 1);
     },
@@ -169,7 +197,7 @@ export function usePuzzleSession(index: RhymeIndex, opening: OpeningPuzzle): Puz
     session: play.session,
     last,
     seq,
-    isDaily: play.date !== null,
+    kind: play.kind,
     submit,
     reveal,
     newPuzzle,

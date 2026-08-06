@@ -36,7 +36,7 @@ import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/v
 import { FLAG_PATH } from "./endpoints.ts";
 import { isFirstVisit, markVisited } from "./firstVisit.ts";
 import { speak, speechSupported } from "./speech.ts";
-import { usePuzzleSession, type OpeningPuzzle } from "./usePuzzleSession.ts";
+import { usePuzzleSession, type OpeningPuzzle, type PuzzleKind } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
 
 /** The Tutorial, the first-run Puzzle, is always seeded with `ate` (CONTEXT.md). */
@@ -58,13 +58,48 @@ function drawFreeSeed(pool: readonly FamilyEntry[]): string | SeedWord {
 }
 
 /**
+ * The Daily Puzzle for the player's own local calendar date, or null when there
+ * is not one to open — the date falls outside the run, or the built index no
+ * longer carries the Seed the schedule names.
+ *
+ * It is resolved once and used twice: the boot path opens it, and the control
+ * that leaves the Tutorial for it needs the same answer. Returning null rather
+ * than falling back here is what lets that control know there is nothing to
+ * offer, instead of quietly handing over a free-play draw labelled as today's.
+ */
+function dailyPuzzle(index: RhymeIndex): OpeningPuzzle | null {
+  const date = localCalendarDate();
+  const scheduled = seedForDate(SCHEDULE, date);
+  if (scheduled === null) return null;
+  try {
+    index.pinSeed(scheduled.word, scheduled.rhymeKey);
+  } catch (err) {
+    // Silent in production — one free-play Puzzle beats a white screen. But in
+    // development this means the schedule and the built index disagree, which is
+    // a bug in the pair and not something to discover from a player.
+    if (import.meta.env.DEV) {
+      console.warn(
+        `[rhyme-bee] schedule/index mismatch for ${date}: the index does not carry ` +
+          `Seed Word "${scheduled.word}" on Rhyme Key ${scheduled.rhymeKey}. ` +
+          `Falling back to free play. Rebuild the index, or rebuild the schedule ` +
+          `against this index.`,
+        err,
+      );
+    }
+    return null;
+  }
+  return { kind: "daily", date, seed: scheduled };
+}
+
+/**
  * The Puzzle a player lands on: the Tutorial on a first ever visit, otherwise
- * the scheduled Puzzle for *their* local calendar date, and free play when the
- * date falls outside the run — an early visit before the start date, or a visit
- * after the 260 days are up. An early click is not a dead end.
+ * today's Daily Puzzle, and Free Play when there is no Daily Puzzle to open —
+ * an early visit before the start date, a visit after the 260 days are up, or a
+ * schedule the index has fallen out of step with. An early click is not a dead
+ * end.
  */
 function openingPuzzle(
-  index: RhymeIndex,
+  daily: OpeningPuzzle | null,
   pool: readonly FamilyEntry[],
   firstVisit: boolean,
 ): OpeningPuzzle {
@@ -75,32 +110,8 @@ function openingPuzzle(
   // it. Not unscored: Score and Rank render on the Tutorial exactly as they do on
   // a scheduled Puzzle, though CONTEXT.md calls the Tutorial unscored. Whether the
   // code or the glossary should give way is #125.
-  if (firstVisit) return { date: null, seed: TUTORIAL_SEED };
-  const date = localCalendarDate();
-  const scheduled = seedForDate(SCHEDULE, date);
-  if (scheduled !== null) {
-    // A rebuilt index that no longer carries the day's Seed would otherwise take
-    // the whole game down rather than one Puzzle. Free play is the same fallback
-    // an out-of-range date gets.
-    try {
-      index.pinSeed(scheduled.word, scheduled.rhymeKey);
-      return { date, seed: scheduled };
-    } catch (err) {
-      // Silent in production — one free-play Puzzle beats a white screen. But in
-      // development this means the schedule and the built index disagree, which
-      // is a bug in the pair and not something to discover from a player.
-      if (import.meta.env.DEV) {
-        console.warn(
-          `[rhyme-bee] schedule/index mismatch for ${date}: the index does not carry ` +
-            `Seed Word "${scheduled.word}" on Rhyme Key ${scheduled.rhymeKey}. ` +
-            `Falling back to free play. Rebuild the index, or rebuild the schedule ` +
-            `against this index.`,
-          err,
-        );
-      }
-    }
-  }
-  return { date: null, seed: drawFreeSeed(pool) };
+  if (firstVisit) return { kind: "tutorial", date: null, seed: TUTORIAL_SEED };
+  return daily ?? { kind: "free", date: null, seed: drawFreeSeed(pool) };
 }
 
 export function PuzzleView({ index }: { index: RhymeIndex }) {
@@ -113,12 +124,18 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // them because the flag has since been written.
   const [firstVisit] = useState(isFirstVisit);
 
+  // Today's Puzzle, resolved whether or not the player boots into it: a first
+  // visit opens the Tutorial and then needs somewhere to go, and a player in Free
+  // Play needs the way back. Null means the schedule has nothing for this date,
+  // and the control below does not render.
+  const daily = useMemo(() => dailyPuzzle(index), [index]);
+
   const opening = useMemo(
-    () => openingPuzzle(index, pool, firstVisit),
-    [index, pool, firstVisit],
+    () => openingPuzzle(daily, pool, firstVisit),
+    [daily, pool, firstVisit],
   );
 
-  const { session, last, seq, isDaily, submit, reveal, newPuzzle } = usePuzzleSession(
+  const { session, last, seq, kind, submit, reveal, newPuzzle } = usePuzzleSession(
     index,
     opening,
   );
@@ -200,7 +217,25 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // this visit.
   function onNewPuzzle() {
     if (pool.length === 0) return;
-    newPuzzle(drawFreeSeed(pool));
+    newPuzzle({ kind: "free", date: null, seed: drawFreeSeed(pool) });
+    setField("");
+    setConfirming(false);
+    inputRef.current?.focus();
+  }
+
+  // The route to today's Puzzle from a Puzzle that is not it (#113). A first-ever
+  // visit boots the Tutorial, and until this existed the only way on was a manual
+  // reload — the free-play draw is a different Puzzle, not this one. Deliberately
+  // a control the player takes and not an advance the Tutorial's end performs:
+  // finishing is not the only reason to move on, and a player who is stuck should
+  // not have to finish to leave.
+  //
+  // Unlike free play this opens a *dateful* Puzzle, so the Session it starts is
+  // filed under the player's local date and survives a reload — and if they have
+  // already played some of today, `open` resumes it rather than wiping it.
+  function onDailyPuzzle() {
+    if (daily === null) return;
+    newPuzzle(daily);
     setField("");
     setConfirming(false);
     inputRef.current?.focus();
@@ -229,11 +264,18 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
             {isComplete ? "★ Show the Bonus Words I missed" : "🏳️ Reveal Answers"}
           </button>
         )}
+        {/* Only when there is somewhere to go: on the Daily Puzzle the player is
+            already there, and a date outside the run has no Puzzle to offer. */}
+        {kind !== "daily" && daily !== null && (
+          <button type="button" className="daily-puzzle" onClick={onDailyPuzzle}>
+            📅 Today’s Puzzle
+          </button>
+        )}
         <button type="button" className="new-puzzle" onClick={onNewPuzzle}>
           🎲 Free play
         </button>
       </div>
-      <Seed session={session} isDaily={isDaily} />
+      <Seed session={session} kind={kind} />
       <Stats session={session} />
       {/* Both per-Submission flashes are re-keyed on `seq` so each new Submission
           genuinely remounts them (that is what restarts the banner's dismissal
@@ -336,7 +378,14 @@ function StartGate({ tutorial, onStart }: { tutorial: boolean; onStart: () => vo
 
 // --- The Seed Word -------------------------------------------------------------
 
-function Seed({ session, isDaily }: { session: Session; isDaily: boolean }) {
+/** What each kind of Puzzle calls itself above the Seed Word. */
+const SEED_LABEL: Record<PuzzleKind, string> = {
+  daily: "Today’s Seed Word",
+  tutorial: "Warm-up · Seed Word",
+  free: "Free play · Seed Word",
+};
+
+function Seed({ session, kind }: { session: Session; kind: PuzzleKind }) {
   const { puzzle } = session;
   const word = puzzle.seed.word;
 
@@ -348,8 +397,10 @@ function Seed({ session, isDaily }: { session: Session; isDaily: boolean }) {
     <header className="seed">
       {/* Which Puzzle this is. Today's is the one that is saved and shared with
           everybody else; a free-play draw is nobody else's and is not kept, so a
-          player should be able to tell them apart without reloading. */}
-      <p className="seed__label">{isDaily ? "Today’s Seed Word" : "Free play · Seed Word"}</p>
+          player should be able to tell them apart without reloading. The Tutorial
+          is neither — labelling it "Free play" told a first-time player they had
+          chosen an extra before they had played anything at all. */}
+      <p className="seed__label">{SEED_LABEL[kind]}</p>
       <p className="seed__word">{word}</p>
       <p className="seed__respelling">“{puzzle.seedRespelling}”</p>
       {speechSupported() && (

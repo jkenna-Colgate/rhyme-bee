@@ -206,7 +206,8 @@ code {
   gap: 0.5rem;
 }
 
-.new-puzzle {
+.new-puzzle,
+.daily-puzzle {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -220,7 +221,17 @@ code {
   cursor: pointer;
 }
 
-.new-puzzle:hover {
+.new-puzzle:hover,
+.daily-puzzle:hover {
+  border-color: var(--accent);
+}
+
+/* The way out of the Tutorial, and back from a free-play draw. It sits beside
+   the free-play button and has to read as the onward route rather than a second
+   equal option, so it takes the accent the start tap uses. */
+.daily-puzzle {
+  color: var(--accent-ink);
+  background: var(--accent);
   border-color: var(--accent);
 }
 
