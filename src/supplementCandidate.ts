@@ -26,7 +26,7 @@ import { normaliseWord } from "./cmudict.ts";
 import { REJECTION_MESSAGE, type RejectionReason } from "./verdict.ts";
 
 export interface SupplementCandidate {
-  /** The submission the maintainer thinks should have counted. */
+  /** The Submission the player says should have counted as an Answer. */
   word: string;
   /** The Seed Word it was played against — what it must rhyme with. */
   seedWord: string;
