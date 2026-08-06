@@ -1,9 +1,15 @@
 /**
- * A dev-only feedback affordance: a fixed bottom-right button that opens a
- * non-modal, compact popover with a single textarea. Submitting POSTs the note,
- * plus the live session context read at submit time, to the dev-server endpoint
- * (`/api/feedback`), which files it as a GitHub issue. Rendered only under
- * `import.meta.env.DEV`, so it is dead-code-eliminated from the production build.
+ * The feedback affordance: a fixed bottom-right button that opens a non-modal,
+ * compact popover with a single textarea. Submitting POSTs the note, plus the
+ * live session context read at submit time, to the feedback endpoint, which
+ * files it as an issue on the tracker — a dev-server Vite plugin during
+ * `npm run dev`, a route on the Worker once deployed (#118).
+ *
+ * It ships in production. A playtester's only channel back is what they can say
+ * from inside the game, and reporting is out of band: if the endpoint is down or
+ * unreachable the failure is shown and the Puzzle carries on, because judging
+ * happens in the browser (ADR-0013). A failed submit keeps the typed text, so a
+ * hiccup never eats what someone wrote.
  *
  * The popover has no backdrop and no focus trap: the game underneath stays fully
  * interactive, so you can keep submitting words to reproduce a pattern and jot
@@ -13,6 +19,7 @@
 
 import { useState } from "react";
 import type { Session } from "../../../src/session.ts";
+import { FEEDBACK_PATH } from "../endpoints.ts";
 import type { FeedbackContext } from "./feedbackIssue.ts";
 
 type Status =
@@ -45,7 +52,7 @@ export function FeedbackButton({ session }: { session: Session }) {
     if (text.trim() === "" || status.kind === "sending") return;
     setStatus({ kind: "sending" });
     try {
-      const res = await fetch("/api/feedback", {
+      const res = await fetch(FEEDBACK_PATH, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, context: snapshot(session) }),

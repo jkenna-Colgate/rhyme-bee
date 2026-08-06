@@ -627,10 +627,10 @@ code {
   }
 }
 
-/* --- Dev-only feedback button (#41) ------------------------------------- */
+/* --- Feedback button (#41, shipped by #118) ----------------------------- */
 /* A fixed, non-modal affordance: no backdrop, so the game stays interactive.
-   The button, endpoint and its JS are stripped from production builds by the
-   `import.meta.env.DEV` gate; these selectors then simply match nothing. */
+   It ships in production — a playtester's note is filed by the Worker rather
+   than the dev server, but the control itself is unchanged. */
 
 .feedback-fab {
   position: fixed;
