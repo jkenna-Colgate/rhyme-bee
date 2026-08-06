@@ -24,29 +24,12 @@
  */
 
 import { useCallback, useState } from "react";
-import type { RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
+import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import { Session, type SubmissionResult } from "../../src/session.ts";
 import { resume, snapshot, snapshotKey } from "../../src/sessionSnapshot.ts";
+import type { OpeningPuzzle, PuzzleKind } from "./bootPuzzle.ts";
 
-/**
- * Which of the three kinds of Puzzle this is. They are genuinely three and not
- * two: the Tutorial and Free Play are both dateless, so a date alone cannot tell
- * them apart, and telling a first-time player they are in Free Play is a lie the
- * view was previously forced into.
- */
-export type PuzzleKind = "daily" | "tutorial" | "free";
-
-/** The Puzzle the hook opens: the Daily Puzzle, the Tutorial, or a Free Play draw. */
-export interface OpeningPuzzle {
-  kind: PuzzleKind;
-  /**
-   * The calendar date this Puzzle is filed under, and the key its Session is
-   * saved beneath. Only a `daily` Puzzle has one; the other two kinds carry null
-   * and are deliberately not saved.
-   */
-  date: string | null;
-  seed: string | SeedWord;
-}
+export type { OpeningPuzzle, PuzzleKind };
 
 export interface PuzzleSession {
   session: Session;
@@ -127,13 +110,17 @@ function save(play: Play): void {
 
 /** Open the Puzzle: resume the day's saved Session, or start a fresh one. */
 function open(index: RhymeIndex, opening: OpeningPuzzle): Play {
-  const seed = typeof opening.seed === "string" ? index.pinSeed(opening.seed) : opening.seed;
   if (opening.date === null) {
-    return { session: Session.start(index, seed), submissions: [], kind: opening.kind, date: null };
+    return {
+      session: Session.start(index, opening.seed),
+      submissions: [],
+      kind: opening.kind,
+      date: null,
+    };
   }
   // `resume` is total: absent, corrupt and stale snapshots all come back as a
   // fresh Session, so there is nothing here to branch on.
-  const resumed = resume(index, seed, read(snapshotKey(opening.date)));
+  const resumed = resume(index, opening.seed, read(snapshotKey(opening.date)));
   return {
     session: resumed.session,
     submissions: resumed.submissions,
