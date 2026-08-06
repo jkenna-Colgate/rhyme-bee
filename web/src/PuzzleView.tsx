@@ -16,103 +16,25 @@
  * lines come from `REJECTION_MESSAGE`, which sits with the closed reason set so
  * the REPL says the same thing.
  *
- * The boot path carries two things that look unrelated and are not (#116). A
- * Puzzle does not begin until the player taps to start, because iOS Safari
- * blocks speech synthesis outside a user gesture and the Seed Word being spoken
- * is the mechanic, not a garnish — the tap *is* the audio unlock. And which
- * Puzzle boots depends on whether this browser has ever been here: a first ever
- * visit gets the Tutorial, once, and every visit after it goes straight to a
- * Puzzle.
+ * A Puzzle does not begin until the player taps to start (#116): iOS Safari
+ * blocks speech synthesis outside a user gesture, and the Seed Word being
+ * spoken is the mechanic, not a garnish — the tap *is* the audio unlock. Which
+ * Puzzle boots is a separate question, decided by `bootPuzzle.ts` (#124); the
+ * view only asks it and renders what comes back.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { FamilyEntry } from "../../src/curation.ts";
 import { playableSeeds } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
-import scheduleArtifact from "../../data/schedule.json";
-import { localCalendarDate, parseSchedule, seedForDate } from "../../src/schedule.ts";
+import { localCalendarDate } from "../../src/schedule.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
+import { dailyPuzzle, freePlayPuzzle, openingPuzzle, SCHEDULE, type PuzzleKind } from "./bootPuzzle.ts";
 import { FLAG_PATH } from "./endpoints.ts";
 import { isFirstVisit, markVisited } from "./firstVisit.ts";
 import { speak, speechSupported } from "./speech.ts";
-import { usePuzzleSession, type OpeningPuzzle, type PuzzleKind } from "./usePuzzleSession.ts";
+import { usePuzzleSession } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
-
-/** The Tutorial, the first-run Puzzle, is always seeded with `ate` (CONTEXT.md). */
-const TUTORIAL_SEED = "ate";
-
-/**
- * The reviewed schedule, read once at module load. It is committed data that
- * ships inside the bundle, so there is no fetch and no waiting for it.
- */
-const SCHEDULE = parseSchedule(scheduleArtifact);
-
-/** A free-play draw from the shared in-band Seed pool (#33). */
-function drawFreeSeed(pool: readonly FamilyEntry[]): string | SeedWord {
-  if (pool.length === 0) return TUTORIAL_SEED;
-  const family = pool[Math.floor(Math.random() * pool.length)]!;
-  // Read the Seed off the drawn family, pinned to the family's own Rhyme Key
-  // so an ambiguous representative can't misfire.
-  return { word: family.representative, rhymeKey: family.rhymeKey };
-}
-
-/**
- * The Daily Puzzle for the player's own local calendar date, or null when there
- * is not one to open — the date falls outside the run, or the built index no
- * longer carries the Seed the schedule names.
- *
- * It is resolved once and used twice: the boot path opens it, and the control
- * that leaves the Tutorial for it needs the same answer. Returning null rather
- * than falling back here is what lets that control know there is nothing to
- * offer, instead of quietly handing over a free-play draw labelled as today's.
- */
-function dailyPuzzle(index: RhymeIndex): OpeningPuzzle | null {
-  const date = localCalendarDate();
-  const scheduled = seedForDate(SCHEDULE, date);
-  if (scheduled === null) return null;
-  try {
-    index.pinSeed(scheduled.word, scheduled.rhymeKey);
-  } catch (err) {
-    // Silent in production — one free-play Puzzle beats a white screen. But in
-    // development this means the schedule and the built index disagree, which is
-    // a bug in the pair and not something to discover from a player.
-    if (import.meta.env.DEV) {
-      console.warn(
-        `[rhyme-bee] schedule/index mismatch for ${date}: the index does not carry ` +
-          `Seed Word "${scheduled.word}" on Rhyme Key ${scheduled.rhymeKey}. ` +
-          `Falling back to free play. Rebuild the index, or rebuild the schedule ` +
-          `against this index.`,
-        err,
-      );
-    }
-    return null;
-  }
-  return { kind: "daily", date, seed: scheduled };
-}
-
-/**
- * The Puzzle a player lands on: the Tutorial on a first ever visit, otherwise
- * today's Daily Puzzle, and Free Play when there is no Daily Puzzle to open —
- * an early visit before the start date, a visit after the 260 days are up, or a
- * schedule the index has fallen out of step with. An early click is not a dead
- * end.
- */
-function openingPuzzle(
-  daily: OpeningPuzzle | null,
-  pool: readonly FamilyEntry[],
-  firstVisit: boolean,
-): OpeningPuzzle {
-  // A first ever visit gets the Tutorial whatever the schedule says: it exists to
-  // teach that the game is about sound and not spelling, and that lesson has to
-  // land before the first real Puzzle. It carries no date, so it is *unpersisted*
-  // — never filed under the day, and the player still meets today's Puzzle after
-  // it. Not unscored: Score and Rank render on the Tutorial exactly as they do on
-  // a scheduled Puzzle, though CONTEXT.md calls the Tutorial unscored. Whether the
-  // code or the glossary should give way is #125.
-  if (firstVisit) return { kind: "tutorial", date: null, seed: TUTORIAL_SEED };
-  return daily ?? { kind: "free", date: null, seed: drawFreeSeed(pool) };
-}
 
 export function PuzzleView({ index }: { index: RhymeIndex }) {
   // The shared in-band Seed pool (#33), which both the opening fallback and the
@@ -124,15 +46,19 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // them because the flag has since been written.
   const [firstVisit] = useState(isFirstVisit);
 
+  // The player's own local calendar date (ADR-0013), resolved once and reused
+  // by both the boot decision and the "Today's Puzzle" control below.
+  const date = useMemo(() => localCalendarDate(), []);
+
   // Today's Puzzle, resolved whether or not the player boots into it: a first
   // visit opens the Tutorial and then needs somewhere to go, and a player in Free
   // Play needs the way back. Null means the schedule has nothing for this date,
   // and the control below does not render.
-  const daily = useMemo(() => dailyPuzzle(index), [index]);
+  const daily = useMemo(() => dailyPuzzle(index, SCHEDULE, date), [index, date]);
 
   const opening = useMemo(
-    () => openingPuzzle(daily, pool, firstVisit),
-    [daily, pool, firstVisit],
+    () => openingPuzzle(index, pool, daily, firstVisit),
+    [index, pool, daily, firstVisit],
   );
 
   const { session, last, seq, kind, submit, reveal, newPuzzle } = usePuzzleSession(
@@ -217,7 +143,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // this visit.
   function onNewPuzzle() {
     if (pool.length === 0) return;
-    newPuzzle({ kind: "free", date: null, seed: drawFreeSeed(pool) });
+    newPuzzle(freePlayPuzzle(index, pool));
     setField("");
     setConfirming(false);
     inputRef.current?.focus();
