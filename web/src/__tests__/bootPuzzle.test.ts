@@ -1,9 +1,11 @@
 /**
  * Boot policy: which Puzzle a player opens, and why. Extracted out of
- * `PuzzleView` (#124), which had grown the whole decision in place — a first
- * ever visit gets the Tutorial, otherwise the Daily Puzzle for the player's
- * own local date, falling back to Free Play when the schedule has nothing for
- * that date or disagrees with the built index.
+ * `PuzzleView` (#124), which had grown the whole decision in place — the Daily
+ * Puzzle for the player's own local date, falling back to Free Play when the
+ * schedule has nothing for that date or disagrees with the built index. The
+ * Tutorial that used to precede both is switched off for the playtest (#130),
+ * so these assert the policy with it off *and* that it is still there to switch
+ * back on.
  *
  * The fixture index (`makeTestIndex`) stands in for the built Rhyme Index; a
  * hand-built `Schedule` stands in for the committed artifact, so every branch
@@ -19,6 +21,7 @@ import {
   dailyPuzzle,
   freePlayPuzzle,
   openingPuzzle,
+  TUTORIAL_ENABLED,
   tutorialPuzzle,
 } from "../bootPuzzle.ts";
 
@@ -117,20 +120,21 @@ describe("openingPuzzle: the boot decision table", () => {
   // resolved from a schedule and a date.
   const scheduledDaily = dailyPuzzle(index, schedule, SCHEDULED_DATE);
 
-  it("a first ever visit gets the Tutorial, whatever today's Puzzle is", () => {
+  // The Tutorial is switched off for the playtest (#130), so the first-visit
+  // flag no longer changes which Puzzle opens — the four cases below are two
+  // cases played twice. That is the assertion: `firstVisit` is inert.
+  it("a first ever visit gets the Daily Puzzle, not the Tutorial", () => {
     expect(openingPuzzle(index, pool, scheduledDaily, true)).toEqual({
-      kind: "tutorial",
-      date: null,
+      kind: "daily",
+      date: SCHEDULED_DATE,
       seed: { word: "ate", rhymeKey: "EY T" },
     });
   });
 
-  it("a first ever visit gets the Tutorial even with no Daily Puzzle to fall back to", () => {
-    expect(openingPuzzle(index, pool, null, true)).toEqual({
-      kind: "tutorial",
-      date: null,
-      seed: { word: "ate", rhymeKey: "EY T" },
-    });
+  it("a first ever visit gets Free Play when there is no Daily Puzzle to open", () => {
+    const opening = openingPuzzle(index, pool, null, true);
+    expect(opening.kind).toBe("free");
+    expect(opening.date).toBeNull();
   });
 
   it("a returning player gets the resolved Daily Puzzle when there is one", () => {
@@ -145,5 +149,20 @@ describe("openingPuzzle: the boot decision table", () => {
     const opening = openingPuzzle(index, pool, null, false);
     expect(opening.kind).toBe("free");
     expect(opening.date).toBeNull();
+  });
+
+  it("never opens the Tutorial while it is switched off", () => {
+    expect(TUTORIAL_ENABLED).toBe(false);
+    for (const firstVisit of [true, false]) {
+      for (const daily of [scheduledDaily, null]) {
+        expect(openingPuzzle(index, pool, daily, firstVisit).kind).not.toBe("tutorial");
+      }
+    }
+  });
+
+  // The Tutorial is dormant, not deleted: it stays buildable so that flipping
+  // the one constant back brings it home rather than starting a rewrite.
+  it("keeps the Tutorial itself intact behind the constant", () => {
+    expect(tutorialPuzzle(index).kind).toBe("tutorial");
   });
 });

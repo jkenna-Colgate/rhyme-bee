@@ -1,12 +1,14 @@
 /**
- * Boot policy: which Puzzle a player opens, and why (#124). A first ever visit
- * gets the Tutorial, unconditionally. Otherwise a player meets the Daily
- * Puzzle scheduled for their own local calendar date — or, when the schedule
- * has nothing for that date (an early visit before the run starts, one after
- * it ends, or a schedule/index disagreement), Free Play: a random draw from
- * the shared in-band Seed pool. The same draw is also what a player reaches
+ * Boot policy: which Puzzle a player opens, and why (#124). A player meets the
+ * Daily Puzzle scheduled for their own local calendar date — or, when the
+ * schedule has nothing for that date (an early visit before the run starts, one
+ * after it ends, or a schedule/index disagreement), Free Play: a random draw
+ * from the shared in-band Seed pool. The same draw is also what a player reaches
  * for on purpose, once, via the "Free play" control — Free Play is both the
  * automatic fallback and something chosen.
+ *
+ * A first ever visit would get the Tutorial ahead of either, but the Tutorial is
+ * switched off for the playtest (#130) — see `TUTORIAL_ENABLED` below.
  *
  * Every Seed is resolved to a pinned `SeedWord` here, at this one boundary,
  * rather than carried onward as a bare string for a caller to pin later.
@@ -41,6 +43,20 @@ export interface OpeningPuzzle {
 
 /** The Tutorial, the first-run Puzzle, is always seeded with `ate` (CONTEXT.md). */
 const TUTORIAL_SEED = "ate";
+
+/**
+ * Whether a first ever visit opens the Tutorial (#130). Off for the playtest:
+ * testers are handed the game with context, so a warm-up Puzzle standing
+ * between them and the real one costs more than it teaches. Its one lesson —
+ * that the game is about sound and not spelling — has moved into the ordinary
+ * start-gate copy, where every player reads it every visit.
+ *
+ * A named constant rather than a deleted branch, deliberately. `tutorialPuzzle`,
+ * the first-visit flag and the `tutorial` `PuzzleKind` all stay live and
+ * dormant, so bringing the Tutorial back after the playtest is this one word.
+ * Do not "tidy up" what then looks like an unreachable path.
+ */
+export const TUTORIAL_ENABLED = false;
 
 /**
  * The reviewed schedule, read once at module load. It is committed data that
@@ -102,11 +118,11 @@ export function dailyPuzzle(
 }
 
 /**
- * The Puzzle a player lands on: the Tutorial on a first ever visit, otherwise
- * today's Daily Puzzle, and Free Play when there is no Daily Puzzle to open —
- * an early visit before the start date, a visit after the run's days are up,
- * or a schedule the index has fallen out of step with. An early click is not
- * a dead end.
+ * The Puzzle a player lands on: today's Daily Puzzle, and Free Play when there
+ * is no Daily Puzzle to open — an early visit before the start date, a visit
+ * after the run's days are up, or a schedule the index has fallen out of step
+ * with. An early click is not a dead end. A first ever visit takes the Tutorial
+ * ahead of both, when `TUTORIAL_ENABLED` says so.
  *
  * Takes `daily` already resolved rather than recomputing it, because the
  * caller needs that same answer a second time — for the control that leaves
@@ -126,7 +142,8 @@ export function openingPuzzle(
   // today's Puzzle after it. Not unscored: Score and Rank render on the
   // Tutorial exactly as they do on a scheduled Puzzle, though CONTEXT.md calls
   // the Tutorial unscored. Whether the code or the glossary should give way is
-  // #125.
-  if (firstVisit) return tutorialPuzzle(index);
+  // #125 — dormant while the constant is off, since this branch cannot be
+  // taken.
+  if (TUTORIAL_ENABLED && firstVisit) return tutorialPuzzle(index);
   return daily ?? freePlayPuzzle(index, pool);
 }

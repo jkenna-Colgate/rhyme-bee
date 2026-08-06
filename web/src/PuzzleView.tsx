@@ -43,7 +43,9 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
 
   // Read once, at mount, and held: `markVisited` fires when the player taps to
   // start, and the Tutorial they are then playing must not change underneath
-  // them because the flag has since been written.
+  // them because the flag has since been written. Still read and still written
+  // while the Tutorial is switched off (#130) — `openingPuzzle` ignores it, but
+  // the flag has to stay truthful for when the Tutorial comes back.
   const [firstVisit] = useState(isFirstVisit);
 
   // The player's own local calendar date (ADR-0013), resolved once and reused
@@ -83,9 +85,10 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   function start() {
     speak(seedWord);
     spoken.current = seedWord;
-    // The Tutorial has now actually been played, so spend the first visit here
-    // rather than on mount — a player who opens the link and never taps has not
-    // had their one Tutorial.
+    // The visit has now actually happened, so spend it here rather than on
+    // mount — a player who opens the link and never taps has not had their one
+    // Tutorial. Kept recording while the Tutorial is off (#130), so the flag
+    // still means "has played before" when it returns.
     if (firstVisit) markVisited();
     setStarted(true);
   }
@@ -171,7 +174,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // not decoration: without a gesture the Seed Word is never spoken on a phone,
   // and a game adjudicated against a pronunciation the player never heard is a
   // game whose premise is discovered through rejection.
-  if (!started) return <StartGate tutorial={firstVisit} onStart={start} />;
+  if (!started) return <StartGate tutorial={kind === "tutorial"} onStart={start} />;
 
   return (
     <section className="puzzle">
@@ -285,10 +288,14 @@ function StartGate({ tutorial, onStart }: { tutorial: boolean; onStart: () => vo
   return (
     <section className="start-gate">
       <h2 className="start-gate__title">{tutorial ? "Welcome to Rhyme Bee" : "Today’s puzzle"}</h2>
+      {/* The sound-not-spelling sentence used to be the Tutorial's alone, and it
+          was the only part of the Tutorial carrying its weight (#130). It now
+          reads on every visit, whichever Puzzle follows: it is the game's
+          premise, and a player who has not been told it discovers it through
+          rejection. */}
       <p className="start-gate__body">
-        {tutorial
-          ? "One word, and every word you can find that rhymes with it. This first one is a quick warm-up and does not count — it is here to show you the game is about sound, not spelling."
-          : "One word, and every word you can find that rhymes with it."}
+        One word, and every word you can find that rhymes with it. It is about
+        sound, not spelling.
       </p>
       <button type="button" className="start-gate__start" onClick={onStart} autoFocus>
         ▶ Tap to start

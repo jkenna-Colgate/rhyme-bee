@@ -38,6 +38,7 @@ _Avoid_: Practice mode, random puzzle, endless mode, casual mode
 
 **Tutorial**:
 The unscored first-run Puzzle, seeded with `ate`. It exists to teach that the game is about sound and not spelling, and is exempt from the size band that governs shipped Puzzles. It carries no date, so it is not a Daily Puzzle and its Session is not kept — a first-time player still meets the day's Puzzle on their next visit.
+**Switched off for the playtest** ([#130](https://github.com/jkenna-Colgate/rhyme-bee/issues/130)): the term and its design stand, but no player currently reaches one. A first visit opens the Daily Puzzle directly, and the sound-not-spelling sentence now lives in the ordinary start gate. `TUTORIAL_ENABLED` in `web/src/bootPuzzle.ts` is the one word that brings it back.
 
 **Session**:
 One player's play-through of a single Puzzle: the words they have found, and the Score, Rank and progress derived from them. The Daily Puzzle is the shared content of the day; the Session is one person's engagement with it. A Session on the Daily Puzzle outlives the tab that played it and resets when the date turns over; a Tutorial or Free Play Session is not kept at all.
