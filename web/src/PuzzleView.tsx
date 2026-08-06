@@ -190,18 +190,18 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
             className="reveal-button"
             onClick={() => (isComplete ? takeReveal() : setConfirming(true))}
           >
-            {isComplete ? "★ Show the Bonus Words I missed" : "🏳️ Reveal Answers"}
+            {isComplete ? "★ Show the Bonus Words I missed" : "Reveal Answers"}
           </button>
         )}
         {/* Only when there is somewhere to go: on the Daily Puzzle the player is
             already there, and a date outside the run has no Puzzle to offer. */}
         {kind !== "daily" && daily !== null && (
           <button type="button" className="daily-puzzle" onClick={onDailyPuzzle}>
-            📅 Today’s Puzzle
+            Today’s Puzzle
           </button>
         )}
         <button type="button" className="new-puzzle" onClick={onNewPuzzle}>
-          🎲 Free play
+          Free play
         </button>
       </div>
       <Seed session={session} kind={kind} />
@@ -343,7 +343,7 @@ function Seed({ session, kind }: { session: Session; kind: PuzzleKind }) {
           onClick={() => speak(word)}
           aria-label={`Hear “${word}” again`}
         >
-          🔊 Hear it again
+          Hear it again
         </button>
       )}
     </header>
@@ -412,7 +412,7 @@ function CompletionOverlay({
           ×
         </button>
         <h2 id="complete-title" className="complete-card__title">
-          🏆 Puzzle complete!
+          Puzzle complete!
         </h2>
         <p className="complete-card__body">
           You found every Answer. Final Score <b>{score}</b>, Rank <b>{rankLabel}</b>.
@@ -461,7 +461,7 @@ function GiveUpConfirm({
     >
       <div className="complete-card">
         <h2 id="give-up-title" className="complete-card__title">
-          🏳️ Give up and reveal?
+          Give up and reveal?
         </h2>
         <p className="complete-card__body">
           {remaining === 1
@@ -506,7 +506,7 @@ function EndedNotice({
   return (
     <p className="ended" role="status" aria-live="polite">
       <b className="ended__title">
-        {gaveUp ? "Session over — Answers revealed." : "Session over — everything revealed."}
+        {gaveUp ? "Session over. Answers revealed." : "Session over. Everything revealed."}
       </b>
       <span className="ended__detail">
         Final Score <b>{score}</b>, Rank <b>{rankLabel}</b>. Start a new Puzzle to play again.
@@ -593,6 +593,14 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 // --- Per-Submission feedback: every Verdict rendered distinctly (ADR-0005) -----
+//
+// The glyph rule, for whoever reaches for the next one (#131): keep a glyph only
+// where it *encodes a verdict*, and delete every glyph that decorates a label.
+// ✓ ✗ ★ below each carry meaning no adjacent word repeats — the star is the only
+// thing separating a Bonus Word from an Answer in the found list, and replacing
+// it costs either words or colour. The emoji that once sat on Free play, the
+// Reveal, the Puzzle-complete card and the rest said nothing the button did not
+// already say, and made the interface read as machine-generated.
 
 /** Plain-English messages for the closed rejection set — one distinct line each. */
 function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }) {
@@ -685,7 +693,7 @@ function ShouldCountButton({
   if (status === "sent") {
     return (
       <span className="feedback__appealed" role="status" aria-live="polite">
-        ✓ thanks — sent
+        ✓ thanks, sent
       </span>
     );
   }
@@ -698,7 +706,7 @@ function ShouldCountButton({
       disabled={status === "sending"}
       title="Tell us this word should have counted"
     >
-      {status === "error" ? "⚠ didn’t send — retry" : "＋ should count"}
+      {status === "error" ? "⚠ didn’t send, retry" : "＋ should count"}
     </button>
   );
 }
@@ -720,7 +728,7 @@ function RankBanner({ label }: { label: string }) {
 
   return (
     <p className="rank-banner" role="status" aria-live="polite">
-      🎉 New Rank: <b>{label}</b>!
+      New Rank: <b>{label}</b>!
     </p>
   );
 }
@@ -738,7 +746,7 @@ function FoundList({ session }: { session: Session }) {
         {foundAnswers.length === 0 ? (
           // Once the Session is over there is no entry control to point at.
           <p className="found__empty">
-            {session.ended ? "You found no Answers this time." : "No Answers yet — type one above."}
+            {session.ended ? "You found no Answers this time." : "No Answers yet. Type one above."}
           </p>
         ) : (
           <ul className="found__list">

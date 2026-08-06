@@ -79,7 +79,7 @@ export function FeedbackButton({ session }: { session: Session }) {
         aria-label="Open feedback"
         title="Send feedback"
       >
-        🐝 Feedback
+        Feedback
       </button>
     );
   }
