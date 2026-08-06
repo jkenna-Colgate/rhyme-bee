@@ -27,7 +27,7 @@ import {
   resolveTitle,
   MAX_NOTE_BYTES,
 } from "../src/feedback/feedbackIssue.ts";
-import { json, readCappedBody } from "./http.ts";
+import { json, readReport } from "./http.ts";
 import type { Env } from "./env.ts";
 
 /** The label that puts a filed note in front of the maintainer's triage. */
@@ -64,24 +64,17 @@ function refusalMessage(status: number): string {
 }
 
 export async function handleFeedback(request: Request, env: Env): Promise<Response> {
-  if (request.method !== "POST") {
-    return json(405, { error: "Send a note with POST." }, { Allow: "POST" });
-  }
-
-  const body = await readCappedBody(request, MAX_NOTE_BYTES);
-  if (body === null) return json(413, { error: "That note is too large." });
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(body);
-  } catch {
-    return json(400, { error: "That note is not JSON." });
-  }
-
-  const report = noteFromReport(parsed);
-  // A refusal returns no note at all, so there is nothing partial to file and
-  // the tracker is never called.
-  if (!report.ok) return json(400, { error: report.error });
+  const outcome = await readReport(request, {
+    maxBytes: MAX_NOTE_BYTES,
+    method: "Send a note with POST.",
+    tooLarge: "That note is too large.",
+    notJson: "That note is not JSON.",
+    // A refusal returns no note at all, so there is nothing partial to file
+    // and the tracker is never called.
+    validate: noteFromReport,
+  });
+  if (!outcome.ok) return outcome.response;
+  const { note } = outcome.report;
 
   const token = env.GITHUB_ISSUE_TOKEN?.trim();
   if (!token) {
@@ -90,7 +83,7 @@ export async function handleFeedback(request: Request, env: Env): Promise<Respon
     return json(503, { error: "Reporting is not configured: the tracker credential is unset." });
   }
 
-  const title = await resolveTitle(report.note.text, noGeneratedTitle);
+  const title = await resolveTitle(note.text, noGeneratedTitle);
 
   let response: Response;
   try {
@@ -105,7 +98,7 @@ export async function handleFeedback(request: Request, env: Env): Promise<Respon
       },
       body: JSON.stringify({
         title,
-        body: buildIssueBody(report.note.text, report.note.context),
+        body: buildIssueBody(note.text, note.context),
         labels: [LABEL],
       }),
     });

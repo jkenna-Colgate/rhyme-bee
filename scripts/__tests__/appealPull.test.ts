@@ -77,7 +77,6 @@ describe("choosing what to pull", () => {
     expect(selectNewCandidates([], new Set())).toEqual({
       added: [],
       append: "",
-      alreadyHeld: 0,
       unreadable: [],
       misfiled: [],
     });
@@ -91,7 +90,6 @@ describe("choosing what to pull", () => {
 
     expect(second.added).toEqual([]);
     expect(second.append).toBe("");
-    expect(second.alreadyHeld).toBe(2);
   });
 
   it("still skips a record the maintainer has judged and archived", () => {
@@ -115,13 +113,11 @@ describe("choosing what to pull", () => {
     );
 
     expect(selection.added).toEqual([overjoy]);
-    expect(selection.alreadyHeld).toBe(1);
   });
 
   it("collapses a duplicate met twice within one batch", () => {
     const selection = selectNewCandidates([objectFor(airburst), objectFor(airburst)], new Set());
     expect(selection.added).toEqual([airburst]);
-    expect(selection.alreadyHeld).toBe(1);
   });
 
   it("reports an object holding nothing readable, without failing the pull", () => {

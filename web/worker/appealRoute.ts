@@ -23,31 +23,24 @@ import {
   serialiseCandidate,
   MAX_REPORT_BYTES,
 } from "../../src/supplementCandidate.ts";
-import { json, readCappedBody } from "./http.ts";
+import { json, readReport } from "./http.ts";
 import type { Env } from "./env.ts";
 
 export async function handleAppeal(request: Request, env: Env): Promise<Response> {
-  if (request.method !== "POST") {
-    return json(405, { error: "Send an Appeal with POST." }, { Allow: "POST" });
-  }
-
-  const body = await readCappedBody(request, MAX_REPORT_BYTES);
-  if (body === null) return json(413, { error: "That report is too large." });
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(body);
-  } catch {
-    return json(400, { error: "That report is not JSON." });
-  }
-
-  const report = candidateFromReport(parsed, new Date().toISOString());
-  // A refusal returns no candidate at all, so there is nothing partial to write
-  // and the bucket is never touched.
-  if (!report.ok) return json(400, { error: report.error });
+  const outcome = await readReport(request, {
+    maxBytes: MAX_REPORT_BYTES,
+    method: "Send an Appeal with POST.",
+    tooLarge: "That report is too large.",
+    notJson: "That report is not JSON.",
+    // A refusal returns no candidate at all, so there is nothing partial to
+    // write and the bucket is never touched.
+    validate: (body) => candidateFromReport(body, new Date().toISOString()),
+  });
+  if (!outcome.ok) return outcome.response;
+  const { candidate } = outcome.report;
 
   try {
-    await env.APPEAL_QUEUE.put(candidateKey(report.candidate), serialiseCandidate(report.candidate), {
+    await env.APPEAL_QUEUE.put(candidateKey(candidate), serialiseCandidate(candidate), {
       httpMetadata: { contentType: "application/json" },
     });
   } catch {
@@ -56,5 +49,5 @@ export async function handleAppeal(request: Request, env: Env): Promise<Response
     return json(500, { error: "Could not record that Appeal." });
   }
 
-  return json(201, { word: report.candidate.word });
+  return json(201, { word: candidate.word });
 }

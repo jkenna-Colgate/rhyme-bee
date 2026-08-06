@@ -131,8 +131,6 @@ export interface PullSelection {
   added: SupplementCandidate[];
   /** Precisely what to append: JSON Lines the existing queue reader accepts. */
   append: string;
-  /** Objects whose record the queue (or the archive) already holds. */
-  alreadyHeld: number;
   /** Keys whose body held no readable candidate. */
   unreadable: string[];
   /** Keys no record in their own body derives — the format drift #120 fears. */
@@ -158,7 +156,6 @@ export function selectNewCandidates(
   const unreadable: string[] = [];
   const misfiled: string[] = [];
   const seen = new Set(held);
-  let alreadyHeld = 0;
 
   for (const object of objects) {
     const candidates = parseCandidates(object.body);
@@ -172,10 +169,7 @@ export function selectNewCandidates(
 
     for (const candidate of candidates) {
       const key = candidateKey(candidate);
-      if (seen.has(key)) {
-        alreadyHeld++;
-        continue;
-      }
+      if (seen.has(key)) continue;
       seen.add(key);
       added.push(candidate);
     }
@@ -184,7 +178,6 @@ export function selectNewCandidates(
   return {
     added,
     append: added.map(serialiseCandidate).join(""),
-    alreadyHeld,
     unreadable,
     misfiled,
   };

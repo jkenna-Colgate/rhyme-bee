@@ -1,11 +1,15 @@
 /**
- * The bits of HTTP every endpoint on this Worker needs: a JSON reply, and a
- * request body read under a cap.
+ * The bits of HTTP every endpoint on this Worker needs: a JSON reply, a
+ * request body read under a cap, and the envelope that reads, parses and
+ * validates a POST body — refuse anything but POST, refuse an oversize body,
+ * refuse unparseable JSON, then hand the parsed value to the route's own
+ * validator.
  *
  * They live together rather than in one route because the cap in particular is
  * security-relevant and subtle, and a second copy-pasted copy is a second thing
- * to get wrong. Each route chooses its own limit — an Appeal is six short
- * fields, a note is prose — but they count bytes the same way.
+ * to get wrong. Each route chooses its own limit and its own validator — an
+ * Appeal is six short fields, a note is prose — but the sequence around them,
+ * and the way bytes are counted, is the same for both.
  */
 
 export function json(
@@ -59,4 +63,57 @@ export async function readCappedBody(
     at += chunk.byteLength;
   }
   return new TextDecoder().decode(body);
+}
+
+/** A validation failure, structurally — what every route's own `Validated<Key, T>` refusal looks like. */
+interface Refused {
+  ok: false;
+  error: string;
+}
+
+/** The wording a route supplies for each way `readReport` can refuse a request. */
+export interface ReportMessages {
+  /** Answers a non-POST request, e.g. `"Send an Appeal with POST."` */
+  method: string;
+  /** Answers a body over the cap, e.g. `"That report is too large."` */
+  tooLarge: string;
+  /** Answers a body that is not valid JSON, e.g. `"That report is not JSON."` */
+  notJson: string;
+}
+
+/**
+ * Read, parse and validate a POST body: reject anything but POST, read the
+ * body under `maxBytes`, parse it as JSON, then hand the parsed value to
+ * `validate`. This is the sequence `appealRoute.ts` and `feedbackRoute.ts`
+ * both repeated verbatim before #122 — what moves here is that sequence, not
+ * the decisions either route makes with it. Each route still supplies its own
+ * cap, its own validator and its own wording for what went wrong.
+ *
+ * Returns the validated report, or the `Response` the route should return as
+ * it is — a refusal already has its status and message chosen, so the caller
+ * never re-decides one.
+ */
+export async function readReport<Report extends { ok: true } | Refused>(
+  request: Request,
+  config: ReportMessages & { maxBytes: number; validate: (body: unknown) => Report },
+): Promise<{ ok: true; report: Exclude<Report, Refused> } | { ok: false; response: Response }> {
+  if (request.method !== "POST") {
+    return { ok: false, response: json(405, { error: config.method }, { Allow: "POST" }) };
+  }
+
+  const body = await readCappedBody(request, config.maxBytes);
+  if (body === null) return { ok: false, response: json(413, { error: config.tooLarge }) };
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    return { ok: false, response: json(400, { error: config.notJson }) };
+  }
+
+  const result = config.validate(parsed);
+  if (!result.ok) {
+    return { ok: false, response: json(400, { error: (result as Refused).error }) };
+  }
+  return { ok: true, report: result as Exclude<Report, Refused> };
 }

@@ -23,6 +23,7 @@
  */
 
 import { normaliseWord } from "./cmudict.ts";
+import { hasOnlyFields, refuse, type Validated } from "./report.ts";
 import { REJECTION_MESSAGE, type RejectionReason } from "./verdict.ts";
 
 export interface SupplementCandidate {
@@ -102,13 +103,11 @@ const MAX_RESPELLING_LENGTH = 120;
 /**
  * The outcome of reading an untrusted report: either a whole candidate or a
  * refusal. There is deliberately no third state — a caller cannot get half a
- * record out of this, so a refusal can never be half-written.
+ * record out of this, so a refusal can never be half-written. Shares its
+ * shape with `NoteReport` (`web/src/feedback/feedbackIssue.ts`) via `Validated`
+ * (`./report.ts`); only the fields of a candidate are specific to this module.
  */
-export type CandidateReport =
-  | { ok: true; candidate: SupplementCandidate }
-  | { ok: false; error: string };
-
-const refuse = (error: string): CandidateReport => ({ ok: false, error });
+export type CandidateReport = Validated<"candidate", SupplementCandidate>;
 
 /**
  * Coerce an untrusted report body into a candidate, or refuse it.
@@ -134,9 +133,7 @@ export function candidateFromReport(body: unknown, timestamp: string): Candidate
   }
   const report = body as Record<string, unknown>;
 
-  for (const field of Object.keys(report)) {
-    if (!REPORT_FIELDS.has(field)) return refuse("Unrecognised field in report.");
-  }
+  if (!hasOnlyFields(report, REPORT_FIELDS)) return refuse("Unrecognised field in report.");
 
   if (typeof report.word !== "string") return refuse("A word is required.");
   const word = normaliseWord(report.word);
