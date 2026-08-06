@@ -39,7 +39,7 @@ import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession, type OpeningPuzzle } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
 
-/** The unscored first-run Puzzle is always seeded with `ate` (CONTEXT.md). */
+/** The Tutorial, the first-run Puzzle, is always seeded with `ate` (CONTEXT.md). */
 const TUTORIAL_SEED = "ate";
 
 /**
@@ -70,8 +70,11 @@ function openingPuzzle(
 ): OpeningPuzzle {
   // A first ever visit gets the Tutorial whatever the schedule says: it exists to
   // teach that the game is about sound and not spelling, and that lesson has to
-  // land before the first real Puzzle. It carries no date, so it is unscored and
-  // never filed under the day — the player still gets today's Puzzle next visit.
+  // land before the first real Puzzle. It carries no date, so it is *unpersisted*
+  // — never filed under the day, and the player still meets today's Puzzle after
+  // it. Not unscored: Score and Rank render on the Tutorial exactly as they do on
+  // a scheduled Puzzle, though CONTEXT.md calls the Tutorial unscored. Whether the
+  // code or the glossary should give way is #125.
   if (firstVisit) return { date: null, seed: TUTORIAL_SEED };
   const date = localCalendarDate();
   const scheduled = seedForDate(SCHEDULE, date);
