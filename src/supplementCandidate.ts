@@ -1,6 +1,6 @@
 /**
  * A play-testing candidate for the pronunciation supplement (ADR-0009): a
- * Submission a player flagged mid-play as *should have counted as an Answer*,
+ * Submission a player Appealed mid-play as *should have counted as an Answer*,
  * captured with the context a judge needs to act on it later. Capture only
  * records; the judging — is this a real word, an add or a stress correction,
  * what reading — happens on a later run against the queue.
@@ -12,7 +12,7 @@
  * Two capture paths write the same record. In dev it is a button → the dev
  * server, appending to `data/supplement-candidates.jsonl` (a scratch file,
  * gitignored with the rest of `data/`). Deployed it is a button → a route on the
- * Worker, writing one R2 object per flag. Both reach a queue of JSON Lines,
+ * Worker, writing one R2 object per Appeal. Both reach a queue of JSON Lines,
  * which is why `serialiseCandidate` is the serialisation on both paths and why
  * the pull-down that reassembles the objects gets a queue `parseCandidates`
  * already reads.
@@ -39,7 +39,7 @@ export interface SupplementCandidate {
    * the judge can see which stress it must correct. Null for the other reasons.
    */
   engineRespelling: string | null;
-  /** When it was flagged (ISO 8601). */
+  /** When the Appeal was raised (ISO 8601). */
   timestamp: string;
 }
 
@@ -74,7 +74,7 @@ export function parseCandidates(text: string): SupplementCandidate[] {
 /**
  * The largest report body the deployed endpoint will read, in bytes. A candidate
  * is six short fields; a kilobyte is generous for the longest word in English
- * flagged against the longest Rhyme Key, and small enough that a body is cheap
+ * Appealed against the longest Rhyme Key, and small enough that a body is cheap
  * to refuse.
  */
 export const MAX_REPORT_BYTES = 1024;
@@ -124,9 +124,9 @@ const refuse = (error: string): CandidateReport => ({ ok: false, error });
  * by construction (ADR-0005): adding a reason to the closed set cannot compile
  * without extending the table, and this validation follows it for free.
  *
- * The timestamp is the caller's, never the sender's — capture owns when a flag
- * arrived, and a client that could name it could scatter records across the
- * queue's ordering.
+ * The timestamp is the caller's, never the sender's — capture owns when an
+ * Appeal arrived, and a client that could name it could scatter records across
+ * the queue's ordering.
  */
 export function candidateFromReport(body: unknown, timestamp: string): CandidateReport {
   if (typeof body !== "object" || body === null || Array.isArray(body)) {
@@ -176,27 +176,29 @@ export function candidateFromReport(body: unknown, timestamp: string): Candidate
 // --- Object storage ----------------------------------------------------------
 
 /**
- * The prefix every flagged word is written under in object storage, so the
+ * The prefix every Appealed word is written under in object storage, so the
  * pull-down can list the queue without meeting anything else in the bucket.
+ * The prefix itself is the pre-existing object key format and is unchanged by
+ * the Appeal rename, so anything already in the bucket still pulls down.
  */
 export const CANDIDATE_KEY_PREFIX = "flags/";
 
 /**
- * The object key one flagged word is stored under:
+ * The object key one Appealed word is stored under:
  *
  *     flags/<timestamp>-<word>.json
  *
  * where `<timestamp>` is the record's ISO 8601 instant with `:` and `.` rewritten
  * to `-`, e.g. `flags/2026-08-05T19-00-00-000Z-airburst.json`.
  *
- * One object per flag rather than one appended file: two players flagging in the
- * same second would race on a read-modify-write and one report would vanish
+ * One object per Appeal rather than one appended file: two players Appealing in
+ * the same second would race on a read-modify-write and one report would vanish
  * silently. The timestamp leads so that a plain lexicographic listing is also
  * chronological, and the word follows so a listing is readable without opening
  * anything. The punctuation is rewritten because the pull-down writes these keys
  * to a filesystem, and `:` is not a legal filename character on Windows.
  *
- * Two flags of the same word in the same millisecond collide, and the second
+ * Two Appeals of the same word in the same millisecond collide, and the second
  * overwrites the first with an identical record — a duplicate lost, never a
  * distinct report.
  */

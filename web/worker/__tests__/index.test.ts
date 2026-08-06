@@ -17,7 +17,7 @@ function envServing(asset: string) {
         return new Response(asset);
       },
     },
-    FLAG_QUEUE: { put: async () => undefined },
+    APPEAL_QUEUE: { put: async () => undefined },
     ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
     GITHUB_ISSUE_TOKEN: "github_pat_0xdeadbeef",
   } satisfies Env;
@@ -40,7 +40,7 @@ describe("the deployed Worker", () => {
     expect(asked).toEqual(["/", "/index.html", "/index.json", "/assets/main.js"]);
   });
 
-  it("routes the flag path to its own handler instead", async () => {
+  it("routes the appeal path to its own handler instead", async () => {
     const { env, asked } = envServing("the game");
     const response = await worker.fetch(
       new Request(url("/api/supplement-candidate"), {

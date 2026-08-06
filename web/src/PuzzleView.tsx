@@ -33,7 +33,7 @@ import scheduleArtifact from "../../data/schedule.json";
 import { localCalendarDate, parseSchedule, seedForDate } from "../../src/schedule.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
-import { FLAG_PATH } from "./endpoints.ts";
+import { APPEAL_PATH } from "./endpoints.ts";
 import { isFirstVisit, markVisited } from "./firstVisit.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession, type OpeningPuzzle, type PuzzleKind } from "./usePuzzleSession.ts";
@@ -728,11 +728,11 @@ function ShouldCountButton({
 }) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  async function flag() {
+  async function appeal() {
     if (status === "sending" || status === "sent") return;
     setStatus("sending");
     try {
-      const res = await fetch(FLAG_PATH, {
+      const res = await fetch(APPEAL_PATH, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -751,7 +751,7 @@ function ShouldCountButton({
 
   if (status === "sent") {
     return (
-      <span className="feedback__flagged" role="status" aria-live="polite">
+      <span className="feedback__appealed" role="status" aria-live="polite">
         ✓ thanks — sent
       </span>
     );
@@ -760,8 +760,8 @@ function ShouldCountButton({
   return (
     <button
       type="button"
-      className="feedback__flag"
-      onClick={flag}
+      className="feedback__appeal"
+      onClick={appeal}
       disabled={status === "sending"}
       title="Tell us this word should have counted"
     >

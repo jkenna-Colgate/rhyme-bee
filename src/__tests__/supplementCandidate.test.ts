@@ -99,7 +99,7 @@ describe("reading an untrusted report", () => {
     expect(candidateFromReport({ ...report, note: "hello" }, TIMESTAMP).ok).toBe(false);
   });
 
-  it("refuses a timestamp from the sender — capture owns when a flag arrived", () => {
+  it("refuses a timestamp from the sender — capture owns when an Appeal arrived", () => {
     expect(candidateFromReport({ ...report, timestamp: TIMESTAMP }, TIMESTAMP).ok).toBe(false);
   });
 
@@ -115,7 +115,7 @@ describe("reading an untrusted report", () => {
   });
 });
 
-describe("the object key one flag is stored under", () => {
+describe("the object key one Appeal is stored under", () => {
   it("is the timestamp then the word, under the queue's prefix", () => {
     expect(candidateKey({ ...candidate, timestamp: TIMESTAMP })).toBe(
       "flags/2026-08-05T19-00-00-000Z-airburst.json",

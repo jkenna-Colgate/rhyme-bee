@@ -10,7 +10,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { R2Credentials } from "../flagPull.ts";
+import type { R2Credentials } from "../appealPull.ts";
 import { parseListing, signGet, uriEncode } from "../r2Bucket.ts";
 
 const credentials: R2Credentials = {

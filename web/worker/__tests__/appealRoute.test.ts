@@ -1,14 +1,14 @@
 /**
- * The deployed flag endpoint. The interesting decisions live in the pure module
- * and are tested there; what is tested here is the transport around them — that
- * a good report reaches the bucket in the shape the pull-down expects, that a
- * refused one never touches it at all, and that nothing about the environment
- * leaks out in a response.
+ * The deployed Appeal endpoint. The interesting decisions live in the pure
+ * module and are tested there; what is tested here is the transport around
+ * them — that a good report reaches the bucket in the shape the pull-down
+ * expects, that a refused one never touches it at all, and that nothing about
+ * the environment leaks out in a response.
  */
 
 import { describe, expect, it } from "vitest";
 import { parseCandidates } from "../../../src/supplementCandidate.ts";
-import { handleFlag } from "../flagRoute.ts";
+import { handleAppeal } from "../appealRoute.ts";
 import type { Env } from "../env.ts";
 
 interface Written {
@@ -21,7 +21,7 @@ function bucket(onPut?: () => never) {
   const writes: Written[] = [];
   const env = {
     ASSETS: { fetch: async () => new Response("the game") },
-    FLAG_QUEUE: {
+    APPEAL_QUEUE: {
       put: async (key: string, value: string) => {
         onPut?.();
         writes.push({ key, value });
@@ -51,9 +51,9 @@ function post(body: unknown, headers: Record<string, string> = {}): Request {
 }
 
 describe("the should-have-counted endpoint", () => {
-  it("writes one object per flag, keyed by timestamp and word", async () => {
+  it("writes one object per Appeal, keyed by timestamp and word", async () => {
     const { env, writes } = bucket();
-    const response = await handleFlag(post(report), env);
+    const response = await handleAppeal(post(report), env);
 
     expect(response.status).toBe(201);
     await expect(response.json()).resolves.toEqual({ word: "airburst" });
@@ -63,7 +63,7 @@ describe("the should-have-counted endpoint", () => {
 
   it("stores the record in the serialisation the judge already reads", async () => {
     const { env, writes } = bucket();
-    await handleFlag(post({ ...report, reason: "does-not-rhyme", engineRespelling: "AIR-burst" }), env);
+    await handleAppeal(post({ ...report, reason: "does-not-rhyme", engineRespelling: "AIR-burst" }), env);
 
     expect(parseCandidates(writes[0]!.value)).toEqual([
       {
@@ -85,7 +85,7 @@ describe("the should-have-counted endpoint", () => {
       { ...report, surpriseField: true },
     ]) {
       const { env, writes } = bucket();
-      const response = await handleFlag(post(bad), env);
+      const response = await handleAppeal(post(bad), env);
       expect(response.status).toBe(400);
       expect(writes).toEqual([]);
     }
@@ -93,7 +93,7 @@ describe("the should-have-counted endpoint", () => {
 
   it("refuses a body over the cap before reading it, and writes nothing", async () => {
     const { env, writes } = bucket();
-    const response = await handleFlag(post({ ...report, word: "a".repeat(4000) }), env);
+    const response = await handleAppeal(post({ ...report, word: "a".repeat(4000) }), env);
 
     expect(response.status).toBe(413);
     expect(writes).toEqual([]);
@@ -103,20 +103,20 @@ describe("the should-have-counted endpoint", () => {
     const { env, writes } = bucket();
     const request = post({ ...report, word: "a".repeat(4000) }, { "Content-Length": "42" });
 
-    expect((await handleFlag(request, env)).status).toBe(413);
+    expect((await handleAppeal(request, env)).status).toBe(413);
     expect(writes).toEqual([]);
   });
 
   it("refuses a body that is not JSON, and writes nothing", async () => {
     const { env, writes } = bucket();
-    expect((await handleFlag(post("{not json"), env)).status).toBe(400);
+    expect((await handleAppeal(post("{not json"), env)).status).toBe(400);
     expect(writes).toEqual([]);
   });
 
   it("answers anything but POST with a method refusal", async () => {
     const { env } = bucket();
     const request = new Request("https://example.test/api/supplement-candidate");
-    const response = await handleFlag(request, env);
+    const response = await handleAppeal(request, env);
 
     expect(response.status).toBe(405);
     expect(response.headers.get("Allow")).toBe("POST");
@@ -126,7 +126,7 @@ describe("the should-have-counted endpoint", () => {
     const { env } = bucket(() => {
       throw new Error("R2 PUT failed for bucket rhyme-bee-flags: token 0xdeadbeef");
     });
-    const response = await handleFlag(post(report), env);
+    const response = await handleAppeal(post(report), env);
 
     expect(response.status).toBe(500);
     const body = JSON.stringify(await response.json());

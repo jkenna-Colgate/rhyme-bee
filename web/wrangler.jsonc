@@ -42,12 +42,12 @@
     "binding": "ASSETS"
   },
 
-  // Where a should-have-counted flag is written, one object per flag (#119).
+  // Where a should-have-counted Appeal is written, one object per Appeal (#119).
   // A binding, not an access key: the Worker is handed the bucket itself, so
   // there is no credential anywhere on the write path.
   "r2_buckets": [
     {
-      "binding": "FLAG_QUEUE",
+      "binding": "APPEAL_QUEUE",
       "bucket_name": "rhyme-bee-flags"
     }
   ],

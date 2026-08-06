@@ -26,9 +26,9 @@ import {
 import { json, readCappedBody } from "./http.ts";
 import type { Env } from "./env.ts";
 
-export async function handleFlag(request: Request, env: Env): Promise<Response> {
+export async function handleAppeal(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") {
-    return json(405, { error: "Send a flag with POST." }, { Allow: "POST" });
+    return json(405, { error: "Send an Appeal with POST." }, { Allow: "POST" });
   }
 
   const body = await readCappedBody(request, MAX_REPORT_BYTES);
@@ -47,13 +47,13 @@ export async function handleFlag(request: Request, env: Env): Promise<Response> 
   if (!report.ok) return json(400, { error: report.error });
 
   try {
-    await env.FLAG_QUEUE.put(candidateKey(report.candidate), serialiseCandidate(report.candidate), {
+    await env.APPEAL_QUEUE.put(candidateKey(report.candidate), serialiseCandidate(report.candidate), {
       httpMetadata: { contentType: "application/json" },
     });
   } catch {
     // Whatever R2 said stays here. A caught error can carry a bucket name, an
     // account id or a signed URL, and none of that belongs in a public response.
-    return json(500, { error: "Could not record that flag." });
+    return json(500, { error: "Could not record that Appeal." });
   }
 
   return json(201, { word: report.candidate.word });

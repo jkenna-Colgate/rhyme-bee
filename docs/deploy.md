@@ -9,7 +9,7 @@ browser, so the deploy is a file upload with a routing table attached — see
 |---|---|
 | Worker | `bramble-bee` |
 | Public URL | `https://bramble-bee.jackkenna8.workers.dev` |
-| R2 binding → bucket | `FLAG_QUEUE` → `rhyme-bee-flags` |
+| R2 binding → bucket | `APPEAL_QUEUE` → `rhyme-bee-flags` |
 | Worker secret | `GITHUB_ISSUE_TOKEN` |
 | Config | `web/wrangler.jsonc`, committed |
 
@@ -42,9 +42,9 @@ without uploading it, `npm run --prefix web deploy:dry-run`.
    first time someone files a note. Re-running overwrites, so recovery is doing
    it again properly.
 3. `credentials.env` at the repo root, holding the read-only R2 token for
-   `npm run flags:pull`. Git-ignored, and it stays that way.
+   `npm run appeals:pull`. Git-ignored, and it stays that way.
 
-The `FLAG_QUEUE` binding does not exist until the first deploy creates it. The
+The `APPEAL_QUEUE` binding does not exist until the first deploy creates it. The
 Worker's settings page showing nothing beforehand is expected, not a fault.
 
 ### What is not done, deliberately
@@ -89,10 +89,10 @@ the deploy by default instead of having to be remembered and excluded.
 ## The daily refine loop
 
 The playtest's whole point is that a false rejection gets fixed while people are
-still playing. Once a day, or whenever the flags look worth a look:
+still playing. Once a day, or whenever the Appeals look worth a look:
 
 ```
-npm run flags:pull            # 1. bring down what players flagged (#120)
+npm run appeals:pull          # 1. bring down what players Appealed (#120)
 npm run supplement:candidates # 2. judge the batch into data/supplement.dict
 npm run deploy                # 3. rebuild the index and ship it
 ```
