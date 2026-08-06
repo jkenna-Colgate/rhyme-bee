@@ -20,6 +20,20 @@ Decisions already made live in `docs/adr/`. ADR-0001 and ADR-0003 in particular
 were reversed mid-design — read the rejected options before proposing
 alternatives.
 
+## Testing
+
+**Worker routes are tested.** The tickets that introduced them called transport
+untested by convention; three separate agents wrote route tests anyway, so the
+convention lost and the tests stay. `web/worker/__tests__/` covers method
+handling, the body cap and the refusal path per route. Validation and
+adjudication are pure modules and are tested apart from the transport around
+them.
+
+`vitest.config.ts` exists for one exclusion: `.claude/worktrees/`, where agent
+checkouts keep their own copy of every test file. Without it a bare `npm test`
+walks into them and reports several times the real suite — and passes, which is
+the dangerous direction to be wrong in. The real suite is 40 files.
+
 ## Context hygiene
 
 Sessions here run out of room on tool output, not on documentation. Four rules,
