@@ -1,6 +1,6 @@
 {
-  "generated": "2026-08-04",
-  "startDate": "2026-08-10",
+  "generated": "2026-08-06",
+  "startDate": "2026-08-03",
   "band": {
     "min": 20,
     "max": 120
@@ -61,7 +61,7 @@
   "note": "Reviewed artifact (ADR-0012). Edit by hand; do not regenerate.",
   "days": [
     {
-      "date": "2026-08-10",
+      "date": "2026-08-03",
       "weekday": "Mon",
       "week": 1,
       "seed": "lopsided",
@@ -70,7 +70,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-08-11",
+      "date": "2026-08-04",
       "weekday": "Tue",
       "week": 1,
       "seed": "boulder",
@@ -79,7 +79,7 @@
       "difficulty": 0.0383
     },
     {
-      "date": "2026-08-12",
+      "date": "2026-08-05",
       "weekday": "Wed",
       "week": 1,
       "seed": "fake",
@@ -88,7 +88,7 @@
       "difficulty": 0.0647
     },
     {
-      "date": "2026-08-13",
+      "date": "2026-08-06",
       "weekday": "Thu",
       "week": 1,
       "seed": "cage",
@@ -97,7 +97,7 @@
       "difficulty": 0.1092
     },
     {
-      "date": "2026-08-14",
+      "date": "2026-08-07",
       "weekday": "Fri",
       "week": 1,
       "seed": "bust",
@@ -106,7 +106,7 @@
       "difficulty": 0.1255
     },
     {
-      "date": "2026-08-15",
+      "date": "2026-08-08",
       "weekday": "Sat",
       "week": 1,
       "seed": "centimeter",
@@ -115,7 +115,7 @@
       "difficulty": 0.159
     },
     {
-      "date": "2026-08-16",
+      "date": "2026-08-09",
       "weekday": "Sun",
       "week": 1,
       "seed": "mayor",
@@ -124,7 +124,7 @@
       "difficulty": 0.2898
     },
     {
-      "date": "2026-08-17",
+      "date": "2026-08-10",
       "weekday": "Mon",
       "week": 2,
       "seed": "beard",
@@ -133,7 +133,7 @@
       "difficulty": 0.0315
     },
     {
-      "date": "2026-08-18",
+      "date": "2026-08-11",
       "weekday": "Tue",
       "week": 2,
       "seed": "shellshocked",
@@ -142,7 +142,7 @@
       "difficulty": 0.037
     },
     {
-      "date": "2026-08-19",
+      "date": "2026-08-12",
       "weekday": "Wed",
       "week": 2,
       "seed": "blame",
@@ -151,7 +151,7 @@
       "difficulty": 0.0847
     },
     {
-      "date": "2026-08-20",
+      "date": "2026-08-13",
       "weekday": "Thu",
       "week": 2,
       "seed": "slept",
@@ -160,7 +160,7 @@
       "difficulty": 0.1
     },
     {
-      "date": "2026-08-21",
+      "date": "2026-08-14",
       "weekday": "Fri",
       "week": 2,
       "seed": "wall",
@@ -169,7 +169,7 @@
       "difficulty": 0.1409
     },
     {
-      "date": "2026-08-22",
+      "date": "2026-08-15",
       "weekday": "Sat",
       "week": 2,
       "seed": "idiotic",
@@ -178,7 +178,7 @@
       "difficulty": 0.1608
     },
     {
-      "date": "2026-08-23",
+      "date": "2026-08-16",
       "weekday": "Sun",
       "week": 2,
       "seed": "horse",
@@ -187,7 +187,7 @@
       "difficulty": 0.2063
     },
     {
-      "date": "2026-08-24",
+      "date": "2026-08-17",
       "weekday": "Mon",
       "week": 3,
       "seed": "sentimental",
@@ -196,7 +196,7 @@
       "difficulty": 0.0304
     },
     {
-      "date": "2026-08-25",
+      "date": "2026-08-18",
       "weekday": "Tue",
       "week": 3,
       "seed": "taxpaying",
@@ -205,7 +205,7 @@
       "difficulty": 0.0517
     },
     {
-      "date": "2026-08-26",
+      "date": "2026-08-19",
       "weekday": "Wed",
       "week": 3,
       "seed": "landlord",
@@ -214,7 +214,7 @@
       "difficulty": 0.0589
     },
     {
-      "date": "2026-08-27",
+      "date": "2026-08-20",
       "weekday": "Thu",
       "week": 3,
       "seed": "import",
@@ -223,7 +223,7 @@
       "difficulty": 0.1011
     },
     {
-      "date": "2026-08-28",
+      "date": "2026-08-21",
       "weekday": "Fri",
       "week": 3,
       "seed": "pornography",
@@ -232,7 +232,7 @@
       "difficulty": 0.1315
     },
     {
-      "date": "2026-08-29",
+      "date": "2026-08-22",
       "weekday": "Sat",
       "week": 3,
       "seed": "grasshopper",
@@ -241,7 +241,7 @@
       "difficulty": 0.1617
     },
     {
-      "date": "2026-08-30",
+      "date": "2026-08-23",
       "weekday": "Sun",
       "week": 3,
       "seed": "commander",
@@ -250,7 +250,7 @@
       "difficulty": 0.2627
     },
     {
-      "date": "2026-08-31",
+      "date": "2026-08-24",
       "weekday": "Mon",
       "week": 4,
       "seed": "laird",
@@ -259,7 +259,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-09-01",
+      "date": "2026-08-25",
       "weekday": "Tue",
       "week": 4,
       "seed": "booze",
@@ -268,7 +268,7 @@
       "difficulty": 0.0433
     },
     {
-      "date": "2026-09-02",
+      "date": "2026-08-26",
       "weekday": "Wed",
       "week": 4,
       "seed": "sprint",
@@ -277,7 +277,7 @@
       "difficulty": 0.0828
     },
     {
-      "date": "2026-09-03",
+      "date": "2026-08-27",
       "weekday": "Thu",
       "week": 4,
       "seed": "idealistic",
@@ -286,7 +286,7 @@
       "difficulty": 0.092
     },
     {
-      "date": "2026-09-04",
+      "date": "2026-08-28",
       "weekday": "Fri",
       "week": 4,
       "seed": "smallpox",
@@ -295,7 +295,7 @@
       "difficulty": 0.135
     },
     {
-      "date": "2026-09-05",
+      "date": "2026-08-29",
       "weekday": "Sat",
       "week": 4,
       "seed": "cheerleader",
@@ -304,7 +304,7 @@
       "difficulty": 0.1731
     },
     {
-      "date": "2026-09-06",
+      "date": "2026-08-30",
       "weekday": "Sun",
       "week": 4,
       "seed": "him",
@@ -313,7 +313,7 @@
       "difficulty": 0.1959
     },
     {
-      "date": "2026-09-07",
+      "date": "2026-08-31",
       "weekday": "Mon",
       "week": 5,
       "seed": "housewares",
@@ -322,7 +322,7 @@
       "difficulty": 0.0171
     },
     {
-      "date": "2026-09-08",
+      "date": "2026-09-01",
       "weekday": "Tue",
       "week": 5,
       "seed": "ground",
@@ -331,7 +331,7 @@
       "difficulty": 0.0437
     },
     {
-      "date": "2026-09-09",
+      "date": "2026-09-02",
       "weekday": "Wed",
       "week": 5,
       "seed": "noon",
@@ -340,7 +340,7 @@
       "difficulty": 0.0693
     },
     {
-      "date": "2026-09-10",
+      "date": "2026-09-03",
       "weekday": "Thu",
       "week": 5,
       "seed": "toothpaste",
@@ -349,7 +349,7 @@
       "difficulty": 0.102
     },
     {
-      "date": "2026-09-11",
+      "date": "2026-09-04",
       "weekday": "Fri",
       "week": 5,
       "seed": "male",
@@ -358,7 +358,7 @@
       "difficulty": 0.1292
     },
     {
-      "date": "2026-09-12",
+      "date": "2026-09-05",
       "weekday": "Sat",
       "week": 5,
       "seed": "base",
@@ -367,7 +367,7 @@
       "difficulty": 0.1875
     },
     {
-      "date": "2026-09-13",
+      "date": "2026-09-06",
       "weekday": "Sun",
       "week": 5,
       "seed": "water",
@@ -376,7 +376,7 @@
       "difficulty": 0.2222
     },
     {
-      "date": "2026-09-14",
+      "date": "2026-09-07",
       "weekday": "Mon",
       "week": 6,
       "seed": "wild",
@@ -385,7 +385,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-09-15",
+      "date": "2026-09-08",
       "weekday": "Tue",
       "week": 6,
       "seed": "win",
@@ -394,7 +394,7 @@
       "difficulty": 0.0415
     },
     {
-      "date": "2026-09-16",
+      "date": "2026-09-09",
       "weekday": "Wed",
       "week": 6,
       "seed": "tomb",
@@ -403,16 +403,16 @@
       "difficulty": 0.0868
     },
     {
-      "date": "2026-09-17",
+      "date": "2026-09-10",
       "weekday": "Thu",
       "week": 6,
-      "seed": "exclude",
-      "rhymeKey": "UW D",
-      "answerCount": 92,
-      "difficulty": 0.1149
+      "seed": "shoot",
+      "rhymeKey": "UW T",
+      "answerCount": 88,
+      "difficulty": 0.1184
     },
     {
-      "date": "2026-09-18",
+      "date": "2026-09-11",
       "weekday": "Fri",
       "week": 6,
       "seed": "gain",
@@ -421,7 +421,7 @@
       "difficulty": 0.1564
     },
     {
-      "date": "2026-09-19",
+      "date": "2026-09-12",
       "weekday": "Sat",
       "week": 6,
       "seed": "bill",
@@ -430,7 +430,7 @@
       "difficulty": 0.1566
     },
     {
-      "date": "2026-09-20",
+      "date": "2026-09-13",
       "weekday": "Sun",
       "week": 6,
       "seed": "trick",
@@ -439,7 +439,7 @@
       "difficulty": 0.2135
     },
     {
-      "date": "2026-09-21",
+      "date": "2026-09-14",
       "weekday": "Mon",
       "week": 7,
       "seed": "cave",
@@ -448,7 +448,7 @@
       "difficulty": 0.0321
     },
     {
-      "date": "2026-09-22",
+      "date": "2026-09-15",
       "weekday": "Tue",
       "week": 7,
       "seed": "group",
@@ -457,7 +457,7 @@
       "difficulty": 0.0483
     },
     {
-      "date": "2026-09-23",
+      "date": "2026-09-16",
       "weekday": "Wed",
       "week": 7,
       "seed": "suggest",
@@ -466,25 +466,25 @@
       "difficulty": 0.0769
     },
     {
-      "date": "2026-09-24",
+      "date": "2026-09-17",
       "weekday": "Thu",
       "week": 7,
-      "seed": "aircraft",
-      "rhymeKey": "AE F T",
-      "answerCount": 31,
-      "difficulty": 0.1073
+      "seed": "exclude",
+      "rhymeKey": "UW D",
+      "answerCount": 92,
+      "difficulty": 0.1149
     },
     {
-      "date": "2026-09-25",
+      "date": "2026-09-18",
       "weekday": "Fri",
       "week": 7,
-      "seed": "shoot",
-      "rhymeKey": "UW T",
-      "answerCount": 88,
-      "difficulty": 0.1184
+      "seed": "juice",
+      "rhymeKey": "UW S",
+      "answerCount": 38,
+      "difficulty": 0.1535
     },
     {
-      "date": "2026-09-26",
+      "date": "2026-09-19",
       "weekday": "Sat",
       "week": 7,
       "seed": "blur",
@@ -493,7 +493,7 @@
       "difficulty": 0.1698
     },
     {
-      "date": "2026-09-27",
+      "date": "2026-09-20",
       "weekday": "Sun",
       "week": 7,
       "seed": "grid",
@@ -502,7 +502,7 @@
       "difficulty": 0.2672
     },
     {
-      "date": "2026-09-28",
+      "date": "2026-09-21",
       "weekday": "Mon",
       "week": 8,
       "seed": "build",
@@ -511,7 +511,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-09-29",
+      "date": "2026-09-22",
       "weekday": "Tue",
       "week": 8,
       "seed": "storytelling",
@@ -520,7 +520,7 @@
       "difficulty": 0.0456
     },
     {
-      "date": "2026-09-30",
+      "date": "2026-09-23",
       "weekday": "Wed",
       "week": 8,
       "seed": "ghost",
@@ -529,25 +529,25 @@
       "difficulty": 0.069
     },
     {
-      "date": "2026-10-01",
+      "date": "2026-09-24",
       "weekday": "Thu",
       "week": 8,
-      "seed": "microbiologist",
-      "rhymeKey": "AA L AH JH IH S T",
-      "answerCount": 24,
-      "difficulty": 0.0918
+      "seed": "aircraft",
+      "rhymeKey": "AE F T",
+      "answerCount": 31,
+      "difficulty": 0.1073
     },
     {
-      "date": "2026-10-02",
+      "date": "2026-09-25",
       "weekday": "Fri",
       "week": 8,
-      "seed": "juice",
-      "rhymeKey": "UW S",
-      "answerCount": 38,
-      "difficulty": 0.1535
+      "seed": "devastatingly",
+      "rhymeKey": "EY T IH NG L IY",
+      "answerCount": 28,
+      "difficulty": 0.1227
     },
     {
-      "date": "2026-10-03",
+      "date": "2026-09-26",
       "weekday": "Sat",
       "week": 8,
       "seed": "role",
@@ -556,7 +556,7 @@
       "difficulty": 0.1833
     },
     {
-      "date": "2026-10-04",
+      "date": "2026-09-27",
       "weekday": "Sun",
       "week": 8,
       "seed": "jaw",
@@ -565,7 +565,7 @@
       "difficulty": 0.4094
     },
     {
-      "date": "2026-10-05",
+      "date": "2026-09-28",
       "weekday": "Mon",
       "week": 9,
       "seed": "mug",
@@ -574,7 +574,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-10-06",
+      "date": "2026-09-29",
       "weekday": "Tue",
       "week": 9,
       "seed": "klutz",
@@ -583,7 +583,7 @@
       "difficulty": 0.047
     },
     {
-      "date": "2026-10-07",
+      "date": "2026-09-30",
       "weekday": "Wed",
       "week": 9,
       "seed": "delusion",
@@ -592,25 +592,25 @@
       "difficulty": 0.067
     },
     {
-      "date": "2026-10-08",
+      "date": "2026-10-01",
       "weekday": "Thu",
       "week": 9,
-      "seed": "cool",
-      "rhymeKey": "UW AH L",
-      "answerCount": 82,
-      "difficulty": 0.1023
+      "seed": "microbiologist",
+      "rhymeKey": "AA L AH JH IH S T",
+      "answerCount": 24,
+      "difficulty": 0.0918
     },
     {
-      "date": "2026-10-09",
+      "date": "2026-10-02",
       "weekday": "Fri",
       "week": 9,
-      "seed": "devastatingly",
-      "rhymeKey": "EY T IH NG L IY",
+      "seed": "litter",
+      "rhymeKey": "IH T ER",
       "answerCount": 28,
-      "difficulty": 0.1227
+      "difficulty": 0.1261
     },
     {
-      "date": "2026-10-10",
+      "date": "2026-10-03",
       "weekday": "Sat",
       "week": 9,
       "seed": "hut",
@@ -619,7 +619,7 @@
       "difficulty": 0.1628
     },
     {
-      "date": "2026-10-11",
+      "date": "2026-10-04",
       "weekday": "Sun",
       "week": 9,
       "seed": "dish",
@@ -628,7 +628,7 @@
       "difficulty": 0.2303
     },
     {
-      "date": "2026-10-12",
+      "date": "2026-10-05",
       "weekday": "Mon",
       "week": 10,
       "seed": "facility",
@@ -637,7 +637,7 @@
       "difficulty": 0.0282
     },
     {
-      "date": "2026-10-13",
+      "date": "2026-10-06",
       "weekday": "Tue",
       "week": 10,
       "seed": "engineer",
@@ -646,7 +646,7 @@
       "difficulty": 0.0452
     },
     {
-      "date": "2026-10-14",
+      "date": "2026-10-07",
       "weekday": "Wed",
       "week": 10,
       "seed": "mesdames",
@@ -655,7 +655,7 @@
       "difficulty": 0.0804
     },
     {
-      "date": "2026-10-15",
+      "date": "2026-10-08",
       "weekday": "Thu",
       "week": 10,
       "seed": "heart",
@@ -664,16 +664,16 @@
       "difficulty": 0.1111
     },
     {
-      "date": "2026-10-16",
+      "date": "2026-10-09",
       "weekday": "Fri",
       "week": 10,
-      "seed": "litter",
-      "rhymeKey": "IH T ER",
-      "answerCount": 28,
-      "difficulty": 0.1261
+      "seed": "eyebrow",
+      "rhymeKey": "AW",
+      "answerCount": 31,
+      "difficulty": 0.1481
     },
     {
-      "date": "2026-10-17",
+      "date": "2026-10-10",
       "weekday": "Sat",
       "week": 10,
       "seed": "typewriter",
@@ -682,7 +682,7 @@
       "difficulty": 0.1733
     },
     {
-      "date": "2026-10-18",
+      "date": "2026-10-11",
       "weekday": "Sun",
       "week": 10,
       "seed": "oil",
@@ -691,7 +691,7 @@
       "difficulty": 0.2368
     },
     {
-      "date": "2026-10-19",
+      "date": "2026-10-12",
       "weekday": "Mon",
       "week": 11,
       "seed": "seduction",
@@ -700,7 +700,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-10-20",
+      "date": "2026-10-13",
       "weekday": "Tue",
       "week": 11,
       "seed": "sincerity",
@@ -709,7 +709,7 @@
       "difficulty": 0.0513
     },
     {
-      "date": "2026-10-21",
+      "date": "2026-10-14",
       "weekday": "Wed",
       "week": 11,
       "seed": "addict",
@@ -718,7 +718,7 @@
       "difficulty": 0.0553
     },
     {
-      "date": "2026-10-22",
+      "date": "2026-10-15",
       "weekday": "Thu",
       "week": 11,
       "seed": "suck",
@@ -727,16 +727,16 @@
       "difficulty": 0.1087
     },
     {
-      "date": "2026-10-23",
+      "date": "2026-10-16",
       "weekday": "Fri",
       "week": 11,
-      "seed": "eyebrow",
-      "rhymeKey": "AW",
-      "answerCount": 31,
-      "difficulty": 0.1481
+      "seed": "quit",
+      "rhymeKey": "IH T",
+      "answerCount": 59,
+      "difficulty": 0.1226
     },
     {
-      "date": "2026-10-24",
+      "date": "2026-10-17",
       "weekday": "Sat",
       "week": 11,
       "seed": "itch",
@@ -745,7 +745,7 @@
       "difficulty": 0.1894
     },
     {
-      "date": "2026-10-25",
+      "date": "2026-10-18",
       "weekday": "Sun",
       "week": 11,
       "seed": "trainer",
@@ -754,7 +754,7 @@
       "difficulty": 0.2624
     },
     {
-      "date": "2026-10-26",
+      "date": "2026-10-19",
       "weekday": "Mon",
       "week": 12,
       "seed": "fiction",
@@ -763,7 +763,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-10-27",
+      "date": "2026-10-20",
       "weekday": "Tue",
       "week": 12,
       "seed": "corrective",
@@ -772,7 +772,7 @@
       "difficulty": 0.0381
     },
     {
-      "date": "2026-10-28",
+      "date": "2026-10-21",
       "weekday": "Wed",
       "week": 12,
       "seed": "mix",
@@ -781,7 +781,7 @@
       "difficulty": 0.0671
     },
     {
-      "date": "2026-10-29",
+      "date": "2026-10-22",
       "weekday": "Thu",
       "week": 12,
       "seed": "makeup",
@@ -790,16 +790,16 @@
       "difficulty": 0.0948
     },
     {
-      "date": "2026-10-30",
+      "date": "2026-10-23",
       "weekday": "Fri",
       "week": 12,
-      "seed": "quit",
-      "rhymeKey": "IH T",
-      "answerCount": 59,
-      "difficulty": 0.1226
+      "seed": "tough",
+      "rhymeKey": "AH F",
+      "answerCount": 25,
+      "difficulty": 0.1517
     },
     {
-      "date": "2026-10-31",
+      "date": "2026-10-24",
       "weekday": "Sat",
       "week": 12,
       "seed": "junk",
@@ -808,7 +808,7 @@
       "difficulty": 0.1897
     },
     {
-      "date": "2026-11-01",
+      "date": "2026-10-25",
       "weekday": "Sun",
       "week": 12,
       "seed": "tern",
@@ -817,7 +817,7 @@
       "difficulty": 0.2206
     },
     {
-      "date": "2026-11-02",
+      "date": "2026-10-26",
       "weekday": "Mon",
       "week": 13,
       "seed": "playhouse",
@@ -826,7 +826,7 @@
       "difficulty": 0.0231
     },
     {
-      "date": "2026-11-03",
+      "date": "2026-10-27",
       "weekday": "Tue",
       "week": 13,
       "seed": "drum",
@@ -835,7 +835,7 @@
       "difficulty": 0.0417
     },
     {
-      "date": "2026-11-04",
+      "date": "2026-10-28",
       "weekday": "Wed",
       "week": 13,
       "seed": "about",
@@ -844,7 +844,7 @@
       "difficulty": 0.078
     },
     {
-      "date": "2026-11-05",
+      "date": "2026-10-29",
       "weekday": "Thu",
       "week": 13,
       "seed": "cure",
@@ -853,16 +853,16 @@
       "difficulty": 0.0946
     },
     {
-      "date": "2026-11-06",
+      "date": "2026-10-30",
       "weekday": "Fri",
       "week": 13,
-      "seed": "tough",
-      "rhymeKey": "AH F",
-      "answerCount": 25,
-      "difficulty": 0.1517
+      "seed": "ship",
+      "rhymeKey": "IH P",
+      "answerCount": 100,
+      "difficulty": 0.1419
     },
     {
-      "date": "2026-11-07",
+      "date": "2026-10-31",
       "weekday": "Sat",
       "week": 13,
       "seed": "steam",
@@ -871,7 +871,7 @@
       "difficulty": 0.1881
     },
     {
-      "date": "2026-11-08",
+      "date": "2026-11-01",
       "weekday": "Sun",
       "week": 13,
       "seed": "hop",
@@ -880,7 +880,7 @@
       "difficulty": 0.2
     },
     {
-      "date": "2026-11-09",
+      "date": "2026-11-02",
       "weekday": "Mon",
       "week": 14,
       "seed": "grassroots",
@@ -889,7 +889,7 @@
       "difficulty": 0.022
     },
     {
-      "date": "2026-11-10",
+      "date": "2026-11-03",
       "weekday": "Tue",
       "week": 14,
       "seed": "breathtaking",
@@ -898,7 +898,7 @@
       "difficulty": 0.036
     },
     {
-      "date": "2026-11-11",
+      "date": "2026-11-04",
       "weekday": "Wed",
       "week": 14,
       "seed": "notebook",
@@ -907,7 +907,7 @@
       "difficulty": 0.066
     },
     {
-      "date": "2026-11-12",
+      "date": "2026-11-05",
       "weekday": "Thu",
       "week": 14,
       "seed": "meal",
@@ -916,16 +916,16 @@
       "difficulty": 0.0963
     },
     {
-      "date": "2026-11-13",
+      "date": "2026-11-06",
       "weekday": "Fri",
       "week": 14,
-      "seed": "ship",
-      "rhymeKey": "IH P",
-      "answerCount": 100,
-      "difficulty": 0.1419
+      "seed": "compressor",
+      "rhymeKey": "EH S ER",
+      "answerCount": 23,
+      "difficulty": 0.1389
     },
     {
-      "date": "2026-11-14",
+      "date": "2026-11-07",
       "weekday": "Sat",
       "week": 14,
       "seed": "plot",
@@ -934,7 +934,7 @@
       "difficulty": 0.1719
     },
     {
-      "date": "2026-11-15",
+      "date": "2026-11-08",
       "weekday": "Sun",
       "week": 14,
       "seed": "schilling",
@@ -943,7 +943,7 @@
       "difficulty": 0.2266
     },
     {
-      "date": "2026-11-16",
+      "date": "2026-11-09",
       "weekday": "Mon",
       "week": 15,
       "seed": "longstanding",
@@ -952,7 +952,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-11-17",
+      "date": "2026-11-10",
       "weekday": "Tue",
       "week": 15,
       "seed": "bark",
@@ -961,7 +961,7 @@
       "difficulty": 0.0348
     },
     {
-      "date": "2026-11-18",
+      "date": "2026-11-11",
       "weekday": "Wed",
       "week": 15,
       "seed": "sentimental",
@@ -970,7 +970,7 @@
       "difficulty": 0.0795
     },
     {
-      "date": "2026-11-19",
+      "date": "2026-11-12",
       "weekday": "Thu",
       "week": 15,
       "seed": "feet",
@@ -979,16 +979,16 @@
       "difficulty": 0.1041
     },
     {
-      "date": "2026-11-20",
+      "date": "2026-11-13",
       "weekday": "Fri",
       "week": 15,
-      "seed": "compressor",
-      "rhymeKey": "EH S ER",
-      "answerCount": 23,
-      "difficulty": 0.1389
+      "seed": "cool",
+      "rhymeKey": "UW AH L",
+      "answerCount": 88,
+      "difficulty": 0.1479
     },
     {
-      "date": "2026-11-21",
+      "date": "2026-11-14",
       "weekday": "Sat",
       "week": 15,
       "seed": "would",
@@ -997,7 +997,7 @@
       "difficulty": 0.1822
     },
     {
-      "date": "2026-11-22",
+      "date": "2026-11-15",
       "weekday": "Sun",
       "week": 15,
       "seed": "radar",
@@ -1006,7 +1006,7 @@
       "difficulty": 0.2387
     },
     {
-      "date": "2026-11-23",
+      "date": "2026-11-16",
       "weekday": "Mon",
       "week": 16,
       "seed": "arouse",
@@ -1015,7 +1015,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-11-24",
+      "date": "2026-11-17",
       "weekday": "Tue",
       "week": 16,
       "seed": "guard",
@@ -1024,7 +1024,7 @@
       "difficulty": 0.0406
     },
     {
-      "date": "2026-11-25",
+      "date": "2026-11-18",
       "weekday": "Wed",
       "week": 16,
       "seed": "peak",
@@ -1033,7 +1033,7 @@
       "difficulty": 0.0856
     },
     {
-      "date": "2026-11-26",
+      "date": "2026-11-19",
       "weekday": "Thu",
       "week": 16,
       "seed": "sleep",
@@ -1042,7 +1042,7 @@
       "difficulty": 0.099
     },
     {
-      "date": "2026-11-27",
+      "date": "2026-11-20",
       "weekday": "Fri",
       "week": 16,
       "seed": "one",
@@ -1051,7 +1051,7 @@
       "difficulty": 0.1188
     },
     {
-      "date": "2026-11-28",
+      "date": "2026-11-21",
       "weekday": "Sat",
       "week": 16,
       "seed": "cat",
@@ -1060,7 +1060,7 @@
       "difficulty": 0.1798
     },
     {
-      "date": "2026-11-29",
+      "date": "2026-11-22",
       "weekday": "Sun",
       "week": 16,
       "seed": "inspector",
@@ -1069,7 +1069,7 @@
       "difficulty": 0.2217
     },
     {
-      "date": "2026-11-30",
+      "date": "2026-11-23",
       "weekday": "Mon",
       "week": 17,
       "seed": "zounds",
@@ -1078,7 +1078,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-12-01",
+      "date": "2026-11-24",
       "weekday": "Tue",
       "week": 17,
       "seed": "retrospect",
@@ -1087,7 +1087,7 @@
       "difficulty": 0.0333
     },
     {
-      "date": "2026-12-02",
+      "date": "2026-11-25",
       "weekday": "Wed",
       "week": 17,
       "seed": "shortsighted",
@@ -1096,7 +1096,7 @@
       "difficulty": 0.078
     },
     {
-      "date": "2026-12-03",
+      "date": "2026-11-26",
       "weekday": "Thu",
       "week": 17,
       "seed": "triceratops",
@@ -1105,7 +1105,7 @@
       "difficulty": 0.109
     },
     {
-      "date": "2026-12-04",
+      "date": "2026-11-27",
       "weekday": "Fri",
       "week": 17,
       "seed": "sphinx",
@@ -1114,7 +1114,7 @@
       "difficulty": 0.119
     },
     {
-      "date": "2026-12-05",
+      "date": "2026-11-28",
       "weekday": "Sat",
       "week": 17,
       "seed": "cause",
@@ -1123,7 +1123,7 @@
       "difficulty": 0.1762
     },
     {
-      "date": "2026-12-06",
+      "date": "2026-11-29",
       "weekday": "Sun",
       "week": 17,
       "seed": "tripod",
@@ -1132,7 +1132,7 @@
       "difficulty": 0.2669
     },
     {
-      "date": "2026-12-07",
+      "date": "2026-11-30",
       "weekday": "Mon",
       "week": 18,
       "seed": "darjeeling",
@@ -1141,7 +1141,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-12-08",
+      "date": "2026-12-01",
       "weekday": "Tue",
       "week": 18,
       "seed": "town",
@@ -1150,7 +1150,7 @@
       "difficulty": 0.0322
     },
     {
-      "date": "2026-12-09",
+      "date": "2026-12-02",
       "weekday": "Wed",
       "week": 18,
       "seed": "handicap",
@@ -1159,7 +1159,7 @@
       "difficulty": 0.0537
     },
     {
-      "date": "2026-12-10",
+      "date": "2026-12-03",
       "weekday": "Thu",
       "week": 18,
       "seed": "police",
@@ -1168,7 +1168,7 @@
       "difficulty": 0.1176
     },
     {
-      "date": "2026-12-11",
+      "date": "2026-12-04",
       "weekday": "Fri",
       "week": 18,
       "seed": "succeed",
@@ -1177,7 +1177,7 @@
       "difficulty": 0.1469
     },
     {
-      "date": "2026-12-12",
+      "date": "2026-12-05",
       "weekday": "Sat",
       "week": 18,
       "seed": "plank",
@@ -1186,7 +1186,7 @@
       "difficulty": 0.1856
     },
     {
-      "date": "2026-12-13",
+      "date": "2026-12-06",
       "weekday": "Sun",
       "week": 18,
       "seed": "tutorial",
@@ -1195,7 +1195,7 @@
       "difficulty": 0.283
     },
     {
-      "date": "2026-12-14",
+      "date": "2026-12-07",
       "weekday": "Mon",
       "week": 19,
       "seed": "act",
@@ -1204,7 +1204,7 @@
       "difficulty": 0.0211
     },
     {
-      "date": "2026-12-15",
+      "date": "2026-12-08",
       "weekday": "Tue",
       "week": 19,
       "seed": "tracker",
@@ -1213,7 +1213,7 @@
       "difficulty": 0.0503
     },
     {
-      "date": "2026-12-16",
+      "date": "2026-12-09",
       "weekday": "Wed",
       "week": 19,
       "seed": "hog",
@@ -1222,7 +1222,7 @@
       "difficulty": 0.0547
     },
     {
-      "date": "2026-12-17",
+      "date": "2026-12-10",
       "weekday": "Thu",
       "week": 19,
       "seed": "locker",
@@ -1231,7 +1231,7 @@
       "difficulty": 0.1176
     },
     {
-      "date": "2026-12-18",
+      "date": "2026-12-11",
       "weekday": "Fri",
       "week": 19,
       "seed": "unisex",
@@ -1240,7 +1240,7 @@
       "difficulty": 0.1217
     },
     {
-      "date": "2026-12-19",
+      "date": "2026-12-12",
       "weekday": "Sat",
       "week": 19,
       "seed": "bloodletting",
@@ -1249,7 +1249,7 @@
       "difficulty": 0.1846
     },
     {
-      "date": "2026-12-20",
+      "date": "2026-12-13",
       "weekday": "Sun",
       "week": 19,
       "seed": "bomb",
@@ -1258,7 +1258,7 @@
       "difficulty": 0.3488
     },
     {
-      "date": "2026-12-21",
+      "date": "2026-12-14",
       "weekday": "Mon",
       "week": 20,
       "seed": "shortcoming",
@@ -1267,7 +1267,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-12-22",
+      "date": "2026-12-15",
       "weekday": "Tue",
       "week": 20,
       "seed": "beaver",
@@ -1276,7 +1276,7 @@
       "difficulty": 0.0447
     },
     {
-      "date": "2026-12-23",
+      "date": "2026-12-16",
       "weekday": "Wed",
       "week": 20,
       "seed": "grayling",
@@ -1285,7 +1285,7 @@
       "difficulty": 0.0582
     },
     {
-      "date": "2026-12-24",
+      "date": "2026-12-17",
       "weekday": "Thu",
       "week": 20,
       "seed": "broadcast",
@@ -1294,7 +1294,7 @@
       "difficulty": 0.0986
     },
     {
-      "date": "2026-12-25",
+      "date": "2026-12-18",
       "weekday": "Fri",
       "week": 20,
       "seed": "cross",
@@ -1303,7 +1303,7 @@
       "difficulty": 0.1405
     },
     {
-      "date": "2026-12-26",
+      "date": "2026-12-19",
       "weekday": "Sat",
       "week": 20,
       "seed": "joy",
@@ -1312,7 +1312,7 @@
       "difficulty": 0.1595
     },
     {
-      "date": "2026-12-27",
+      "date": "2026-12-20",
       "weekday": "Sun",
       "week": 20,
       "seed": "crayon",
@@ -1321,7 +1321,7 @@
       "difficulty": 0.2683
     },
     {
-      "date": "2026-12-28",
+      "date": "2026-12-21",
       "weekday": "Mon",
       "week": 21,
       "seed": "thirst",
@@ -1330,7 +1330,7 @@
       "difficulty": 0
     },
     {
-      "date": "2026-12-29",
+      "date": "2026-12-22",
       "weekday": "Tue",
       "week": 21,
       "seed": "snob",
@@ -1339,7 +1339,7 @@
       "difficulty": 0.0504
     },
     {
-      "date": "2026-12-30",
+      "date": "2026-12-23",
       "weekday": "Wed",
       "week": 21,
       "seed": "ambition",
@@ -1348,7 +1348,7 @@
       "difficulty": 0.083
     },
     {
-      "date": "2026-12-31",
+      "date": "2026-12-24",
       "weekday": "Thu",
       "week": 21,
       "seed": "wax",
@@ -1357,7 +1357,7 @@
       "difficulty": 0.0926
     },
     {
-      "date": "2027-01-01",
+      "date": "2026-12-25",
       "weekday": "Fri",
       "week": 21,
       "seed": "proud",
@@ -1366,7 +1366,7 @@
       "difficulty": 0.1548
     },
     {
-      "date": "2027-01-02",
+      "date": "2026-12-26",
       "weekday": "Sat",
       "week": 21,
       "seed": "mock",
@@ -1375,7 +1375,7 @@
       "difficulty": 0.195
     },
     {
-      "date": "2027-01-03",
+      "date": "2026-12-27",
       "weekday": "Sun",
       "week": 21,
       "seed": "graph",
@@ -1384,7 +1384,7 @@
       "difficulty": 0.2146
     },
     {
-      "date": "2027-01-04",
+      "date": "2026-12-28",
       "weekday": "Mon",
       "week": 22,
       "seed": "manuscript",
@@ -1393,7 +1393,7 @@
       "difficulty": 0.0296
     },
     {
-      "date": "2027-01-05",
+      "date": "2026-12-29",
       "weekday": "Tue",
       "week": 22,
       "seed": "eclipse",
@@ -1402,7 +1402,7 @@
       "difficulty": 0.0485
     },
     {
-      "date": "2027-01-06",
+      "date": "2026-12-30",
       "weekday": "Wed",
       "week": 22,
       "seed": "bad",
@@ -1411,7 +1411,7 @@
       "difficulty": 0.084
     },
     {
-      "date": "2027-01-07",
+      "date": "2026-12-31",
       "weekday": "Thu",
       "week": 22,
       "seed": "back",
@@ -1420,7 +1420,7 @@
       "difficulty": 0.0992
     },
     {
-      "date": "2027-01-08",
+      "date": "2027-01-01",
       "weekday": "Fri",
       "week": 22,
       "seed": "glass",
@@ -1429,7 +1429,7 @@
       "difficulty": 0.1193
     },
     {
-      "date": "2027-01-09",
+      "date": "2027-01-02",
       "weekday": "Sat",
       "week": 22,
       "seed": "rag",
@@ -1438,7 +1438,7 @@
       "difficulty": 0.1705
     },
     {
-      "date": "2027-01-10",
+      "date": "2027-01-03",
       "weekday": "Sun",
       "week": 22,
       "seed": "kilogram",
@@ -1447,7 +1447,7 @@
       "difficulty": 0.211
     },
     {
-      "date": "2027-01-11",
+      "date": "2027-01-04",
       "weekday": "Mon",
       "week": 23,
       "seed": "obstruct",
@@ -1456,7 +1456,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-01-12",
+      "date": "2027-01-05",
       "weekday": "Tue",
       "week": 23,
       "seed": "diner",
@@ -1465,7 +1465,7 @@
       "difficulty": 0.0462
     },
     {
-      "date": "2027-01-13",
+      "date": "2027-01-06",
       "weekday": "Wed",
       "week": 23,
       "seed": "hospitality",
@@ -1474,7 +1474,7 @@
       "difficulty": 0.0811
     },
     {
-      "date": "2027-01-14",
+      "date": "2027-01-07",
       "weekday": "Thu",
       "week": 23,
       "seed": "plant",
@@ -1483,7 +1483,7 @@
       "difficulty": 0.093
     },
     {
-      "date": "2027-01-15",
+      "date": "2027-01-08",
       "weekday": "Fri",
       "week": 23,
       "seed": "leave",
@@ -1492,7 +1492,7 @@
       "difficulty": 0.1365
     },
     {
-      "date": "2027-01-16",
+      "date": "2027-01-09",
       "weekday": "Sat",
       "week": 23,
       "seed": "man",
@@ -1501,7 +1501,7 @@
       "difficulty": 0.1647
     },
     {
-      "date": "2027-01-17",
+      "date": "2027-01-10",
       "weekday": "Sun",
       "week": 23,
       "seed": "investor",
@@ -1510,7 +1510,7 @@
       "difficulty": 0.3427
     },
     {
-      "date": "2027-01-18",
+      "date": "2027-01-11",
       "weekday": "Mon",
       "week": 24,
       "seed": "master",
@@ -1519,7 +1519,7 @@
       "difficulty": 0.0295
     },
     {
-      "date": "2027-01-19",
+      "date": "2027-01-12",
       "weekday": "Tue",
       "week": 24,
       "seed": "event",
@@ -1528,7 +1528,7 @@
       "difficulty": 0.0483
     },
     {
-      "date": "2027-01-20",
+      "date": "2027-01-13",
       "weekday": "Wed",
       "week": 24,
       "seed": "blitz",
@@ -1537,7 +1537,7 @@
       "difficulty": 0.0556
     },
     {
-      "date": "2027-01-21",
+      "date": "2027-01-14",
       "weekday": "Thu",
       "week": 24,
       "seed": "fanatic",
@@ -1546,7 +1546,7 @@
       "difficulty": 0.1162
     },
     {
-      "date": "2027-01-22",
+      "date": "2027-01-15",
       "weekday": "Fri",
       "week": 24,
       "seed": "payoff",
@@ -1555,7 +1555,7 @@
       "difficulty": 0.1273
     },
     {
-      "date": "2027-01-23",
+      "date": "2027-01-16",
       "weekday": "Sat",
       "week": 24,
       "seed": "deluxe",
@@ -1564,7 +1564,7 @@
       "difficulty": 0.1579
     },
     {
-      "date": "2027-01-24",
+      "date": "2027-01-17",
       "weekday": "Sun",
       "week": 24,
       "seed": "ceremony",
@@ -1573,7 +1573,7 @@
       "difficulty": 0.2834
     },
     {
-      "date": "2027-01-25",
+      "date": "2027-01-18",
       "weekday": "Mon",
       "week": 25,
       "seed": "mind",
@@ -1582,7 +1582,7 @@
       "difficulty": 0.0293
     },
     {
-      "date": "2027-01-26",
+      "date": "2027-01-19",
       "weekday": "Tue",
       "week": 25,
       "seed": "utility",
@@ -1591,7 +1591,7 @@
       "difficulty": 0.0487
     },
     {
-      "date": "2027-01-27",
+      "date": "2027-01-20",
       "weekday": "Wed",
       "week": 25,
       "seed": "expense",
@@ -1600,7 +1600,7 @@
       "difficulty": 0.0645
     },
     {
-      "date": "2027-01-28",
+      "date": "2027-01-21",
       "weekday": "Thu",
       "week": 25,
       "seed": "technological",
@@ -1609,7 +1609,7 @@
       "difficulty": 0.0932
     },
     {
-      "date": "2027-01-29",
+      "date": "2027-01-22",
       "weekday": "Fri",
       "week": 25,
       "seed": "contraction",
@@ -1618,7 +1618,7 @@
       "difficulty": 0.1523
     },
     {
-      "date": "2027-01-30",
+      "date": "2027-01-23",
       "weekday": "Sat",
       "week": 25,
       "seed": "astrology",
@@ -1627,7 +1627,7 @@
       "difficulty": 0.1582
     },
     {
-      "date": "2027-01-31",
+      "date": "2027-01-24",
       "weekday": "Sun",
       "week": 25,
       "seed": "dollar",
@@ -1636,7 +1636,7 @@
       "difficulty": 0.2069
     },
     {
-      "date": "2027-02-01",
+      "date": "2027-01-25",
       "weekday": "Mon",
       "week": 26,
       "seed": "hardwired",
@@ -1645,7 +1645,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-02-02",
+      "date": "2027-01-26",
       "weekday": "Tue",
       "week": 26,
       "seed": "gatekeeper",
@@ -1654,7 +1654,7 @@
       "difficulty": 0.041
     },
     {
-      "date": "2027-02-03",
+      "date": "2027-01-27",
       "weekday": "Wed",
       "week": 26,
       "seed": "band",
@@ -1663,7 +1663,7 @@
       "difficulty": 0.0541
     },
     {
-      "date": "2027-02-04",
+      "date": "2027-01-28",
       "weekday": "Thu",
       "week": 26,
       "seed": "bald",
@@ -1672,7 +1672,7 @@
       "difficulty": 0.0983
     },
     {
-      "date": "2027-02-05",
+      "date": "2027-01-29",
       "weekday": "Fri",
       "week": 26,
       "seed": "link",
@@ -1681,7 +1681,7 @@
       "difficulty": 0.1218
     },
     {
-      "date": "2027-02-06",
+      "date": "2027-01-30",
       "weekday": "Sat",
       "week": 26,
       "seed": "belong",
@@ -1690,7 +1690,7 @@
       "difficulty": 0.1648
     },
     {
-      "date": "2027-02-07",
+      "date": "2027-01-31",
       "weekday": "Sun",
       "week": 26,
       "seed": "list",
@@ -1699,7 +1699,7 @@
       "difficulty": 0.1981
     },
     {
-      "date": "2027-02-08",
+      "date": "2027-02-01",
       "weekday": "Mon",
       "week": 27,
       "seed": "quartz",
@@ -1708,7 +1708,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-02-09",
+      "date": "2027-02-02",
       "weekday": "Tue",
       "week": 27,
       "seed": "ongoing",
@@ -1717,7 +1717,7 @@
       "difficulty": 0.0358
     },
     {
-      "date": "2027-02-10",
+      "date": "2027-02-03",
       "weekday": "Wed",
       "week": 27,
       "seed": "depend",
@@ -1726,7 +1726,7 @@
       "difficulty": 0.0689
     },
     {
-      "date": "2027-02-11",
+      "date": "2027-02-04",
       "weekday": "Thu",
       "week": 27,
       "seed": "tender",
@@ -1735,7 +1735,7 @@
       "difficulty": 0.1092
     },
     {
-      "date": "2027-02-12",
+      "date": "2027-02-05",
       "weekday": "Fri",
       "week": 27,
       "seed": "constitution",
@@ -1744,7 +1744,7 @@
       "difficulty": 0.1205
     },
     {
-      "date": "2027-02-13",
+      "date": "2027-02-06",
       "weekday": "Sat",
       "week": 27,
       "seed": "bronze",
@@ -1753,7 +1753,7 @@
       "difficulty": 0.1843
     },
     {
-      "date": "2027-02-14",
+      "date": "2027-02-07",
       "weekday": "Sun",
       "week": 27,
       "seed": "chronic",
@@ -1762,7 +1762,7 @@
       "difficulty": 0.2638
     },
     {
-      "date": "2027-02-15",
+      "date": "2027-02-08",
       "weekday": "Mon",
       "week": 28,
       "seed": "miniseries",
@@ -1771,7 +1771,7 @@
       "difficulty": 0.0224
     },
     {
-      "date": "2027-02-16",
+      "date": "2027-02-09",
       "weekday": "Tue",
       "week": 28,
       "seed": "highflying",
@@ -1780,7 +1780,7 @@
       "difficulty": 0.0522
     },
     {
-      "date": "2027-02-17",
+      "date": "2027-02-10",
       "weekday": "Wed",
       "week": 28,
       "seed": "upheld",
@@ -1789,7 +1789,7 @@
       "difficulty": 0.084
     },
     {
-      "date": "2027-02-18",
+      "date": "2027-02-11",
       "weekday": "Thu",
       "week": 28,
       "seed": "essentially",
@@ -1798,7 +1798,7 @@
       "difficulty": 0.1149
     },
     {
-      "date": "2027-02-19",
+      "date": "2027-02-12",
       "weekday": "Fri",
       "week": 28,
       "seed": "vicious",
@@ -1807,7 +1807,7 @@
       "difficulty": 0.1532
     },
     {
-      "date": "2027-02-20",
+      "date": "2027-02-13",
       "weekday": "Sat",
       "week": 28,
       "seed": "congrats",
@@ -1816,7 +1816,7 @@
       "difficulty": 0.1734
     },
     {
-      "date": "2027-02-21",
+      "date": "2027-02-14",
       "weekday": "Sun",
       "week": 28,
       "seed": "envelope",
@@ -1825,7 +1825,7 @@
       "difficulty": 0.2075
     },
     {
-      "date": "2027-02-22",
+      "date": "2027-02-15",
       "weekday": "Mon",
       "week": 29,
       "seed": "splendid",
@@ -1834,7 +1834,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-02-23",
+      "date": "2027-02-16",
       "weekday": "Tue",
       "week": 29,
       "seed": "rejection",
@@ -1843,7 +1843,7 @@
       "difficulty": 0.0355
     },
     {
-      "date": "2027-02-24",
+      "date": "2027-02-17",
       "weekday": "Wed",
       "week": 29,
       "seed": "songwriting",
@@ -1852,7 +1852,7 @@
       "difficulty": 0.0636
     },
     {
-      "date": "2027-02-25",
+      "date": "2027-02-18",
       "weekday": "Thu",
       "week": 29,
       "seed": "flash",
@@ -1861,7 +1861,7 @@
       "difficulty": 0.0938
     },
     {
-      "date": "2027-02-26",
+      "date": "2027-02-19",
       "weekday": "Fri",
       "week": 29,
       "seed": "drift",
@@ -1870,7 +1870,7 @@
       "difficulty": 0.1221
     },
     {
-      "date": "2027-02-27",
+      "date": "2027-02-20",
       "weekday": "Sat",
       "week": 29,
       "seed": "humanitarian",
@@ -1879,7 +1879,7 @@
       "difficulty": 0.1733
     },
     {
-      "date": "2027-02-28",
+      "date": "2027-02-21",
       "weekday": "Sun",
       "week": 29,
       "seed": "glucose",
@@ -1888,7 +1888,7 @@
       "difficulty": 0.3953
     },
     {
-      "date": "2027-03-01",
+      "date": "2027-02-22",
       "weekday": "Mon",
       "week": 30,
       "seed": "hoax",
@@ -1897,7 +1897,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-03-02",
+      "date": "2027-02-23",
       "weekday": "Tue",
       "week": 30,
       "seed": "adapt",
@@ -1906,7 +1906,7 @@
       "difficulty": 0.037
     },
     {
-      "date": "2027-03-03",
+      "date": "2027-02-24",
       "weekday": "Wed",
       "week": 30,
       "seed": "crossbones",
@@ -1915,7 +1915,7 @@
       "difficulty": 0.0645
     },
     {
-      "date": "2027-03-04",
+      "date": "2027-02-25",
       "weekday": "Thu",
       "week": 30,
       "seed": "personality",
@@ -1924,7 +1924,7 @@
       "difficulty": 0.0882
     },
     {
-      "date": "2027-03-05",
+      "date": "2027-02-26",
       "weekday": "Fri",
       "week": 30,
       "seed": "session",
@@ -1933,7 +1933,7 @@
       "difficulty": 0.1232
     },
     {
-      "date": "2027-03-06",
+      "date": "2027-02-27",
       "weekday": "Sat",
       "week": 30,
       "seed": "float",
@@ -1942,7 +1942,7 @@
       "difficulty": 0.1792
     },
     {
-      "date": "2027-03-07",
+      "date": "2027-02-28",
       "weekday": "Sun",
       "week": 30,
       "seed": "storm",
@@ -1951,7 +1951,7 @@
       "difficulty": 0.1966
     },
     {
-      "date": "2027-03-08",
+      "date": "2027-03-01",
       "weekday": "Mon",
       "week": 31,
       "seed": "bioengineering",
@@ -1960,7 +1960,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-03-09",
+      "date": "2027-03-02",
       "weekday": "Tue",
       "week": 31,
       "seed": "purifier",
@@ -1969,7 +1969,7 @@
       "difficulty": 0.0534
     },
     {
-      "date": "2027-03-10",
+      "date": "2027-03-03",
       "weekday": "Wed",
       "week": 31,
       "seed": "skirt",
@@ -1978,7 +1978,7 @@
       "difficulty": 0.0608
     },
     {
-      "date": "2027-03-11",
+      "date": "2027-03-04",
       "weekday": "Thu",
       "week": 31,
       "seed": "motel",
@@ -1987,7 +1987,7 @@
       "difficulty": 0.0914
     },
     {
-      "date": "2027-03-12",
+      "date": "2027-03-05",
       "weekday": "Fri",
       "week": 31,
       "seed": "jerk",
@@ -1996,7 +1996,7 @@
       "difficulty": 0.124
     },
     {
-      "date": "2027-03-13",
+      "date": "2027-03-06",
       "weekday": "Sat",
       "week": 31,
       "seed": "crossword",
@@ -2005,7 +2005,7 @@
       "difficulty": 0.1942
     },
     {
-      "date": "2027-03-14",
+      "date": "2027-03-07",
       "weekday": "Sun",
       "week": 31,
       "seed": "worn",
@@ -2014,7 +2014,7 @@
       "difficulty": 0.2733
     },
     {
-      "date": "2027-03-15",
+      "date": "2027-03-08",
       "weekday": "Mon",
       "week": 32,
       "seed": "collapse",
@@ -2023,7 +2023,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-03-16",
+      "date": "2027-03-09",
       "weekday": "Tue",
       "week": 32,
       "seed": "yield",
@@ -2032,7 +2032,7 @@
       "difficulty": 0.0379
     },
     {
-      "date": "2027-03-17",
+      "date": "2027-03-10",
       "weekday": "Wed",
       "week": 32,
       "seed": "confidential",
@@ -2041,7 +2041,7 @@
       "difficulty": 0.0565
     },
     {
-      "date": "2027-03-18",
+      "date": "2027-03-11",
       "weekday": "Thu",
       "week": 32,
       "seed": "synthesizer",
@@ -2050,7 +2050,7 @@
       "difficulty": 0.1158
     },
     {
-      "date": "2027-03-19",
+      "date": "2027-03-12",
       "weekday": "Fri",
       "week": 32,
       "seed": "ice",
@@ -2059,7 +2059,7 @@
       "difficulty": 0.1538
     },
     {
-      "date": "2027-03-20",
+      "date": "2027-03-13",
       "weekday": "Sat",
       "week": 32,
       "seed": "neck",
@@ -2068,7 +2068,7 @@
       "difficulty": 0.1759
     },
     {
-      "date": "2027-03-21",
+      "date": "2027-03-14",
       "weekday": "Sun",
       "week": 32,
       "seed": "swipe",
@@ -2077,7 +2077,7 @@
       "difficulty": 0.2134
     },
     {
-      "date": "2027-03-22",
+      "date": "2027-03-15",
       "weekday": "Mon",
       "week": 33,
       "seed": "hertz",
@@ -2086,7 +2086,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-03-23",
+      "date": "2027-03-16",
       "weekday": "Tue",
       "week": 33,
       "seed": "hive",
@@ -2095,7 +2095,7 @@
       "difficulty": 0.0438
     },
     {
-      "date": "2027-03-24",
+      "date": "2027-03-17",
       "weekday": "Wed",
       "week": 33,
       "seed": "maker",
@@ -2104,7 +2104,7 @@
       "difficulty": 0.0778
     },
     {
-      "date": "2027-03-25",
+      "date": "2027-03-18",
       "weekday": "Thu",
       "week": 33,
       "seed": "head",
@@ -2113,7 +2113,7 @@
       "difficulty": 0.1105
     },
     {
-      "date": "2027-03-26",
+      "date": "2027-03-19",
       "weekday": "Fri",
       "week": 33,
       "seed": "pen",
@@ -2122,7 +2122,7 @@
       "difficulty": 0.14
     },
     {
-      "date": "2027-03-27",
+      "date": "2027-03-20",
       "weekday": "Sat",
       "week": 33,
       "seed": "power",
@@ -2131,7 +2131,7 @@
       "difficulty": 0.1594
     },
     {
-      "date": "2027-03-28",
+      "date": "2027-03-21",
       "weekday": "Sun",
       "week": 33,
       "seed": "error",
@@ -2140,7 +2140,7 @@
       "difficulty": 0.4182
     },
     {
-      "date": "2027-03-29",
+      "date": "2027-03-22",
       "weekday": "Mon",
       "week": 34,
       "seed": "experimentally",
@@ -2149,7 +2149,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-03-30",
+      "date": "2027-03-23",
       "weekday": "Tue",
       "week": 34,
       "seed": "nurse",
@@ -2158,7 +2158,7 @@
       "difficulty": 0.0486
     },
     {
-      "date": "2027-03-31",
+      "date": "2027-03-24",
       "weekday": "Wed",
       "week": 34,
       "seed": "hold",
@@ -2167,7 +2167,7 @@
       "difficulty": 0.0813
     },
     {
-      "date": "2027-04-01",
+      "date": "2027-03-25",
       "weekday": "Thu",
       "week": 34,
       "seed": "core",
@@ -2176,7 +2176,7 @@
       "difficulty": 0.1163
     },
     {
-      "date": "2027-04-02",
+      "date": "2027-03-26",
       "weekday": "Fri",
       "week": 34,
       "seed": "sunburn",
@@ -2185,7 +2185,7 @@
       "difficulty": 0.1543
     },
     {
-      "date": "2027-04-03",
+      "date": "2027-03-27",
       "weekday": "Sat",
       "week": 34,
       "seed": "upload",
@@ -2194,7 +2194,7 @@
       "difficulty": 0.1578
     },
     {
-      "date": "2027-04-04",
+      "date": "2027-03-28",
       "weekday": "Sun",
       "week": 34,
       "seed": "steroid",
@@ -2203,7 +2203,7 @@
       "difficulty": 0.2218
     },
     {
-      "date": "2027-04-05",
+      "date": "2027-03-29",
       "weekday": "Mon",
       "week": 35,
       "seed": "expire",
@@ -2212,7 +2212,7 @@
       "difficulty": 0
     },
     {
-      "date": "2027-04-06",
+      "date": "2027-03-30",
       "weekday": "Tue",
       "week": 35,
       "seed": "attention",
@@ -2221,7 +2221,7 @@
       "difficulty": 0.0515
     },
     {
-      "date": "2027-04-07",
+      "date": "2027-03-31",
       "weekday": "Wed",
       "week": 35,
       "seed": "ersatz",
@@ -2230,7 +2230,7 @@
       "difficulty": 0.0814
     },
     {
-      "date": "2027-04-08",
+      "date": "2027-04-01",
       "weekday": "Thu",
       "week": 35,
       "seed": "loan",
@@ -2239,7 +2239,7 @@
       "difficulty": 0.1128
     },
     {
-      "date": "2027-04-09",
+      "date": "2027-04-02",
       "weekday": "Fri",
       "week": 35,
       "seed": "like",
@@ -2248,7 +2248,7 @@
       "difficulty": 0.1332
     },
     {
-      "date": "2027-04-10",
+      "date": "2027-04-03",
       "weekday": "Sat",
       "week": 35,
       "seed": "let",
@@ -2257,7 +2257,7 @@
       "difficulty": 0.1888
     },
     {
-      "date": "2027-04-11",
+      "date": "2027-04-04",
       "weekday": "Sun",
       "week": 35,
       "seed": "foam",
@@ -2266,7 +2266,7 @@
       "difficulty": 0.3763
     },
     {
-      "date": "2027-04-12",
+      "date": "2027-04-05",
       "weekday": "Mon",
       "week": 36,
       "seed": "time",
@@ -2275,7 +2275,7 @@
       "difficulty": 0.0297
     },
     {
-      "date": "2027-04-13",
+      "date": "2027-04-06",
       "weekday": "Tue",
       "week": 36,
       "seed": "wing",
@@ -2284,7 +2284,7 @@
       "difficulty": 0.0525
     },
     {
-      "date": "2027-04-14",
+      "date": "2027-04-07",
       "weekday": "Wed",
       "week": 36,
       "seed": "air",
@@ -2293,7 +2293,7 @@
       "difficulty": 0.0849
     },
     {
-      "date": "2027-04-15",
+      "date": "2027-04-08",
       "weekday": "Thu",
       "week": 36,
       "seed": "chess",
@@ -2302,7 +2302,7 @@
       "difficulty": 0.0927
     },
     {
-      "date": "2027-04-16",
+      "date": "2027-04-09",
       "weekday": "Fri",
       "week": 36,
       "seed": "messieurs",
@@ -2311,7 +2311,7 @@
       "difficulty": 0.1213
     },
     {
-      "date": "2027-04-17",
+      "date": "2027-04-10",
       "weekday": "Sat",
       "week": 36,
       "seed": "administrative",
@@ -2320,7 +2320,7 @@
       "difficulty": 0.1671
     },
     {
-      "date": "2027-04-18",
+      "date": "2027-04-11",
       "weekday": "Sun",
       "week": 36,
       "seed": "spacious",
@@ -2329,7 +2329,7 @@
       "difficulty": 0.2877
     },
     {
-      "date": "2027-04-19",
+      "date": "2027-04-12",
       "weekday": "Mon",
       "week": 37,
       "seed": "schmalz",
@@ -2338,7 +2338,7 @@
       "difficulty": 0.0272
     },
     {
-      "date": "2027-04-20",
+      "date": "2027-04-13",
       "weekday": "Tue",
       "week": 37,
       "seed": "folk",
@@ -2347,7 +2347,7 @@
       "difficulty": 0.0362
     },
     {
-      "date": "2027-04-21",
+      "date": "2027-04-14",
       "weekday": "Wed",
       "week": 37,
       "seed": "operational",
@@ -2356,7 +2356,7 @@
       "difficulty": 0.0623
     },
     {
-      "date": "2027-04-22",
+      "date": "2027-04-15",
       "weekday": "Thu",
       "week": 37,
       "seed": "curl",
@@ -2365,7 +2365,7 @@
       "difficulty": 0.097
     },
     {
-      "date": "2027-04-23",
+      "date": "2027-04-16",
       "weekday": "Fri",
       "week": 37,
       "seed": "category",
@@ -2374,7 +2374,7 @@
       "difficulty": 0.1327
     },
     {
-      "date": "2027-04-24",
+      "date": "2027-04-17",
       "weekday": "Sat",
       "week": 37,
       "seed": "computer",
@@ -2383,7 +2383,7 @@
       "difficulty": 0.1925
     },
     {
-      "date": "2027-04-25",
+      "date": "2027-04-18",
       "weekday": "Sun",
       "week": 37,
       "seed": "genetic",
@@ -2392,7 +2392,7 @@
       "difficulty": 0.207
     },
     {
-      "date": "2027-04-26",
+      "date": "2027-04-19",
       "weekday": "Mon",
       "week": 38,
       "seed": "smile",

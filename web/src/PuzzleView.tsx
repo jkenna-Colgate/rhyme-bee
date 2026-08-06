@@ -43,17 +43,19 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
 
   // Read once, at mount, and held: `markVisited` fires when the player taps to
   // start, and the Tutorial they are then playing must not change underneath
-  // them because the flag has since been written.
+  // them because the flag has since been written. Still read and still written
+  // while the Tutorial is switched off (#130) — `openingPuzzle` ignores it, but
+  // the flag has to stay truthful for when the Tutorial comes back.
   const [firstVisit] = useState(isFirstVisit);
 
   // The player's own local calendar date (ADR-0013), resolved once and reused
   // by both the boot decision and the "Today's Puzzle" control below.
   const date = useMemo(() => localCalendarDate(), []);
 
-  // Today's Puzzle, resolved whether or not the player boots into it: a first
-  // visit opens the Tutorial and then needs somewhere to go, and a player in Free
-  // Play needs the way back. Null means the schedule has nothing for this date,
-  // and the control below does not render.
+  // Today's Puzzle, resolved whether or not the player boots into it: a player
+  // in Free Play needs the way back, and a Tutorial would too were it switched
+  // on (#130). Null means the schedule has nothing for this date, and the
+  // control below does not render.
   const daily = useMemo(() => dailyPuzzle(index, SCHEDULE, date), [index, date]);
 
   const opening = useMemo(
@@ -83,9 +85,10 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   function start() {
     speak(seedWord);
     spoken.current = seedWord;
-    // The Tutorial has now actually been played, so spend the first visit here
-    // rather than on mount — a player who opens the link and never taps has not
-    // had their one Tutorial.
+    // The visit has now actually happened, so spend it here rather than on
+    // mount — a player who opens the link and never taps has not had their one
+    // Tutorial. Kept recording while the Tutorial is off (#130), so the flag
+    // still means "has played before" when it returns.
     if (firstVisit) markVisited();
     setStarted(true);
   }
@@ -149,12 +152,12 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
     inputRef.current?.focus();
   }
 
-  // The route to today's Puzzle from a Puzzle that is not it (#113). A first-ever
-  // visit boots the Tutorial, and until this existed the only way on was a manual
-  // reload — the free-play draw is a different Puzzle, not this one. Deliberately
-  // a control the player takes and not an advance the Tutorial's end performs:
-  // finishing is not the only reason to move on, and a player who is stuck should
-  // not have to finish to leave.
+  // The route to today's Puzzle from a Puzzle that is not it (#113): from a
+  // free-play draw, and from the Tutorial were it switched on (#130). Until this
+  // existed the only way on was a manual reload — the free-play draw is a
+  // different Puzzle, not this one. Deliberately a control the player takes and
+  // not an advance the Tutorial's end performs: finishing is not the only reason
+  // to move on, and a player who is stuck should not have to finish to leave.
   //
   // Unlike free play this opens a *dateful* Puzzle, so the Session it starts is
   // filed under the player's local date and survives a reload — and if they have
@@ -171,7 +174,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // not decoration: without a gesture the Seed Word is never spoken on a phone,
   // and a game adjudicated against a pronunciation the player never heard is a
   // game whose premise is discovered through rejection.
-  if (!started) return <StartGate tutorial={firstVisit} onStart={start} />;
+  if (!started) return <StartGate kind={kind} onStart={start} />;
 
   return (
     <section className="puzzle">
@@ -187,18 +190,18 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
             className="reveal-button"
             onClick={() => (isComplete ? takeReveal() : setConfirming(true))}
           >
-            {isComplete ? "★ Show the Bonus Words I missed" : "🏳️ Reveal Answers"}
+            {isComplete ? "★ Show the Bonus Words I missed" : "Reveal Answers"}
           </button>
         )}
         {/* Only when there is somewhere to go: on the Daily Puzzle the player is
             already there, and a date outside the run has no Puzzle to offer. */}
         {kind !== "daily" && daily !== null && (
           <button type="button" className="daily-puzzle" onClick={onDailyPuzzle}>
-            📅 Today’s Puzzle
+            Today’s Puzzle
           </button>
         )}
         <button type="button" className="new-puzzle" onClick={onNewPuzzle}>
-          🎲 Free play
+          Free play
         </button>
       </div>
       <Seed session={session} kind={kind} />
@@ -277,18 +280,40 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
 // --- The start tap ------------------------------------------------------------
 
 /**
+ * What the gate calls the Puzzle behind it — one caption per kind, so each of
+ * the three names itself (#132). It used to be told only whether the player was
+ * in the Tutorial, and captioned everything else "Today's puzzle": a Free Play
+ * draw served because the schedule had nothing for the player's date got
+ * announced as today's, while the label above the Seed Word said Free play, and
+ * a reload produced a *different* "today's puzzle" every time.
+ *
+ * Derived from the kind, not from whether a Daily Puzzle resolved. Inferring it
+ * would put the same coupling back one level down, with the gate again guessing
+ * at something it can simply be told.
+ */
+const START_TITLE: Record<PuzzleKind, string> = {
+  daily: "Today’s puzzle",
+  tutorial: "Welcome to Rhyme Bee",
+  free: "Free play",
+};
+
+/**
  * The opening beat, and the gesture browsers demand before they will speak.
  * Nothing about the Puzzle is on screen yet — the Seed Word arrives spoken and
  * written at the same moment, which is the order the game means.
  */
-function StartGate({ tutorial, onStart }: { tutorial: boolean; onStart: () => void }) {
+function StartGate({ kind, onStart }: { kind: PuzzleKind; onStart: () => void }) {
   return (
     <section className="start-gate">
-      <h2 className="start-gate__title">{tutorial ? "Welcome to Rhyme Bee" : "Today’s puzzle"}</h2>
+      <h2 className="start-gate__title">{START_TITLE[kind]}</h2>
+      {/* The sound-not-spelling sentence used to be the Tutorial's alone, and it
+          was the only part of the Tutorial carrying its weight (#130). It now
+          reads on every visit, whichever Puzzle follows: it is the game's
+          premise, and a player who has not been told it discovers it through
+          rejection. */}
       <p className="start-gate__body">
-        {tutorial
-          ? "One word, and every word you can find that rhymes with it. This first one is a quick warm-up and does not count — it is here to show you the game is about sound, not spelling."
-          : "One word, and every word you can find that rhymes with it."}
+        One word, and every word you can find that rhymes with it. It is about
+        sound, not spelling.
       </p>
       <button type="button" className="start-gate__start" onClick={onStart} autoFocus>
         ▶ Tap to start
@@ -336,7 +361,7 @@ function Seed({ session, kind }: { session: Session; kind: PuzzleKind }) {
           onClick={() => speak(word)}
           aria-label={`Hear “${word}” again`}
         >
-          🔊 Hear it again
+          Hear it again
         </button>
       )}
     </header>
@@ -405,7 +430,7 @@ function CompletionOverlay({
           ×
         </button>
         <h2 id="complete-title" className="complete-card__title">
-          🏆 Puzzle complete!
+          Puzzle complete!
         </h2>
         <p className="complete-card__body">
           You found every Answer. Final Score <b>{score}</b>, Rank <b>{rankLabel}</b>.
@@ -454,7 +479,7 @@ function GiveUpConfirm({
     >
       <div className="complete-card">
         <h2 id="give-up-title" className="complete-card__title">
-          🏳️ Give up and reveal?
+          Give up and reveal?
         </h2>
         <p className="complete-card__body">
           {remaining === 1
@@ -499,7 +524,7 @@ function EndedNotice({
   return (
     <p className="ended" role="status" aria-live="polite">
       <b className="ended__title">
-        {gaveUp ? "Session over — Answers revealed." : "Session over — everything revealed."}
+        {gaveUp ? "Session over. Answers revealed." : "Session over. Everything revealed."}
       </b>
       <span className="ended__detail">
         Final Score <b>{score}</b>, Rank <b>{rankLabel}</b>. Start a new Puzzle to play again.
@@ -586,6 +611,14 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 // --- Per-Submission feedback: every Verdict rendered distinctly (ADR-0005) -----
+//
+// The glyph rule, for whoever reaches for the next one (#131): keep a glyph only
+// where it *encodes a verdict*, and delete every glyph that decorates a label.
+// ✓ ✗ ★ below each carry meaning no adjacent word repeats — the star is the only
+// thing separating a Bonus Word from an Answer in the found list, and replacing
+// it costs either words or colour. The emoji that once sat on Free play, the
+// Reveal, the Puzzle-complete card and the rest said nothing the button did not
+// already say, and made the interface read as machine-generated.
 
 /** Plain-English messages for the closed rejection set — one distinct line each. */
 function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }) {
@@ -678,7 +711,7 @@ function ShouldCountButton({
   if (status === "sent") {
     return (
       <span className="feedback__appealed" role="status" aria-live="polite">
-        ✓ thanks — sent
+        ✓ thanks, sent
       </span>
     );
   }
@@ -691,7 +724,7 @@ function ShouldCountButton({
       disabled={status === "sending"}
       title="Tell us this word should have counted"
     >
-      {status === "error" ? "⚠ didn’t send — retry" : "＋ should count"}
+      {status === "error" ? "⚠ didn’t send, retry" : "＋ should count"}
     </button>
   );
 }
@@ -713,7 +746,7 @@ function RankBanner({ label }: { label: string }) {
 
   return (
     <p className="rank-banner" role="status" aria-live="polite">
-      🎉 New Rank: <b>{label}</b>!
+      New Rank: <b>{label}</b>!
     </p>
   );
 }
@@ -731,7 +764,7 @@ function FoundList({ session }: { session: Session }) {
         {foundAnswers.length === 0 ? (
           // Once the Session is over there is no entry control to point at.
           <p className="found__empty">
-            {session.ended ? "You found no Answers this time." : "No Answers yet — type one above."}
+            {session.ended ? "You found no Answers this time." : "No Answers yet. Type one above."}
           </p>
         ) : (
           <ul className="found__list">

@@ -25,7 +25,7 @@ describe("the committed schedule artifact parses", () => {
     expect(schedule).not.toBeNull();
     expect(schedule?.days).toHaveLength(260);
     expect(schedule?.days[0]).toEqual({
-      date: "2026-08-10",
+      date: "2026-08-03",
       weekday: "Mon",
       week: 1,
       seed: "lopsided",
@@ -64,8 +64,8 @@ describe("a date resolves to that day's Seed Word, pinned to its Rhyme Key", () 
   });
 
   it("resolves a date in the middle to that day's Puzzle and no other", () => {
-    expect(seedForDate(schedule, "2026-08-11")).toEqual({ word: "boulder", rhymeKey: "OW L D ER" });
-    expect(seedForDate(schedule, "2026-12-18")).toEqual({ word: "unisex", rhymeKey: "EH K S" });
+    expect(seedForDate(schedule, "2026-08-04")).toEqual({ word: "boulder", rhymeKey: "OW L D ER" });
+    expect(seedForDate(schedule, "2026-12-11")).toEqual({ word: "unisex", rhymeKey: "EH K S" });
   });
 
   it("pins the Seed Word to the schedule's Rhyme Key rather than leaving it raw", () => {
@@ -81,9 +81,9 @@ describe("a date outside the schedule resolves to nothing", () => {
   const days = schedule?.days ?? [];
 
   it.each([
-    ["the day before the run starts", "2026-08-09"],
+    ["the day before the run starts", "2026-08-02"],
     ["long before the run starts", "2020-01-01"],
-    ["the day after the run ends", "2027-04-27"],
+    ["the day after the run ends", "2027-04-20"],
     ["long after the run ends", "2099-12-31"],
     ["a malformed date", "not-a-date"],
     ["an empty date", ""],
