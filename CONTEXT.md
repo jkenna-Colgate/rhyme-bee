@@ -26,14 +26,22 @@ _Avoid_: Fuzzy matching, near rhyme, tolerance (all imply the rhyme test got loo
 A word that sounds identical to another but is spelled differently. Homophones of the Seed Word rhyme with it and count as valid.
 
 **Puzzle**:
-One day's game: a Seed Word and the set of words that rhyme with it. Seed Words are curated in advance so that each Puzzle's answer set lands in a playable size band, rather than swinging between twelve answers and five hundred.
+A Seed Word and the set of words that rhyme with it. Seed Words are curated in advance so that each Puzzle's answer set lands in a playable size band, rather than swinging between twelve answers and five hundred. Most play is on the Daily Puzzle, but the Tutorial and Free Play produce a Puzzle too — a Puzzle is not inherently tied to a date.
+
+**Daily Puzzle**:
+The Puzzle scheduled for a given calendar date, and the only kind whose Session is kept. The date is the player's own local calendar date, so the day turns over where the player is rather than where the game is hosted.
+_Avoid_: "the puzzle of the day" as a separate concept, today's game
+
+**Free Play**:
+A Puzzle drawn at random from the Seed pool rather than taken from the schedule, carrying no date. It is both something a player chooses — an extra, once the Daily Puzzle is done — and what the game offers when the schedule has nothing for the player's date, on a visit before the run begins or after it ends. A Free Play Session is never kept: it is a Puzzle to play now, not a day to come back to.
+_Avoid_: Practice mode, random puzzle, endless mode, casual mode
 
 **Tutorial**:
-The unscored first-run Puzzle, seeded with `ate`. It exists to teach that the game is about sound and not spelling, and is exempt from the size band that governs shipped Puzzles.
+The unscored first-run Puzzle, seeded with `ate`. It exists to teach that the game is about sound and not spelling, and is exempt from the size band that governs shipped Puzzles. It carries no date, so it is not a Daily Puzzle and its Session is not kept — a first-time player still meets the day's Puzzle on their next visit.
 
 **Session**:
-One player's play-through of a single Puzzle: the words they have found, and the Score, Rank and progress derived from them. The Puzzle is the shared content of the day; the Session is one person's engagement with it, and it resets each day.
-_Avoid_: Game (the whole product is "the game", and one day's game is the Puzzle), playthrough, run
+One player's play-through of a single Puzzle: the words they have found, and the Score, Rank and progress derived from them. The Daily Puzzle is the shared content of the day; the Session is one person's engagement with it. A Session on the Daily Puzzle outlives the tab that played it and resets when the date turns over; a Tutorial or Free Play Session is not kept at all.
+_Avoid_: Game (the whole product is "the game", and one day's game is the Daily Puzzle), playthrough, run
 
 **Reveal**:
 The end-of-game disclosure of what the player never found — the missed Answers, and the Bonus Words they never reached. It is a **give-up gate, not a peek**: taking the Reveal ends the Session, which is what keeps the Score and Rank it freezes honest. A Reveal a player could take mid-Puzzle and then carry on from would quietly empty Rank of meaning, since the remaining Answers would be there for the copying. Helping a player who is stuck *keep playing* is not the Reveal's job and belongs to the hint system; the two are deliberately separate mechanics.
@@ -70,3 +78,11 @@ _Avoid_: "inflected key" (inflection *density* is not the test — /aɪnd/ is in
 
 **Proper Noun**:
 A name. Never valid, however well it rhymes, because the space of names is unbounded and has no defensible edge. Rejected with a reason of its own, since `Kate` obviously rhymes with `ate` and a silent refusal reads as a bug.
+
+**Appeal**:
+A player's report that a Submission the game rejected should have counted as an Answer. It contests a verdict already delivered and never asks for one — adjudication happens in the player's browser and stays there — so raising an Appeal changes nothing about the Session it came from, and the player plays on.
+_Avoid_: Flag (the maintainer-facing schedule review flags the days worth reading first, and that is the word's only other use), challenge, dispute, complaint
+
+**Candidate**:
+The record an Appeal becomes: the Submission, the reason the engine gave for rejecting it, and the context a judge needs to rule on it later. Judging is a separate offline pass over the queue, and may end in a correction to the pronunciation the engine reads — so a Candidate is the report, never the fix.
+_Avoid_: Suggestion, correction, fix (those name what judging may produce, not what the player sent)
