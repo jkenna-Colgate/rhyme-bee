@@ -172,3 +172,138 @@ candidates.
 At 245 puzzles the library is still ~eight months of never-repeat daily play —
 comfortably above the ~80-family floor ADR-0004 worried about, and its pre-approved
 lever (widen the band to [10, 120]) remains available if the pool ever dips too low.
+
+## Amendment (2026-07-30): *derived* includes derivational suffixes
+
+**The definition in [What counts as "derived"](#what-counts-as-derived) widens: a
+word is also derived when it is a **configured derivational suffix** on a real base
+— `-ly, -ness, -er, -est, -ish, -ful, -less, -ment` and the `-edly` / `-edness`
+variants, the inventory `src/affixes.ts` configures.** The clause above names only
+inflections and prefixes because, when this ADR was written, those were the only
+affixes the build knew about. Issue #77 added a suffix inventory, and three
+suffix-only keys are now sitting in the Seed pool.
+
+### The gap is live, not hypothetical
+
+Measured over the current build at the default band [20, 120] — 294 candidates, 91
+already dropped as Shadow Keys — exactly three candidates lose *all* native content
+once suffixes count. Every member of all three is an adjective or participle plus
+`-ly`:
+
+| Rhyme Key | representative | members | in the pinned data | given a reading by #77 |
+|---|---|---|---|---|
+| `EH N SH AH L IY` | `essentially` | 23 | 10 | 13 |
+| `EH N T AH L IY` | `parentally` | 24 | 13 | 11 |
+| `EY T IH NG L IY` | `dominatingly` | 30 | 4 | 26 |
+
+`EH N SH AH L IY` is the `essential / potential / torrential` board with `-ly` on
+every word — `downs` in a different suit, and the exact thing this ADR exists to
+bar.
+
+**#77 is what opened the gap.** Family size is an upper bound on Answer count, and
+the pinned-data-only membership of the three keys is 10, 13 and 4 — all below the
+band floor of 20. None of them could have been a candidate before the coverage
+stage started composing `-ly` readings. So the suffix inventory did not merely
+inflate keys that were already in band; it lifted three shadows into the pool.
+
+The consequence is concrete rather than theoretical, and it has since stopped being
+a matter of eligibility: the run dealt on 2026-08-04 **schedules all three keys**,
+each on a different representative from the same family.
+
+| date | Seed Word | Rhyme Key |
+|---|---|---|
+| 2026-10-09 | `devastatingly` | `EY T IH NG L IY` |
+| 2027-02-18 | `essentially` | `EH N SH AH L IY` |
+| 2027-03-29 | `experimentally` | `EH N T AH L IY` |
+
+A Seed Word is *spoken* to the player at the start of a Puzzle, so on those three
+days it is spoken from a composed reading.
+
+### Why the relation is the same one
+
+A Rhyme Key runs from the last stressed vowel to the end of the word, and every
+configured suffix is stress-neutral, so the stressed vowel stays in the stem and
+the derived key is always **the base key plus the suffix's phonemes**. This is
+enforced, not merely observed: `suffixRule` refuses any composition whose key is
+not the stem's key extended.
+
+That makes base key → derived key a function, and an injective one — strip the
+suffix's phonemes and the base key comes back. A suffix therefore maps a whole base
+family one-to-one onto a single derived key, which is structurally identical to
+`down` → `downs`. The rationale this ADR already rests on — *carries no rhyme
+experience the base key doesn't already carry* — applies unchanged.
+
+Keys that mix suffixed and native words are not caught by this and should not be:
+the `-er` key holds `teacher` and `runner` alongside `water`, `mother` and
+`finger`, keeps substantial native content, and survives. The threshold does that
+work, so the inventory does not need trimming to protect them.
+
+### The detector is morphological, not phonological
+
+A tempting stronger test — accept a word as suffix-derived only when its own
+reading *is* the stem's reading composed with the suffix — was measured and
+rejected. It reclaims 752 words against the morphological test's 939, and flips
+**zero** keys instead of three.
+
+It under-fires for a reason that has nothing to do with rhyme. CMUdict's
+disagreement between a stem and its own derived entry sits in the unstressed
+syllables *before* the stressed vowel, outside the Rhyme Key entirely:
+
+```
+presidentially  P R EH2 S IH0 D EH1 N SH AH0 L IY0
+presidential    P R EH2 Z AH0 D EH1 N SH AH0 L        S IH0 D  vs  Z AH0 D
+excruciatingly  EH2 K S K R UW1 S IY0 EY2 T IH0 NG L IY0
+excruciating    IH0 K S K R UW1 SH IY0 EY2 T IH0 NG   S IY0   vs  SH IY0
+```
+
+Five of the six misses have Rhyme Keys that match exactly. Whether a word is
+derived is a question about morphology, and the answer does not become less true
+because a lexicographer typed a different schwa three syllables upstream.
+
+### What is unchanged
+
+- **The eligibility rule.** Native content `== 0` → drop as Seed. Only the
+  membership of *derived* moves. The detector does not read the suffix inventory,
+  and now will not — see the Resolution below.
+- **Answers.** Suffixed words remain fully valid Answers wherever they rhyme.
+  `essentially` is still an Answer on the `EH N SH AH L IY` key; that key is
+  merely barred from being a *Seed*.
+- **[Why the obvious filters are wrong](#why-the-obvious-filters-are-wrong).**
+  This is still not a density test. `AY N D` stays a Puzzle.
+- **The 2026-07-26 Resolution's figures**, which record what was true then. The
+  current build reads 294 candidates and 91 shadow drops.
+
+### Resolution (2026-08-06): the definition widens, the detector does not
+
+**Issue #88 — sharing the suffix inventory with `isDerived` — was declined, and the
+three scheduled days above stand.** The definition in this Amendment is unchanged
+and correct: those keys *are* Shadow Keys. The build simply does not act on it, and
+that is now a decision rather than a gap.
+
+The reason is cost, not doubt. Landing #88 drops the pool 294 → 291 and so forces
+the run to be dealt again; a re-deal moves the Seed Word under every date after the
+first change, and the schedule is a committed artifact the game ships inside its
+bundle. Three days out of 260 — the first of them 2026-10-09, months past the
+playtest — is not worth re-cutting the run and re-reviewing it.
+
+So this is a **known and accepted deviation**: for these three days the shipped
+schedule serves a Seed Word this ADR's own rule would bar. The days are named above
+so that a report of one reads as expected behaviour and not as a new bug. What
+makes them survivable is that the Puzzle is still *playable* — every member of the
+key genuinely rhymes, the answer set is in band, and the only loss is that the
+board is one family wearing a suffix rather than a fresh one.
+
+Reopening #88 is the fix if it is ever worth a re-deal — most cheaply while the
+schedule is being re-cut for some other reason anyway, when the marginal cost is
+the review rather than the deal.
+
+### A larger neighbour, deliberately not fixed here
+
+The same measurement found **54 candidate keys surviving on one to three native
+words**, where the survivor is overwhelmingly a proper noun or a foreign form that
+slipped the names filter — `versailles`, `heinz`, `algiers`, `marx`, `azores`,
+`mesdames`, `schmalz`, `franz`, `hertz`, `rhodes`, `bortz`, `schwarz`, `sheard`.
+This ADR's [Measurement](#measurement) section predicted exactly that ("shadows
+wearing a costume") and its Consequences name tightening the names filter as an
+orthogonal lever. It gates more keys than the suffix gap does and is tracked as
+issue #89; widening *derived* neither fixes nor worsens it.

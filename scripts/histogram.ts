@@ -19,10 +19,11 @@ import { fileURLToPath } from "node:url";
 import { RhymeIndex } from "../src/rhymeIndex.ts";
 import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
 import { curate, DEFAULT_PLAYABLE_BAND } from "../src/curation.ts";
+import { indexArtifactPath } from "./indexArtifact.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const artifact = JSON.parse(
-  readFileSync(resolve(root, "dist-data/index.json"), "utf8"),
+  readFileSync(indexArtifactPath(resolve(root, "dist-data")), "utf8"),
 ) as SerialisedIndex;
 
 const index: RhymeIndex = deserialise(artifact);

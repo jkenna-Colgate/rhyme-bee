@@ -1,16 +1,20 @@
 /**
  * The dev-only feedback endpoint. A Vite plugin that, during `npm run dev` only
  * (`apply: "serve"` and `configureServer` never run in a production build),
- * serves `POST /api/feedback`: it turns a jotted note into a GitHub issue on
- * this repo by shelling out to the `gh` CLI (already authenticated) and titles
- * it with the `claude` CLI in headless print mode (the maintainer's Pro
+ * serves the feedback path: it turns a jotted note into a GitHub issue on this
+ * repo by shelling out to the `gh` CLI (already authenticated) and titles it
+ * with the `claude` CLI in headless print mode (the maintainer's Pro
  * subscription — no API key anywhere).
  *
  * All dynamic content travels through stdin — the issue as JSON to
  * `gh api --input -`, the prompt to `claude` — so no user text is ever placed
  * on a command line. The only args are static tokens, which keeps `shell: true`
  * (needed to resolve `gh`/`claude` on Windows) safe. The pure title/body
- * decisions live in `src/feedback/feedbackIssue.ts`.
+ * decisions, and the validation, live in `src/feedback/feedbackIssue.ts`.
+ *
+ * Deployed, the same path is answered by `worker/feedbackRoute.ts` instead —
+ * neither CLI exists in a Worker, so that route calls the GitHub API directly
+ * and takes the derived title. This is the path with the titler on it.
  */
 
 import { spawn } from "node:child_process";
@@ -19,16 +23,12 @@ import type { Plugin } from "vite";
 import {
   buildIssueBody,
   cleanGeneratedTitle,
+  noteFromReport,
   resolveTitle,
-  type FeedbackContext,
 } from "./src/feedback/feedbackIssue.ts";
+import { FEEDBACK_PATH } from "./src/endpoints.ts";
 
 const LABEL = "feedback";
-
-interface FeedbackRequest {
-  text: string;
-  context: FeedbackContext | null;
-}
 
 /** Spawn a CLI, feeding `input` on stdin and resolving with its stdout. Rejects
  *  on a non-zero exit, surfacing stderr so the caller can decide what to do. */
@@ -91,13 +91,13 @@ async function createIssue(title: string, body: string): Promise<{ number: numbe
   return { number: issue.number, url: issue.html_url };
 }
 
-function readJson(req: IncomingMessage): Promise<FeedbackRequest> {
+function readJson(req: IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
     let raw = "";
     req.on("data", (chunk) => (raw += chunk));
     req.on("end", () => {
       try {
-        resolve(JSON.parse(raw) as FeedbackRequest);
+        resolve(JSON.parse(raw));
       } catch {
         reject(new Error("Malformed request body."));
       }
@@ -121,17 +121,20 @@ export function feedbackPlugin(): Plugin {
       // first submit can await it — otherwise a submit could race ahead of the
       // label existing and `createIssue`'s `labels: ["feedback"]` would fail.
       const labelReady = ensureLabel();
-      server.middlewares.use("/api/feedback", (req, res, next) => {
+      server.middlewares.use(FEEDBACK_PATH, (req, res, next) => {
         if (req.method !== "POST") return next();
         void (async () => {
           try {
-            const { text, context } = await readJson(req);
-            if (typeof text !== "string" || text.trim() === "") {
-              return sendJson(res, 400, { error: "Feedback text is required." });
-            }
+            // Same validation the deployed Worker applies, from the module that
+            // owns the note — so a note the endpoint would refuse is refused
+            // here too, and dev is not a more forgiving judge than production.
+            const report = noteFromReport(await readJson(req));
+            if (!report.ok) return sendJson(res, 400, { error: report.error });
+
+            const { text, context } = report.note;
             const title = await resolveTitle(text, () => generateTitle(text));
             await labelReady;
-            const issue = await createIssue(title, buildIssueBody(text, context ?? null));
+            const issue = await createIssue(title, buildIssueBody(text, context));
             sendJson(res, 201, issue);
           } catch (error) {
             sendJson(res, 500, {

@@ -14,8 +14,16 @@ export type IndexLoad =
   | { status: "error"; message: string }
   | { status: "ready"; index: RhymeIndex };
 
-/** Served from `../dist-data` via Vite's static serving (see vite.config.ts). */
-const INDEX_URL = `${import.meta.env.BASE_URL}index.json`;
+/**
+ * Served from `../dist-data` via Vite's static serving (see vite.config.ts).
+ *
+ * The filename is content-addressed and baked into the bundle at build time, so
+ * the artifact can be cached immutably and a redeployed index still reaches the
+ * browser immediately — the name changes with the contents. There is no runtime
+ * manifest fetch: a lookup would block this request, which is the one that
+ * matters, behind another. See ADR-0013 and #117.
+ */
+const INDEX_URL = `${import.meta.env.BASE_URL}${__INDEX_ARTIFACT__}`;
 
 export function useRhymeIndex(): IndexLoad {
   const [load, setLoad] = useState<IndexLoad>({ status: "loading" });

@@ -15,29 +15,87 @@
  * nothing here subtracts one word list from another. The plain-English rejection
  * lines come from `REJECTION_MESSAGE`, which sits with the closed reason set so
  * the REPL says the same thing.
+ *
+ * A Puzzle does not begin until the player taps to start (#116): iOS Safari
+ * blocks speech synthesis outside a user gesture, and the Seed Word being
+ * spoken is the mechanic, not a garnish — the tap *is* the audio unlock. Which
+ * Puzzle boots is a separate question, decided by `bootPuzzle.ts` (#124); the
+ * view only asks it and renders what comes back.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { playableSeeds } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
+import { localCalendarDate } from "../../src/schedule.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
+import { dailyPuzzle, freePlayPuzzle, openingPuzzle, SCHEDULE, type PuzzleKind } from "./bootPuzzle.ts";
+import { APPEAL_PATH } from "./endpoints.ts";
+import { isFirstVisit, markVisited } from "./firstVisit.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
 
-/** The unscored first-run Puzzle is always seeded with `ate` (CONTEXT.md). */
-const TUTORIAL_SEED = "ate";
-
 export function PuzzleView({ index }: { index: RhymeIndex }) {
-  const { session, last, seq, submit, reveal, newPuzzle } = usePuzzleSession(index, TUTORIAL_SEED);
-
-  // The shared in-band Seed pool (#33). The boot Seed stays the fixed tutorial
-  // word `ate`; only the "new puzzle" button draws from this pool.
+  // The shared in-band Seed pool (#33), which both the opening fallback and the
+  // free-play button draw from.
   const pool = useMemo(() => playableSeeds(index), [index]);
+
+  // Read once, at mount, and held: `markVisited` fires when the player taps to
+  // start, and the Tutorial they are then playing must not change underneath
+  // them because the flag has since been written.
+  const [firstVisit] = useState(isFirstVisit);
+
+  // The player's own local calendar date (ADR-0013), resolved once and reused
+  // by both the boot decision and the "Today's Puzzle" control below.
+  const date = useMemo(() => localCalendarDate(), []);
+
+  // Today's Puzzle, resolved whether or not the player boots into it: a first
+  // visit opens the Tutorial and then needs somewhere to go, and a player in Free
+  // Play needs the way back. Null means the schedule has nothing for this date,
+  // and the control below does not render.
+  const daily = useMemo(() => dailyPuzzle(index, SCHEDULE, date), [index, date]);
+
+  const opening = useMemo(
+    () => openingPuzzle(index, pool, daily, firstVisit),
+    [index, pool, daily, firstVisit],
+  );
+
+  const { session, last, seq, kind, submit, reveal, newPuzzle } = usePuzzleSession(
+    index,
+    opening,
+  );
 
   const [field, setField] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // --- The start tap, and the spoken Seed that is its whole reason for being --
+  //
+  // The Seed Word most recently spoken aloud. The start tap speaks the first one
+  // *synchronously, inside the gesture* — that call is what unlocks synthesis
+  // for the rest of the visit on iOS — so the effect below must not say it a
+  // second time. Every later Seed (a free-play draw) is spoken by the effect,
+  // which is allowed to because the tap already unlocked it.
+  const [started, setStarted] = useState(false);
+  const spoken = useRef<string | null>(null);
+  const seedWord = session.puzzle.seed.word;
+
+  function start() {
+    speak(seedWord);
+    spoken.current = seedWord;
+    // The Tutorial has now actually been played, so spend the first visit here
+    // rather than on mount — a player who opens the link and never taps has not
+    // had their one Tutorial.
+    if (firstVisit) markVisited();
+    setStarted(true);
+  }
+
+  useEffect(() => {
+    if (!started) return;
+    if (spoken.current === seedWord) return;
+    spoken.current = seedWord;
+    speak(seedWord);
+  }, [started, seedWord]);
 
   // Puzzle-complete overlay (#49): fire once, on the Submission that finds the
   // *last* Answer. Bonus Words never gate completion. It is a one-shot per
@@ -78,18 +136,42 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
     inputRef.current?.focus();
   }
 
+  // Free play, the explicit extra after today's Puzzle: a fresh draw from the
+  // pool, unscheduled and unsaved. The daily Session stays where it is and comes
+  // back on the next load. Auto-speak follows for free: the effect above is keyed
+  // on the Seed Word (#36), and the start tap has already unlocked synthesis for
+  // this visit.
   function onNewPuzzle() {
     if (pool.length === 0) return;
-    const family = pool[Math.floor(Math.random() * pool.length)]!;
-    // Read the Seed off the drawn family, pinned to the family's own Rhyme Key
-    // so an ambiguous representative can't misfire. Auto-speak follows for free:
-    // Seed's speak effect is keyed on the Seed Word (#36).
-    const seed: SeedWord = { word: family.representative, rhymeKey: family.rhymeKey };
-    newPuzzle(seed);
+    newPuzzle(freePlayPuzzle(index, pool));
     setField("");
     setConfirming(false);
     inputRef.current?.focus();
   }
+
+  // The route to today's Puzzle from a Puzzle that is not it (#113). A first-ever
+  // visit boots the Tutorial, and until this existed the only way on was a manual
+  // reload — the free-play draw is a different Puzzle, not this one. Deliberately
+  // a control the player takes and not an advance the Tutorial's end performs:
+  // finishing is not the only reason to move on, and a player who is stuck should
+  // not have to finish to leave.
+  //
+  // Unlike free play this opens a *dateful* Puzzle, so the Session it starts is
+  // filed under the player's local date and survives a reload — and if they have
+  // already played some of today, `open` resumes it rather than wiping it.
+  function onDailyPuzzle() {
+    if (daily === null) return;
+    newPuzzle(daily);
+    setField("");
+    setConfirming(false);
+    inputRef.current?.focus();
+  }
+
+  // The Puzzle does not begin until the player taps. This is the audio unlock,
+  // not decoration: without a gesture the Seed Word is never spoken on a phone,
+  // and a game adjudicated against a pronunciation the player never heard is a
+  // game whose premise is discovered through rejection.
+  if (!started) return <StartGate tutorial={firstVisit} onStart={start} />;
 
   return (
     <section className="puzzle">
@@ -108,11 +190,18 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
             {isComplete ? "★ Show the Bonus Words I missed" : "🏳️ Reveal Answers"}
           </button>
         )}
+        {/* Only when there is somewhere to go: on the Daily Puzzle the player is
+            already there, and a date outside the run has no Puzzle to offer. */}
+        {kind !== "daily" && daily !== null && (
+          <button type="button" className="daily-puzzle" onClick={onDailyPuzzle}>
+            📅 Today’s Puzzle
+          </button>
+        )}
         <button type="button" className="new-puzzle" onClick={onNewPuzzle}>
-          🎲 New puzzle
+          🎲 Free play
         </button>
       </div>
-      <Seed session={session} />
+      <Seed session={session} kind={kind} />
       <Stats session={session} />
       {/* Both per-Submission flashes are re-keyed on `seq` so each new Submission
           genuinely remounts them (that is what restarts the banner's dismissal
@@ -178,28 +267,66 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
       <FoundList session={session} />
       {session.ended && <MissedList answers={missed.answers} bonus={missed.bonus} />}
 
-      {/* Dev-only: dead-code-eliminated from the production build (#41). */}
-      {import.meta.env.DEV && <FeedbackButton session={session} />}
+      {/* Ships in production (#118). A playtester's only channel back is what
+          they can say from inside the game, so the note goes with them. */}
+      <FeedbackButton session={session} />
+    </section>
+  );
+}
+
+// --- The start tap ------------------------------------------------------------
+
+/**
+ * The opening beat, and the gesture browsers demand before they will speak.
+ * Nothing about the Puzzle is on screen yet — the Seed Word arrives spoken and
+ * written at the same moment, which is the order the game means.
+ */
+function StartGate({ tutorial, onStart }: { tutorial: boolean; onStart: () => void }) {
+  return (
+    <section className="start-gate">
+      <h2 className="start-gate__title">{tutorial ? "Welcome to Rhyme Bee" : "Today’s puzzle"}</h2>
+      <p className="start-gate__body">
+        {tutorial
+          ? "One word, and every word you can find that rhymes with it. This first one is a quick warm-up and does not count — it is here to show you the game is about sound, not spelling."
+          : "One word, and every word you can find that rhymes with it."}
+      </p>
+      <button type="button" className="start-gate__start" onClick={onStart} autoFocus>
+        ▶ Tap to start
+      </button>
+      {speechSupported() && (
+        <p className="start-gate__note">
+          The Seed Word is read aloud when you start, so have the sound on.
+        </p>
+      )}
     </section>
   );
 }
 
 // --- The Seed Word -------------------------------------------------------------
 
-function Seed({ session }: { session: Session }) {
+/** What each kind of Puzzle calls itself above the Seed Word. */
+const SEED_LABEL: Record<PuzzleKind, string> = {
+  daily: "Today’s Seed Word",
+  tutorial: "Warm-up · Seed Word",
+  free: "Free play · Seed Word",
+};
+
+function Seed({ session, kind }: { session: Session; kind: PuzzleKind }) {
   const { puzzle } = session;
   const word = puzzle.seed.word;
 
-  // Speak the Seed aloud when the Puzzle starts. Keyed on the word, so #37's
-  // new-puzzle draw (a fresh session with a new Seed) auto-speaks for free. The
+  // Speaking lives in the boot path, not here: the first utterance of a visit
+  // has to come out of the start tap's own handler or iOS never plays it. The
   // visible respelling below stays the source of truth regardless of the audio.
-  useEffect(() => {
-    speak(word);
-  }, [word]);
 
   return (
     <header className="seed">
-      <p className="seed__label">Seed Word</p>
+      {/* Which Puzzle this is. Today's is the one that is saved and shared with
+          everybody else; a free-play draw is nobody else's and is not kept, so a
+          player should be able to tell them apart without reloading. The Tutorial
+          is neither — labelling it "Free play" told a first-time player they had
+          chosen an extra before they had played anything at all. */}
+      <p className="seed__label">{SEED_LABEL[kind]}</p>
       <p className="seed__word">{word}</p>
       <p className="seed__respelling">“{puzzle.seedRespelling}”</p>
       {speechSupported() && (
@@ -470,16 +597,15 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
         <span className="feedback__badge">✗</span>
         <b className="feedback__word">{word}</b>
         <span className="feedback__note">{REJECTION_MESSAGE[verdict.reason]}</span>
-        {/* Dev-only: queue a wrongly-rejected word for the supplement judge (#54
-            follow-up). Dead-code-eliminated from the production build. */}
-        {import.meta.env.DEV && (
-          <ShouldCountButton
-            word={word}
-            seed={seed}
-            reason={verdict.reason}
-            engineRespelling={verdict.respelling ?? null}
-          />
-        )}
+        {/* Ships in production (#119). Nothing observes what players submit
+            (ADR-0013), so a rejection the player disagrees with is only ever
+            known because they said so — this control is the sensor. */}
+        <ShouldCountButton
+          word={word}
+          seed={seed}
+          reason={verdict.reason}
+          engineRespelling={verdict.respelling ?? null}
+        />
       </p>
     );
   }
@@ -503,11 +629,17 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
 }
 
 /**
- * Dev-only: flag a wrongly-rejected word for the supplement judge. It POSTs the
- * word with its Seed and Rhyme Key — what the judge needs to know *what it must
- * rhyme with* — to the dev-server queue; the judging (add / stress-correction /
- * derive-from-inflection / defer) happens later against that queue. Capture only
- * records, so this stays a thin fire-and-forget with a small status.
+ * Report a Submission the player believes should have counted as an Answer. One
+ * tap on the rejection sends the word with its Seed Word, the Seed's Rhyme Key,
+ * the reason it was refused and the reading the engine used — everything the
+ * supplement judge needs, so the player never retypes the word or explains
+ * themselves. The judging (add / stress-correction / derive-from-inflection /
+ * defer) happens later against the queue this feeds.
+ *
+ * Reporting is out of band and may fail freely: the verdict was already reached
+ * in the browser (ADR-0013), so an endpoint that is down or unreachable costs a
+ * report, never a Puzzle. That is why this is a thin fire-and-forget with a
+ * small status and no retry loop — the failure is shown, and play carries on.
  */
 function ShouldCountButton({
   word,
@@ -520,13 +652,13 @@ function ShouldCountButton({
   reason: RejectionReason;
   engineRespelling: string | null;
 }) {
-  const [status, setStatus] = useState<"idle" | "sending" | "queued" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  async function flag() {
-    if (status === "sending" || status === "queued") return;
+  async function appeal() {
+    if (status === "sending" || status === "sent") return;
     setStatus("sending");
     try {
-      const res = await fetch("/api/supplement-candidate", {
+      const res = await fetch(APPEAL_PATH, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -537,25 +669,29 @@ function ShouldCountButton({
           engineRespelling,
         }),
       });
-      setStatus(res.ok ? "queued" : "error");
+      setStatus(res.ok ? "sent" : "error");
     } catch {
       setStatus("error");
     }
   }
 
-  if (status === "queued") {
-    return <span className="feedback__flagged">✓ queued for the supplement</span>;
+  if (status === "sent") {
+    return (
+      <span className="feedback__appealed" role="status" aria-live="polite">
+        ✓ thanks — sent
+      </span>
+    );
   }
 
   return (
     <button
       type="button"
-      className="feedback__flag"
-      onClick={flag}
+      className="feedback__appeal"
+      onClick={appeal}
       disabled={status === "sending"}
-      title="Queue this word for the supplement judge"
+      title="Tell us this word should have counted"
     >
-      {status === "error" ? "⚠ retry" : "＋ should count"}
+      {status === "error" ? "⚠ didn’t send — retry" : "＋ should count"}
     </button>
   );
 }

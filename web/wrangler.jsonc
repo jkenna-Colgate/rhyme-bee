@@ -1,0 +1,74 @@
+{
+  // The deployed game: one Worker serving the built static assets and the
+  // out-of-band reporting endpoints beside them.
+  //
+  // This file is committed on purpose. Bindings declared here come into
+  // existence on deploy, which is the only durable home for them — a binding
+  // added in the dashboard is clobbered by the next deploy from a config that
+  // does not declare it (#114, Step 4).
+  //
+  // Secrets are the opposite: they are set on the Worker with
+  // `wrangler secret put` and must never appear here, because this file is in
+  // git. Nothing below is a credential.
+  //
+  // The names are settled in #114 and are not ours to improve.
+  //
+  // Deployed by `npm run deploy` from the repo root, which builds the index and
+  // the bundle first and then runs `wrangler deploy` here — one command, one
+  // atomic version carrying the Worker, the bundle and the index together. See
+  // docs/deploy.md for that loop and for how to roll a bad one back.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bramble-bee",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-05",
+
+  // Served from the unlisted `bramble-bee.jackkenna8.workers.dev`. Declared
+  // rather than left to default, because it is the whole public surface of the
+  // playtest: #113 rules out a custom domain, so this is the address that gets
+  // sent to friends.
+  "workers_dev": true,
+
+  // The built bundle, with the content-addressed Rhyme Index alongside it:
+  // `npm run build` writes the shell here and copies in the one hashed artifact
+  // and its manifest, and nothing else from `dist-data` (see indexAssetPlugin).
+  // `_headers` lands here too, and Workers reads it from the root of this
+  // directory — which is how the cache directives #117 settled on are declared
+  // by the deployment rather than inherited from host defaults.
+  //
+  // Assets are matched before the Worker runs, so loading the game never enters
+  // `worker/index.ts`.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+
+  // Where a should-have-counted Appeal is written, one object per Appeal (#119).
+  // A binding, not an access key: the Worker is handed the bucket itself, so
+  // there is no credential anywhere on the write path.
+  "r2_buckets": [
+    {
+      "binding": "APPEAL_QUEUE",
+      "bucket_name": "rhyme-bee-flags"
+    }
+  ],
+
+  // The tracker a general note is filed on (#118). A plaintext var, not a
+  // secret: which repository this game reports to is not a confidence, and
+  // naming it here keeps the deployment fact out of the source.
+  //
+  // The credential that files it is deliberately absent from this file. The
+  // fine-grained token lives as the Worker secret `GITHUB_ISSUE_TOKEN`, set
+  // with `wrangler secret put GITHUB_ISSUE_TOKEN --name bramble-bee` and
+  // referenced by name only (#114, Step 7) — this file is committed.
+  "vars": {
+    "ISSUE_REPO": "jkenna-Colgate/rhyme-bee"
+  }
+
+  // There is deliberately **no rate-limiting binding**. #114 Step 9 decided
+  // against one for the playtest: the URL is unlisted, the worst case is junk
+  // issues in a private tracker and a bucket that can be emptied, and both
+  // endpoints already degrade to "reporting broken, game still playable". That
+  // is a decision, not an omission — revisit it if the URL leaks or the
+  // playtest widens beyond friends, and add it here rather than in the
+  // dashboard when you do.
+}

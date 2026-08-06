@@ -2,31 +2,76 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
 import react from "@vitejs/plugin-react";
+import {
+  MANIFEST_FILENAME,
+  UNBUILT_ARTIFACT_FILENAME,
+  readIndexManifest,
+} from "../scripts/indexArtifact.ts";
+import { deployHeadersPlugin } from "./deployHeadersPlugin.ts";
+import { indexAssetPlugin } from "./indexAssetPlugin.ts";
 import { feedbackPlugin } from "./feedbackPlugin.ts";
 import { supplementPlugin } from "./supplementPlugin.ts";
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
+const distDataDir = resolve(rootDir, "../dist-data");
 
 /**
  * The web shell. Rooted in `web/`, it resolves the engine's TypeScript source in
  * `../src` directly — Vite (via esbuild) reads the `.ts` imports with no engine
  * build step, so `src/` never gains a runtime dependency.
  *
- * The built index artifact (`../dist-data/index.json`, produced by
- * `npm run build:index` at the repo root) is served as a static asset by
- * pointing `publicDir` at `dist-data`, so the browser loader can `fetch` it in
- * dev at `/index.json`.
+ * The built index artifact (produced by `npm run build:index` at the repo root)
+ * is served as a static asset from the site root, so the browser loader can
+ * `fetch` it there. In development that is `publicDir` pointed at `dist-data`;
+ * a build takes the named artifact and manifest only, via `indexAssetPlugin`,
+ * because the rest of `dist-data` is diagnostics and probe scripts that have no
+ * business on a public URL (#121).
+ *
+ * Its filename is content-addressed, and is **baked into the bundle here**, read
+ * from the manifest at build time (#117). There is deliberately no runtime
+ * manifest fetch: under a single deploy the bundle *is* the manifest, and a
+ * runtime lookup would add a blocking round trip before the 14 MB index could
+ * even start downloading, plus a second source of truth for which artifact is
+ * current. ADR-0013 records the runtime fetch as the upgrade path to a split
+ * deploy, at which point this constant becomes that `fetch`.
  */
-export default defineConfig({
-  root: rootDir,
-  // `feedbackPlugin` and `supplementPlugin` are dev-only (`apply: "serve"`); they
-  // add no build output.
-  plugins: [react(), feedbackPlugin(), supplementPlugin()],
-  publicDir: resolve(rootDir, "../dist-data"),
-  server: {
-    fs: {
-      // The engine source lives above web/, so allow serving from the repo root.
-      allow: [searchForWorkspaceRoot(rootDir)],
+export default defineConfig(({ command }) => {
+  const manifest = readIndexManifest(distDataDir);
+
+  // A production build with no index would ship a bundle that can never load
+  // one, so it fails here rather than in a player's browser. `npm run dev`
+  // carries on: a dev server that refuses to start is a worse answer than the
+  // shell's existing index-load error state, which says what is wrong.
+  if (manifest === null && command === "build") {
+    throw new Error(
+      `No ${MANIFEST_FILENAME} in ${distDataDir}. ` +
+        "Run `npm run build:index` from the repo root before building the shell.",
+    );
+  }
+
+  return {
+    root: rootDir,
+    // `feedbackPlugin` and `supplementPlugin` are dev-only (`apply: "serve"`);
+    // `deployHeadersPlugin` and `indexAssetPlugin` are build-only.
+    plugins: [
+      react(),
+      deployHeadersPlugin(),
+      indexAssetPlugin(distDataDir),
+      feedbackPlugin(),
+      supplementPlugin(),
+    ],
+    // The deploy contains only runtime assets, so a build takes nothing from
+    // `dist-data` wholesale — `indexAssetPlugin` names the two files that ship.
+    // The dev server has no upload to pay for and keeps the whole directory.
+    publicDir: command === "build" ? false : distDataDir,
+    define: {
+      __INDEX_ARTIFACT__: JSON.stringify(manifest?.index ?? UNBUILT_ARTIFACT_FILENAME),
     },
-  },
+    server: {
+      fs: {
+        // The engine source lives above web/, so allow serving from the repo root.
+        allow: [searchForWorkspaceRoot(rootDir)],
+      },
+    },
+  };
 });

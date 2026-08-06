@@ -100,6 +100,48 @@ code {
   font-size: 0.9em;
 }
 
+/* --- The start tap (#116) ------------------------------------------------- */
+
+.start-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.start-gate__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.start-gate__body {
+  margin: 0;
+  max-width: 28rem;
+  color: var(--muted);
+}
+
+.start-gate__start {
+  padding: 0.9rem 2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.start-gate__note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 /* --- The Seed Word ------------------------------------------------------- */
 
 .seed {
@@ -164,7 +206,8 @@ code {
   gap: 0.5rem;
 }
 
-.new-puzzle {
+.new-puzzle,
+.daily-puzzle {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -178,7 +221,17 @@ code {
   cursor: pointer;
 }
 
-.new-puzzle:hover {
+.new-puzzle:hover,
+.daily-puzzle:hover {
+  border-color: var(--accent);
+}
+
+/* The way out of the Tutorial, and back from a free-play draw. It sits beside
+   the free-play button and has to read as the onward route rather than a second
+   equal option, so it takes the accent the start tap uses. */
+.daily-puzzle {
+  color: var(--accent-ink);
+  background: var(--accent);
   border-color: var(--accent);
 }
 
@@ -308,8 +361,8 @@ code {
   color: var(--bad);
 }
 
-/* Dev-only "should count" flag on a rejection (supplement-candidate capture). */
-.feedback__flag {
+/* Dev-only "should count" Appeal on a rejection (supplement-candidate capture). */
+.feedback__appeal {
   margin-left: auto;
   padding: 0.15rem 0.55rem;
   border: 1px dashed currentColor;
@@ -322,11 +375,11 @@ code {
   opacity: 0.75;
 }
 
-.feedback__flag:hover:not(:disabled) {
+.feedback__appeal:hover:not(:disabled) {
   opacity: 1;
 }
 
-.feedback__flagged {
+.feedback__appealed {
   margin-left: auto;
   font-size: 0.8rem;
   opacity: 0.8;
@@ -627,10 +680,10 @@ code {
   }
 }
 
-/* --- Dev-only feedback button (#41) ------------------------------------- */
+/* --- Feedback button (#41, shipped by #118) ----------------------------- */
 /* A fixed, non-modal affordance: no backdrop, so the game stays interactive.
-   The button, endpoint and its JS are stripped from production builds by the
-   `import.meta.env.DEV` gate; these selectors then simply match nothing. */
+   It ships in production — a playtester's note is filed by the Worker rather
+   than the dev server, but the control itself is unchanged. */
 
 .feedback-fab {
   position: fixed;

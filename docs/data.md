@@ -2,19 +2,35 @@
 
 The Rhyme Index is a build artifact derived from three static, pinned inputs.
 The raw data is **not committed** (large, regenerable — see `.gitignore` and
-ADR-0003/0004). The build reads it from `data/`, writes `dist-data/index.json`,
-and the runtime loads that artifact with no network call.
+ADR-0003/0004). The build reads it from `data/` and writes the artifact to
+`dist-data/`, and adjudication runs against that artifact with no network call
+(ADR-0013).
 
 ```
-data/            (uncommitted)         dist-data/         (uncommitted)
-  cmudict.dict   pronunciations          index.json          the built index
-  words.txt      wordhood gate      ->   dropped-report.json why each word dropped
-  names.txt      proper nouns            derived-report.json what gained a reading
-  prevalence.csv knownness
+data/            (uncommitted)         dist-data/            (uncommitted)
+  cmudict.dict   pronunciations          index-<hash>.json     the built index
+  words.txt      wordhood gate      ->   index.manifest.json   which one is current
+  names.txt      proper nouns            dropped-report.json   why each word dropped
+  prevalence.csv knownness               derived-report.json   what gained a reading
   sources.json   pinned versions
   supplement.dict human overrides  (committed — see below)
   demotions.txt   human overrides  (committed — see below)
 ```
+
+The index is **content-addressed**: its filename carries a hash of its contents,
+so a rebuilt judge is a new filename rather than new bytes under an old one, and
+the artifact can be served immutably and still reach every player on the next
+deploy. `index.manifest.json` names the current one. Nothing reads the manifest
+at runtime — the web build reads it here and bakes the filename into the bundle
+— and it is kept anyway as the upgrade path to a split deploy. `scripts/indexArtifact.ts`
+owns the naming and is what every reader resolves through; `web/README.md` has
+the deploy half.
+
+`dist-data/` is a working directory as well as a build output — the two reports
+above live there, and so does every probe script anyone has written while chasing
+a rhyme bug. **Only the current artifact and the manifest are published**, by
+name, so nothing else written there ends up at a public URL. See
+[deploy.md](./deploy.md).
 
 `supplement.dict` and `demotions.txt` are the hand-authored inputs and the only
 committed files in `data/` — the permanent human override layer. The build merges
