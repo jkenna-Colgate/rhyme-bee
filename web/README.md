@@ -26,6 +26,26 @@ likely skipped step 1.
 - `npm run dev` — start the Vite dev server.
 - `npm run build` — production build into `web/dist`.
 - `npm run typecheck` — type-check the shell (`tsc --noEmit`).
+- `npm run deploy` — publish `web/dist` and the Worker as one version. Normally
+  reached as `npm run deploy` from the repo root, which builds the index first;
+  see [docs/deploy.md](../docs/deploy.md).
+- `npm run deploy:dry-run`, `npm run deployments`, `npm run rollback` — see what
+  would go up, list recent versions, put the previous one back.
+
+## What the build publishes
+
+`web/dist` is the uploaded assets directory, and it holds only what the running
+game needs: `index.html`, `assets/*`, `_headers`, the current
+`index-<hash>.json` and `index.manifest.json`.
+
+The dev server reaches the index through `publicDir`, which is the whole of
+`../dist-data` — but a **build takes a named list out of that directory instead**
+(`indexAssetPlugin.ts`), because `dist-data` is a working directory as much as a
+build output. The drop and derivation reports live there, and so does every probe
+script written while chasing a rhyme bug; publishing the directory wholesale put
+34 MB at a public URL, some 20 MB of it diagnostics and repo internals. An
+allow-list rather than a deny-list, so the next probe script is out of the deploy
+by default instead of having to be remembered.
 
 ## The index artifact, the manifest, and caching
 

@@ -3,7 +3,8 @@
 The game ships as a static, client-side artifact. The shell fetches the built
 Rhyme Index once, rehydrates it, and every Submission after that is judged in the
 browser — instantly, offline, with no request in flight. Hosting is a CDN
-(Cloudflare Pages, deployed from the maintainer's machine), not a server.
+(a Cloudflare Worker serving static assets, deployed from the maintainer's
+machine), not a server.
 
 This is written down now because the playtest makes it load-bearing for the first
 time. Until now "no server" was simply the absence of a decision: the engine is
@@ -111,7 +112,9 @@ brotli to matter, and awkward precisely because the artifact is not in git.
   report it. This is why the one-tap should-have-counted control is not a
   nice-to-have: it is the only sensor.
 - **Reporting is out-of-band, and may fail freely.** Both report endpoints are
-  Pages Functions sitting outside the loop. Exhausting the free request budget,
+  routes on the Worker, sitting outside the loop — reached only by a request no
+  static asset matched, so the game loads without entering Worker code at all.
+  Exhausting the free request budget,
   or taking them down entirely, degrades reporting only — the game keeps playing,
   because judging is local. Untrusted payloads are validated in the pure modules
   that own each record, and the closed rejection reason set

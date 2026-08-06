@@ -37,6 +37,16 @@ export const MANIFEST_FILENAME = "index.manifest.json";
  */
 const ARTIFACT_PATTERN = /^index-[0-9a-f]+\.json$/;
 
+/**
+ * What the index was called before it was content-addressed. Builds from before
+ * #117 left one behind, and it survived the sweep below because it does not
+ * match the pattern — a stale copy of the whole index, inert but indistinguish-
+ * able at a glance from the real one. A second, different judge lying beside the
+ * current one is the kind of thing that later gets found and believed, so the
+ * build clears it rather than leaving it to be recognised.
+ */
+const LEGACY_ARTIFACT_FILENAME = "index.json";
+
 /** 64 bits of SHA-256. Collisions are not the threat model; typos are. */
 const HASH_LENGTH = 16;
 
@@ -62,16 +72,18 @@ export function artifactName(contents: string): IndexManifest {
 
 /**
  * Write the artifact under its content-addressed name and the manifest beside
- * it, then drop artifacts from earlier builds. The sweep is not tidiness: the
- * whole directory is the web build's `publicDir`, so a stale 15 MB index left
- * lying about is a stale 15 MB index uploaded on every deploy.
+ * it, then drop indexes from earlier builds — both the content-addressed ones
+ * and the pre-#117 `index.json`. The sweep is not tidiness: this directory is
+ * where the offline scripts and the dev server look for *the* index, and a stale
+ * 15 MB copy of a judge nobody is running is a thing to be believed by mistake.
  */
 export function writeIndexArtifact(outDir: string, contents: string): IndexManifest {
   const manifest = artifactName(contents);
   writeFileSync(resolve(outDir, manifest.index), contents);
 
   for (const name of readdirSync(outDir)) {
-    if (ARTIFACT_PATTERN.test(name) && name !== manifest.index) rmSync(resolve(outDir, name));
+    const superseded = ARTIFACT_PATTERN.test(name) && name !== manifest.index;
+    if (superseded || name === LEGACY_ARTIFACT_FILENAME) rmSync(resolve(outDir, name));
   }
 
   writeFileSync(resolve(outDir, MANIFEST_FILENAME), `${JSON.stringify(manifest, null, 2)}\n`);

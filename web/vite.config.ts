@@ -8,6 +8,7 @@ import {
   readIndexManifest,
 } from "../scripts/indexArtifact.ts";
 import { deployHeadersPlugin } from "./deployHeadersPlugin.ts";
+import { indexAssetPlugin } from "./indexAssetPlugin.ts";
 import { feedbackPlugin } from "./feedbackPlugin.ts";
 import { supplementPlugin } from "./supplementPlugin.ts";
 
@@ -20,8 +21,11 @@ const distDataDir = resolve(rootDir, "../dist-data");
  * build step, so `src/` never gains a runtime dependency.
  *
  * The built index artifact (produced by `npm run build:index` at the repo root)
- * is served as a static asset by pointing `publicDir` at `dist-data`, so the
- * browser loader can `fetch` it at the site root.
+ * is served as a static asset from the site root, so the browser loader can
+ * `fetch` it there. In development that is `publicDir` pointed at `dist-data`;
+ * a build takes the named artifact and manifest only, via `indexAssetPlugin`,
+ * because the rest of `dist-data` is diagnostics and probe scripts that have no
+ * business on a public URL (#121).
  *
  * Its filename is content-addressed, and is **baked into the bundle here**, read
  * from the manifest at build time (#117). There is deliberately no runtime
@@ -48,9 +52,18 @@ export default defineConfig(({ command }) => {
   return {
     root: rootDir,
     // `feedbackPlugin` and `supplementPlugin` are dev-only (`apply: "serve"`);
-    // `deployHeadersPlugin` is build-only.
-    plugins: [react(), deployHeadersPlugin(), feedbackPlugin(), supplementPlugin()],
-    publicDir: distDataDir,
+    // `deployHeadersPlugin` and `indexAssetPlugin` are build-only.
+    plugins: [
+      react(),
+      deployHeadersPlugin(),
+      indexAssetPlugin(distDataDir),
+      feedbackPlugin(),
+      supplementPlugin(),
+    ],
+    // The deploy contains only runtime assets, so a build takes nothing from
+    // `dist-data` wholesale — `indexAssetPlugin` names the two files that ship.
+    // The dev server has no upload to pay for and keeps the whole directory.
+    publicDir: command === "build" ? false : distDataDir,
     define: {
       __INDEX_ARTIFACT__: JSON.stringify(manifest?.index ?? UNBUILT_ARTIFACT_FILENAME),
     },

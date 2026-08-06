@@ -10,6 +10,7 @@ The first thing built is the **Rhyme Index** — the offline lookup that answers
 - **[CONTEXT.md](./CONTEXT.md)** — the glossary. Seed Word, Rhyme Key, Answer, Bonus Word.
 - **[docs/adr/](./docs/adr/)** — the decisions, and why the obvious alternatives were rejected.
 - **[docs/data.md](./docs/data.md)** — the build pipeline and its pinned data inputs.
+- **[docs/deploy.md](./docs/deploy.md)** — how the game reaches players, the daily refine loop, and rolling a bad deploy back.
 - **`src/rhymeIndex.ts`** — the single seam: `adjudicate` and `buildPuzzle`.
 
 ## Building and testing
@@ -21,6 +22,7 @@ npm run typecheck
 npm run build:index   # build the index from pinned data in data/ (uncommitted)
 npm run histogram     # answer ADR-0004: how many playable Rhyme Keys exist
 npm run play          # play a Puzzle in the terminal
+npm run deploy        # build the index and the shell, and ship both — docs/deploy.md
 ```
 
 `play` and `histogram` draw Seed Words from a playable size band, set by the

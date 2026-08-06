@@ -26,6 +26,12 @@ at runtime — the web build reads it here and bakes the filename into the bundl
 owns the naming and is what every reader resolves through; `web/README.md` has
 the deploy half.
 
+`dist-data/` is a working directory as well as a build output — the two reports
+above live there, and so does every probe script anyone has written while chasing
+a rhyme bug. **Only the current artifact and the manifest are published**, by
+name, so nothing else written there ends up at a public URL. See
+[deploy.md](./deploy.md).
+
 `supplement.dict` and `demotions.txt` are the hand-authored inputs and the only
 committed files in `data/` — the permanent human override layer. The build merges
 them over the pinned inputs, so they survive the rebuild: the supplement's adds

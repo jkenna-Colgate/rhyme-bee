@@ -12,15 +12,31 @@
   // git. Nothing below is a credential.
   //
   // The names are settled in #114 and are not ours to improve.
+  //
+  // Deployed by `npm run deploy` from the repo root, which builds the index and
+  // the bundle first and then runs `wrangler deploy` here — one command, one
+  // atomic version carrying the Worker, the bundle and the index together. See
+  // docs/deploy.md for that loop and for how to roll a bad one back.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bramble-bee",
   "main": "worker/index.ts",
   "compatibility_date": "2026-08-05",
 
-  // The built bundle, with the content-addressed Rhyme Index alongside it —
-  // Vite's `publicDir` points at `../dist-data`, so `npm run build` lands both
-  // here. Assets are matched before the Worker runs, so loading the game never
-  // enters `worker/index.ts`.
+  // Served from the unlisted `bramble-bee.jackkenna8.workers.dev`. Declared
+  // rather than left to default, because it is the whole public surface of the
+  // playtest: #113 rules out a custom domain, so this is the address that gets
+  // sent to friends.
+  "workers_dev": true,
+
+  // The built bundle, with the content-addressed Rhyme Index alongside it:
+  // `npm run build` writes the shell here and copies in the one hashed artifact
+  // and its manifest, and nothing else from `dist-data` (see indexAssetPlugin).
+  // `_headers` lands here too, and Workers reads it from the root of this
+  // directory — which is how the cache directives #117 settled on are declared
+  // by the deployment rather than inherited from host defaults.
+  //
+  // Assets are matched before the Worker runs, so loading the game never enters
+  // `worker/index.ts`.
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
@@ -47,4 +63,12 @@
   "vars": {
     "ISSUE_REPO": "jkenna-Colgate/rhyme-bee"
   }
+
+  // There is deliberately **no rate-limiting binding**. #114 Step 9 decided
+  // against one for the playtest: the URL is unlisted, the worst case is junk
+  // issues in a private tracker and a bucket that can be emptied, and both
+  // endpoints already degrade to "reporting broken, game still playable". That
+  // is a decision, not an omission — revisit it if the URL leaks or the
+  // playtest widens beyond friends, and add it here rather than in the
+  // dashboard when you do.
 }

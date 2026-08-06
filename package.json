@@ -9,6 +9,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:index": "tsx scripts/build-index.ts",
+    "deploy": "npm run build:index && npm run --prefix web build && npm run --prefix web deploy",
     "build:schedule": "tsx scripts/build-schedule.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
