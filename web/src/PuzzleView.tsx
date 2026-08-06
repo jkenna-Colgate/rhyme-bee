@@ -52,10 +52,10 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // by both the boot decision and the "Today's Puzzle" control below.
   const date = useMemo(() => localCalendarDate(), []);
 
-  // Today's Puzzle, resolved whether or not the player boots into it: a first
-  // visit opens the Tutorial and then needs somewhere to go, and a player in Free
-  // Play needs the way back. Null means the schedule has nothing for this date,
-  // and the control below does not render.
+  // Today's Puzzle, resolved whether or not the player boots into it: a player
+  // in Free Play needs the way back, and a Tutorial would too were it switched
+  // on (#130). Null means the schedule has nothing for this date, and the
+  // control below does not render.
   const daily = useMemo(() => dailyPuzzle(index, SCHEDULE, date), [index, date]);
 
   const opening = useMemo(
@@ -152,12 +152,12 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
     inputRef.current?.focus();
   }
 
-  // The route to today's Puzzle from a Puzzle that is not it (#113). A first-ever
-  // visit boots the Tutorial, and until this existed the only way on was a manual
-  // reload — the free-play draw is a different Puzzle, not this one. Deliberately
-  // a control the player takes and not an advance the Tutorial's end performs:
-  // finishing is not the only reason to move on, and a player who is stuck should
-  // not have to finish to leave.
+  // The route to today's Puzzle from a Puzzle that is not it (#113): from a
+  // free-play draw, and from the Tutorial were it switched on (#130). Until this
+  // existed the only way on was a manual reload — the free-play draw is a
+  // different Puzzle, not this one. Deliberately a control the player takes and
+  // not an advance the Tutorial's end performs: finishing is not the only reason
+  // to move on, and a player who is stuck should not have to finish to leave.
   //
   // Unlike free play this opens a *dateful* Puzzle, so the Session it starts is
   // filed under the player's local date and survives a reload — and if they have
@@ -174,7 +174,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
   // not decoration: without a gesture the Seed Word is never spoken on a phone,
   // and a game adjudicated against a pronunciation the player never heard is a
   // game whose premise is discovered through rejection.
-  if (!started) return <StartGate tutorial={kind === "tutorial"} onStart={start} />;
+  if (!started) return <StartGate kind={kind} onStart={start} />;
 
   return (
     <section className="puzzle">
@@ -280,14 +280,32 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
 // --- The start tap ------------------------------------------------------------
 
 /**
+ * What the gate calls the Puzzle behind it — one caption per kind, so each of
+ * the three names itself (#132). It used to be told only whether the player was
+ * in the Tutorial, and captioned everything else "Today's puzzle": a Free Play
+ * draw served because the schedule had nothing for the player's date got
+ * announced as today's, while the label above the Seed Word said Free play, and
+ * a reload produced a *different* "today's puzzle" every time.
+ *
+ * Derived from the kind, not from whether a Daily Puzzle resolved. Inferring it
+ * would put the same coupling back one level down, with the gate again guessing
+ * at something it can simply be told.
+ */
+const START_TITLE: Record<PuzzleKind, string> = {
+  daily: "Today’s puzzle",
+  tutorial: "Welcome to Rhyme Bee",
+  free: "Free play",
+};
+
+/**
  * The opening beat, and the gesture browsers demand before they will speak.
  * Nothing about the Puzzle is on screen yet — the Seed Word arrives spoken and
  * written at the same moment, which is the order the game means.
  */
-function StartGate({ tutorial, onStart }: { tutorial: boolean; onStart: () => void }) {
+function StartGate({ kind, onStart }: { kind: PuzzleKind; onStart: () => void }) {
   return (
     <section className="start-gate">
-      <h2 className="start-gate__title">{tutorial ? "Welcome to Rhyme Bee" : "Today’s puzzle"}</h2>
+      <h2 className="start-gate__title">{START_TITLE[kind]}</h2>
       {/* The sound-not-spelling sentence used to be the Tutorial's alone, and it
           was the only part of the Tutorial carrying its weight (#130). It now
           reads on every visit, whichever Puzzle follows: it is the game's
