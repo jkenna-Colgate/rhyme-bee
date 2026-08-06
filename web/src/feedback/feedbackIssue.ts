@@ -11,6 +11,8 @@
  * the browser, never a request for a verdict (ADR-0013).
  */
 
+import { hasOnlyFields, refuse, type Validated } from "../../../src/report.ts";
+
 /** The live game context stamped onto a feedback issue, read at submit time. */
 export interface FeedbackContext {
   seedWord: string;
@@ -135,11 +137,11 @@ export interface FeedbackNote {
 /**
  * The outcome of reading an untrusted note: either a whole note or a refusal.
  * There is deliberately no third state — a caller cannot get half a note out of
- * this, so a refused one can never be half-filed.
+ * this, so a refused one can never be half-filed. Shares its shape with
+ * `CandidateReport` (`src/supplementCandidate.ts`) via `Validated`
+ * (`src/report.ts`); only the fields of a note are specific to this module.
  */
-export type NoteReport = { ok: true; note: FeedbackNote } | { ok: false; error: string };
-
-const refuse = (error: string): NoteReport => ({ ok: false, error });
+export type NoteReport = Validated<"note", FeedbackNote>;
 
 /**
  * Coerce an untrusted request body into a note, or refuse it.
@@ -161,9 +163,7 @@ export function noteFromReport(body: unknown): NoteReport {
   }
   const report = body as Record<string, unknown>;
 
-  for (const field of Object.keys(report)) {
-    if (!NOTE_FIELDS.has(field)) return refuse("Unrecognised field in note.");
-  }
+  if (!hasOnlyFields(report, NOTE_FIELDS)) return refuse("Unrecognised field in note.");
 
   if (typeof report.text !== "string") return refuse("Note text is required.");
   const text = report.text.trim();
@@ -183,9 +183,7 @@ function contextFromReport(value: unknown): FeedbackContext | null {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return null;
   const raw = value as Record<string, unknown>;
 
-  for (const field of Object.keys(raw)) {
-    if (!CONTEXT_FIELDS.has(field)) return null;
-  }
+  if (!hasOnlyFields(raw, CONTEXT_FIELDS)) return null;
 
   const seedWord = line(raw.seedWord);
   const rank = line(raw.rank);
