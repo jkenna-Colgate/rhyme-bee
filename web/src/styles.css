@@ -100,6 +100,48 @@ code {
   font-size: 0.9em;
 }
 
+/* --- The start tap (#116) ------------------------------------------------- */
+
+.start-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.start-gate__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.start-gate__body {
+  margin: 0;
+  max-width: 28rem;
+  color: var(--muted);
+}
+
+.start-gate__start {
+  padding: 0.9rem 2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.start-gate__note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 /* --- The Seed Word ------------------------------------------------------- */
 
 .seed {
