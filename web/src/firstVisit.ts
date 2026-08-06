@@ -4,11 +4,10 @@
  * it runs once and is never shown again: not on a reload, and not tomorrow.
  *
  * Thin, untested I/O, on the same principle as the browser index loader: there
- * is no logic here to cover, only a `localStorage` read and write. Both are
- * wrapped, because in a locked-down Safari `localStorage` *throws* on access
- * rather than returning null. The failure mode that leaves is a player who is
- * shown the Tutorial on every visit, which is survivable; a boot that throws is
- * not.
+ * is no logic here to cover, only a `localStorage` read and write, guarded
+ * the same way and for the same reason as `usePuzzleSession.ts`'s — the
+ * game's other touch point. Here the failure mode is a player shown the
+ * Tutorial on every visit, which is survivable; a boot that throws is not.
  */
 
 const VISITED_KEY = "rhyme-bee:visited";

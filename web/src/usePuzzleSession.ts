@@ -8,13 +8,15 @@
  * returns a fresh one), a single `useState` cell drives re-renders — nothing is
  * denormalised here.
  *
- * It also holds the daily Puzzle's persistence, and this is the *only* place in
- * the game that touches `localStorage`. The format is the engine's
- * (`sessionSnapshot.ts`); the transport is this file's, and it stays thin,
- * untested I/O — the same principle under which the browser index loader is left
- * untested. What is written is the raw Submissions in order, never the verdicts,
- * so a resume replays them through whatever judge shipped today and a word
- * wrongly refused last week starts counting on its own.
+ * It also holds the daily Puzzle's persistence. `firstVisit.ts` is the only
+ * other place in the game that touches `localStorage` — its own guarded
+ * read/write, for a single boolean flag rather than a Session. The format
+ * here is the engine's (`sessionSnapshot.ts`); the transport is this file's,
+ * and it stays thin, untested I/O — the same principle under which the
+ * browser index loader is left untested. What is written is the raw
+ * Submissions in order, never the verdicts, so a resume replays them through
+ * whatever judge shipped today and a word wrongly refused last week starts
+ * counting on its own.
  *
  * Only the Daily Puzzle persists. A Free Play Seed is drawn at random and the
  * Tutorial is shown once ever; neither has a stable date to key on, so neither
@@ -92,7 +94,12 @@ interface Play {
   date: string | null;
 }
 
-/** A blocked or full store costs the resume, never the Puzzle. */
+/**
+ * Guarded because a locked-down Safari makes `localStorage` throw on access
+ * rather than returning null or failing silently — `firstVisit.ts` wraps its
+ * own read/write the same way, for the same reason. Here, a blocked or full
+ * store costs the resume, never the Puzzle.
+ */
 function read(key: string): string | null {
   try {
     return window.localStorage.getItem(key);
