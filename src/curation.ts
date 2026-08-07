@@ -15,10 +15,12 @@
 
 import type { RhymeKey } from "./phonology.ts";
 import { splitFamily, type RhymeIndex } from "./rhymeIndex.ts";
+import type { PuzzleFacts } from "./schedule.ts";
 import {
   DEFAULT_SCORING_CONFIG,
   isRare,
   scoreEntry,
+  type Scorable,
   type ScoringConfig,
 } from "./scoring.ts";
 
@@ -157,6 +159,40 @@ export function playableSeeds(
   return curate(index, { sizeBand: band }).candidates;
 }
 
+/**
+ * The three figures a Puzzle is curated and scheduled on: how many Answers it
+ * holds, the maximum Score they sum to, and its Difficulty — the share of that
+ * maximum living in rare Answers (ADR-0007), so a common-only player's Rank
+ * ceiling is exactly `1 − difficulty`.
+ *
+ * Both the curation sweep and the Editor's Pass measure a Puzzle through this,
+ * so "the Difficulty of this Puzzle" cannot mean two things depending on who
+ * asked. Points come from the shared `scoreEntry`, which keeps that identity
+ * exact.
+ *
+ * Returns `PuzzleFacts` rather than a structural twin of it: what this measures
+ * is what the schedule records and what `checkDayDrift` reads back, and the
+ * Editor's Pass feeds one straight into the other.
+ */
+export function measureAnswers(
+  answers: Scorable[],
+  scoring: ScoringConfig = DEFAULT_SCORING_CONFIG,
+): PuzzleFacts {
+  let maxScore = 0;
+  let rareMass = 0;
+  for (const answer of answers) {
+    const points = scoreEntry(answer, scoring);
+    maxScore += points;
+    if (isRare(answer.knownness, scoring)) rareMass += points;
+  }
+  // A family with no Answers (below-band) has no Score to divide.
+  return {
+    answerCount: answers.length,
+    maxScore,
+    difficulty: maxScore === 0 ? 0 : rareMass / maxScore,
+  };
+}
+
 export function curate(index: RhymeIndex, options: CurationOptions): CurationReport {
   const accentUnstable = options.accentUnstable ?? new Set<RhymeKey>();
   const blocked = options.blocked ?? new Map<string, string>();
@@ -191,27 +227,15 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
       if (!derivation.isDerived(member.word)) nativeCount++;
     }
 
-    // Difficulty from the shared per-Answer points (`scoreEntry`, so the
-    // `1 − difficulty` identity stays exact): the rare-only mass over the
-    // whole maximum achievable Score (ADR-0007).
-    let maxScore = 0;
-    let rareMass = 0;
-    for (const answer of answers) {
-      const points = scoreEntry(
-        { length: answer.length, knownness: answer.knownness },
-        scoring,
-      );
-      maxScore += points;
-      if (isRare(answer.knownness, scoring)) rareMass += points;
-    }
+    const measured = measureAnswers(answers, scoring);
 
     const family: FamilyEntry = {
       rhymeKey,
       representative,
-      answerCount: answers.length,
+      answerCount: measured.answerCount,
       bonusCount: bonusWords.length,
       multiplePronunciations: index.isAmbiguous(representative),
-      difficulty: maxScore === 0 ? 0 : rareMass / maxScore,
+      difficulty: measured.difficulty,
       nativeCount,
       mergedKeys: rhymeFamily.mergedKeys,
     };

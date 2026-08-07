@@ -96,8 +96,8 @@ them apart.
   backlog wearing a data-fix costume.
 - **The schedule pins Seed Words, so a rebuild cannot reshuffle the calendar.**
   It can still move a scheduled Seed's answer count out of band or change its
-  Difficulty. Accepted: after review, band membership is advisory, and the daily
-  play-ahead is what surfaces a Puzzle that has drifted.
+  Difficulty. Accepted: after review, band membership is advisory, and the
+  Editor's Pass is what surfaces a Puzzle that has drifted.
 - **Review binds only if the build is deterministic.** #75 pins a Seed to a real
   dictionary reading reproducibly across rebuilds; without it, the Seed approved
   last night can be *spoken* differently today, and approval guarantees nothing.

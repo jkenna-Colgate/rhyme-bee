@@ -24,7 +24,7 @@
  */
 
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 /** Names the current artifact. Written by the build, read only at build time. */
@@ -111,4 +111,107 @@ export function indexArtifactPath(outDir: string): string {
     );
   }
   return resolve(outDir, manifest.index);
+}
+
+// --- Is the built artifact still current? --------------------------------------
+
+/**
+ * Every file `build-index.ts` reads, in the order that script reads them. Taken
+ * from the code rather than from prose: this list is only useful if it is
+ * complete, and a forgotten input is a fix that silently never ships.
+ *
+ * `data/schedule.json` is deliberately absent. It is read by the web bundle and
+ * never by the Index (`bootPuzzle.ts` imports it into the bundle), so a Seed
+ * Word swap needs a rebuild of the bundle and nothing else — which is the four
+ * minutes this predicate exists to give back.
+ *
+ * Two of these (`words.txt`, `names.txt`) are gitignored and regenerable from
+ * pinned upstream sources (ADR-0003), so on a fresh clone they may be absent
+ * altogether. Absent counts as stale; see below.
+ */
+const DATA_INPUTS = [
+  "sources.json",
+  "cmudict.dict",
+  "words.txt",
+  "names.txt",
+  "prevalence.csv",
+  "demotions.txt",
+  "supplement.dict",
+];
+
+/**
+ * The build's own source counts as an input.
+ *
+ * #134 specified data inputs only, which leaves a hole: a change to the code
+ * that manufactures the index is not a data change, so an edit to a
+ * normalisation rule or an affix would ship a bundle whose judge predates it,
+ * silently. That is the exact failure the err-toward-rebuilding bias exists to
+ * prevent, so it is closed here rather than left to be discovered.
+ *
+ * The sweep is every module in `src/` plus the two scripts the build is made
+ * of, rather than the import graph `build-index.ts` actually pulls in.
+ * Resolving imports would be more precise and is the wrong trade: the cost of
+ * over-reaching is an occasional unnecessary four minutes during development,
+ * and the cost of under-reaching reaches players. `src/` is the engine, and
+ * nearly all of it is in that graph already. The rest of `scripts/` is not —
+ * the play REPL and the Editor's Pass cannot change a verdict — so it is left
+ * out, and an editor reading tomorrow's Puzzle does not pay for a rebuild.
+ */
+const CODE_INPUTS = ["scripts/build-index.ts", "scripts/indexArtifact.ts"];
+const CODE_INPUT_DIR = "src";
+const CODE_INPUT_PATTERN = /\.ts$/;
+const CODE_INPUT_SKIP = /^(__tests__|__fixtures__)$/;
+
+/** Absolute paths of every input the built index depends on, present or not. */
+export function indexInputs(root: string): string[] {
+  return [
+    ...DATA_INPUTS.map((name) => resolve(root, "data", name)),
+    ...CODE_INPUTS.map((name) => resolve(root, name)),
+    ...typeScriptFiles(resolve(root, CODE_INPUT_DIR)),
+  ];
+}
+
+function typeScriptFiles(dir: string): string[] {
+  if (!existsSync(dir)) return [];
+  const found: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      if (!CODE_INPUT_SKIP.test(entry.name)) found.push(...typeScriptFiles(resolve(dir, entry.name)));
+    } else if (CODE_INPUT_PATTERN.test(entry.name)) {
+      found.push(resolve(dir, entry.name));
+    }
+  }
+  return found;
+}
+
+export interface IndexStaleness {
+  stale: boolean;
+  /** Null only when the artifact is current. */
+  reason: "no-artifact" | "missing-input" | "input-newer" | null;
+  /** The input that settled it, absolute, when an input did. */
+  input?: string;
+}
+
+/**
+ * Whether the built index needs rebuilding: is any input newer than the
+ * artifact, or missing, or is there no artifact at all.
+ *
+ * **The two errors are not symmetric, and this is not neutral between them.** A
+ * checkout or a re-save bumps a timestamp and costs a wasted four minutes. The
+ * reverse — shipping a bundle whose judge lacks the fix just made — is silent
+ * and reaches players, who have no way to see it. So anything unclear rebuilds:
+ * a missing artifact, a missing input, an input whose timestamp merely ties.
+ */
+export function indexStaleness(root: string, outDir = resolve(root, "dist-data")): IndexStaleness {
+  const manifest = readIndexManifest(outDir);
+  if (manifest === null) return { stale: true, reason: "no-artifact" };
+  const builtAt = statSync(resolve(outDir, manifest.index)).mtimeMs;
+
+  for (const input of indexInputs(root)) {
+    if (!existsSync(input)) return { stale: true, reason: "missing-input", input };
+    // `>=` rather than `>`: a same-millisecond tie is unresolvable, and the tie
+    // breaks toward rebuilding for the reason above.
+    if (statSync(input).mtimeMs >= builtAt) return { stale: true, reason: "input-newer", input };
+  }
+  return { stale: false, reason: null };
 }

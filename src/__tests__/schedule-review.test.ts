@@ -7,11 +7,16 @@
  * week, and the days flagged as worth reading first.
  */
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
+  checkDayDrift,
   dealSchedule,
   DAYS_PER_WEEK,
+  parseSchedule,
   reviewSchedule,
+  scheduleBands,
   type Reviewable,
 } from "../schedule.ts";
 
@@ -126,5 +131,136 @@ describe("the days flagged as worth reading first", () => {
     ]);
     const dates = many.map((d) => d.date);
     expect([...dates].sort()).toEqual(dates);
+  });
+});
+
+/**
+ * The other half of ADR-0012: review binds the calendar, not what a Puzzle
+ * contains. A rebuild can move a scheduled Seed's Answer count out of the size
+ * band or shift its Difficulty off the weekday rung it was dealt for, and the
+ * Editor's Pass is what surfaces that the night before it ships.
+ *
+ * The bands come from the real committed artifact, as `schedule-dates.test.ts`
+ * does — a drift check that agreed with a hand-written stand-in would be
+ * checking days nobody plays. The drifted and un-drifted cases are constructed,
+ * because they are about the arithmetic and not about any particular day.
+ */
+describe("the drift check", () => {
+  const artifact: unknown = JSON.parse(
+    readFileSync(fileURLToPath(new URL("../../data/schedule.json", import.meta.url)), "utf8"),
+  );
+  const schedule = parseSchedule(artifact)!;
+  const bands = scheduleBands(schedule);
+  const monday = schedule.days.find((d) => d.weekday === "Mon")!;
+  const mondayBand = bands.weekday.find((b) => b.weekday === "Mon")!;
+
+  /** The Puzzle a day was recorded as, so a test can move one figure at a time. */
+  const asRecorded = (day = monday) => ({
+    answerCount: day.answerCount,
+    maxScore: 180,
+    difficulty: day.difficulty,
+  });
+
+  it("recovers both bands from the committed artifact", () => {
+    expect(bands.size).toEqual({ min: 20, max: 120 });
+    expect(bands.weekday.map((b) => b.weekday)).toEqual([
+      "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
+    ]);
+    expect(mondayBand.min).toBeLessThanOrEqual(mondayBand.max);
+  });
+
+  it("reports the recorded and the recomputed figures side by side", () => {
+    const drift = checkDayDrift(monday, { answerCount: 34, maxScore: 205, difficulty: 0.5 }, bands);
+    expect(drift.recorded).toEqual({
+      answerCount: monday.answerCount,
+      difficulty: monday.difficulty,
+    });
+    expect(drift.recomputed).toEqual({ answerCount: 34, maxScore: 205, difficulty: 0.5 });
+    expect(drift.date).toBe(monday.date);
+    expect(drift.seed).toBe(monday.seed);
+    expect(drift.rhymeKey).toBe(monday.rhymeKey);
+  });
+
+  it("leaves a day sitting inside both bands undrifted", () => {
+    const drift = checkDayDrift(monday, asRecorded(), bands);
+    expect(drift.drifted).toBe(false);
+    expect(drift.reasons).toEqual([]);
+  });
+
+  it("reports a day whose Difficulty has left its weekday band", () => {
+    const drift = checkDayDrift(
+      monday,
+      { ...asRecorded(), difficulty: mondayBand.max + 0.2 },
+      bands,
+    );
+    expect(drift.drifted).toBe(true);
+    expect(drift.reasons).toEqual(["difficulty-out-of-band"]);
+    expect(drift.weekdayBand).toEqual(mondayBand);
+  });
+
+  it("reports a Difficulty below its weekday band too, not only above", () => {
+    const drift = checkDayDrift(
+      monday,
+      { ...asRecorded(), difficulty: mondayBand.min - 0.2 },
+      bands,
+    );
+    expect(drift.reasons).toEqual(["difficulty-out-of-band"]);
+  });
+
+  it("reports a day whose Answer count has left the size band", () => {
+    const belowBand = checkDayDrift(monday, { ...asRecorded(), answerCount: 4 }, bands);
+    expect(belowBand.reasons).toEqual(["answer-count-out-of-band"]);
+    const aboveBand = checkDayDrift(monday, { ...asRecorded(), answerCount: 400 }, bands);
+    expect(aboveBand.reasons).toEqual(["answer-count-out-of-band"]);
+  });
+
+  it("reports both reasons when a day has left both bands", () => {
+    const drift = checkDayDrift(
+      monday,
+      { answerCount: 400, maxScore: 4000, difficulty: mondayBand.max + 0.2 },
+      bands,
+    );
+    expect(drift.reasons).toEqual(["answer-count-out-of-band", "difficulty-out-of-band"]);
+  });
+
+  it("does not call the artifact's own rounding a drift", () => {
+    // Difficulty is recorded to four decimal places, so a day sitting exactly on
+    // its band edge is half a step outside it as often as not. That is
+    // arithmetic, not a Puzzle that moved.
+    const drift = checkDayDrift(
+      monday,
+      { ...asRecorded(), difficulty: mondayBand.min - 0.00004 },
+      bands,
+    );
+    expect(drift.drifted).toBe(false);
+  });
+
+  it("still reports a day that has moved further than the rounding explains", () => {
+    // The slack is half a step of four-decimal rounding and no more: 6e-5 is
+    // outside anything `toFixed(4)` can account for, so it is a Puzzle that
+    // moved. A wider tolerance would swallow this.
+    for (const difficulty of [mondayBand.min - 0.00006, mondayBand.max + 0.00006]) {
+      const drift = checkDayDrift(monday, { ...asRecorded(), difficulty }, bands);
+      expect(drift.reasons).toEqual(["difficulty-out-of-band"]);
+    }
+  });
+
+  it("holds every committed day inside the bands it was dealt from", () => {
+    // Nothing has been rebuilt since the deal, so every day agrees with itself.
+    // This is the baseline the check is read against: a report on a fresh clone
+    // should be empty, and anything in it is a real change.
+    const drifted = schedule.days
+      .filter((day) => checkDayDrift(day, asRecorded(day), bands).drifted)
+      .map((day) => day.date);
+    expect(drifted).toEqual([]);
+  });
+
+  it("constrains only the size band when the artifact records no weekday for it", () => {
+    // A weekday the run never fills has no band to be outside of, so the day is
+    // reported with a null band rather than the check inventing one.
+    const sunday = { ...monday, weekday: "Sun" as const };
+    const drift = checkDayDrift(sunday, asRecorded(), { weekday: [], size: bands.size });
+    expect(drift.weekdayBand).toBeNull();
+    expect(drift.drifted).toBe(false);
   });
 });

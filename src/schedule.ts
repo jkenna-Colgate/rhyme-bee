@@ -158,6 +158,19 @@ export interface ScheduleDay {
 export interface Schedule {
   startDate: string;
   days: ScheduleDay[];
+  /**
+   * The Answer-count band the run was dealt from, when the artifact records one.
+   * Nothing a player does needs it — it is here so the Editor's Pass can ask
+   * whether a Puzzle has since drifted out of the band it was chosen for,
+   * without re-running a deal to find out what that band was.
+   */
+  band?: SizeBand;
+}
+
+/** An inclusive Answer-count band. */
+export interface SizeBand {
+  min: number;
+  max: number;
 }
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -188,11 +201,19 @@ function isScheduleDay(value: unknown): value is ScheduleDay {
  */
 export function parseSchedule(raw: unknown): Schedule | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const artifact = raw as { startDate?: unknown; days?: unknown };
+  const artifact = raw as { startDate?: unknown; days?: unknown; band?: unknown };
   if (typeof artifact.startDate !== "string") return null;
   if (!Array.isArray(artifact.days) || artifact.days.length === 0) return null;
   if (!artifact.days.every(isScheduleDay)) return null;
-  return { startDate: artifact.startDate, days: artifact.days };
+  const schedule: Schedule = { startDate: artifact.startDate, days: artifact.days };
+  // Optional, and deliberately not a reason to reject the file: a schedule with
+  // no recorded band still serves Puzzles perfectly well, and only the Editor's
+  // Pass is poorer for its absence.
+  const band = artifact.band as Partial<SizeBand> | undefined;
+  if (typeof band?.min === "number" && typeof band.max === "number") {
+    schedule.band = { min: band.min, max: band.max };
+  }
+  return schedule;
 }
 
 /**
@@ -269,6 +290,24 @@ export interface ScheduleReview<T extends Reviewable> {
 }
 
 /**
+ * The Difficulty range each weekday actually spans — the ramp, one rung per
+ * weekday, in Monday-to-Sunday order. Shared by the review of a fresh deal and
+ * by the Editor's Pass reading the committed artifact months later, because the
+ * band a day was dealt from is the same band either way round.
+ */
+function bandsByWeekday(entries: { weekday: Weekday; difficulty: number }[]): WeekdayBand[] {
+  const bands: WeekdayBand[] = [];
+  for (const weekday of WEEKDAYS) {
+    const band = entries.filter((e) => e.weekday === weekday).map((e) => e.difficulty);
+    // A pool shorter than a week leaves later weekdays unfilled; a band with no
+    // members has no range to report, so it is absent rather than infinite.
+    if (band.length === 0) continue;
+    bands.push({ weekday, min: Math.min(...band), max: Math.max(...band) });
+  }
+  return bands;
+}
+
+/**
  * A Seed Word this short is unlikely to be a word the player recognises when it
  * is spoken to them — abbreviations and fragments hold wordhood and are always
  * short.
@@ -308,14 +347,9 @@ export function reviewSchedule<T extends Reviewable>(deal: Deal<T>): ScheduleRev
   const { days, finalWeekLength } = deal;
   const weeks = Math.ceil(days.length / DAYS_PER_WEEK);
 
-  const ramp: WeekdayBand[] = [];
-  for (const weekday of WEEKDAYS) {
-    const band = days.filter((d) => d.weekday === weekday).map((d) => d.entry.difficulty);
-    // A pool shorter than a week leaves later weekdays unfilled; a band with no
-    // members has no range to report, so it is absent rather than infinite.
-    if (band.length === 0) continue;
-    ramp.push({ weekday, min: Math.min(...band), max: Math.max(...band) });
-  }
+  const ramp = bandsByWeekday(
+    days.map((d) => ({ weekday: d.weekday, difficulty: d.entry.difficulty })),
+  );
 
   const shortFinalWeek =
     finalWeekLength > 0
@@ -328,5 +362,108 @@ export function reviewSchedule<T extends Reviewable>(deal: Deal<T>): ScheduleRev
     ramp,
     shortFinalWeek,
     flagged: days.filter(isFlagged),
+  };
+}
+
+// --- The drift check (the Editor's Pass) ---------------------------------------
+
+/**
+ * The bands a committed day was dealt from, recovered from the artifact itself
+ * rather than by re-running a deal. Both are already recorded there: the size
+ * band directly, the weekday's Difficulty band as the range its days span.
+ */
+export function scheduleBands(schedule: Schedule): {
+  weekday: WeekdayBand[];
+  size: SizeBand | undefined;
+} {
+  return { weekday: bandsByWeekday(schedule.days), size: schedule.band };
+}
+
+/**
+ * What the built Rhyme Index produces for a Seed Word *now* — the three figures
+ * the schedule was dealt on, two of which it records.
+ */
+export interface PuzzleFacts {
+  answerCount: number;
+  /** The sum of every Answer's points: Rank's denominator, and the Score to beat. */
+  maxScore: number;
+  difficulty: number;
+}
+
+export type DriftReason = "answer-count-out-of-band" | "difficulty-out-of-band";
+
+/** One scheduled day, as recorded and as the index reads it today. */
+export interface DayDrift {
+  date: string;
+  weekday: Weekday;
+  seed: string;
+  rhymeKey: string;
+  /** What the schedule was dealt with. `maxScore` was never recorded. */
+  recorded: { answerCount: number; difficulty: number };
+  recomputed: PuzzleFacts;
+  /** The weekday's Difficulty band, or null for a weekday the run never fills. */
+  weekdayBand: WeekdayBand | null;
+  sizeBand: SizeBand | undefined;
+  drifted: boolean;
+  /** Empty when the day has not drifted. */
+  reasons: DriftReason[];
+}
+
+/**
+ * The artifact records Difficulty to four decimal places, so a recomputed value
+ * can sit up to half a step outside a band it never actually left. Tolerate the
+ * rounding rather than reporting arithmetic as drift.
+ *
+ * Half a step of `toFixed(4)` is `5e-5`, and the slack is exactly that: any
+ * wider and it absorbs real drift on either edge as well as the rounding it is
+ * here for.
+ */
+const DIFFICULTY_TOLERANCE = 5e-5;
+
+/**
+ * Whether a scheduled day still holds the Puzzle it was scheduled as.
+ *
+ * The review binds the calendar (ADR-0012) but not what a Puzzle contains: a
+ * rebuild can move a Seed's Answer count out of the size band or shift its
+ * Difficulty off the weekday rung it was dealt for, and after review band
+ * membership is only advisory. This is what surfaces that.
+ *
+ * Both sets of figures are reported whether or not the day drifted. A day that
+ * has moved and is still inside its band is worth the editor's eye, and hiding
+ * it would defeat the point of looking.
+ */
+export function checkDayDrift(
+  day: ScheduleDay,
+  recomputed: PuzzleFacts,
+  bands: { weekday: WeekdayBand[]; size: SizeBand | undefined },
+): DayDrift {
+  const weekdayBand = bands.weekday.find((b) => b.weekday === day.weekday) ?? null;
+  const reasons: DriftReason[] = [];
+
+  if (
+    bands.size !== undefined &&
+    (recomputed.answerCount < bands.size.min || recomputed.answerCount > bands.size.max)
+  ) {
+    reasons.push("answer-count-out-of-band");
+  }
+  if (
+    weekdayBand !== null &&
+    (recomputed.difficulty < weekdayBand.min - DIFFICULTY_TOLERANCE ||
+      recomputed.difficulty > weekdayBand.max + DIFFICULTY_TOLERANCE)
+  ) {
+    reasons.push("difficulty-out-of-band");
+  }
+
+  return {
+    date: day.date,
+    weekday: day.weekday,
+    seed: day.seed,
+    rhymeKey: day.rhymeKey,
+    recorded: { answerCount: day.answerCount, difficulty: day.difficulty },
+    recomputed,
+    weekdayBand,
+    sizeBand: bands.size,
+    drifted: reasons.length > 0,
+    reasons,
   };
 }

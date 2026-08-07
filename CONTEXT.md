@@ -87,3 +87,7 @@ _Avoid_: Flag (the maintainer-facing schedule review flags the days worth readin
 **Candidate**:
 The record an Appeal becomes: the Submission, the reason the engine gave for rejecting it, and the context a judge needs to rule on it later. Judging is a separate offline pass over the queue, and may end in a correction to the pronunciation the engine reads — so a Candidate is the report, never the fix.
 _Avoid_: Suggestion, correction, fix (those name what judging may produce, not what the player sent)
+
+**Editor's Pass**:
+The puzzles editor's read of a Daily Puzzle before its date arrives, and the corrections that read produces. It is a *read*, not a play: the editor scans the day's Answers and Bonus Words as text — against a third-party rhyme list in another window — and never opens a Session. The term covers both halves of the loop, because they are one activity rather than two: the pass surfaces a Puzzle that has drifted out of the band it was dealt from or is missing an obvious rhyme, and the words it adds are added in the same sitting, by name alone.
+_Avoid_: play-ahead, preflight, daily review
