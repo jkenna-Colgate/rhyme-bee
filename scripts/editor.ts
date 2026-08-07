@@ -43,7 +43,7 @@
  * tested there.
  */
 
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcess } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -376,9 +376,10 @@ function evidenceContext(): EvidenceContext {
  * print mode on the maintainer's Pro subscription, no API key and no new
  * dependency.
  *
- * Never throws. A missing CLI, a non-zero exit and unparseable output are all
- * the same outcome to the caller — the word is deferred and the night carries
- * on. A tooling problem costs a few words, not the evening.
+ * Never throws, and never waits forever. A missing CLI, a non-zero exit,
+ * unparseable output and a process that simply hangs are all the same outcome
+ * to the caller — the word is deferred and the night carries on. A tooling
+ * problem costs a few words, not the evening.
  */
 function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation | null> {
   const prompt = [
@@ -396,12 +397,53 @@ function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation 
   return new Promise((done) => {
     const child = spawn("claude", ["-p", "--model", "sonnet"], { shell: true });
     let stdout = "";
+    let settled = false;
+    const settle = (reading: Pronunciation | null): void => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      done(reading);
+    };
+    // `error` and `close` between them cover a CLI that is absent and one that
+    // fails. Neither fires for one that hangs — waiting on a login prompt at a
+    // stdin already closed, or on a stalled network — so the wait is bounded
+    // here, and the word takes the path a missing CLI takes.
+    const timer = setTimeout(() => {
+      killTree(child);
+      settle(null);
+    }, AGENT_TIMEOUT_MS);
     child.stdout.on("data", (chunk) => (stdout += chunk));
     child.stderr.on("data", () => {});
-    child.on("error", () => done(null));
-    child.on("close", (code) => done(code === 0 ? parseReading(stdout) : null));
+    child.on("error", () => settle(null));
+    child.on("close", (code) => settle(code === 0 ? parseReading(stdout) : null));
     child.stdin.end(prompt);
   });
+}
+
+/**
+ * How long the agent gets for one word. Headless `claude -p` answers a request
+ * this small — one word, one line of ARPAbet — in seconds; a minute means it is
+ * not going to, and no amount of further waiting changes that. Erring long
+ * because the cost of being wrong is asymmetric: too short defers a word the
+ * agent would have authored, too long is the night this bound exists to save.
+ */
+const AGENT_TIMEOUT_MS = 60_000;
+
+/**
+ * End the abandoned CLI, so it does not outlive the command that asked it a
+ * question. `shell: true` is what lets `claude` be found on Windows, where it
+ * is a `.cmd` shim — but it also means the child this program holds is the
+ * shell, and killing that alone would orphan the CLI under it. `taskkill /t`
+ * takes the tree. Elsewhere the shell execs the command in place, so the signal
+ * reaches the CLI directly.
+ */
+function killTree(child: ChildProcess): void {
+  if (child.pid === undefined) return;
+  if (process.platform === "win32") {
+    spawn("taskkill", ["/pid", String(child.pid), "/f", "/t"]).on("error", () => {});
+  } else {
+    child.kill();
+  }
 }
 
 const SUPPLEMENT = "supplement.dict";
