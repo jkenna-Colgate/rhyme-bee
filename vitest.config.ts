@@ -9,7 +9,7 @@ import { configDefaults, defineConfig } from "vitest/config";
  * worktrees under `.claude/worktrees/`, each a full checkout with its own copy
  * of every test file, and Vitest's default glob happily walks into them: with
  * seven worktrees present a bare `npm test` reported 242 files and 3625 tests
- * against a real suite of 40 and 616. It passed, which is the dangerous part —
+ * against a real suite of 43 and 688. It passed, which is the dangerous part —
  * the number is wrong in the reassuring direction, and it counts a stale agent
  * branch's tests as evidence about this one.
  */
