@@ -235,6 +235,16 @@ describe("the drift check", () => {
     expect(drift.drifted).toBe(false);
   });
 
+  it("still reports a day that has moved further than the rounding explains", () => {
+    // The slack is half a step of four-decimal rounding and no more: 6e-5 is
+    // outside anything `toFixed(4)` can account for, so it is a Puzzle that
+    // moved. A wider tolerance would swallow this.
+    for (const difficulty of [mondayBand.min - 0.00006, mondayBand.max + 0.00006]) {
+      const drift = checkDayDrift(monday, { ...asRecorded(), difficulty }, bands);
+      expect(drift.reasons).toEqual(["difficulty-out-of-band"]);
+    }
+  });
+
   it("holds every committed day inside the bands it was dealt from", () => {
     // Nothing has been rebuilt since the deal, so every day agrees with itself.
     // This is the baseline the check is read against: a report on a fresh clone

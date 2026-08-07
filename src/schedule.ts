@@ -413,8 +413,12 @@ export interface DayDrift {
  * The artifact records Difficulty to four decimal places, so a recomputed value
  * can sit up to half a step outside a band it never actually left. Tolerate the
  * rounding rather than reporting arithmetic as drift.
+ *
+ * Half a step of `toFixed(4)` is `5e-5`, and the slack is exactly that: any
+ * wider and it absorbs real drift on either edge as well as the rounding it is
+ * here for.
  */
-const DIFFICULTY_TOLERANCE = 1e-4;
+const DIFFICULTY_TOLERANCE = 5e-5;
 
 /**
  * Whether a scheduled day still holds the Puzzle it was scheduled as.
