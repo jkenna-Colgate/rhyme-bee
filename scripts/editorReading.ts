@@ -28,6 +28,10 @@ const PHONEME = /^[A-Z]{1,3}[012]?$/;
 export function parseReading(output: string): Pronunciation | null {
   const lines = output.trim().split(/\r?\n/).filter((line) => line.trim() !== "");
   const last = lines[lines.length - 1] ?? "";
+  // `split` never yields an empty array, so a reply with nothing in it arrives
+  // here as a single empty token — which is not a phoneme, and is refused as
+  // one. There is no separate emptiness check because there is nothing for one
+  // to catch.
   const phonemes = last.trim().toUpperCase().split(/\s+/);
-  return phonemes.length > 0 && phonemes.every((p) => PHONEME.test(p)) ? phonemes : null;
+  return phonemes.every((p) => PHONEME.test(p)) ? phonemes : null;
 }

@@ -37,6 +37,17 @@ import { parseReading } from "./editorReading.ts";
 import { fail, root } from "./editorShell.ts";
 
 /**
+ * What an add is aimed at: one Rhyme Key, and where that key came from. The two
+ * travel together because the provenance is printed beside the key — a night's
+ * add is auditable from its own output only if the readout says whether the
+ * editor typed the key or the schedule supplied it.
+ */
+export interface AddTarget {
+  target: RhymeKey;
+  provenance: string;
+}
+
+/**
  * The editor names words the pass turned up as missing, and nothing else — no
  * phonemes, and no per-entry comment, because the reason for an add is constant
  * (the word was absent from the pinned sources) and restating it every time
@@ -48,8 +59,14 @@ import { fail, root } from "./editorShell.ts";
  * to author. Every proposal, whoever made it, passes the same `verifyReading`
  * before it is written (ADR-0014). Anything that still fails is appended to the
  * deferred queue, so a miss is recorded rather than rediscovered next time.
+ *
+ * The words are independent of one another: every one is judged against the
+ * same snapshot of the evidence, taken before the first of them (see
+ * `evidenceContext`), so their order carries no meaning and no word can be a
+ * part of another's compound split within one invocation.
  */
-export async function add(words: string[], target: RhymeKey, provenance: string): Promise<void> {
+export async function add(words: string[], aim: AddTarget): Promise<void> {
+  const { target, provenance } = aim;
   const ctx = evidenceContext();
   const accepted: WordReading[] = [];
   const deferred: DeferredReading[] = [];
@@ -285,11 +302,8 @@ function printAddSummary(
   console.log("");
 }
 
-/** The Rhyme Key an add is aimed at: an explicit one, or the day's. */
-export function targetFor(
-  schedule: Schedule,
-  date: string,
-): { target: RhymeKey; provenance: string } {
+/** The Rhyme Key an add is aimed at, taken from a scheduled day. */
+export function targetFor(schedule: Schedule, date: string): AddTarget {
   const day = schedule.days.find((d) => d.date === date);
   if (day === undefined) {
     fail(`No Daily Puzzle scheduled for ${date}. Pass --rhymeKey to add against a key directly.`);

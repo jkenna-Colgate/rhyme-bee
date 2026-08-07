@@ -282,6 +282,26 @@ describe("assembling a context from the pinned inputs", () => {
     expect(evidence.rhymesDirectly).toBe(true);
   });
 
+  it("composes through a part that reaches the target only on an appended reading", () => {
+    // The path that actually feeds the deferred queue. `gruel` is
+    // `G R UW1 AH0 L` in the data, and the Index also holds the syllabic
+    // `G R UW1 L` — so a compound ending in it reaches `UW L` on the appended
+    // reading and `UW AH L` on the base one. Without the append the split
+    // misses, and the word is recorded as a composition failure it never was.
+    const ctx = evidenceContextFrom({
+      pronunciations: new Map([
+        ["water", [["W", "AO1", "T", "ER0"]]],
+        ["gruel", [["G", "R", "UW1", "AH0", "L"]]],
+      ]),
+      words: new Set(["water", "gruel"]),
+      names: new Set(),
+    });
+    const evidence = gatherEvidence("watergruel", "UW L", ctx);
+
+    expect(evidence.composed?.phonemes).toEqual(["W", "AA1", "T", "ER0", "G", "R", "UW2", "L"]);
+    expect(evidence.composed?.tail.phonemes).toEqual(["G", "R", "UW1", "L"]);
+  });
+
   it("derives relatives from the normalised readings", () => {
     // The derivation is built over the same map, after the rewrite rather than
     // before it, so nothing downstream sees the pre-Normalisation readings.
