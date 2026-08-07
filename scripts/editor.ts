@@ -38,7 +38,9 @@
  * comes from the tested core (`measureAnswers`, `checkDayDrift`, `buildPuzzle`,
  * `composeReading`, `verifyReading`), and its argument parsing lives in
  * `editorArgs.ts`, which is tested. The agent invocation is untested by the
- * same precedent; what it returns is covered wherever verification is.
+ * same precedent — but the reading of what comes back is not game logic's
+ * neighbour so much as a gate on it, so it lives in `editorReading.ts` and is
+ * tested there.
  */
 
 import { spawn } from "node:child_process";
@@ -71,6 +73,7 @@ import {
 } from "../src/schedule.ts";
 import { indexArtifactPath } from "./indexArtifact.ts";
 import { parseEditorArgs, tomorrow, type EditorArgs } from "./editorArgs.ts";
+import { parseReading } from "./editorReading.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -393,17 +396,6 @@ function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation 
     child.on("close", (code) => done(code === 0 ? parseReading(stdout) : null));
     child.stdin.end(prompt);
   });
-}
-
-/** ARPAbet phoneme, with an optional stress digit. */
-const PHONEME = /^[A-Z]{1,3}[012]?$/;
-
-/** The phonemes out of whatever the agent said, or null if that is nothing. */
-function parseReading(output: string): Pronunciation | null {
-  const lines = output.trim().split(/\r?\n/).filter((line) => line.trim() !== "");
-  const last = lines[lines.length - 1] ?? "";
-  const phonemes = last.trim().toUpperCase().split(/\s+/);
-  return phonemes.length > 0 && phonemes.every((p) => PHONEME.test(p)) ? phonemes : null;
 }
 
 const SUPPLEMENT = "supplement.dict";
