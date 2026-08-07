@@ -364,8 +364,20 @@ interface DeferredReading {
  * the one that set the target, and loses words to a disagreement about the
  * accent rather than about the rhyme.
  *
- * So a word added earlier tonight is already present, and can serve as a part
- * of tonight's next compound.
+ * A **snapshot**, taken once before the loop below and not added to as words
+ * are accepted. So a word added on an *earlier* invocation is present and can
+ * serve as a part of tonight's next compound — the committed supplement is
+ * re-read every time — but a word accepted earlier in *this* invocation is not:
+ * `--words=candleholder,candleholders` cannot use the first as a part of the
+ * second. That wants a second `editor:add`, once the first one's readings are
+ * written.
+ *
+ * Folding each accepted reading back in as it is accepted would close that, and
+ * is a few lines. It is not done because nothing has asked for it: it would
+ * make the order of `--words` significant — a word could only ever be a part of
+ * a *later* one — in exchange for a compound whose part was itself missing
+ * until tonight, which no pass has yet turned up. Worth revisiting from a real
+ * night's findings rather than from this comment.
  */
 function evidenceContext(): EvidenceContext {
   const read = (name: string) => readFileSync(resolve(root, "data", name), "utf8");
