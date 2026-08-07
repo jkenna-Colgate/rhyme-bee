@@ -13,6 +13,7 @@
     "build:schedule": "tsx scripts/build-schedule.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
+    "editor:read": "tsx scripts/editor.ts read",
     "supplement:candidates": "tsx scripts/supplement-candidates.ts",
     "appeals:pull": "tsx scripts/pull-appeals.ts"
   },
