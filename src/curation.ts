@@ -15,6 +15,7 @@
 
 import type { RhymeKey } from "./phonology.ts";
 import { splitFamily, type RhymeIndex } from "./rhymeIndex.ts";
+import type { PuzzleFacts } from "./schedule.ts";
 import {
   DEFAULT_SCORING_CONFIG,
   isRare,
@@ -168,11 +169,15 @@ export function playableSeeds(
  * so "the Difficulty of this Puzzle" cannot mean two things depending on who
  * asked. Points come from the shared `scoreEntry`, which keeps that identity
  * exact.
+ *
+ * Returns `PuzzleFacts` rather than a structural twin of it: what this measures
+ * is what the schedule records and what `checkDayDrift` reads back, and the
+ * Editor's Pass feeds one straight into the other.
  */
 export function measureAnswers(
   answers: Scorable[],
   scoring: ScoringConfig = DEFAULT_SCORING_CONFIG,
-): { answerCount: number; maxScore: number; difficulty: number } {
+): PuzzleFacts {
   let maxScore = 0;
   let rareMass = 0;
   for (const answer of answers) {

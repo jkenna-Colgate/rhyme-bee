@@ -53,8 +53,12 @@ export interface WordEvidence {
   composed: ComposedReading | null;
 }
 
-/** One part of a compound split, and the reading it contributed. */
-export interface ComposedPart {
+/**
+ * A word and one reading of it — the pair `data/supplement.dict` records a line
+ * at a time. It names a part of a compound split below, and it names an
+ * accepted add wherever one is being carried to that file.
+ */
+export interface WordReading {
   word: string;
   phonemes: Pronunciation;
 }
@@ -67,8 +71,8 @@ export interface ComposedPart {
 export interface ComposedReading {
   phonemes: Pronunciation;
   key: RhymeKey;
-  head: ComposedPart;
-  tail: ComposedPart;
+  head: WordReading;
+  tail: WordReading;
 }
 
 /** The pinned inputs `gatherEvidence` reads against — one Rhyme Index's worth. */
@@ -111,7 +115,8 @@ export function evidenceContextFrom(inputs: EvidenceInputs): EvidenceContext {
   applyNormalisation({ pronunciations });
   // Built last, so the derivation reads the normalised map and nothing
   // downstream can reach the readings Normalisation replaced.
-  return { pronunciations, words, names, derivation: new Derivation(new IndexDataSource({ words, pronunciations })) };
+  const derivation = new Derivation(new IndexDataSource({ words, pronunciations }));
+  return { pronunciations, words, names, derivation };
 }
 
 function readingsOf(word: string, pronunciations: ReadonlyMap<string, Pronunciation[]>): ReadingEvidence[] {

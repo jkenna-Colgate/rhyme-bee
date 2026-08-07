@@ -58,6 +58,7 @@ import {
   gatherEvidence,
   verifyReading,
   type EvidenceContext,
+  type WordReading,
 } from "../src/supplementEvidence.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../src/rhymeIndex.ts";
 import {
@@ -81,7 +82,7 @@ let args: EditorArgs;
 try {
   args = parseEditorArgs(process.argv.slice(2));
 } catch (error) {
-  fail(error instanceof Error ? error.message : String(error));
+  fail(message(error));
 }
 
 const schedule = loadSchedule();
@@ -130,7 +131,7 @@ function audition(seed: string): void {
   try {
     pinned = builtIndex().pinSeed(seed);
   } catch (error) {
-    fail(error instanceof Error ? error.message : String(error));
+    fail(message(error));
   }
   const puzzle = builtIndex().buildPuzzle(pinned);
   const facts = measureAnswers(puzzle.answers);
@@ -246,7 +247,7 @@ function buildOrFail(day: ScheduleDay): ReturnType<RhymeIndex["buildPuzzle"]> {
   try {
     return builtIndex().buildPuzzle(builtIndex().pinSeed(day.seed, day.rhymeKey));
   } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
+    const detail = message(error);
     fail(
       `SCHEDULE / INDEX DISAGREEMENT on ${day.date} (${day.weekday}).\n` +
         `  Seed Word "${day.seed}" cannot be pinned to ${day.rhymeKey} in the built index.\n` +
@@ -257,9 +258,14 @@ function buildOrFail(day: ScheduleDay): ReturnType<RhymeIndex["buildPuzzle"]> {
   }
 }
 
-function fail(message: string): never {
-  console.error(message);
+function fail(text: string): never {
+  console.error(text);
   process.exit(1);
+}
+
+/** What a thrown thing has to say for itself, whether or not it is an Error. */
+function message(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 // --- adding a word by name -----------------------------------------------------
@@ -279,7 +285,7 @@ function fail(message: string): never {
  */
 async function add(words: string[], target: RhymeKey, provenance: string): Promise<void> {
   const ctx = evidenceContext();
-  const accepted: { word: string; phonemes: Pronunciation }[] = [];
+  const accepted: WordReading[] = [];
   const deferred: DeferredReading[] = [];
 
   console.log("");
@@ -458,7 +464,7 @@ const EDITOR_SECTION =
   "# --- Adds by the Editor's Pass: composed from a compound split and verified\n" +
   "# against the day's Rhyme Key before being written here (ADR-0014). ---";
 
-function appendToSupplement(readings: { word: string; phonemes: Pronunciation }[]): void {
+function appendToSupplement(readings: WordReading[]): void {
   if (readings.length === 0) return;
   const path = resolve(root, "data", SUPPLEMENT);
   const existing = readFileSync(path, "utf8");
@@ -483,7 +489,7 @@ function appendToDeferredQueue(deferred: DeferredReading[]): void {
 }
 
 function printAddSummary(
-  accepted: { word: string }[],
+  accepted: WordReading[],
   deferred: DeferredReading[],
 ): void {
   console.log("");
