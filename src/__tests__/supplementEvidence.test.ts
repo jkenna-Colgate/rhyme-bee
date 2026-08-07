@@ -6,7 +6,12 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { composeReading, gatherEvidence, verifyReading } from "../supplementEvidence.ts";
+import {
+  composeReading,
+  evidenceContextFrom,
+  gatherEvidence,
+  verifyReading,
+} from "../supplementEvidence.ts";
 import { Derivation, IndexDataSource } from "../derivation.ts";
 import { rhymeKeyOf, type Pronunciation } from "../phonology.ts";
 
@@ -212,5 +217,87 @@ describe("what composition is not for", () => {
     const evidence = gatherEvidence("candleholder", "OW L D ER", ctx);
     expect(evidence.composed?.key).toBe("OW L D ER");
     expect(evidence.composed?.head.word).toBe("candle");
+  });
+});
+
+describe("assembling a context from the pinned inputs", () => {
+  // A context assembled any other way adjudicates under a different phonology
+  // from the built Rhyme Index, and the target Rhyme Key always comes from the
+  // Index side. Every divergence is a false negative — verification stays exact
+  // equality — so the words it loses are recorded as composition failures they
+  // were not.
+
+  it("merges the cot–caught vowel, as the Index build does", () => {
+    const ctx = evidenceContextFrom({
+      pronunciations: new Map([["walk", [["W", "AO1", "K"]]]]),
+      words: new Set(["walk"]),
+      names: new Set(),
+    });
+    expect(ctx.pronunciations.get("walk")).toEqual([["W", "AA1", "K"]]);
+  });
+
+  it("leaves the pre-rhotic vowel alone, as the Index build does", () => {
+    const ctx = evidenceContextFrom({
+      pronunciations: new Map([["for", [["F", "AO1", "R"]]]]),
+      words: new Set(["for"]),
+      names: new Set(),
+    });
+    expect(ctx.pronunciations.get("for")).toEqual([["F", "AO1", "R"]]);
+  });
+
+  it("composes a reading carrying the unmerged vowel against a merged target", () => {
+    // `cross` + `walk` are both `AO` in the pinned data; the scheduled target
+    // is post-Normalisation and so is `AA`. Composed under the raw inputs the
+    // split reaches `AO2 K` and is deferred as a miss it never was.
+    const inputs = {
+      pronunciations: new Map([
+        ["cross", [["K", "R", "AO1", "S"]]],
+        ["walk", [["W", "AO1", "K"]]],
+      ]),
+      words: new Set(["cross", "walk"]),
+      names: new Set<string>(),
+    };
+    const evidence = gatherEvidence("crosswalk", "AA K", evidenceContextFrom(inputs));
+
+    expect(evidence.composed?.phonemes).toEqual(["K", "R", "AA1", "S", "W", "AA2", "K"]);
+    expect(evidence.composed?.key).toBe("AA K");
+  });
+
+  it("carries the readings Normalisation appends, not only the ones it replaces", () => {
+    // `crewel` is `K R UW1 AH0 L` in the data and `K R UW1 L` out of most
+    // mouths; the Index holds both, so the word already reads on `UW L`. A
+    // context missing the appended reading calls it a non-rhyming reading —
+    // a CORRECTION the editor never asked for.
+    const ctx = evidenceContextFrom({
+      pronunciations: new Map([["crewel", [["K", "R", "UW1", "AH0", "L"]]]]),
+      words: new Set(["crewel"]),
+      names: new Set(),
+    });
+    const evidence = gatherEvidence("crewel", "UW L", ctx);
+
+    expect(evidence.direct.map((r) => r.phonemes)).toEqual([
+      ["K", "R", "UW1", "AH0", "L"],
+      ["K", "R", "UW1", "L"],
+    ]);
+    expect(evidence.rhymesDirectly).toBe(true);
+  });
+
+  it("derives relatives from the normalised readings", () => {
+    // The derivation is built over the same map, after the rewrite rather than
+    // before it, so nothing downstream sees the pre-Normalisation readings.
+    const ctx = evidenceContextFrom({
+      pronunciations: new Map([["balked", [["B", "AO1", "K", "T"]]]]),
+      words: new Set(["balk", "balked"]),
+      names: new Set(),
+    });
+    const evidence = gatherEvidence("balk", "AA K T", ctx);
+
+    expect(evidence.relatives).toEqual([
+      {
+        word: "balked",
+        readings: [{ phonemes: ["B", "AA1", "K", "T"], key: "AA K T" }],
+        rhymes: true,
+      },
+    ]);
   });
 });

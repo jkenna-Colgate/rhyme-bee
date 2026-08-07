@@ -11,8 +11,9 @@
  */
 
 import { normaliseWord } from "./cmudict.ts";
-import type { Derivation } from "./derivation.ts";
+import { Derivation, IndexDataSource } from "./derivation.ts";
 import { inflectionalVariants } from "./inflections.ts";
+import { applyNormalisation } from "./normalise.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
 
 /** One reading, alongside the Rhyme Key it yields (null if unstressed). */
@@ -76,6 +77,41 @@ export interface EvidenceContext {
   words: ReadonlySet<string>;
   names: ReadonlySet<string>;
   derivation: Derivation;
+}
+
+/** The pinned inputs a context is assembled from, before Normalisation. */
+export interface EvidenceInputs {
+  pronunciations: Map<string, Pronunciation[]>;
+  words: Set<string>;
+  names: Set<string>;
+}
+
+/**
+ * Assemble a context from inputs read straight off `data/`, applying
+ * Normalisation exactly as the index build applies it (`src/manufacture.ts`,
+ * step 4) — so evidence gathered here and a Rhyme Key taken from the built
+ * artifact are computed under one phonology rather than two.
+ *
+ * That divergence is not a rounding difference. `cot-caught-merger` *replaces*
+ * a reading, so a raw `AO` computes a Rhyme Key a merged target can never
+ * equal; `syllabic-consonant` and `stress-promotion` *append*, so raw inputs
+ * are simply missing readings the Index holds. Either way the evidence is short
+ * of what the game will read.
+ *
+ * It widens what is *seen*, never what is *accepted*: `verifyReading` below is
+ * unchanged and stays exact equality against the target (ADR-0014). Every
+ * divergence it closes was a false negative, and a false negative here is a
+ * word recorded in the deferred queue as a composition failure it never was.
+ *
+ * `pronunciations` is rewritten in place, as the build's own stage does — the
+ * caller hands its inputs over rather than keeping the raw readings alongside.
+ */
+export function evidenceContextFrom(inputs: EvidenceInputs): EvidenceContext {
+  const { pronunciations, words, names } = inputs;
+  applyNormalisation({ pronunciations });
+  // Built last, so the derivation reads the normalised map and nothing
+  // downstream can reach the readings Normalisation replaced.
+  return { pronunciations, words, names, derivation: new Derivation(new IndexDataSource({ words, pronunciations })) };
 }
 
 function readingsOf(word: string, pronunciations: ReadonlyMap<string, Pronunciation[]>): ReadingEvidence[] {

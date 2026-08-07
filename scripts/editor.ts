@@ -49,12 +49,12 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../src/cmudict.ts";
 import { measureAnswers } from "../src/curation.ts";
-import { Derivation, IndexDataSource } from "../src/derivation.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import { parseWordList } from "../src/pipeline.ts";
 import { applySupplement } from "../src/supplement.ts";
 import {
+  evidenceContextFrom,
   gatherEvidence,
   verifyReading,
   type EvidenceContext,
@@ -350,9 +350,16 @@ interface DeferredReading {
 }
 
 /**
- * The pinned inputs with the committed supplement merged over them, which is
- * what the build itself will read — so a word added earlier tonight is already
- * present, and can serve as a part of tonight's next compound.
+ * The pinned inputs with the committed supplement merged over them and
+ * Normalisation applied on top — the same stack, in the same order, that the
+ * index build reads (`src/manufacture.ts`). The target Rhyme Key an add is
+ * aimed at always comes from the built artifact or the schedule, so a context
+ * assembled any other way judges the evidence under a different phonology from
+ * the one that set the target, and loses words to a disagreement about the
+ * accent rather than about the rhyme.
+ *
+ * So a word added earlier tonight is already present, and can serve as a part
+ * of tonight's next compound.
  */
 function evidenceContext(): EvidenceContext {
   const read = (name: string) => readFileSync(resolve(root, "data", name), "utf8");
@@ -360,8 +367,7 @@ function evidenceContext(): EvidenceContext {
   const words = parseWordList(read("words.txt"));
   const names = parseWordList(read("names.txt"));
   applySupplement(read(SUPPLEMENT), { pronunciations, words, names });
-  const derivation = new Derivation(new IndexDataSource({ words, pronunciations }));
-  return { pronunciations, words, names, derivation };
+  return evidenceContextFrom({ pronunciations, words, names });
 }
 
 /**
