@@ -5,6 +5,8 @@
  *   npm run editor:read                          # tomorrow's Daily Puzzle
  *   npm run editor:read -- --date=2026-08-20     # a named day
  *   npm run editor:read -- --seed=placeholder    # audition an unscheduled Seed
+ *   npm run editor:add -- --words=placeholder,toothache
+ *   npm run editor:add -- --words=earache --rhymeKey="EY K"
  *
  * Flags take either spelling, `--date 2026-08-20` or `--date=2026-08-20`. The
  * equals form exists for Windows PowerShell, which strips the bare `--`
@@ -19,17 +21,21 @@
 /** ISO `YYYY-MM-DD`, the spelling the schedule artifact uses. */
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-export type EditorCommand = "read";
+export type EditorCommand = "read" | "add";
 
 export interface EditorArgs {
   command: EditorCommand;
-  /** The day to read. Absent means tomorrow, which is the point of the pass. */
+  /** The day to read, or whose Rhyme Key to add against. Absent means tomorrow. */
   date?: string;
-  /** A Seed Word to audition instead of reading a scheduled day. */
+  /** `read` only: a Seed Word to audition instead of reading a scheduled day. */
   seed?: string;
+  /** `add` only: the words the editor named. A night's findings are one command. */
+  words?: string[];
+  /** `add` only: the target Rhyme Key, when not taken from a day. */
+  rhymeKey?: string;
 }
 
-const COMMANDS: EditorCommand[] = ["read"];
+const COMMANDS: EditorCommand[] = ["read", "add"];
 
 export function parseEditorArgs(argv: string[]): EditorArgs {
   const [first, ...rest] = argv;
@@ -50,10 +56,18 @@ export function parseEditorArgs(argv: string[]): EditorArgs {
       args.date = requireDate(inline ?? rest[++i]);
     } else if (flag === "--seed") {
       args.seed = requireSeed(inline ?? rest[++i]);
+    } else if (flag === "--words") {
+      args.words = requireWords(inline ?? rest[++i]);
+    } else if (flag === "--rhymeKey") {
+      args.rhymeKey = requireRhymeKey(inline ?? rest[++i]);
     } else if (flag.startsWith("--")) {
       throw new Error(`Unknown argument: ${token}`);
     } else if (ISO_DATE.test(token)) {
       args.date = requireDate(token);
+    } else if (args.command === "add") {
+      // Bare words are the thing `add` is for, so they need no flag when the
+      // shell lets them through.
+      args.words = [...(args.words ?? []), ...requireWords(token)];
     } else {
       args.seed = requireSeed(token);
     }
@@ -64,6 +78,18 @@ export function parseEditorArgs(argv: string[]): EditorArgs {
   // both at once — a Seed Word does not have a date.
   if (args.date !== undefined && args.seed !== undefined) {
     throw new Error("Pass a date or a Seed Word, not both: a Seed audition has no date.");
+  }
+  if (args.command === "add") {
+    if (args.words === undefined) {
+      throw new Error("Name at least one word, e.g. --words=placeholder,toothache");
+    }
+    // A day *is* a Rhyme Key here, resolved from the schedule. Two ways of
+    // naming the same target can only disagree.
+    if (args.date !== undefined && args.rhymeKey !== undefined) {
+      throw new Error("Pass a date or a Rhyme Key, not both: the date resolves to a key.");
+    }
+  } else if (args.words !== undefined || args.rhymeKey !== undefined) {
+    throw new Error("--words and --rhymeKey belong to `add`, not `read`.");
   }
   return args;
 }
@@ -80,6 +106,31 @@ function requireSeed(value: string | undefined): string {
     throw new Error("--seed needs a word, e.g. --seed=placeholder");
   }
   return value;
+}
+
+/** One or more words, comma-separated: a night's findings are one command. */
+function requireWords(value: string | undefined): string[] {
+  const words = (value ?? "")
+    .split(",")
+    .map((word) => word.trim())
+    .filter((word) => word !== "");
+  if (words.length === 0) {
+    throw new Error("--words needs at least one word, e.g. --words=placeholder,toothache");
+  }
+  return words;
+}
+
+/**
+ * A Rhyme Key as the readout prints it — ARPAbet phonemes without stress
+ * digits, space-separated. The editor copies it rather than composing it, which
+ * is exactly why the readout prints it (story 5).
+ */
+function requireRhymeKey(value: string | undefined): string {
+  const key = value?.trim().toUpperCase();
+  if (key === undefined || !/^[A-Z]+( [A-Z]+)*$/.test(key)) {
+    throw new Error(`--rhymeKey needs a Rhyme Key, e.g. --rhymeKey="OW L D ER" (got: ${value ?? "nothing"})`);
+  }
+  return key;
 }
 
 /**

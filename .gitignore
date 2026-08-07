@@ -23,6 +23,12 @@ desktop.ini
 # The demotion list corrects the upstream word list's proper nouns and junk
 # (ADR-0011, amended). Hand-authored, so it is kept for the same reason.
 !/data/demotions.txt
+# The Editor's Pass defers what it cannot compose a reading for. Unlike the
+# Appeal candidates queue beside it, which is pulled down from R2 and can be
+# pulled again, this is the only record that a miss happened — it is the work
+# list for a later pass and the instrument that turns "7 out of 7" into a real
+# miss rate (ADR-0014). A record kept on one machine measures nothing.
+!/data/deferred-readings.jsonl
 *.csv
 *.xlsx
 

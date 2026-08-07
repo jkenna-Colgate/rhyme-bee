@@ -44,6 +44,30 @@ export interface WordEvidence {
    * a derivation, so relatives are not offered as a distraction from it.
    */
   relatives: RelativeEvidence[];
+  /**
+   * A reading composed from a compound split, when one reaches the target.
+   * Null when no split does, and — like `relatives` — never searched for a word
+   * that already has a direct reading, which is a correction rather than an add.
+   */
+  composed: ComposedReading | null;
+}
+
+/** One part of a compound split, and the reading it contributed. */
+export interface ComposedPart {
+  word: string;
+  phonemes: Pronunciation;
+}
+
+/**
+ * A reading composed for a word the editor named, with the parts it came from
+ * so the proposal is inspectable rather than opaque. Its `key` equals the
+ * target by construction — nothing that fails `verifyReading` is ever returned.
+ */
+export interface ComposedReading {
+  phonemes: Pronunciation;
+  key: RhymeKey;
+  head: ComposedPart;
+  tail: ComposedPart;
 }
 
 /** The pinned inputs `gatherEvidence` reads against — one Rhyme Index's worth. */
@@ -61,6 +85,75 @@ function readingsOf(word: string, pronunciations: ReadonlyMap<string, Pronunciat
 
 function rhymesOnTarget(readings: ReadingEvidence[], target: RhymeKey): boolean {
   return readings.some((r) => r.key === target);
+}
+
+/**
+ * The one accept-or-reject test for a proposed reading: it is accepted only
+ * when its computed Rhyme Key equals the Rhyme Key it is being added to.
+ *
+ * **Author-blind, and the single such predicate** (ADR-0014). The composition
+ * below goes through it, an agent asked to author an awkward word goes through
+ * it, and so does a human — which is what makes it a stronger guarantee than
+ * hand-authoring, where nothing checks the author at all.
+ *
+ * Its known limit is accepted rather than mitigated: a Rhyme Key runs from the
+ * last stressed vowel, so this constrains the tail of a reading and can say
+ * nothing about its head. A wrong head cannot change a verdict — adjudication
+ * compares only Rhyme Keys — but it would be audible if the word were later
+ * drawn as a Seed Word, which is spoken (ADR-0002).
+ */
+export function verifyReading(phonemes: Pronunciation, target: RhymeKey): boolean {
+  return rhymeKeyOf(phonemes) === target;
+}
+
+/** Every primary stress in a reading demoted to secondary. */
+function demote(phonemes: Pronunciation): Pronunciation {
+  return phonemes.map((phoneme) => phoneme.replace(/1$/, "2"));
+}
+
+/**
+ * Compose a reading for a word the pinned sources do not read, from a compound
+ * split: a head and a tail that are themselves words with readings, the tail
+ * taking secondary stress.
+ *
+ * This encodes the rule the existing supplement entries were authored under by
+ * hand — `airburst` is recorded there as "air (EH1 R) + burst (B ER1 S T), the
+ * compound taking secondary". The machine's `placeholder` is identical to the
+ * hand derivation.
+ *
+ * Every split is tried, and every reading of both parts, because the accept
+ * test is exact equality against the target: a wider search cannot admit a
+ * wrong reading, only stop losing a good one to a part whose first reading
+ * happened to be the wrong one. Returns null when no split reaches the target,
+ * which is a word for the deferred queue rather than a failure.
+ *
+ * This is not reading manufacture (ADR-0014): it produces one verified reading
+ * for one word the editor named, never a rule that reaches words nobody asked
+ * about.
+ */
+export function composeReading(
+  word: string,
+  target: RhymeKey,
+  ctx: EvidenceContext,
+): ComposedReading | null {
+  const w = normaliseWord(word);
+  for (let i = 1; i < w.length; i++) {
+    const headWord = w.slice(0, i);
+    const tailWord = w.slice(i);
+    for (const head of ctx.pronunciations.get(headWord) ?? []) {
+      for (const tail of ctx.pronunciations.get(tailWord) ?? []) {
+        const phonemes = [...head, ...demote(tail)];
+        if (!verifyReading(phonemes, target)) continue;
+        return {
+          phonemes,
+          key: target,
+          head: { word: headWord, phonemes: head },
+          tail: { word: tailWord, phonemes: tail },
+        };
+      }
+    }
+  }
+  return null;
 }
 
 /** Gather the correction/derivation evidence for `word` against `target`. */
@@ -85,5 +178,10 @@ export function gatherEvidence(word: string, target: RhymeKey, ctx: EvidenceCont
     direct,
     rhymesDirectly: rhymesOnTarget(direct, target),
     relatives,
+    // Scoped to a word with no direct reading, like the relatives above and for
+    // the same reason: a word that already reads, wrongly, is a *correction*,
+    // and overriding an upstream pronunciation by machine is a bigger claim
+    // than filling a gap. That stays the deliberate hand-edit it is today.
+    composed: direct.length > 0 ? null : composeReading(w, target, ctx),
   };
 }

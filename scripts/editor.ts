@@ -1,9 +1,12 @@
 /**
- * The Editor's Pass: read a Daily Puzzle the night before it goes live.
+ * The Editor's Pass: read a Daily Puzzle the night before it goes live, and add
+ * the words that read turns up as missing.
  *
  *   npm run editor:read                          # tomorrow
  *   npm run editor:read -- --date=2026-08-20     # a named day
  *   npm run editor:read -- --seed=placeholder    # audition an unscheduled Seed
+ *   npm run editor:add -- --words=placeholder,toothache
+ *   npm run editor:add -- --words=earache --rhymeKey="EY K"
  *
  * On Windows PowerShell the bare `--` separator (and the token after it) is
  * stripped before npm forwards anything, so use the equals form above, or
@@ -24,17 +27,36 @@
  * The script never writes `data/schedule.json`. An audition prints a line to
  * paste; the schedule stays the hand-edited reviewed artifact ADR-0012 requires.
  *
+ * `add` takes words and nothing else — no phonemes, ever. It composes a reading
+ * from a compound split, hands what it cannot resolve to an agent, and holds
+ * both to the same verification before either reaches `data/supplement.dict`
+ * (ADR-0014). What still fails is appended to the deferred queue rather than
+ * discarded, which is what makes the miss rate countable.
+ *
  * An imperative shell carrying no game logic of its own, and left untested
  * exactly as `play`, `build-index` and `histogram` are — every figure it prints
- * comes from the tested core (`measureAnswers`, `checkDayDrift`, `buildPuzzle`),
- * and its argument parsing lives in `editorArgs.ts`, which is tested.
+ * comes from the tested core (`measureAnswers`, `checkDayDrift`, `buildPuzzle`,
+ * `composeReading`, `verifyReading`), and its argument parsing lives in
+ * `editorArgs.ts`, which is tested. The agent invocation is untested by the
+ * same precedent; what it returns is covered wherever verification is.
  */
 
-import { readFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { appendFileSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseCmudict } from "../src/cmudict.ts";
 import { measureAnswers } from "../src/curation.ts";
+import { Derivation, IndexDataSource } from "../src/derivation.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
+import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
+import { parseWordList } from "../src/pipeline.ts";
+import { applySupplement } from "../src/supplement.ts";
+import {
+  gatherEvidence,
+  verifyReading,
+  type EvidenceContext,
+} from "../src/supplementEvidence.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../src/rhymeIndex.ts";
 import {
   checkDayDrift,
@@ -59,8 +81,18 @@ try {
   fail(error instanceof Error ? error.message : String(error));
 }
 
-const index = loadRhymeIndex(indexArtifactPath(resolve(root, "dist-data")));
 const schedule = loadSchedule();
+
+/**
+ * The built index, loaded on first use. `add` never needs it — it reads the
+ * pinned sources directly, as the supplement tooling does — and the artifact is
+ * megabytes.
+ */
+let loaded: RhymeIndex | undefined;
+function builtIndex(): RhymeIndex {
+  loaded ??= loadRhymeIndex(indexArtifactPath(resolve(root, "dist-data")));
+  return loaded;
+}
 
 // --- the two readouts ----------------------------------------------------------
 
@@ -93,11 +125,11 @@ function readDay(date: string): void {
 function audition(seed: string): void {
   let pinned: SeedWord;
   try {
-    pinned = index.pinSeed(seed);
+    pinned = builtIndex().pinSeed(seed);
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
   }
-  const puzzle = index.buildPuzzle(pinned);
+  const puzzle = builtIndex().buildPuzzle(pinned);
   const facts = measureAnswers(puzzle.answers);
 
   console.log("");
@@ -209,7 +241,7 @@ function loadSchedule(): Schedule {
  */
 function buildOrFail(day: ScheduleDay): ReturnType<RhymeIndex["buildPuzzle"]> {
   try {
-    return index.buildPuzzle(index.pinSeed(day.seed, day.rhymeKey));
+    return builtIndex().buildPuzzle(builtIndex().pinSeed(day.seed, day.rhymeKey));
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     fail(
@@ -227,9 +259,226 @@ function fail(message: string): never {
   process.exit(1);
 }
 
+// --- adding a word by name -----------------------------------------------------
+
+/**
+ * The editor names words the pass turned up as missing, and nothing else — no
+ * phonemes, and no per-entry comment, because the reason for an add is constant
+ * (the word was absent from the pinned sources) and restating it every time
+ * carries no information.
+ *
+ * Per word, in order: a name is refused outright; a word that already reads is
+ * a correction and is left alone; otherwise a reading is composed from a
+ * compound split, and if no split reaches the target the word goes to an agent
+ * to author. Every proposal, whoever made it, passes the same `verifyReading`
+ * before it is written (ADR-0014). Anything that still fails is appended to the
+ * deferred queue, so a miss is recorded rather than rediscovered next time.
+ */
+async function add(words: string[], target: RhymeKey, provenance: string): Promise<void> {
+  const ctx = evidenceContext();
+  const accepted: { word: string; phonemes: Pronunciation }[] = [];
+  const deferred: DeferredReading[] = [];
+
+  console.log("");
+  console.log(`  Adding ${words.length} word(s) against ${target}  ·  ${provenance}`);
+  console.log("");
+
+  for (const supplied of words) {
+    const evidence = gatherEvidence(supplied, target, ctx);
+    const word = evidence.word;
+    console.log(`  ${word}`);
+
+    // A name stays a name, however well it rhymes: the space of names is
+    // unbounded and has no defensible edge. Refused rather than deferred —
+    // deferring says "later", and this is never.
+    if (evidence.isName) {
+      console.log(`    refused: a Proper Noun stays a Proper Noun, however well it rhymes.`);
+      continue;
+    }
+
+    if (evidence.direct.length > 0) {
+      const verdict = evidence.rhymesDirectly
+        ? `already reads on ${target} — it is in the game already, nothing to add.`
+        : `already has a reading that does not rhyme. That is a CORRECTION, not an add:` +
+          ` overriding an upstream pronunciation stays a deliberate hand-edit in` +
+          ` data/supplement.dict.`;
+      console.log(`    ${verdict}`);
+      for (const reading of evidence.direct) console.log(`      ${reading.phonemes.join(" ")}`);
+      continue;
+    }
+
+    if (evidence.composed !== null) {
+      const { head, tail, phonemes } = evidence.composed;
+      console.log(`    composed  ${phonemes.join(" ")}`);
+      console.log(
+        `    from      ${head.word} (${head.phonemes.join(" ")}) + ` +
+          `${tail.word} (${tail.phonemes.join(" ")}), the tail taking secondary stress`,
+      );
+      accepted.push({ word, phonemes });
+      continue;
+    }
+
+    console.log(`    no compound split reaches ${target} — asking the agent to author one.`);
+    const authored = await authorWithAgent(word, target);
+    if (authored === null) {
+      deferred.push({ word, rhymeKey: target, reason: "agent-unavailable" });
+      console.log(`    the agent did not answer. Deferred.`);
+    } else if (verifyReading(authored, target)) {
+      // The same predicate, applied to a reading this program did not compose.
+      // Delegating authorship does not lower the bar.
+      console.log(`    the agent proposed  ${authored.join(" ")}  — verified against ${target}.`);
+      accepted.push({ word, phonemes: authored });
+    } else {
+      deferred.push({ word, rhymeKey: target, reason: "agent-reading-failed-verification" });
+      console.log(`    the agent proposed  ${authored.join(" ")}, which does not reach ${target}. Deferred.`);
+    }
+  }
+
+  appendToSupplement(accepted);
+  appendToDeferredQueue(deferred);
+  printAddSummary(accepted, deferred);
+}
+
+/** One word the pass could not resolve, kept so the miss rate is countable. */
+interface DeferredReading {
+  word: string;
+  rhymeKey: RhymeKey;
+  reason: "agent-unavailable" | "agent-reading-failed-verification";
+}
+
+/**
+ * The pinned inputs with the committed supplement merged over them, which is
+ * what the build itself will read — so a word added earlier tonight is already
+ * present, and can serve as a part of tonight's next compound.
+ */
+function evidenceContext(): EvidenceContext {
+  const read = (name: string) => readFileSync(resolve(root, "data", name), "utf8");
+  const pronunciations = parseCmudict(read("cmudict.dict"));
+  const words = parseWordList(read("words.txt"));
+  const names = parseWordList(read("names.txt"));
+  applySupplement(read(SUPPLEMENT), { pronunciations, words, names });
+  const derivation = new Derivation(new IndexDataSource({ words, pronunciations }));
+  return { pronunciations, words, names, derivation };
+}
+
+/**
+ * Ask the agent to author a reading for a word no split resolves, following the
+ * pattern the dev feedback button established: the `claude` CLI in headless
+ * print mode on the maintainer's Pro subscription, no API key and no new
+ * dependency.
+ *
+ * Never throws. A missing CLI, a non-zero exit and unparseable output are all
+ * the same outcome to the caller — the word is deferred and the night carries
+ * on. A tooling problem costs a few words, not the evening.
+ */
+function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation | null> {
+  const prompt = [
+    `Write the General American CMUdict/ARPAbet pronunciation of the English word "${word}".`,
+    `It must rhyme on the Rhyme Key ${target} — that is, the phonemes from its last`,
+    `stressed vowel to the end of the word must be exactly: ${target}.`,
+    "",
+    "Use ARPAbet phonemes with stress digits on vowels (0 unstressed, 1 primary,",
+    "2 secondary), separated by single spaces. A compound's final element usually",
+    "takes secondary rather than primary stress.",
+    "",
+    "Respond with ONLY the phonemes on one line. No word, no quotes, no explanation.",
+  ].join("\n");
+
+  return new Promise((done) => {
+    const child = spawn("claude", ["-p", "--model", "sonnet"], { shell: true });
+    let stdout = "";
+    child.stdout.on("data", (chunk) => (stdout += chunk));
+    child.stderr.on("data", () => {});
+    child.on("error", () => done(null));
+    child.on("close", (code) => done(code === 0 ? parseReading(stdout) : null));
+    child.stdin.end(prompt);
+  });
+}
+
+/** ARPAbet phoneme, with an optional stress digit. */
+const PHONEME = /^[A-Z]{1,3}[012]?$/;
+
+/** The phonemes out of whatever the agent said, or null if that is nothing. */
+function parseReading(output: string): Pronunciation | null {
+  const lines = output.trim().split(/\r?\n/).filter((line) => line.trim() !== "");
+  const last = lines[lines.length - 1] ?? "";
+  const phonemes = last.trim().toUpperCase().split(/\s+/);
+  return phonemes.length > 0 && phonemes.every((p) => PHONEME.test(p)) ? phonemes : null;
+}
+
+const SUPPLEMENT = "supplement.dict";
+const DEFERRED_QUEUE = "deferred-readings.jsonl";
+
+/**
+ * The section the pass appends to, written once. There is no per-entry comment
+ * — the reason for an add is constant, and a line restating it every time
+ * carries no information (ADR-0014).
+ */
+const EDITOR_SECTION =
+  "# --- Adds by the Editor's Pass: composed from a compound split and verified\n" +
+  "# against the day's Rhyme Key before being written here (ADR-0014). ---";
+
+function appendToSupplement(readings: { word: string; phonemes: Pronunciation }[]): void {
+  if (readings.length === 0) return;
+  const path = resolve(root, "data", SUPPLEMENT);
+  const existing = readFileSync(path, "utf8");
+  const section = existing.includes(EDITOR_SECTION) ? "" : `\n${EDITOR_SECTION}\n`;
+  const lines = readings.map((r) => `${r.word} ${r.phonemes.join(" ")}`).join("\n");
+  appendFileSync(path, `${section}${lines}\n`);
+}
+
+/**
+ * The deferred queue, in the shape `supplement-candidates.jsonl` established.
+ * It is the work list for a later human or agent pass — each entry carries the
+ * word and the Rhyme Key it must reach, which is all an author needs — and it
+ * is what makes the composition's real miss rate countable. Discarding misses
+ * would forfeit that, and a second composition rule is meant to be decided from
+ * this file's contents rather than from the next frustrating word.
+ */
+function appendToDeferredQueue(deferred: DeferredReading[]): void {
+  if (deferred.length === 0) return;
+  const timestamp = new Date().toISOString();
+  const lines = deferred.map((d) => JSON.stringify({ ...d, timestamp })).join("\n");
+  appendFileSync(resolve(root, "data", DEFERRED_QUEUE), `${lines}\n`);
+}
+
+function printAddSummary(
+  accepted: { word: string }[],
+  deferred: DeferredReading[],
+): void {
+  console.log("");
+  if (accepted.length > 0) {
+    console.log(`  ${accepted.length} reading(s) appended to data/${SUPPLEMENT}.`);
+    console.log(`  Commit it, then npm run deploy — the fix applies to every Puzzle`);
+    console.log(`  the word appears in, and a Session already in progress picks it up.`);
+  }
+  if (deferred.length > 0) {
+    console.log(`  ${deferred.length} word(s) appended to data/${DEFERRED_QUEUE} for a later pass.`);
+  }
+  if (accepted.length === 0 && deferred.length === 0) {
+    console.log(`  Nothing to write.`);
+  }
+  console.log("");
+}
+
+/** The Rhyme Key an add is aimed at: an explicit one, or the day's. */
+function targetFor(date: string): { target: RhymeKey; provenance: string } {
+  const day = schedule.days.find((d) => d.date === date);
+  if (day === undefined) {
+    fail(`No Daily Puzzle scheduled for ${date}. Pass --rhymeKey to add against a key directly.`);
+  }
+  return { target: day.rhymeKey, provenance: `${day.date}, the ${day.seed} Puzzle` };
+}
+
 // --- run -----------------------------------------------------------------------
 
-if (args.seed !== undefined) {
+if (args.command === "add") {
+  const { target, provenance } =
+    args.rhymeKey !== undefined
+      ? { target: args.rhymeKey, provenance: "an explicit Rhyme Key" }
+      : targetFor(args.date ?? tomorrow(localCalendarDate()));
+  await add(args.words!, target, provenance);
+} else if (args.seed !== undefined) {
   audition(args.seed);
 } else {
   readDay(args.date ?? tomorrow(localCalendarDate()));
