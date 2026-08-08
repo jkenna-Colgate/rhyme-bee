@@ -144,6 +144,8 @@ export interface TestInputs {
   demotions?: string;
   /** The supplement (ADR-0009) this build runs. Likewise. */
   supplement?: string;
+  /** The Retrieval override layer (ADR-0015) this build runs. Likewise. */
+  tierOverrides?: string;
   /** The tier cutoff, for a test that needs to move it. */
   knownnessThreshold?: number;
 }
@@ -160,6 +162,7 @@ function testSlice(inputs: TestInputs): FixtureSlice {
     prevalence: new Map([...prevalence, ...(inputs.prevalence ?? [])]),
     demotions: inputs.demotions,
     supplement: inputs.supplement,
+    tierOverrides: inputs.tierOverrides,
   };
 }
 

@@ -24,6 +24,7 @@ export interface FixtureSlice {
   prevalence?: Map<string, number>;
   demotions?: string;
   supplement?: string;
+  tierOverrides?: string;
 }
 
 /** Readings to CMUdict text: `WORD  P1 P2`, alternates as `WORD(n)`. */
@@ -61,6 +62,7 @@ function toPinnedInputs(slice: FixtureSlice): PinnedInputs {
     prevalence: toPrevalenceCsv(slice.prevalence ?? new Map()),
     demotions: slice.demotions ?? "",
     supplement: slice.supplement ?? "",
+    tierOverrides: slice.tierOverrides ?? "",
   };
 }
 

@@ -25,7 +25,7 @@
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 
 /** Names the current artifact. Written by the build, read only at build time. */
 export const MANIFEST_FILENAME = "index.manifest.json";
@@ -128,6 +128,15 @@ export function indexArtifactPath(outDir: string): string {
  * Two of these (`words.txt`, `names.txt`) are gitignored and regenerable from
  * pinned upstream sources (ADR-0003), so on a fresh clone they may be absent
  * altogether. Absent counts as stale; see below.
+ *
+ * `tier-overrides.csv` (ADR-0015) is also here, but not on the same footing.
+ * Every other file's absence is a *setup step not yet run* — the fresh clone
+ * that has not generated `words.txt` yet is, in every real sense, a build that
+ * cannot succeed until it does. A missing override file is different: ADR-0015
+ * fixes it as a legitimate no-op, the same standing an *empty* file has, and
+ * for a project with no Editor's Pass behind it yet that absence is not a
+ * step still to run — it may never be. See `OPTIONAL_DATA_INPUTS` below for
+ * how that changes what "absent" means for this one entry.
  */
 const DATA_INPUTS = [
   "sources.json",
@@ -137,7 +146,26 @@ const DATA_INPUTS = [
   "prevalence.csv",
   "demotions.txt",
   "supplement.dict",
+  "tier-overrides.csv",
 ];
+
+/**
+ * The one input whose absence is not itself news.
+ *
+ * The general rule below — "missing counts as stale" — exists to err toward
+ * rebuilding whenever a stale-or-not question is unclear (see
+ * `indexStaleness`'s own doc comment). For `tier-overrides.csv` it is not
+ * unclear: a missing file and an empty one are the same fact, by ADR-0015's
+ * own design, and the empty case is plainly not stale. Folding the missing
+ * case into "stale" regardless would mean a project with no Editor's Pass yet
+ * rebuilds the Index on *every* deploy, forever, defeating the one thing this
+ * predicate exists to answer ("did anything actually change") for every other
+ * input at the same time. So this file alone is exempted from the
+ * missing-is-stale branch; it stays fully subject to the *other* branch —
+ * once it exists, a newer mtime than the artifact is stale exactly like any
+ * other input, which is what makes a rebuild after an Editor's Pass automatic.
+ */
+const OPTIONAL_DATA_INPUTS = new Set(["tier-overrides.csv"]);
 
 /**
  * The build's own source counts as an input.
@@ -208,7 +236,14 @@ export function indexStaleness(root: string, outDir = resolve(root, "dist-data")
   const builtAt = statSync(resolve(outDir, manifest.index)).mtimeMs;
 
   for (const input of indexInputs(root)) {
-    if (!existsSync(input)) return { stale: true, reason: "missing-input", input };
+    if (!existsSync(input)) {
+      // An optional input's absence is a stable, legitimate state (see
+      // `OPTIONAL_DATA_INPUTS`), not the "something is unclear" case the
+      // general rule below exists to catch — so it does not, on its own,
+      // make the build stale.
+      if (OPTIONAL_DATA_INPUTS.has(basename(input))) continue;
+      return { stale: true, reason: "missing-input", input };
+    }
     // `>=` rather than `>`: a same-millisecond tie is unresolvable, and the tie
     // breaks toward rebuilding for the reason above.
     if (statSync(input).mtimeMs >= builtAt) return { stale: true, reason: "input-newer", input };

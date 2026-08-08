@@ -2,12 +2,23 @@
  * Manufacture: pinned text in, index data out.
  *
  * The build turns the pinned inputs into readings in a fixed order — demotions,
- * then the committed supplement, then coverage derivation, then normalisation —
- * and that order is load-bearing. Demotions run first so every later stage reads
- * a corrected word list rather than working around it. A hand-authored reading
- * must beat a composed one, so the supplement precedes coverage. And every
- * reading must reach the accent specification as an *input* rather than an
- * exemption, so normalisation runs last (ADR-0010, ADR-0011).
+ * then the committed supplement, then coverage derivation, then normalisation,
+ * then the Retrieval override layer — and that order is load-bearing. Demotions
+ * run first so every later stage reads a corrected word list rather than
+ * working around it. A hand-authored reading must beat a composed one, so the
+ * supplement precedes coverage. And every reading must reach the accent
+ * specification as an *input* rather than an exemption, so normalisation runs
+ * before anything else is considered finished (ADR-0010, ADR-0011).
+ *
+ * The Retrieval override layer (ADR-0015) runs *last*, after normalisation,
+ * because it is not a reading stage — it patches only `prevalence`, never a
+ * pronunciation or wordhood. Running it earlier would buy nothing and risks
+ * something: coverage derivation's candidate set is every word already sitting
+ * in the prevalence norms (`src/coverage.ts`), so an override that plants a
+ * fresh prevalence entry for a word with no reading, run *before* coverage,
+ * would silently pull that word into coverage's candidate set — a second effect
+ * ADR-0015 never asked for and the Tier layer must not cause. Last, it only
+ * ever touches a map nothing downstream in *this* function reads again.
  *
  * That order used to live in comments in the build script, with each stage
  * taking a mutable target it would happily accept twice or out of turn. Here it
@@ -16,7 +27,7 @@
  * upstream formats is part of the job for the same reason — a caller that parsed
  * first would be back to holding the pieces in the right order.
  *
- * The four stages stay separately testable through their own modules. This owns
+ * The five stages stay separately testable through their own modules. This owns
  * the order, not the rules.
  */
 
@@ -27,6 +38,7 @@ import { applyNormalisation } from "./normalise.ts";
 import { parsePrevalenceCsv, parseWordList } from "./pipeline.ts";
 import type { RhymeIndexData } from "./rhymeIndex.ts";
 import { applySupplement } from "./supplement.ts";
+import { applyTierOverrides, type AppliedTierOverride } from "./tierOverride.ts";
 
 /**
  * The pinned inputs, as text, exactly as they sit in `data/`. Text rather than
@@ -45,6 +57,13 @@ export interface PinnedInputs {
   demotions: string;
   /** The committed human override layer (ADR-0009). Likewise. */
   supplement: string;
+  /**
+   * The committed Retrieval override layer (ADR-0015): the puzzles editor
+   * setting a word's Tier by name. Empty text is a legitimate no-op, as is a
+   * missing file — the build treats an Editor's Pass that has never happened
+   * the same way it treats an empty demotion list, not as an error.
+   */
+  tierOverrides: string;
 }
 
 /** A CMUdict surface form that will never be a valid Submission, and why. */
@@ -68,6 +87,8 @@ export interface ManufacturedIndex {
   derived: DerivedWord[];
   /** Every pronounced surface form the wordhood gate excludes (story 40). */
   dropped: DroppedWord[];
+  /** Every word the Retrieval override layer patched (ADR-0015). */
+  overridden: AppliedTierOverride[];
 }
 
 export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
@@ -95,9 +116,16 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   const derived = applyCoverage({ pronunciations, words, names, prevalence });
 
   // 4. The accent specification (ADR-0010), applied to every reading before any
-  // Rhyme Key is computed. *Last*, so a hand-authored or derived reading is an
-  // input to the accent rather than an exemption from it. See src/normalise.ts.
+  // Rhyme Key is computed. So a hand-authored or derived reading is an input to
+  // the accent rather than an exemption from it. See src/normalise.ts.
   applyNormalisation({ pronunciations });
+
+  // 5. The Retrieval override layer (ADR-0015), merged over the finished
+  // prevalence map before any Tier is read — so no adjudication code learns
+  // that overrides exist. *Last*: it touches only `prevalence`, and running it
+  // ahead of coverage would risk a fabricated entry wandering into coverage's
+  // candidate set (see the header comment). See src/tierOverride.ts.
+  const overridden = applyTierOverrides(inputs.tierOverrides, { prevalence });
 
   // Dropped-words report (story 40), read off the finished state: every CMUdict
   // surface form that will never be a valid Submission, so over-aggressive
@@ -110,5 +138,5 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   }
   dropped.sort((a, b) => a.word.localeCompare(b.word));
 
-  return { data: { pronunciations, words, names, prevalence }, demoted, derived, dropped };
+  return { data: { pronunciations, words, names, prevalence }, demoted, derived, dropped, overridden };
 }
