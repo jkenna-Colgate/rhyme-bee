@@ -54,7 +54,10 @@ function builtIndex(): RhymeIndex {
 
 /** One scheduled day, checked against the bands it was dealt from. */
 export function readDay(schedule: Schedule, date: string): void {
-  const readout = readScheduledDay(builtIndex(), schedule, date);
+  // `builtIndex` unopened, not `builtIndex()`: a date outside the run is
+  // answered without reading the artifact, as it was before the readout became
+  // a value.
+  const readout = readScheduledDay(builtIndex, schedule, date);
 
   if (readout.outcome === "not-scheduled") {
     fail(

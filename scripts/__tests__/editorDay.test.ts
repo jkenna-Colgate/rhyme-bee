@@ -34,12 +34,12 @@ function scheduleWith(...overrides: Partial<ScheduleDay>[]): Schedule {
 }
 
 describe("a scheduled day", () => {
-  const readout = readScheduledDay(index, scheduleWith(), "2026-09-01");
+  const readout = readScheduledDay(() => index, scheduleWith(), "2026-09-01");
 
   it("returns a value rather than printing", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    readScheduledDay(index, scheduleWith(), "2026-09-01");
+    readScheduledDay(() => index, scheduleWith(), "2026-09-01");
     expect(log).not.toHaveBeenCalled();
     expect(error).not.toHaveBeenCalled();
     log.mockRestore();
@@ -104,7 +104,7 @@ describe("a scheduled day", () => {
   });
 
   it("reports drift without refusing to read the day", () => {
-    const drifted = readScheduledDay(index, scheduleWith({ answerCount: 3, difficulty: 0.9 }), "2026-09-01");
+    const drifted = readScheduledDay(() => index, scheduleWith({ answerCount: 3, difficulty: 0.9 }), "2026-09-01");
     if (drifted.outcome !== "day") throw new Error("expected a day");
     expect(drifted.drift.drifted).toBe(true);
     expect(drifted.answers.length).toBe(facts.answerCount);
@@ -112,7 +112,7 @@ describe("a scheduled day", () => {
 });
 
 describe("a date the run does not cover", () => {
-  const readout = readScheduledDay(index, scheduleWith(), "2027-01-01");
+  const readout = readScheduledDay(() => index, scheduleWith(), "2027-01-01");
 
   it("is a case in the value, naming the run's first and last dates", () => {
     expect(readout).toEqual({
@@ -122,12 +122,30 @@ describe("a date the run does not cover", () => {
       lastDate: "2026-09-02",
     });
   });
+
+  /**
+   * The built index is fifteen megabytes and loading it can throw when no
+   * artifact has been built, which the CLI does not catch — so a mistyped date
+   * has to be answered without opening one. This is the regression that made
+   * the index a function rather than an index.
+   */
+  it("never opens the index", () => {
+    const openIndex = vi.fn(() => index);
+    readScheduledDay(openIndex, scheduleWith(), "2027-01-01");
+    expect(openIndex).not.toHaveBeenCalled();
+  });
+
+  it("opens the index once for a day it can read", () => {
+    const openIndex = vi.fn(() => index);
+    readScheduledDay(openIndex, scheduleWith(), "2026-09-01");
+    expect(openIndex).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("a day whose Seed cannot be pinned", () => {
   // `AA K T` is `docked`'s key: a real key in the fixture, and not one of the
   // Seed's — the shape a mistyped or stale schedule entry actually takes.
-  const readout = readScheduledDay(index, scheduleWith({ rhymeKey: "AA K T" }), "2026-09-01");
+  const readout = readScheduledDay(() => index, scheduleWith({ rhymeKey: "AA K T" }), "2026-09-01");
 
   it("is a case in the value rather than an exit", () => {
     expect(readout.outcome).toBe("unpinnable");
@@ -146,7 +164,7 @@ describe("a day whose Seed cannot be pinned", () => {
 
   it("reports a Seed the index cannot read at all with no keys", () => {
     // `grates` has wordhood but no pronunciation anywhere in the fixture.
-    const none = readScheduledDay(index, scheduleWith({ seed: "grates" }), "2026-09-01");
+    const none = readScheduledDay(() => index, scheduleWith({ seed: "grates" }), "2026-09-01");
     if (none.outcome !== "unpinnable") throw new Error("expected an unpinnable day");
     expect(none.indexRhymeKeys).toEqual([]);
     expect(none.detail).not.toBe("");

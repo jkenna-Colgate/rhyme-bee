@@ -13,7 +13,10 @@
  * The index arrives as an argument rather than being loaded here, for the usual
  * reason: the artifact is megabytes and the caller already knows whether it
  * wants one. It also lets the whole of this module be tested over the fixture
- * index, which is the point.
+ * index, which is the point. It arrives *unopened* — as a function rather than
+ * an index — because a date outside the run is answered without building
+ * anything, and the CLI should not read fifteen megabytes to tell the editor
+ * they mistyped a date. Passing the index itself made that load unconditional.
  *
  * Every failure is a **case in the returned value**, never a process exit. A
  * date outside the run and a Seed the index cannot pin are both things the
@@ -22,7 +25,8 @@
  * value of meeting it here rather than in production.
  */
 
-import type { RhymeIndex } from "../src/rhymeIndex.ts";
+import type { RhymeKey } from "../src/phonology.ts";
+import type { PuzzleEntry, RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Scorable } from "../src/scoring.ts";
 import { measureAnswers } from "../src/curation.ts";
 import {
@@ -34,6 +38,7 @@ import {
   type ScheduleDay,
   type Weekday,
 } from "../src/schedule.ts";
+import { message } from "./editorShell.ts";
 
 /**
  * One word in a day's lists. `Scorable` is the whole of what moving a word
@@ -73,7 +78,7 @@ export interface ScheduledDayReadout {
   seed: string;
   /** Plain-English respelling of the Seed, read in its pinned Rhyme Key. */
   seedRespelling: string;
-  rhymeKey: string;
+  rhymeKey: RhymeKey;
   /** The three figures as the built index reads the day *now*. */
   facts: PuzzleFacts;
   /** The bands the day was dealt from, the recorded figures, and the verdict. */
@@ -110,17 +115,26 @@ export interface UnpinnableDayReadout {
   weekday: Weekday;
   week: number;
   seed: string;
-  scheduledRhymeKey: string;
+  scheduledRhymeKey: RhymeKey;
   /** Every Rhyme Key the built index holds for the Seed. Possibly empty. */
-  indexRhymeKeys: string[];
+  indexRhymeKeys: RhymeKey[];
   /** What the index said when asked, kept verbatim for the reader. */
   detail: string;
 }
 
 export type DayReadout = ScheduledDayReadout | UnscheduledDateReadout | UnpinnableDayReadout;
 
-/** One scheduled day, built and checked against the bands it was dealt from. */
-export function readScheduledDay(index: RhymeIndex, schedule: Schedule, date: string): DayReadout {
+/**
+ * One scheduled day, built and checked against the bands it was dealt from.
+ *
+ * `openIndex` is called at most once, and not at all for a date the run does not
+ * cover — see the note on the index in this module's header.
+ */
+export function readScheduledDay(
+  openIndex: () => RhymeIndex,
+  schedule: Schedule,
+  date: string,
+): DayReadout {
   const day = schedule.days.find((d) => d.date === date);
   if (day === undefined) {
     return {
@@ -131,6 +145,7 @@ export function readScheduledDay(index: RhymeIndex, schedule: Schedule, date: st
     };
   }
 
+  const index = openIndex();
   let puzzle: ReturnType<RhymeIndex["buildPuzzle"]>;
   try {
     puzzle = index.buildPuzzle(index.pinSeed(day.seed, day.rhymeKey));
@@ -138,7 +153,11 @@ export function readScheduledDay(index: RhymeIndex, schedule: Schedule, date: st
     return unpinnable(index, day, error);
   }
 
-  const answers = puzzle.answers.map(listed);
+  // Measured over the *listed* words rather than over the Puzzle's own entries,
+  // so the figures shown and the figures a client recomputes come from one
+  // list. Measured from `puzzle.answers`, a field dropped from `DayWord` could
+  // silently move the payload's arithmetic away from the readout's.
+  const answers = puzzle.answers.map(toDayWord);
   const facts = measureAnswers(answers);
 
   return {
@@ -152,17 +171,17 @@ export function readScheduledDay(index: RhymeIndex, schedule: Schedule, date: st
     facts,
     drift: checkDayDrift(day, facts, scheduleBands(schedule)),
     answers,
-    bonusWords: puzzle.bonusWords.map(listed),
+    bonusWords: puzzle.bonusWords.map(toDayWord),
   };
 }
 
 /**
- * Measured over the *listed* words rather than over the Puzzle's own entries, so
- * the figures shown and the figures a client recomputes come from one list. Were
- * these measured from `puzzle.answers`, a field dropped from `DayWord` could
- * silently move the payload's arithmetic away from the readout's.
+ * A Puzzle's member, narrowed to what a day's list shows and re-measures. The
+ * narrowing is the whole of it — `pronunciation` and `respelling` are dropped
+ * here and nowhere else, so this is the one place to look for why the payload
+ * is the size it is.
  */
-function listed(entry: DayWord): DayWord {
+function toDayWord(entry: PuzzleEntry): DayWord {
   return { word: entry.word, length: entry.length, knownness: entry.knownness };
 }
 
@@ -175,6 +194,6 @@ function unpinnable(index: RhymeIndex, day: ScheduleDay, error: unknown): Unpinn
     seed: day.seed,
     scheduledRhymeKey: day.rhymeKey,
     indexRhymeKeys: index.rhymeKeysOf(day.seed),
-    detail: error instanceof Error ? error.message : String(error),
+    detail: message(error),
   };
 }
