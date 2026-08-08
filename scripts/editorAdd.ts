@@ -10,12 +10,28 @@
  * (ADR-0014). What still fails is appended to the deferred queue rather than
  * discarded, which is what makes the miss rate countable.
  *
- * An imperative shell carrying no game logic of its own, and left untested as
- * the rest of the pass is — the judgements it prints come from the tested core
- * (`gatherEvidence`, `composeReading`, `verifyReading`). The agent invocation is
- * untested by the same precedent; the reading of what comes back is a gate on
- * the core rather than a neighbour of it, so it lives in `editorReading.ts` and
- * is tested there.
+ * `add` used to judge each word and print the judgement in the same breath,
+ * which is why it was unreachable by anything that is not a terminal (#150).
+ * `resolveAddOutcome` is the split: the judgement, as a value, with the
+ * pinned-source context and the agent call both arriving as arguments rather
+ * than being read here — the same move `readScheduledDay` (`editorDay.ts`)
+ * makes for the day half of the pass, for the same reason. `add` stays the
+ * real entry point: it builds the real context, calls `resolveAddOutcome`,
+ * performs the writes the outcome names, and returns the value. `printAddOutcome`
+ * is the one renderer left over it, so the CLI's output is unchanged.
+ *
+ * The writes are kept in `add` rather than pushed out to a caller, unlike
+ * `readScheduledDay`'s pure read: an add's whole point is the write, the web
+ * mode needs it server-side regardless of which surface asked for it
+ * (ADR-0016), and a value that only *describes* a write some other layer must
+ * remember to perform is a bug waiting for a caller that forgets.
+ *
+ * The judgement (`resolveAddOutcome`, `gatherEvidence`, `composeReading`,
+ * `verifyReading`) is tested; `add` itself is not, following the rest of the
+ * pass's shell — it is a context read, a call and two file writes. The agent
+ * invocation is untested by the same precedent; the reading of what comes back
+ * is a gate on the core rather than a neighbour of it, so it lives in
+ * `editorReading.ts` and is tested there.
  */
 
 import { spawn, type ChildProcess } from "node:child_process";
@@ -30,7 +46,9 @@ import {
   evidenceContextFrom,
   gatherEvidence,
   verifyReading,
+  type ComposedReading,
   type EvidenceContext,
+  type ReadingEvidence,
   type WordReading,
 } from "../src/supplementEvidence.ts";
 import { parseReading } from "./editorReading.ts";
@@ -48,6 +66,114 @@ export interface AddTarget {
 }
 
 /**
+ * A word that needed nothing: a Proper Noun, refused outright. The space of
+ * names is unbounded and has no defensible edge, however well the name
+ * rhymes. It is its own case rather than a `deferred` reason — deferring
+ * says "later", and a name is never coming back.
+ */
+export interface RefusedNameOutcome {
+  outcome: "refused-name";
+  word: string;
+}
+
+/**
+ * A word CMUdict already reads on the target Rhyme Key — it is in the Puzzle
+ * already, and there is nothing to add. Distinguished from
+ * `ReadsOnAnotherKeyOutcome` because the two look alike (both are "no write
+ * happened") but mean opposite things to the editor reading the outcome: this
+ * one is confirmation, that one is a problem.
+ *
+ * Carries `readings` for the same reason `ReadsOnAnotherKeyOutcome` does: a
+ * word can hold more than one CMUdict entry, and confirming *which* reading
+ * is the one on the target key is still worth showing, not only the fact of
+ * agreement.
+ */
+export interface AlreadyReadsOutcome {
+  outcome: "already-reads";
+  word: string;
+  readings: ReadingEvidence[];
+}
+
+/**
+ * A word CMUdict already reads, but not on the target key — a correction
+ * rather than an add, and left alone here exactly as it always has been
+ * (overriding an upstream pronunciation stays a deliberate hand-edit in
+ * `data/supplement.dict`, never something this program does on its own
+ * judgement).
+ *
+ * Carries every direct reading CMUdict holds for the word, keys included —
+ * where the index holds it *now* — because a maintainer reading this outcome
+ * cannot act on "it disagrees" without also being told what it currently
+ * says. A later slice offers to record this as a disagreement (#150); this is
+ * the field that slice reads.
+ */
+export interface ReadsOnAnotherKeyOutcome {
+  outcome: "reads-on-another-key";
+  word: string;
+  readings: ReadingEvidence[];
+}
+
+/**
+ * A word given a reading and written to `data/supplement.dict`: either
+ * composed from a compound split (`composed` carries the parts, for a reader
+ * who wants to check the derivation) or authored by the agent once no split
+ * reached the target (`composed` is null). Either way the reading passed the
+ * same `verifyReading` before arriving here (ADR-0014) — this case does not
+ * distinguish the two paths by trustworthiness, only by provenance.
+ */
+export interface WrittenOutcome {
+  outcome: "written";
+  word: string;
+  phonemes: Pronunciation;
+  composed: ComposedReading | null;
+}
+
+/**
+ * A word neither composed nor authored: no compound split reached the target,
+ * and the agent either did not answer (`agent-unavailable`) or proposed a
+ * reading that failed the same verification a human proposal would fail
+ * (`agent-reading-failed-verification`, and `proposed` carries what it said so
+ * the miss is inspectable). Appended to the deferred queue rather than
+ * discarded, so the composition's real miss rate is countable and a night's
+ * words are not silently retried next time.
+ */
+export interface DeferredOutcome {
+  outcome: "deferred";
+  word: string;
+  reason: "agent-unavailable" | "agent-reading-failed-verification";
+  proposed: Pronunciation | null;
+}
+
+export type WordOutcome =
+  | RefusedNameOutcome
+  | AlreadyReadsOutcome
+  | ReadsOnAnotherKeyOutcome
+  | WrittenOutcome
+  | DeferredOutcome;
+
+/**
+ * The whole of one `add` invocation, as a value: the target it was aimed at,
+ * and every supplied word's outcome in the order it was given. `printAddOutcome`
+ * below is the one renderer over it; a later slice's React view is the other
+ * (#150).
+ *
+ * Flat rather than pre-partitioned into written/deferred lists — `words` is
+ * the one list, each entry self-describing via `outcome`, so a reader who
+ * wants the partition filters it (as `printAddOutcome`, `writtenReadings` and
+ * `deferredReadings` below all do) and a reader who wants the original order
+ * an editor typed the words in still has it. Two lists would have to agree on
+ * an order convention neither the CLI nor a browser table actually needs.
+ */
+export interface AddOutcome {
+  target: RhymeKey;
+  provenance: string;
+  words: WordOutcome[];
+}
+
+/** How an add asks an agent to author a reading — real in `add`, stubbed in tests. */
+type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | null>;
+
+/**
  * The editor names words the pass turned up as missing, and nothing else — no
  * phonemes, and no per-entry comment, because the reason for an add is constant
  * (the word was absent from the pinned sources) and restating it every time
@@ -57,78 +183,102 @@ export interface AddTarget {
  * a correction and is left alone; otherwise a reading is composed from a
  * compound split, and if no split reaches the target the word goes to an agent
  * to author. Every proposal, whoever made it, passes the same `verifyReading`
- * before it is written (ADR-0014). Anything that still fails is appended to the
- * deferred queue, so a miss is recorded rather than rediscovered next time.
+ * before it is accepted (ADR-0014). Anything that still fails is a `deferred`
+ * case, so a miss is recorded rather than rediscovered next time.
  *
  * The words are independent of one another: every one is judged against the
- * same snapshot of the evidence, taken before the first of them (see
- * `evidenceContext`), so their order carries no meaning and no word can be a
- * part of another's compound split within one invocation.
+ * same `ctx`, taken before the first of them, so their order carries no
+ * meaning and no word can be a part of another's compound split within one
+ * invocation.
+ *
+ * `ctx` and `authorReading` arrive as arguments rather than being read or
+ * shelled out to here, the same move `readScheduledDay` makes for its index:
+ * it is what makes this function callable over a fixture with a stubbed
+ * agent, with no pinned source on disk and no subprocess in flight, which is
+ * the whole of what makes it testable. `add` below supplies the real ones.
  */
-export async function add(words: string[], aim: AddTarget): Promise<void> {
+export async function resolveAddOutcome(
+  words: string[],
+  aim: AddTarget,
+  ctx: EvidenceContext,
+  authorReading: AgentAuthor = authorWithAgent,
+): Promise<AddOutcome> {
   const { target, provenance } = aim;
-  const ctx = evidenceContext();
-  const accepted: WordReading[] = [];
-  const deferred: DeferredReading[] = [];
-
-  console.log("");
-  console.log(`  Adding ${words.length} word(s) against ${target}  ·  ${provenance}`);
-  console.log("");
+  const results: WordOutcome[] = [];
 
   for (const supplied of words) {
     const evidence = gatherEvidence(supplied, target, ctx);
     const word = evidence.word;
-    console.log(`  ${word}`);
 
     // A name stays a name, however well it rhymes: the space of names is
     // unbounded and has no defensible edge. Refused rather than deferred —
     // deferring says "later", and this is never.
     if (evidence.isName) {
-      console.log(`    refused: a Proper Noun stays a Proper Noun, however well it rhymes.`);
+      results.push({ outcome: "refused-name", word });
       continue;
     }
 
     if (evidence.direct.length > 0) {
-      const verdict = evidence.rhymesDirectly
-        ? `already reads on ${target} — it is in the game already, nothing to add.`
-        : `already has a reading that does not rhyme. That is a CORRECTION, not an add:` +
-          ` overriding an upstream pronunciation stays a deliberate hand-edit in` +
-          ` data/supplement.dict.`;
-      console.log(`    ${verdict}`);
-      for (const reading of evidence.direct) console.log(`      ${reading.phonemes.join(" ")}`);
+      results.push(
+        evidence.rhymesDirectly
+          ? { outcome: "already-reads", word, readings: evidence.direct }
+          : { outcome: "reads-on-another-key", word, readings: evidence.direct },
+      );
       continue;
     }
 
     if (evidence.composed !== null) {
-      const { head, tail, phonemes } = evidence.composed;
-      console.log(`    composed  ${phonemes.join(" ")}`);
-      console.log(
-        `    from      ${head.word} (${head.phonemes.join(" ")}) + ` +
-          `${tail.word} (${tail.phonemes.join(" ")}), the tail taking secondary stress`,
-      );
-      accepted.push({ word, phonemes });
+      results.push({ outcome: "written", word, phonemes: evidence.composed.phonemes, composed: evidence.composed });
       continue;
     }
 
-    console.log(`    no compound split reaches ${target} — asking the agent to author one.`);
-    const authored = await authorWithAgent(word, target);
+    const authored = await authorReading(word, target);
     if (authored === null) {
-      deferred.push({ word, rhymeKey: target, reason: "agent-unavailable" });
-      console.log(`    the agent did not answer. Deferred.`);
+      results.push({ outcome: "deferred", word, reason: "agent-unavailable", proposed: null });
     } else if (verifyReading(authored, target)) {
       // The same predicate, applied to a reading this program did not compose.
       // Delegating authorship does not lower the bar.
-      console.log(`    the agent proposed  ${authored.join(" ")}  — verified against ${target}.`);
-      accepted.push({ word, phonemes: authored });
+      results.push({ outcome: "written", word, phonemes: authored, composed: null });
     } else {
-      deferred.push({ word, rhymeKey: target, reason: "agent-reading-failed-verification" });
-      console.log(`    the agent proposed  ${authored.join(" ")}, which does not reach ${target}. Deferred.`);
+      results.push({ outcome: "deferred", word, reason: "agent-reading-failed-verification", proposed: authored });
     }
   }
 
-  appendToSupplement(accepted);
-  appendToDeferredQueue(deferred);
-  printAddSummary(accepted, deferred);
+  return { target, provenance, words: results };
+}
+
+/**
+ * The real entry point: builds the real pinned-source context, judges the
+ * words against it, writes what `resolveAddOutcome` decided reached a reading
+ * to `data/supplement.dict` and what it deferred to the deferred queue, and
+ * returns the outcome. Nothing here prints — `printAddOutcome` is the one
+ * renderer, and the web mode's Submit is the other consumer of the same value
+ * (#150).
+ *
+ * The writes stay here rather than moving out to a caller: unlike a day
+ * reading, which is pure, an add's whole point is the write, and the web mode
+ * needs it to happen server-side regardless of which surface asked for it
+ * (ADR-0016). A value that only *describes* a write some other layer must
+ * remember to perform is a bug waiting for a caller that forgets — every
+ * consumer of `AddOutcome` gets a value the write has already happened for.
+ */
+export async function add(words: string[], aim: AddTarget): Promise<AddOutcome> {
+  const outcome = await resolveAddOutcome(words, aim, evidenceContext());
+  appendToSupplement(writtenReadings(outcome));
+  appendToDeferredQueue(deferredReadings(outcome));
+  return outcome;
+}
+
+function writtenReadings(outcome: AddOutcome): WordReading[] {
+  return outcome.words
+    .filter((w): w is WrittenOutcome => w.outcome === "written")
+    .map((w) => ({ word: w.word, phonemes: w.phonemes }));
+}
+
+function deferredReadings(outcome: AddOutcome): DeferredReading[] {
+  return outcome.words
+    .filter((w): w is DeferredOutcome => w.outcome === "deferred")
+    .map((w) => ({ word: w.word, rhymeKey: outcome.target, reason: w.reason }));
 }
 
 /** One word the pass could not resolve, kept so the miss rate is countable. */
@@ -283,23 +433,87 @@ function appendToDeferredQueue(deferred: DeferredReading[]): void {
   appendFileSync(resolve(root, "data", DEFERRED_QUEUE), `${lines}\n`);
 }
 
-function printAddSummary(
-  accepted: WordReading[],
-  deferred: DeferredReading[],
-): void {
+/**
+ * The terminal's rendering of an `AddOutcome` — the whole of what `add` used
+ * to print inline, unchanged, now read off the value instead of interleaved
+ * with the judgement that produces it. Writes nothing: by the time this runs,
+ * `add` already has.
+ */
+export function printAddOutcome(outcome: AddOutcome): void {
+  const { target, provenance, words } = outcome;
+
   console.log("");
-  if (accepted.length > 0) {
-    console.log(`  ${accepted.length} reading(s) appended to data/${SUPPLEMENT}.`);
+  console.log(`  Adding ${words.length} word(s) against ${target}  ·  ${provenance}`);
+  console.log("");
+
+  for (const w of words) {
+    console.log(`  ${w.word}`);
+    printWordOutcome(w, target);
+  }
+
+  const written = words.filter((w) => w.outcome === "written");
+  const deferred = words.filter((w) => w.outcome === "deferred");
+
+  console.log("");
+  if (written.length > 0) {
+    console.log(`  ${written.length} reading(s) appended to data/${SUPPLEMENT}.`);
     console.log(`  Commit it, then npm run deploy — the fix applies to every Puzzle`);
     console.log(`  the word appears in, and a Session already in progress picks it up.`);
   }
   if (deferred.length > 0) {
     console.log(`  ${deferred.length} word(s) appended to data/${DEFERRED_QUEUE} for a later pass.`);
   }
-  if (accepted.length === 0 && deferred.length === 0) {
+  if (written.length === 0 && deferred.length === 0) {
     console.log(`  Nothing to write.`);
   }
   console.log("");
+}
+
+function printWordOutcome(w: WordOutcome, target: RhymeKey): void {
+  switch (w.outcome) {
+    case "refused-name":
+      console.log(`    refused: a Proper Noun stays a Proper Noun, however well it rhymes.`);
+      return;
+    case "already-reads":
+      console.log(`    already reads on ${target} — it is in the game already, nothing to add.`);
+      for (const reading of w.readings) console.log(`      ${reading.phonemes.join(" ")}`);
+      return;
+    case "reads-on-another-key":
+      console.log(
+        `    already has a reading that does not rhyme. That is a CORRECTION, not an add:` +
+          ` overriding an upstream pronunciation stays a deliberate hand-edit in` +
+          ` data/supplement.dict.`,
+      );
+      for (const reading of w.readings) console.log(`      ${reading.phonemes.join(" ")}`);
+      return;
+    case "written":
+      if (w.composed !== null) {
+        const { head, tail, phonemes } = w.composed;
+        console.log(`    composed  ${phonemes.join(" ")}`);
+        console.log(
+          `    from      ${head.word} (${head.phonemes.join(" ")}) + ` +
+            `${tail.word} (${tail.phonemes.join(" ")}), the tail taking secondary stress`,
+        );
+      } else {
+        console.log(`    no compound split reaches ${target} — asking the agent to author one.`);
+        console.log(`    the agent proposed  ${w.phonemes.join(" ")}  — verified against ${target}.`);
+      }
+      return;
+    case "deferred":
+      console.log(`    no compound split reaches ${target} — asking the agent to author one.`);
+      if (w.reason === "agent-unavailable") {
+        console.log(`    the agent did not answer. Deferred.`);
+      } else {
+        console.log(
+          `    the agent proposed  ${w.proposed!.join(" ")}, which does not reach ${target}. Deferred.`,
+        );
+      }
+      return;
+    default: {
+      const exhaustive: never = w;
+      throw new Error(`unreachable word outcome: ${JSON.stringify(exhaustive)}`);
+    }
+  }
 }
 
 /** The Rhyme Key an add is aimed at, taken from a scheduled day. */
