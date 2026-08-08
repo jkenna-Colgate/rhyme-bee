@@ -1,0 +1,273 @@
+/*
+ * The editor's own stylesheet, loaded only by `editor.html`. It shares nothing
+ * with the player's `styles.css` on purpose: this is a dense reading surface for
+ * one person on a desktop, and the game's is a playing surface for anyone on a
+ * phone. Keeping them apart is also what keeps the player's bundle free of
+ * anything the editor needs.
+ */
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: #fbfaf7;
+  color: #1c1b18;
+  font: 15px/1.5 ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+}
+
+.editor {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+.editor-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e3ded2;
+  padding-bottom: 0.75rem;
+}
+
+.editor-head h1 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.editor-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b6558;
+}
+
+.editor-jump input {
+  font: inherit;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid #cdc6b6;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.editor-muted {
+  color: #857e70;
+  font-weight: 400;
+}
+
+/* Dimmed, not blanked, while the next day is fetched. */
+.editor-loading {
+  opacity: 0.45;
+  transition: opacity 120ms ease-in;
+}
+
+.editor-day-head h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0;
+}
+
+/* The Seed Word and the reading it adjudicates against, given the most room on
+   the page — every judgement the editor is about to make depends on it. */
+.editor-seed {
+  margin: 0.75rem 0 1.25rem;
+  padding: 0.9rem 1rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-seed-word {
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.editor-seed-said {
+  color: #6b6558;
+  margin-top: 0.15rem;
+}
+
+.editor-seed-key {
+  margin-top: 0.45rem;
+  font-size: 0.85rem;
+  color: #6b6558;
+}
+
+.editor-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.editor-figure {
+  flex: 1 1 12rem;
+  padding: 0.7rem 0.85rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-figure-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #857e70;
+}
+
+.editor-figure-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.editor-figure-band {
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-out-of-band {
+  color: #8a5a00;
+  font-weight: 600;
+}
+
+.editor-recorded {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: #857e70;
+}
+
+/* Advisory. Warm, not red — drift never blocks anything. */
+.editor-warning {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: #fff6e0;
+  border: 1px solid #e6cf95;
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.editor-warning ul {
+  margin: 0 0 0.4rem;
+  padding-left: 1.1rem;
+}
+
+.editor-warning p {
+  margin: 0;
+  color: #6b6558;
+}
+
+/* The schedule/index disagreement: the one thing on this screen that must be
+   impossible to skim past, so it is the only red on the page. */
+.editor-alarm {
+  margin: 1.5rem 0;
+  padding: 1rem 1.1rem;
+  background: #fdecec;
+  border: 2px solid #c0392b;
+  border-radius: 6px;
+}
+
+.editor-alarm h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: #8e2a1f;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.editor-alarm-lede {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.editor-alarm p {
+  margin: 0.5rem 0 0;
+}
+
+.editor-detail {
+  font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.82rem;
+  color: #6b3b34;
+}
+
+.editor-pairs {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.3rem 1rem;
+  margin: 0;
+}
+
+.editor-pairs dt {
+  font-size: 0.8rem;
+  color: #6b6558;
+}
+
+.editor-pairs dd {
+  margin: 0;
+}
+
+.editor-key + .editor-key {
+  margin-left: 0.5rem;
+}
+
+.editor-empty {
+  margin: 2rem 0;
+}
+
+.editor-empty h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.85em;
+  background: #f0ece2;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* Two lists, side by side and never merged: the Tier split is what the editor is
+   here to check, and a single list with a marker on it hides exactly that. */
+.editor-lists {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 46rem) {
+  .editor-lists {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editor-list h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #e3ded2;
+}
+
+/* Alphabetical in columns, so the list can be run against a third-party rhyme
+   list in another window by eye. */
+.editor-words {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 9rem;
+  column-gap: 1.25rem;
+}
+
+.editor-words li {
+  break-inside: avoid;
+  padding: 0.05rem 0;
+}

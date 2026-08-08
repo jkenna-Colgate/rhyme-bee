@@ -25,6 +25,8 @@
     "worker",
     "__tests__",
     "vite.config.ts",
+    "editorDayPlugin.ts",
+    "editorDayRequest.ts",
     "feedbackPlugin.ts",
     "supplementPlugin.ts"
   ]
