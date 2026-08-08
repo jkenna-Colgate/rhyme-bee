@@ -1,8 +1,7 @@
 /**
  * Half of the Editor's Pass: **reading** a Daily Puzzle the night before it
- * goes live. Resolving the day, checking it against the bands it was dealt
- * from, and printing its Answers and Bonus Words in a shape the eye can scan.
- * Writes nothing, anywhere.
+ * goes live — the terminal's rendering of it. Printing the day's Answers and
+ * Bonus Words in a shape the eye can scan. Writes nothing, anywhere.
  *
  * Without this there is no way to see tomorrow's Puzzle at all: the date comes
  * from the player's own local calendar (ADR-0013) and there is no override
@@ -10,33 +9,33 @@
  * rhyme list in another window — alphabetical, in columns — because that is the
  * comparison that finds the missing word, and it is done by eye.
  *
- * Resolving the scheduled Seed Word against the built Rhyme Index in order to
- * print it *is* the schedule/index agreement check, which nothing else performs
- * (#126). In production that disagreement is silent — `pinSeed` throws, the boot
- * policy catches it, and the player is handed Free Play instead of the Daily
- * Puzzle. Here it is a non-zero exit with the day, the Seed and the key named.
+ * *What* a day is now lives in `editorDay.ts` and arrives here as a value; this
+ * module decides only how it looks, and is one renderer of two (#150). The
+ * failure cases arrive the same way, and this is where they become a non-zero
+ * exit — the browser renders them instead. The schedule/index agreement check
+ * that nothing else performs (#126) is a case in that value, not a throw caught
+ * here.
  *
  * This module never writes `data/schedule.json`. An audition prints a line to
  * paste; the schedule stays the hand-edited reviewed artifact ADR-0012 requires.
  *
  * An imperative shell carrying no game logic of its own, and left untested
  * exactly as `play`, `build-index` and `histogram` are — every figure it prints
- * comes from the tested core (`measureAnswers`, `checkDayDrift`, `buildPuzzle`).
+ * comes from the tested core (`readScheduledDay`, `measureAnswers`,
+ * `checkDayDrift`, `buildPuzzle`).
  */
 
 import { resolve } from "node:path";
 import { measureAnswers } from "../src/curation.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
-import type { PuzzleEntry, RhymeIndex, SeedWord } from "../src/rhymeIndex.ts";
-import {
-  checkDayDrift,
-  scheduleBands,
-  type DayDrift,
-  type PuzzleFacts,
-  type Schedule,
-  type ScheduleDay,
-  type SizeBand,
+import type { RhymeIndex, SeedWord } from "../src/rhymeIndex.ts";
+import type {
+  DayDrift,
+  PuzzleFacts,
+  Schedule,
+  SizeBand,
 } from "../src/schedule.ts";
+import { readScheduledDay, type UnpinnableDayReadout } from "./editorDay.ts";
 import { indexArtifactPath } from "./indexArtifact.ts";
 import { fail, message, root } from "./editorShell.ts";
 
@@ -55,23 +54,22 @@ function builtIndex(): RhymeIndex {
 
 /** One scheduled day, checked against the bands it was dealt from. */
 export function readDay(schedule: Schedule, date: string): void {
-  const day = schedule.days.find((d) => d.date === date);
-  if (day === undefined) {
-    const first = schedule.days[0]!.date;
-    const last = schedule.days[schedule.days.length - 1]!.date;
-    fail(`No Daily Puzzle scheduled for ${date}. The run covers ${first} to ${last}.`);
-  }
+  const readout = readScheduledDay(builtIndex(), schedule, date);
 
-  const puzzle = buildOrFail(day);
-  const facts = measureAnswers(puzzle.answers);
-  const drift = checkDayDrift(day, facts, scheduleBands(schedule));
+  if (readout.outcome === "not-scheduled") {
+    fail(
+      `No Daily Puzzle scheduled for ${date}. ` +
+        `The run covers ${readout.firstDate} to ${readout.lastDate}.`,
+    );
+  }
+  if (readout.outcome === "unpinnable") failDisagreement(readout);
 
   console.log("");
-  console.log(`  ${day.date}  ${day.weekday}  ·  week ${day.week}`);
-  printPuzzle(puzzle.seedRespelling, day.seed, day.rhymeKey);
-  printFigures(facts, drift.sizeBand, drift);
-  printDrift(drift);
-  printWords(puzzle.answers, puzzle.bonusWords);
+  console.log(`  ${readout.date}  ${readout.weekday}  ·  week ${readout.week}`);
+  printPuzzle(readout.seedRespelling, readout.seed, readout.rhymeKey);
+  printFigures(readout.facts, readout.drift.sizeBand, readout.drift);
+  printDrift(readout.drift);
+  printWords(readout.answers, readout.bonusWords);
 }
 
 /**
@@ -103,6 +101,11 @@ export function audition(schedule: Schedule, seed: string): void {
 }
 
 // --- printing (no game logic; every figure comes from the tested core) ---------
+
+/** All a word list needs to be printed as columns. */
+interface Listable {
+  word: string;
+}
 
 function printPuzzle(respelling: string, seed: string, rhymeKey: string): void {
   console.log("");
@@ -146,7 +149,12 @@ function printDrift(drift: DayDrift): void {
   console.log(`  Band membership is advisory after review (ADR-0012) — this is for your eye.`);
 }
 
-function printWords(answers: PuzzleEntry[], bonusWords: PuzzleEntry[]): void {
+/**
+ * Typed on the one field the columns read, so the day's payload and an
+ * audition's raw `PuzzleEntry` list both render through this rather than one of
+ * them being converted to suit the printer.
+ */
+function printWords(answers: Listable[], bonusWords: Listable[]): void {
   console.log("");
   console.log(`  Answers (${answers.length})`);
   printColumns(answers);
@@ -168,7 +176,7 @@ const GUTTER = 2;
  * run a scheduled Puzzle's Answers against an alphabetical third-party list and
  * see the gap. One word per line puts a hundred-Answer Puzzle off the screen.
  */
-function printColumns(entries: PuzzleEntry[]): void {
+function printColumns(entries: Listable[]): void {
   const words = entries.map((e) => e.word).sort((a, b) => a.localeCompare(b));
   if (words.length === 0) {
     console.log(`${INDENT}(none)`);
@@ -183,21 +191,19 @@ function printColumns(entries: PuzzleEntry[]): void {
 }
 
 /**
- * The agreement check. A scheduled Seed the built index cannot pin to the key
- * the schedule records is the failure that reaches players as a silent Free
- * Play, so it is the one thing here that must be impossible to skim past.
+ * The agreement check, rendered. A scheduled Seed the built index cannot pin to
+ * the key the schedule records is the failure that reaches players as a silent
+ * Free Play, so it is the one thing here that must be impossible to skim past —
+ * on a terminal that means stderr and a non-zero exit rather than a line in the
+ * scroll. The browser ranks the same case above drift instead.
  */
-function buildOrFail(day: ScheduleDay): ReturnType<RhymeIndex["buildPuzzle"]> {
-  try {
-    return builtIndex().buildPuzzle(builtIndex().pinSeed(day.seed, day.rhymeKey));
-  } catch (error) {
-    const detail = message(error);
-    fail(
-      `SCHEDULE / INDEX DISAGREEMENT on ${day.date} (${day.weekday}).\n` +
-        `  Seed Word "${day.seed}" cannot be pinned to ${day.rhymeKey} in the built index.\n` +
-        `  ${detail}\n` +
-        `  A player asking for this date would be handed Free Play instead, silently.\n` +
-        `  Fix the schedule entry or rebuild the index (npm run build:index).`,
-    );
-  }
+function failDisagreement(readout: UnpinnableDayReadout): never {
+  fail(
+    `SCHEDULE / INDEX DISAGREEMENT on ${readout.date} (${readout.weekday}).\n` +
+      `  Seed Word "${readout.seed}" cannot be pinned to ${readout.scheduledRhymeKey} ` +
+      `in the built index.\n` +
+      `  ${readout.detail}\n` +
+      `  A player asking for this date would be handed Free Play instead, silently.\n` +
+      `  Fix the schedule entry or rebuild the index (npm run build:index).`,
+  );
 }
