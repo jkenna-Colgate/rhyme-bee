@@ -263,11 +263,170 @@ code {
   list-style: none;
   margin: 0;
   padding: 0;
-  columns: 9rem;
+  columns: 11rem;
   column-gap: 1.25rem;
 }
 
 .editor-words li {
   break-inside: avoid;
   padding: 0.05rem 0;
+}
+
+/* Every word is a button: setting a word's Tier is the act this mode exists for,
+   and it costs one click on the word itself. Styled flat so a list of two
+   hundred of them still reads as a list rather than as a wall of controls. */
+.editor-word {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+  cursor: pointer;
+}
+
+.editor-word:hover,
+.editor-word[aria-expanded="true"] {
+  background: #fff;
+  border-color: #cdc6b6;
+}
+
+.editor-word:disabled {
+  cursor: progress;
+  opacity: 0.55;
+}
+
+/* What is already true of a word, at a glance. Small and quiet: the word is the
+   thing being read, and the marks are the footnotes on it. */
+.editor-mark {
+  font-size: 0.68rem;
+  line-height: 1.4;
+  padding: 0 0.28rem;
+  border-radius: 3px;
+  white-space: nowrap;
+  background: #efece4;
+  color: #6b6558;
+}
+
+.editor-verdict-bonus {
+  background: #ece4f3;
+  color: #5a3b78;
+}
+
+.editor-verdict-answer-rare {
+  background: #e2eef0;
+  color: #275f68;
+}
+
+.editor-verdict-answer-common {
+  background: #e5efe2;
+  color: #3a6330;
+}
+
+.editor-verdict-none {
+  background: #efece4;
+  color: #6b6558;
+}
+
+/* A word carrying more than one row. ADR-0015 asks for this by name: the file is
+   append-only, so a reversal is a second row and must never be invisible. */
+.editor-reversed {
+  background: #fff1d6;
+  color: #8a5a00;
+  font-weight: 600;
+}
+
+/* A knownness that is not the word's own — the lemma-family reach, standing. */
+.editor-inherited {
+  background: #f3efe6;
+  color: #857e70;
+  font-style: italic;
+}
+
+.editor-verdicts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.35rem 0 0.6rem;
+  padding: 0.5rem;
+  background: #fff;
+  border: 1px solid #cdc6b6;
+  border-radius: 5px;
+}
+
+.editor-verdict {
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 0.28rem 0.45rem;
+  background: #f7f5ef;
+  border: 1px solid #e3ded2;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-verdict:hover {
+  background: #efece4;
+  border-color: #cdc6b6;
+}
+
+/* The verdict already standing on the word, so the menu shows where it is. */
+.editor-verdict-standing {
+  border-color: #857e70;
+  font-weight: 600;
+}
+
+.editor-lists-note {
+  margin: 1.25rem 0 -0.75rem;
+  font-size: 0.8rem;
+  color: #6b6558;
+}
+
+/* The judgement just written, and what else it reached. */
+.editor-written {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: #eef4ec;
+  border: 1px solid #b9cfb2;
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.editor-written p {
+  margin: 0;
+}
+
+.editor-reach {
+  margin-top: 0.4rem !important;
+  color: #47563f;
+}
+
+.editor-reach-words {
+  font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.82em;
+}
+
+/* Figures the editor has moved but the built index has not caught up with. */
+.editor-moved {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: #6b6558;
+}
+
+/* A judgement the file refused. Loud, because the editor's next act would
+   otherwise be to click the next word and lose this one. */
+.editor-write-failed {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: #fdecec;
+  border: 1px solid #c0392b;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: #8e2a1f;
 }

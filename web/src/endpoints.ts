@@ -40,3 +40,17 @@ export const FEEDBACK_PATH = "/api/feedback";
  * on it is then the one Node computed rather than a second opinion.
  */
 export const EDITOR_DAY_PATH = "/api/editor/day";
+
+/**
+ * Where the Editor's Pass sets a word's Tier: `GET` for the picker's state on a
+ * day, `POST` to append one judgement to `data/tier-overrides.csv`. The day is
+ * named the same way as on `EDITOR_DAY_PATH`, and by the same module.
+ *
+ * Dev only, and structurally so — `editorTierPlugin` is `apply: "serve"`, so
+ * `configureServer` never runs in a production build and no deployed surface
+ * answers this path (ADR-0016). That guarantee is load-bearing here in a way it
+ * is not for the read beside it: this is the one path in the repository that
+ * **writes** to `data/`, and the file it writes can never be regenerated
+ * (ADR-0015).
+ */
+export const EDITOR_TIER_PATH = "/api/editor/tier";

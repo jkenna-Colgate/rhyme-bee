@@ -1,22 +1,31 @@
 /**
- * The editor's screen: the day, and the one control that changes which day.
+ * The editor's screen: the day, the one control that changes which day, and the
+ * Tier picker over the words on it.
  *
  * It opens on tomorrow — the endpoint's default, asked for by naming no date at
  * all — because tomorrow is the day an Editor's Pass is nearly always about.
  * Typing a date jumps there, including to a date the run does not cover, which
  * the readout answers by naming the run's edges.
  *
- * This is the whole of the first slice (#158). There is no Tier picker, no
- * demote, no add and no Submit: those are #159–#162, and the screen they land on
- * is this one.
+ * The picker's state is fetched **for the day the readout came back with**, not
+ * for the date the editor typed: the opening request names no date at all, so
+ * the browser does not know which day it is looking at until the readout says.
+ * Keying off the readout also keeps the two halves of the screen from ever
+ * describing different days, which is why `DayReadoutView` checks the two dates
+ * again before it applies one to the other.
+ *
+ * There is still no demote, no add and no Submit: those are #160–#162, and the
+ * screen they land on is this one.
  */
 
 import { useState } from "react";
 import { useDayReadout } from "./useDayReadout.ts";
+import { useTierPicker } from "./useTierPicker.ts";
 import { DayReadoutView } from "./DayReadoutView.tsx";
 
 export function EditorApp() {
   const { readout, loading, error, goTo } = useDayReadout();
+  const picker = useTierPicker(readout?.date ?? null);
   // The control shows the date the editor last entered in full, and otherwise
   // the day on screen — which is how the endpoint's choice of tomorrow becomes
   // visible without the browser having decided it.
@@ -56,7 +65,7 @@ export function EditorApp() {
           like a failure, and a day's readout arrives in milliseconds. */}
       {readout !== null && (
         <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <DayReadoutView readout={readout} />
+          <DayReadoutView readout={readout} picker={picker} />
         </div>
       )}
 

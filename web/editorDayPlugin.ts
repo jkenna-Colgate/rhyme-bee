@@ -31,11 +31,10 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
-import { loadRhymeIndex } from "../src/loader.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
-import { indexArtifactPath } from "../scripts/indexArtifact.ts";
+import { builtIndex } from "./builtIndex.ts";
 import { EDITOR_DAY_PATH } from "./src/endpoints.ts";
 import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "./editorDayRequest.ts";
 
@@ -157,19 +156,6 @@ function readSchedule(): Schedule {
   const parsed = parseSchedule(JSON.parse(readFileSync(path, "utf8")));
   if (parsed === null) throw new Error(`${path} is not a readable schedule artifact.`);
   return parsed;
-}
-
-/**
- * The built index, loaded on first use and kept — 510 ms to read, and a session
- * of the pass asks for many days. Not loaded when the plugin is constructed:
- * `npm run dev` starts whether or not an index has been built, which is the call
- * `vite.config.ts` already makes for the shell, and the editor's screen says
- * what is missing rather than the dev server refusing to start.
- */
-let loaded: RhymeIndex | undefined;
-function builtIndex(): RhymeIndex {
-  loaded ??= loadRhymeIndex(indexArtifactPath(resolve(repoRoot, "dist-data")));
-  return loaded;
 }
 
 export function editorDayPlugin(): Plugin {

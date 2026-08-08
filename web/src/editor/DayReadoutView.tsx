@@ -3,22 +3,23 @@
  * `readScheduledDay`'s value; `scripts/editorRead.ts` is the first, and renders
  * it to a terminal (ADR-0016).
  *
- * **Neither renderer owns a figure of its own.** Every number here is read
- * straight off the readout — `facts.answerCount`, `facts.maxScore`,
- * `facts.difficulty`, `drift.recorded`, `drift.sizeBand`, `drift.weekdayBand`
- * — and every verdict is read off `drift.reasons`, which `checkDayDrift`
- * decided. Whether the day is inside its size band is *not* recomputed from the
- * band's edges here; that comparison is the engine's, and doing it twice is how
- * the two surfaces would come to disagree about a day. The only arithmetic on
- * this page is `.length` of a list it was handed, which is the count of the
- * items it is about to draw.
+ * **No figure on this page is this page's own.** Every number is either read
+ * straight off the readout Node computed, or — once the Tier picker has moved a
+ * word — recomputed by `retierDay`, which calls the engine's own `measureAnswers`
+ * over the rearranged list. Neither path restates the scoring formula, the rare
+ * cutoff or the Difficulty ratio here. Whether the day is inside its size band is
+ * *not* recomputed at all: that comparison is `checkDayDrift`'s, and the one case
+ * where it would go stale — figures moved by a judgement the index has not been
+ * rebuilt with — is answered by withdrawing the verdict rather than by guessing
+ * at it. A stale verdict displayed as a current one is the failure worth ruling
+ * out.
  *
- * The pass is a read, not a play. There is no Session on this screen, nothing
- * is submitted and no Score is anyone's — `maxScore` is the Puzzle's ceiling and
- * `Difficulty` is the Puzzle's, both properties of the day rather than of a
- * player.
+ * The pass is a read, not a play. There is no Session on this screen, nothing is
+ * submitted and no Score is anyone's — `maxScore` is the Puzzle's ceiling and
+ * Difficulty is the Puzzle's, both properties of the day rather than of a player.
  */
 
+import { useState } from "react";
 import type {
   DayReadout,
   DayWord,
@@ -26,16 +27,19 @@ import type {
   UnpinnableDayReadout,
   UnscheduledDateReadout,
 } from "../../../scripts/editorDay.ts";
-import type { DriftReason } from "../../../src/schedule.ts";
+import type { DriftReason, PuzzleFacts } from "../../../src/schedule.ts";
+import type { TierVerdict } from "../../../src/tierOverride.ts";
+import { retierDay, type RetieredWord } from "./retier.ts";
+import type { TierPicker } from "./useTierPicker.ts";
 
-export function DayReadoutView({ readout }: { readout: DayReadout }) {
+export function DayReadoutView({ readout, picker }: { readout: DayReadout; picker: TierPicker }) {
   switch (readout.outcome) {
     case "unpinnable":
       return <Disagreement readout={readout} />;
     case "not-scheduled":
       return <OutsideTheRun readout={readout} />;
     case "day":
-      return <ScheduledDay readout={readout} />;
+      return <ScheduledDay readout={readout} picker={picker} />;
   }
 }
 
@@ -106,9 +110,28 @@ function OutsideTheRun({ readout }: { readout: UnscheduledDateReadout }) {
   );
 }
 
-function ScheduledDay({ readout }: { readout: ScheduledDayReadout }) {
-  const { drift, facts } = readout;
-  const inSizeBand = !drift.reasons.includes("answer-count-out-of-band");
+function ScheduledDay({ readout, picker }: { readout: ScheduledDayReadout; picker: TierPicker }) {
+  const { drift } = readout;
+  // Which word's verdicts are showing. One at a time: the menu is a choice about
+  // one word, and two open at once would invite a click meant for the other.
+  const [picking, setPicking] = useState<string | null>(null);
+
+  // A state fetched for another day must not be applied to this one — the two
+  // requests are independent and either can land first.
+  const state = picker.state?.date === readout.date ? picker.state : null;
+  const shown =
+    state === null
+      ? { answers: readout.answers.map(unjudged), bonusWords: readout.bonusWords.map(unjudged), facts: readout.facts }
+      : retierDay({ answers: readout.answers, bonusWords: readout.bonusWords }, state);
+
+  // Judgements made since the artifact was built. The band verdicts below were
+  // decided against the figures as built, so this is also what makes them stale.
+  const moved = !sameFigures(shown.facts, readout.facts);
+
+  const judge = (word: string, verdict: TierVerdict) => {
+    setPicking(null);
+    void picker.judge(word, verdict);
+  };
 
   return (
     <>
@@ -137,25 +160,31 @@ function ScheduledDay({ readout }: { readout: ScheduledDayReadout }) {
       <section className="editor-figures">
         <Figure
           label="Answers"
-          value={String(facts.answerCount)}
+          value={String(shown.facts.answerCount)}
           band={
             drift.sizeBand === undefined
               ? null
               : `band ${drift.sizeBand.min}–${drift.sizeBand.max}`
           }
-          inBand={drift.sizeBand === undefined ? null : inSizeBand}
+          inBand={
+            drift.sizeBand === undefined || moved
+              ? null
+              : !drift.reasons.includes("answer-count-out-of-band")
+          }
         />
-        <Figure label="Max Score" value={String(facts.maxScore)} band={null} inBand={null} />
+        <Figure label="Max Score" value={String(shown.facts.maxScore)} band={null} inBand={null} />
         <Figure
           label="Difficulty"
-          value={facts.difficulty.toFixed(4)}
+          value={shown.facts.difficulty.toFixed(4)}
           band={
             drift.weekdayBand === null
               ? null
               : `${drift.weekdayBand.weekday} band ${drift.weekdayBand.min.toFixed(4)}–${drift.weekdayBand.max.toFixed(4)}`
           }
           inBand={
-            drift.weekdayBand === null ? null : !drift.reasons.includes("difficulty-out-of-band")
+            drift.weekdayBand === null || moved
+              ? null
+              : !drift.reasons.includes("difficulty-out-of-band")
           }
         />
       </section>
@@ -165,14 +194,63 @@ function ScheduledDay({ readout }: { readout: ScheduledDayReadout }) {
         {drift.recorded.difficulty.toFixed(4)}
       </p>
 
-      <Drift reasons={drift.reasons} />
+      {moved && (
+        <p className="editor-moved">
+          Your judgements have moved this day. The built index still reads{" "}
+          {readout.facts.answerCount} Answers · Max Score {readout.facts.maxScore} · Difficulty{" "}
+          {readout.facts.difficulty.toFixed(4)}, so the band verdicts are withheld until{" "}
+          <code>npm run build:index</code> folds the overrides in.
+        </p>
+      )}
+
+      {!moved && <Drift reasons={drift.reasons} />}
+
+      {picker.error !== null && (
+        <p className="editor-write-failed">{picker.error} The day is unchanged.</p>
+      )}
+
+      {picker.recorded !== null && <Recorded recorded={picker.recorded} />}
+
+      {/* Said once, above both lists, rather than inside every verdict menu:
+          it is the same sentence for every word, and the lists are columns
+          narrow enough that a paragraph in one of them squeezes the buttons
+          it was meant to explain. */}
+      <p className="editor-lists-note">
+        Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}
+        <code>data/tier-overrides.csv</code> on click, with the prevalence measured at that moment
+        beside it, and governs the word itself plus any inflected form that has no prevalence row
+        of its own.
+      </p>
 
       <div className="editor-lists">
-        <WordList title="Answers" words={readout.answers} />
-        <WordList title="Bonus Words" words={readout.bonusWords} />
+        <WordList
+          title="Answers"
+          words={shown.answers}
+          picking={picking}
+          onPick={setPicking}
+          onJudge={judge}
+          writing={picker.writing}
+        />
+        <WordList
+          title="Bonus Words"
+          words={shown.bonusWords}
+          picking={picking}
+          onPick={setPicking}
+          onJudge={judge}
+          writing={picker.writing}
+        />
       </div>
     </>
   );
+}
+
+/** A day with no picker state yet: the readout's own words, judged by nobody. */
+function unjudged(entry: DayWord): RetieredWord {
+  return { ...entry, verdict: null, rows: 0, source: null, sourceVerdict: null };
+}
+
+function sameFigures(a: PuzzleFacts, b: PuzzleFacts): boolean {
+  return a.answerCount === b.answerCount && a.maxScore === b.maxScore && a.difficulty === b.difficulty;
 }
 
 function Figure({
@@ -184,7 +262,8 @@ function Figure({
   label: string;
   value: string;
   band: string | null;
-  /** `null` where no band applies — not every figure has one, and Max Score has none. */
+  /** `null` where no band verdict applies — Max Score has none, and a day the
+   * editor has moved has one that is no longer about the figure above it. */
   inBand: boolean | null;
 }) {
   return (
@@ -193,7 +272,8 @@ function Figure({
       <div className="editor-figure-value">{value}</div>
       {band !== null && (
         <div className={`editor-figure-band${inBand === false ? " editor-out-of-band" : ""}`}>
-          {band} · {inBand === false ? "outside" : "inside"}
+          {band}
+          {inBand !== null && ` · ${inBand ? "inside" : "outside"}`}
         </div>
       )}
     </div>
@@ -224,17 +304,91 @@ function Drift({ reasons }: { reasons: readonly DriftReason[] }) {
   );
 }
 
+const VERDICT_LABEL: Record<TierVerdict, string> = {
+  bonus: "Bonus Word",
+  "answer-rare": "Answer, rare",
+  "answer-common": "Answer, common",
+  none: "None — prevalence governs",
+};
+
+/**
+ * The last judgement written, and **what else it reached**.
+ *
+ * An override on a lemma also re-tiers the derived forms that have no prevalence
+ * row of their own: overriding `gate` moves `gates`, `gated` and `gating` too,
+ * because `RhymeIndex#tier` resolves knownness through `lemmaCandidates` and a
+ * derived form falls back to its lemma — which it did for measured prevalence
+ * long before overrides existed. The maintainer has ruled that **accepted**: the
+ * narrow alternative would need adjudication to treat an overridden value
+ * differently from a measured one, which ADR-0015 forbids.
+ *
+ * Accepted is not the same as invisible, and this banner is where it is made
+ * visible. It reports the reach over the *whole index* rather than over the day
+ * on screen, and that is deliberate: a lemma and its inflections almost never
+ * share a Rhyme Key — `gate` is /eɪt/ and `gates` is /eɪts/ — so the words a
+ * judgement reaches are nearly always on **other days**, where the editor would
+ * not see them move. A notice confined to this day would say "nothing else
+ * changed" and be wrong.
+ *
+ * It also shows the row exactly as the file received it, prevalence and all,
+ * because that row is the audit trail ADR-0015 keeps and the editor should be
+ * able to read what was recorded about their own judgement.
+ */
+function Recorded({ recorded }: { recorded: NonNullable<TierPicker["recorded"]> }) {
+  const { appended, reach } = recorded;
+  return (
+    <section className="editor-written">
+      <p>
+        Recorded <strong>{appended.word}</strong> as{" "}
+        <strong>{VERDICT_LABEL[appended.verdict]}</strong>.{" "}
+        {appended.measured === null
+          ? "The prevalence data had no row for it, which the file records as an empty measurement."
+          : `Prevalence read ${appended.measured} at that moment.`}
+      </p>
+      {reach.length > 0 && (
+        <p className="editor-reach">
+          This also governs{" "}
+          {reach.length === 1
+            ? "one derived form with no prevalence row of its own"
+            : `${reach.length} derived forms with no prevalence row of their own`}
+          , mostly on other days: <span className="editor-reach-words">{reach.join(", ")}</span>
+        </p>
+      )}
+    </section>
+  );
+}
+
 /**
  * One Tier's words. The two lists are drawn separately and never interleaved,
- * because the Answer / Bonus Word split is the thing the editor is here to
- * check and a merged list with a marker on it hides exactly that.
+ * because the Answer / Bonus Word split is the thing the editor is here to check
+ * and a merged list with a marker on it hides exactly that.
  *
  * Alphabetical, in columns, as the terminal renderer prints them and for the
  * same reason: the pass is conducted against a third-party rhyme list in another
  * window, and running two alphabetical lists against each other by eye is what
  * finds the missing word.
+ *
+ * Every word is a button, because setting a word's Tier is the act this whole
+ * mode exists for and it should cost one click on the word itself — picking from
+ * a displayed list is the task a CLI is worst at (ADR-0016), and a form that
+ * asked the editor to retype a word they are already looking at would have kept
+ * the CLI's worst property.
  */
-function WordList({ title, words }: { title: string; words: DayWord[] }) {
+function WordList({
+  title,
+  words,
+  picking,
+  onPick,
+  onJudge,
+  writing,
+}: {
+  title: string;
+  words: RetieredWord[];
+  picking: string | null;
+  onPick: (word: string | null) => void;
+  onJudge: (word: string, verdict: TierVerdict) => void;
+  writing: string | null;
+}) {
   const sorted = [...words].sort((a, b) => a.word.localeCompare(b.word));
   return (
     <section className="editor-list">
@@ -246,10 +400,106 @@ function WordList({ title, words }: { title: string; words: DayWord[] }) {
       ) : (
         <ul className="editor-words">
           {sorted.map((entry) => (
-            <li key={entry.word}>{entry.word}</li>
+            <li key={entry.word} className="editor-word-row">
+              <button
+                type="button"
+                className="editor-word"
+                aria-expanded={picking === entry.word}
+                disabled={writing !== null}
+                onClick={() => onPick(picking === entry.word ? null : entry.word)}
+              >
+                <span className="editor-word-text">{entry.word}</span>
+                <Marks entry={entry} />
+                {writing === entry.word && <span className="editor-mark">writing…</span>}
+              </button>
+              {picking === entry.word && <VerdictMenu entry={entry} onJudge={onJudge} />}
+            </li>
           ))}
         </ul>
       )}
     </section>
+  );
+}
+
+/**
+ * What is already true of a word, at a glance: the verdict standing on it, that
+ * it has been judged more than once, and — when its knownness is not its own —
+ * the word it is inherited from.
+ *
+ * The reversal mark is the one ADR-0015 asks for by name: the file is
+ * append-only and last-wins, so a word may carry several rows, and "the readout
+ * flags any word carrying more than one row, so a reversal is never invisible".
+ * It shows the count rather than a bare symbol, because two rows and five rows
+ * are different amounts of mind-changing.
+ */
+function Marks({ entry }: { entry: RetieredWord }) {
+  return (
+    <>
+      {entry.verdict !== null && (
+        <span className={`editor-mark editor-verdict-${entry.verdict}`}>
+          {VERDICT_LABEL[entry.verdict]}
+        </span>
+      )}
+      {entry.rows > 1 && (
+        <span
+          className="editor-mark editor-reversed"
+          title={`${entry.rows} rows in data/tier-overrides.csv — this word has been judged more than once`}
+        >
+          reversed ×{entry.rows}
+        </span>
+      )}
+      {entry.source !== null && entry.source !== entry.word && (
+        <span
+          className="editor-mark editor-inherited"
+          title={`No prevalence row of its own — its knownness comes from ${entry.source}`}
+        >
+          via {entry.source}
+          {entry.sourceVerdict !== null && entry.sourceVerdict !== "none"
+            ? ` (${VERDICT_LABEL[entry.sourceVerdict]})`
+            : ""}
+        </span>
+      )}
+    </>
+  );
+}
+
+const VERDICTS: TierVerdict[] = ["bonus", "answer-rare", "answer-common", "none"];
+
+/**
+ * The four verdicts, offered together.
+ *
+ * `none` is offered as a peer of the other three and never as an "undo", because
+ * withdrawing an override and reversing one are different acts (ADR-0015):
+ * "undoing" a demotion with **Answer, common** would pin the word above the rare
+ * cutoff and silently strip the flat bonus from a word that measured below it,
+ * and the editor would believe they had reverted. So the menu says what each one
+ * does rather than offering three verdicts and a back button.
+ *
+ * There is no confirmation step. The click *is* the record: ADR-0015 makes the
+ * file append-only precisely so that a judgement can be written the instant it is
+ * made without a transaction to lose, and a reversal is another click rather than
+ * an undo. A confirm dialog would buy nothing that an appended `none` does not
+ * already buy, and would cost the pass its pace.
+ */
+function VerdictMenu({
+  entry,
+  onJudge,
+}: {
+  entry: RetieredWord;
+  onJudge: (word: string, verdict: TierVerdict) => void;
+}) {
+  return (
+    <div className="editor-verdicts" role="group" aria-label={`Tier for ${entry.word}`}>
+      {VERDICTS.map((verdict) => (
+        <button
+          type="button"
+          key={verdict}
+          className={`editor-verdict${entry.verdict === verdict ? " editor-verdict-standing" : ""}`}
+          onClick={() => onJudge(entry.word, verdict)}
+        >
+          {VERDICT_LABEL[verdict]}
+        </button>
+      ))}
+    </div>
   );
 }
