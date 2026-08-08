@@ -46,6 +46,23 @@ export const REJECTION_MESSAGE: Record<RejectionReason, string> = {
 /** How a Submission that rhymes and is a word is tiered (ADR-0003). */
 export type Tier = "answer" | "bonus";
 
+/**
+ * The Answer/Bonus line: a word tiers to Answer when its knownness clears the
+ * threshold. The *whole* of the rule — the lemma walk that finds a word's
+ * knownness, and the absent-from-the-data default, are the index's job; this is
+ * the comparison they end at.
+ *
+ * It sits here as one function rather than as an expression at each site because
+ * two callers must agree about it exactly: the index tiers words with it, and
+ * the Retrieval override layer's build-time guard asks it whether each sentinel
+ * still lands on the Tier it was chosen for (ADR-0015). A guard that restated
+ * the comparison would keep passing if the comparison itself changed, which is
+ * a blind spot precisely where the guard is supposed to be loud.
+ */
+export function tierFor(knownness: number, knownnessThreshold: number): Tier {
+  return knownness >= knownnessThreshold ? "answer" : "bonus";
+}
+
 export interface AcceptedVerdict {
   outcome: Tier;
   /** The pronunciation whose Rhyme Key matched the Seed Word. */

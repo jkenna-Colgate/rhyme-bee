@@ -50,8 +50,13 @@ export function parsePrevalenceCsv(text: string): Map<string, number> {
   return out;
 }
 
-/** Minimal CSV row splitter: handles double-quoted fields with commas. */
-function splitCsvRow(line: string): string[] {
+/**
+ * Minimal CSV row splitter: handles double-quoted fields with commas. Exported
+ * because the Retrieval override layer (`tierOverride.ts`) is CSV too, and one
+ * splitter that both the pinned prevalence norms and the layer written over them
+ * are read with is one fewer place for a quoting rule to differ.
+ */
+export function splitCsvRow(line: string): string[] {
   const fields: string[] = [];
   let field = "";
   let quoted = false;

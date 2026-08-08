@@ -22,7 +22,7 @@ import { normaliseWord } from "./cmudict.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
 import { schwaTwinOf } from "./schwaTwins.ts";
-import type { Tier, Verdict } from "./verdict.ts";
+import { tierFor, type Tier, type Verdict } from "./verdict.ts";
 
 /** A curated Seed Word: the word itself plus its single pinned Rhyme Key. */
 export interface SeedWord {
@@ -581,7 +581,7 @@ export class RhymeIndex {
       const score = this.#data.prevalence.get(candidate);
       if (score !== undefined) {
         return {
-          tier: score >= this.#config.knownnessThreshold ? "answer" : "bonus",
+          tier: tierFor(score, this.#config.knownnessThreshold),
           knownness: score,
         };
       }
