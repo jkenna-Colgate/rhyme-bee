@@ -21,10 +21,32 @@
  * matters: a Tier verdict or a demotion recorded earlier in the same sitting is
  * already on disk and not yet in the artifact, so an index skipped here is one
  * the day is then re-read from while still stale, and `DayReadoutView` would
- * quietly restore the band verdicts it had been withholding. Knowing whether
- * *those* files have moved is `indexStaleness`'s question and #162's ticket;
- * guessing at half of it here would be the worse of the two errors, and the
- * whole rebuild is 2.4 seconds.
+ * quietly restore the band verdicts it had been withholding.
+ *
+ * ## The first act is skipped when there is nothing to write (#162)
+ *
+ * #161 refused a Submit with no words, so that a night of Tier judgements alone
+ * never paid for a rebuild it did not need. It reached the wrong conclusion
+ * from the right premise: the rebuild a night of Tier judgements needs is one
+ * it very much does need, and the refusal made it unreachable from the browser
+ * — the editor's only routes to it were queueing a word the day did not want,
+ * or leaving the tool for a terminal.
+ *
+ * So an empty batch is now answered by asking `indexStaleness` the question
+ * #161 left to a later ticket. Stale means rows were written since the last
+ * build — a Tier verdict, a demotion, an earlier add — and the rebuild is
+ * exactly what makes them real. Current means nothing is waiting, and the
+ * refusal #161 wrote still stands, for the reason it was written.
+ *
+ * `runAdds` is not called at all on that path, rather than called with an empty
+ * list. That is what makes "an empty Submit writes nothing" structural: the one
+ * function in this handler that can write to `data/` is never entered, so the
+ * claim does not rest on `add` being well behaved when handed nothing.
+ *
+ * The staleness read is a **dependency** rather than a direct call, for the
+ * reason the other three acts are: a route whose refusal path can only be
+ * exercised against the maintainer's real `dist-data/` is a route whose refusal
+ * path is tested by whatever that directory happens to hold that day.
  *
  * ## What this route does not write
  *
@@ -32,9 +54,11 @@
  * `data/demotions.txt`, both already written by the click that made them
  * (#159, #160) — by the time Submit runs they are on disk, and re-recording
  * them here would append rows nobody asked for. The deps below are the whole of
- * what this handler can reach, and neither file is among them;
+ * what this handler can reach, and neither file is among them —
+ * `staleness` stats those two files among many and reads only the manifest;
  * `web/__tests__/editorAddEndpoint.test.ts` holds the two paths to account
- * across a real call rather than leaving the claim to this sentence.
+ * across a real call rather than leaving the claim to this sentence, and holds
+ * the empty Submit to account against all four written files.
  *
  * ## Why this route is dev-only, and structurally so
  *
@@ -57,6 +81,7 @@ import { parseSchedule, type Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { add, targetIn, type AddOutcome, type AddTarget } from "../scripts/editorAdd.ts";
 import { message } from "../scripts/editorShell.ts";
+import { indexStaleness, type IndexStaleness } from "../scripts/indexArtifact.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { rebuildIndex } from "./indexRebuild.ts";
 import { EDITOR_ADD_PATH } from "./src/endpoints.ts";
@@ -88,6 +113,13 @@ export interface EditorAddDeps {
   runAdds: (words: string[], aim: AddTarget) => Promise<AddOutcome>;
   rebuild: () => Promise<RebuildResult>;
   openIndex: () => RhymeIndex;
+  /**
+   * Whether anything has been written since the artifact was built. Read only
+   * on the empty-batch path, where it is the whole of the decision; a batch
+   * with words in it is pending work by definition and needs nobody's opinion
+   * on the matter.
+   */
+  staleness: () => IndexStaleness;
 }
 
 /**
@@ -99,11 +131,12 @@ export interface EditorAddDeps {
  * out on a route whose success case writes to `data/` and rebuilds the index.
  *
  * The order of the checks is the order in which each can rule the Submit out:
- * the verb, then the size, then the batch, then whether the run covers the day
- * the batch is aimed at. Nothing is written until all four have passed, and a
- * rebuild that fails is reported *with* the outcome rather than in place of it —
- * the readings are on disk by then, and an editor told only "the build failed"
- * would retype a batch that had already landed.
+ * the verb, then the size, then the batch, then — for a batch with words in it
+ * — whether the run covers the day they are aimed at, and for an empty one
+ * whether anything is pending at all. Nothing is written until all of them have
+ * passed, and a rebuild that fails is reported *with* the outcome rather than in
+ * place of it — the readings are on disk by then, and an editor told only "the
+ * build failed" would retype a batch that had already landed.
  */
 export function editorAddHandler(deps: EditorAddDeps) {
   // `next` is connect's and is named here only to be visibly never called.
@@ -123,33 +156,61 @@ export function editorAddHandler(deps: EditorAddDeps) {
       const asked = addWriteRequest(body);
       if (!asked.ok) return sendJson(res, 400, { error: asked.error });
 
-      let aim: AddTarget | null;
-      try {
-        aim = targetIn(deps.schedule(), asked.date);
-      } catch (error) {
-        return sendJson(res, 500, { error: `Could not read the schedule: ${message(error)}` });
-      }
-      if (aim === null) {
-        // Not a malformed request and not the file's fault: the run simply does
-        // not cover that day, so there is no Rhyme Key for the words to be aimed
-        // at and nothing to write. The browser cannot reach this from a day it
-        // is looking at, which is exactly why it is worth answering plainly.
-        return sendJson(res, 400, {
-          error: `No Daily Puzzle is scheduled for ${asked.date}, so there is no Rhyme Key to aim these words at.`,
-        });
-      }
+      let outcome: AddOutcome | null = null;
+      if (asked.words.length === 0) {
+        // The empty Submit (#162). Nothing is aimed anywhere, no schedule is
+        // consulted and `runAdds` is never reached — the only question is
+        // whether the rebuild below has anything to fold in.
+        let stale: boolean;
+        try {
+          stale = deps.staleness().stale;
+        } catch {
+          // The staleness read is the only thing standing between an empty
+          // Submit and a rebuild for nothing, and a read that threw has not
+          // answered. Refusing is the cheap error: the editor queues a word or
+          // runs the build themselves. No cause is relayed, because the causes
+          // here are absolute paths under `dist-data/`.
+          return sendJson(res, 500, {
+            error: "Could not tell whether the Rhyme Index is stale, so nothing was rebuilt.",
+          });
+        }
+        if (!stale) {
+          return sendJson(res, 400, {
+            error:
+              "Nothing is pending: no words are queued and the Rhyme Index already holds " +
+              "everything written to data/. Submit rebuilds the index, which is not worth paying for nothing.",
+          });
+        }
+      } else {
+        let aim: AddTarget | null;
+        try {
+          aim = targetIn(deps.schedule(), asked.date);
+        } catch (error) {
+          return sendJson(res, 500, { error: `Could not read the schedule: ${message(error)}` });
+        }
+        if (aim === null) {
+          // Not a malformed request and not the file's fault: the run simply
+          // does not cover that day, so there is no Rhyme Key for the words to
+          // be aimed at and nothing to write. The browser cannot reach this
+          // from a day it is looking at, which is exactly why it is worth
+          // answering plainly.
+          return sendJson(res, 400, {
+            error: `No Daily Puzzle is scheduled for ${asked.date}, so there is no Rhyme Key to aim these words at.`,
+          });
+        }
 
-      let outcome: AddOutcome;
-      try {
-        outcome = await deps.runAdds(asked.words, aim);
-      } catch (error) {
-        // What throws past `add` is a pinned source that would not read or a
-        // supplement that would not take the append. Both name their own file,
-        // so the cause is relayed whole and nothing is added to it — a second
-        // sentence guessing at the remedy reads as two diagnoses of one
-        // problem. Relaying is safe in a way it would not be on a deployed
-        // route: the reader is the maintainer, and the paths are their own.
-        return sendJson(res, 500, { error: `Could not add those words: ${message(error)}` });
+        try {
+          outcome = await deps.runAdds(asked.words, aim);
+        } catch (error) {
+          // What throws past `add` is a pinned source that would not read or a
+          // supplement that would not take the append. Both name their own
+          // file, so the cause is relayed whole and nothing is added to it — a
+          // second sentence guessing at the remedy reads as two diagnoses of
+          // one problem. Relaying is safe in a way it would not be on a
+          // deployed route: the reader is the maintainer, and the paths are
+          // their own.
+          return sendJson(res, 500, { error: `Could not add those words: ${message(error)}` });
+        }
       }
 
       const rebuilt = await deps.rebuild();
@@ -210,6 +271,7 @@ export function editorAddPlugin(): Plugin {
           runAdds: add,
           rebuild: () => rebuildIndex(repoRoot),
           openIndex: builtIndex,
+          staleness: () => indexStaleness(repoRoot),
         }),
       );
     },

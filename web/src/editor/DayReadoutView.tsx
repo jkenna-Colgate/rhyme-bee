@@ -33,6 +33,7 @@ import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
 import { AddQueueView } from "./AddQueueView.tsx";
 import { demotedWords, showsDemotionReassurance, withoutDemoted } from "./demote.ts";
 import { retierDay, type RetieredWord } from "./retier.ts";
+import type { EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 import type { Demoter } from "./useDemoter.ts";
 import type { TierPicker } from "./useTierPicker.ts";
@@ -42,11 +43,19 @@ export function DayReadoutView({
   picker,
   demoter,
   adder,
+  status,
 }: {
   readout: DayReadout;
   picker: TierPicker;
   demoter: Demoter;
   adder: Adder;
+  /**
+   * The repository's state, carried through to the add queue. It is not a fact
+   * about the day and nothing on this screen renders it — `StatusView` does
+   * that, one level up — but Submit's enabling rule is half the queue and half
+   * the index (#162), and the button that reads it lives down here.
+   */
+  status: EditorStatus | null;
 }) {
   switch (readout.outcome) {
     case "unpinnable":
@@ -54,7 +63,15 @@ export function DayReadoutView({
     case "not-scheduled":
       return <OutsideTheRun readout={readout} />;
     case "day":
-      return <ScheduledDay readout={readout} picker={picker} demoter={demoter} adder={adder} />;
+      return (
+        <ScheduledDay
+          readout={readout}
+          picker={picker}
+          demoter={demoter}
+          adder={adder}
+          status={status}
+        />
+      );
   }
 }
 
@@ -130,11 +147,13 @@ function ScheduledDay({
   picker,
   demoter,
   adder,
+  status,
 }: {
   readout: ScheduledDayReadout;
   picker: TierPicker;
   demoter: Demoter;
   adder: Adder;
+  status: EditorStatus | null;
 }) {
   const { drift } = readout;
   // Which word's menu is showing. One at a time: the menu is a choice about one
@@ -294,7 +313,12 @@ function ScheduledDay({
           type it. The queue is aimed at this day's Rhyme Key, which is why it
           is drawn inside the scheduled-day case and nowhere else — the other
           two readouts have no key to aim at. */}
-      <AddQueueView date={readout.date} rhymeKey={readout.rhymeKey} adder={adder} />
+      <AddQueueView
+        date={readout.date}
+        rhymeKey={readout.rhymeKey}
+        adder={adder}
+        status={status}
+      />
 
       <p className="editor-lists-note">
         Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}

@@ -23,6 +23,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
 import { add, type AddOutcome, type AddTarget } from "../../scripts/editorAdd.ts";
+import type { IndexStaleness } from "../../scripts/indexArtifact.ts";
 import type { AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "../editorAddRequest.ts";
 import { editorAddHandler } from "../editorAddPlugin.ts";
@@ -141,6 +142,7 @@ function endpoint(
     runAdds?: (words: string[], aim: AddTarget) => Promise<AddOutcome>;
     rebuild?: () => Promise<RebuildResult>;
     openIndex?: () => RhymeIndex;
+    staleness?: () => IndexStaleness;
   } = {},
 ) {
   const acts: string[] = [];
@@ -169,6 +171,16 @@ function endpoint(
         // rather than assumed: an index opened before the rebuild reads the day
         // as it was, and would show it here.
         return stubIndex(acts.includes("rebuild") ? ["bust", "adjust"] : ["bust"]);
+      }),
+    // A current index by default, which is the state in which #161's refusal of
+    // an empty batch still stands. The tests that widen it (#162) hand in a
+    // stale one, and the act is recorded so "the staleness read happened, and
+    // happened before anything else" is assertable rather than assumed.
+    staleness:
+      options.staleness ??
+      (() => {
+        acts.push("staleness");
+        return { stale: false, reason: null };
       }),
   });
   return { handler, acts, added };
@@ -210,8 +222,8 @@ describe("submitting a queue", () => {
     const result = JSON.parse(answered.body) as AddSubmitResult;
 
     expect(result.rebuilt).toEqual({ ok: true });
-    expect(result.outcome.target).toBe("AH S T");
-    expect(result.outcome.words.map((word) => word.word)).toEqual(["one", "two"]);
+    expect(result.outcome!.target).toBe("AH S T");
+    expect(result.outcome!.words.map((word) => word.word)).toEqual(["one", "two"]);
   });
 
   /**
@@ -263,7 +275,7 @@ describe("submitting a queue", () => {
     expect(answered.status).toBe(200);
     expect(result.rebuilt).toEqual({ ok: false, error: "npm run build:index exited 1." });
     expect(result.readout).toBeNull();
-    expect(result.outcome.words).toHaveLength(1);
+    expect(result.outcome!.words).toHaveLength(1);
     // The index is never opened, because there is no fresh artifact to open.
     expect(acts).toEqual(["add", "rebuild"]);
   });
@@ -286,7 +298,7 @@ describe("submitting a queue", () => {
     expect(answered.status).toBe(200);
     expect(result.readout).toBeNull();
     expect(result.rebuilt).toEqual({ ok: true });
-    expect(result.outcome.words).toHaveLength(1);
+    expect(result.outcome!.words).toHaveLength(1);
   });
 });
 
@@ -320,6 +332,114 @@ describe("submitting a queue", () => {
  * an `AddTarget` and hands back an `AddOutcome`, and there is no Tier or
  * demotion in either direction.
  */
+/**
+ * #162: "Submit is enabled by a stale index as well as by a queued add", and
+ * "submitting with no queued adds rebuilds and re-reads without writing
+ * anything new."
+ *
+ * The second claim is the one worth being careful about, and it is held to
+ * account twice below for the reason #161's equivalent claim is: an assertion
+ * that only ever runs against stubbed deps proves that *this handler* did not
+ * write, and says nothing about what the functions it calls would have done.
+ * Here the two are `acts` — which proves `runAdds` was never entered at all,
+ * so there is no write path to reason about — and a byte-for-byte snapshot of
+ * every file the pass can write, taken across the real call.
+ */
+describe("submitting with nothing queued", () => {
+  const stale: IndexStaleness = {
+    stale: true,
+    reason: "input-newer",
+    input: resolve(repoRoot, "data/tier-overrides.csv"),
+  };
+
+  it("rebuilds and re-reads when rows have been written since the last build", async () => {
+    const { handler, acts } = endpoint({ staleness: () => stale });
+    const answered = await call(handler, submit({ date: "2026-08-10", words: [] }));
+    const result = JSON.parse(answered.body) as AddSubmitResult;
+
+    expect(answered.status).toBe(200);
+    // No `add`. The one function in this handler that can write to `data/` is
+    // never entered, which is what makes "writes nothing new" structural rather
+    // than a property of `add` being well behaved when handed no words.
+    expect(acts).toEqual(["rebuild", "open-index"]);
+    expect(result.rebuilt).toEqual({ ok: true });
+    expect(result.readout).not.toBeNull();
+  });
+
+  /**
+   * Null, not an `AddOutcome` with an empty word list. The two render as the
+   * same counts and are different facts — "nothing was submitted" against
+   * "every word submitted was already known" — and the screen says a different
+   * sentence for each.
+   */
+  it("answers with no outcome at all, rather than an empty one", async () => {
+    const { handler } = endpoint({ staleness: () => stale });
+    const result = JSON.parse(
+      (await call(handler, submit({ date: "2026-08-10", words: [] }))).body,
+    ) as AddSubmitResult;
+
+    expect(result.outcome).toBeNull();
+  });
+
+  /**
+   * The claim, against the files rather than against a comment. Every path the
+   * pass can write is snapshotted by contents *and* mtime, so a rewrite with
+   * identical bytes would still fail this.
+   */
+  it("leaves every file the pass writes byte-identical", async () => {
+    const watched = [
+      "data/tier-overrides.csv",
+      "data/demotions.txt",
+      "data/supplement.dict",
+      "data/deferred-readings.jsonl",
+      // Never written by anything in the pass, and named here because that is
+      // the one guarantee worth restating: the reviewed schedule artifact is
+      // hand-edited and is not this tool's to touch.
+      "data/schedule.json",
+    ].map((name) => resolve(repoRoot, name));
+    const snapshot = () =>
+      watched.map((path) =>
+        existsSync(path)
+          ? { path, text: readFileSync(path, "utf8"), mtimeMs: statSync(path).mtimeMs }
+          : { path, text: null, mtimeMs: null },
+      );
+
+    const before = snapshot();
+    // `runAdds` is the real `add`, so a handler that decided to call it with an
+    // empty batch would be running the writing code rather than a recorder.
+    const { handler, acts } = endpoint({ staleness: () => stale, runAdds: add });
+    const answered = await call(handler, submit({ date: "2026-08-10", words: [] }));
+
+    expect(answered.status).toBe(200);
+    expect(acts).toEqual(["rebuild", "open-index"]);
+    expect(snapshot()).toEqual(before);
+  });
+
+  /**
+   * A day is not resolved for an empty batch, so the schedule is never read —
+   * there is no Rhyme Key to aim nothing at. Asserted because the alternative
+   * shape (resolve the aim, then skip the add) reads almost identically and
+   * would make an unreadable schedule fail a Submit that needs nothing from it.
+   */
+  it("does not consult the schedule, having nothing to aim", async () => {
+    const { handler } = endpoint({
+      staleness: () => stale,
+      schedule: () => {
+        throw new Error("data/schedule.json is not a readable schedule artifact.");
+      },
+    });
+    const answered = await call(handler, submit({ date: "2026-08-10", words: [] }));
+
+    // The re-read still asks for the schedule and still fails, which `readDay`
+    // answers with a null readout rather than a failed Submit — the rebuild it
+    // was pressed for did happen.
+    expect(answered.status).toBe(200);
+    const result = JSON.parse(answered.body) as AddSubmitResult;
+    expect(result.rebuilt).toEqual({ ok: true });
+    expect(result.readout).toBeNull();
+  });
+});
+
 describe("what Submit does not write", () => {
   const paths = (names: string[]) => names.map((name) => resolve(repoRoot, name));
   const verdicts = paths(["data/tier-overrides.csv", "data/demotions.txt"]);
@@ -355,7 +475,7 @@ describe("what Submit does not write", () => {
     // Held to `already-reads` on purpose. If CMUdict ever stopped reading
     // `adjust` on this key the word would be *written*, and the assertion below
     // would then be passing for a reason this test never intended.
-    expect(result.outcome.words.map((word) => word.outcome)).toEqual(["already-reads"]);
+    expect(result.outcome!.words.map((word) => word.outcome)).toEqual(["already-reads"]);
     expect(snapshot(watched)).toEqual(before);
   });
 });
@@ -429,18 +549,42 @@ describe("what the endpoint refuses, and writes nothing for", () => {
   });
 
   /**
-   * Submit is disabled in the browser when nothing is queued, so that a night of
-   * Tier judgements alone never pays for a rebuild it does not need. The rule is
-   * enforced here too, because a rule only a `disabled` attribute holds is not a
-   * rule — and what an empty Submit would cost is the whole rebuild.
+   * #161 refused every empty batch; #162 refuses only the ones with nothing
+   * behind them. With the artifact holding everything on disk there is nothing
+   * for a rebuild to fold in, and the whole rebuild is what an empty Submit
+   * would cost — so the refusal stands, and the staleness read is the only act
+   * that ran.
    */
-  it("refuses an empty batch rather than rebuilding for nothing", async () => {
+  it("refuses an empty batch when the index already holds everything on disk", async () => {
     const { handler, acts } = endpoint();
     const answered = await call(handler, submit({ date: "2026-08-10", words: [] }));
 
     expect(answered.status).toBe(400);
-    expect(JSON.parse(answered.body).error).toMatch(/Nothing was queued/);
-    expect(acts).toEqual([]);
+    expect(JSON.parse(answered.body).error).toMatch(/Nothing is pending/);
+    expect(acts).toEqual(["staleness"]);
+  });
+
+  /**
+   * A staleness read that threw has not answered, and the refusal above is the
+   * only thing between an empty Submit and a rebuild for nothing — so it is
+   * taken. The sentence names no path: the causes here are absolute paths under
+   * `dist-data/`, and this route's neighbours relay theirs on an argument
+   * ("the reader is the maintainer") that #162's own criterion overrides.
+   */
+  it("refuses an empty batch it could not decide about, naming no path", async () => {
+    const { handler, acts } = endpoint({
+      staleness: () => {
+        acts.push("staleness");
+        throw new Error("EPERM: operation not permitted, stat 'C:\\\\Users\\\\someone\\\\dist-data'");
+      },
+    });
+    const answered = await call(handler, submit({ date: "2026-08-10", words: [] }));
+
+    expect(answered.status).toBe(500);
+    const { error } = JSON.parse(answered.body) as { error: string };
+    expect(error).toMatch(/nothing was rebuilt/i);
+    expect(error).not.toMatch(/EPERM|Users|dist-data\b.*stat/);
+    expect(acts).toEqual(["staleness"]);
   });
 
   it("refuses a date the run does not cover, since there is no key to aim at", async () => {
@@ -500,6 +644,20 @@ describe("what counts as a Submit", () => {
    * time: a word no compound split reaches waits on an agent for up to a minute,
    * and those waits are serial.
    */
+  /**
+   * An empty list parses, where #161 refused it here. The decision moved to the
+   * endpoint because it is a question about the disk — is anything pending? —
+   * and this module reads no files, which is the whole reason it can be tested
+   * without a repository around it.
+   */
+  it("takes an empty list, leaving whether it means anything to the endpoint", () => {
+    expect(addWriteRequest(JSON.stringify({ date: "2026-08-10", words: [] }))).toEqual({
+      ok: true,
+      date: "2026-08-10",
+      words: [],
+    });
+  });
+
   it("refuses more words than one Submit carries", () => {
     const words = Array.from({ length: 51 }, (_, n) => "w" + "a".repeat(n + 1));
     const asked = addWriteRequest(JSON.stringify({ date: "2026-08-10", words }));

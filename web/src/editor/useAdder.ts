@@ -157,7 +157,21 @@ export function useAdder(onDay: (readout: DayReadout) => void): Adder {
     // The queue as it stands at the click, not as it stood when this callback
     // was built — the callback is deliberately stable across renders.
     const { queue: batch, queuedFor: boundTo } = standing.current;
-    if (batch.length === 0) return;
+
+    // An empty queue is **posted**, not dropped here, which is #162's widening.
+    // It used to return early, back when an empty Submit could only ever be a
+    // misfire. It can now be the whole point of the click: a night of Tier
+    // verdicts is on disk, the artifact predates them, and the rebuild is what
+    // makes them real. Whether that is the case is a fact about the disk, and
+    // this hook's copy of it — `pendingWork` over a status fetched some
+    // milliseconds ago — is the wrong thing to enforce a refusal with. The
+    // endpoint asks `indexStaleness` at the moment of the request and refuses
+    // in a sentence, which is both fresher and the only enforcement that
+    // cannot be got round.
+    //
+    // The button is still disabled on an empty queue and a current index, for
+    // the reason every disabled button here exists: to say what will happen
+    // before it does not.
 
     // The button that calls this is already disabled on a mismatch. It is
     // checked again because a rule only a button enforces is not a rule, and

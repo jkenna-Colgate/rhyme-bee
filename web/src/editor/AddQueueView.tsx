@@ -23,6 +23,7 @@ import { useState } from "react";
 import type { DeferredOutcome, WordOutcome } from "../../../scripts/editorAdd.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
 import { MAX_QUEUED_WORDS, aimHeldFor, type AddSubmitResult } from "./add.ts";
+import { pendingWork, type EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 
 /**
@@ -39,10 +40,13 @@ export function AddQueueView({
   date,
   rhymeKey,
   adder,
+  status,
 }: {
   date: string;
   rhymeKey: RhymeKey;
   adder: Adder;
+  /** The repository's state, for the half of Submit's rule that is not the queue. */
+  status: EditorStatus | null;
 }) {
   const [typed, setTyped] = useState("");
   const { queue, submitting } = adder;
@@ -74,7 +78,8 @@ export function AddQueueView({
         writes what it can to <code>data/supplement.dict</code>, rebuilds the Rhyme Index and
         re-reads this day from the artifact that rebuild produced. A word that is a name is refused,
         and one that already reads correctly is left alone. It writes no Tier verdict and no
-        demotion — those are on disk already, made when you clicked them.
+        demotion — those are on disk already, made when you clicked them, and an empty queue submits
+        the rebuild alone so a night of them can be folded in without adding a word first.
       </p>
 
       <form
@@ -127,9 +132,17 @@ export function AddQueueView({
         <button
           type="button"
           className="editor-submit"
-          // Disabled on an empty queue, so a night of Tier judgements alone
-          // never pays for a rebuild it does not need. The endpoint refuses an
-          // empty batch too — a rule only a button enforces is not a rule.
+          // Enabled whenever anything is pending — a queued add, *or* rows
+          // written to disk since the last rebuild (#162). The second half is
+          // the widening: a night of Tier verdicts is real work waiting on a
+          // rebuild, and before this it could only be folded in by queueing a
+          // word the day did not need. What the old rule was protecting — an
+          // empty Submit paying for a rebuild that folds in nothing — is still
+          // protected: with nothing queued, `pendingWork` is true only on a
+          // status that came back stale, and false both when the index holds
+          // everything and when no status has arrived. The endpoint asks
+          // `indexStaleness` itself rather than trusting this: a rule only a
+          // button enforces is not a rule.
           //
           // Disabled too on a queue typed against another day. That rule is
           // not also enforced at the endpoint, because the endpoint cannot see
@@ -137,7 +150,7 @@ export function AddQueueView({
           // the wrong day is a perfectly well-formed request for the wrong
           // Rhyme Key. `submit` checks it again instead, so it is not a rule
           // only a button enforces.
-          disabled={queue.length === 0 || submitting || held !== null}
+          disabled={!pendingWork(queue.length, status) || submitting || held !== null}
           onClick={() => void adder.submit(date)}
         >
           {submitting ? "Submitting…" : submitLabel(queue.length)}
@@ -152,8 +165,19 @@ export function AddQueueView({
   );
 }
 
+/**
+ * What the button says it will do.
+ *
+ * An empty queue no longer means a button that cannot be pressed, so "Submit"
+ * on its own is no longer a safe label for it: the act it performs then is a
+ * rebuild and a re-read, with nothing written, and a button reading "Submit"
+ * over an empty list invites the reasonable guess that it is about to submit
+ * something. It names the act instead. When the index is also current the
+ * button is disabled anyway, and the label is what says why the disabled state
+ * is not a bug.
+ */
 function submitLabel(queued: number): string {
-  if (queued === 0) return "Submit";
+  if (queued === 0) return "Rebuild and re-read";
   return queued === 1 ? "Submit 1 word" : `Submit ${queued} words`;
 }
 
@@ -245,22 +269,34 @@ function InFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
  */
 function Submitted({ result }: { result: AddSubmitResult }) {
   const { outcome, rebuilt, readout } = result;
-  const written = outcome.words.filter((w) => w.outcome === "written").length;
-  const deferred = outcome.words.filter((w) => w.outcome === "deferred").length;
+  const written = outcome?.words.filter((w) => w.outcome === "written").length ?? 0;
+  const deferred = outcome?.words.filter((w) => w.outcome === "deferred").length ?? 0;
 
   return (
     <section className="editor-written">
-      <p>
-        <strong>{written}</strong> {written === 1 ? "reading" : "readings"} written to{" "}
-        <code>data/supplement.dict</code>, <strong>{deferred}</strong>{" "}
-        {deferred === 1 ? "word" : "words"} deferred.
-      </p>
+      {/* An empty Submit says what it did rather than counting to zero twice.
+          "0 readings written, 0 words deferred" is true of it and answers a
+          question nobody asked: the button that ran it said *rebuild*, and
+          what happened is that the verdicts and demotions already on disk
+          became the artifact this day is now read off. */}
+      {outcome === null ? (
+        <p>
+          No words were queued, so nothing was written. What was already on disk — Tier verdicts,
+          demotions, earlier adds — is what the rebuild below folded in.
+        </p>
+      ) : (
+        <p>
+          <strong>{written}</strong> {written === 1 ? "reading" : "readings"} written to{" "}
+          <code>data/supplement.dict</code>, <strong>{deferred}</strong>{" "}
+          {deferred === 1 ? "word" : "words"} deferred.
+        </p>
+      )}
 
       {rebuilt.ok ? (
         readout === null ? (
           <p className="editor-write-failed">
-            The Rhyme Index was rebuilt, but this day could not be read back from it. The words above
-            are written; reload to see the day.
+            The Rhyme Index was rebuilt, but this day could not be read back from it.
+            {outcome !== null && " The words above are written;"} reload to see the day.
           </p>
         ) : (
           <p className="editor-reach">
@@ -270,20 +306,32 @@ function Submitted({ result }: { result: AddSubmitResult }) {
         )
       ) : (
         <p className="editor-write-failed">
-          The words above are written, but <code>npm run build:index</code> failed, so this day is
-          still the one from before them. Run it yourself and reload.
+          {outcome === null ? (
+            <>
+              <code>npm run build:index</code> failed, so this day is still being read off the
+              artifact from before your corrections. Nothing was lost — they are on disk. Run it
+              yourself and reload.
+            </>
+          ) : (
+            <>
+              The words above are written, but <code>npm run build:index</code> failed, so this day
+              is still the one from before them. Run it yourself and reload.
+            </>
+          )}
           <br />
           <code className="editor-add-buildlog">{rebuilt.error}</code>
         </p>
       )}
 
-      <ul className="editor-add-outcomes">
-        {outcome.words.map((word) => (
-          <li key={word.word} className={`editor-add-outcome editor-add-${word.outcome}`}>
-            <strong>{word.word}</strong> — <WordOutcomeLine word={word} target={outcome.target} />
-          </li>
-        ))}
-      </ul>
+      {outcome !== null && (
+        <ul className="editor-add-outcomes">
+          {outcome.words.map((word) => (
+            <li key={word.word} className={`editor-add-outcome editor-add-${word.outcome}`}>
+              <strong>{word.word}</strong> — <WordOutcomeLine word={word} target={outcome.target} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

@@ -90,3 +90,24 @@ export const EDITOR_DEMOTION_PATH = "/api/editor/demotion";
  * reachable: it writes to `data/`, spawns a process and rewrites `dist-data/`.
  */
 export const EDITOR_ADD_PATH = "/api/editor/add";
+
+/**
+ * Where the Editor's Pass reads its own state: `GET` alone, naming nothing.
+ * Whether the built Rhyme Index is stale, and whether each file the tool writes
+ * carries uncommitted changes (#162).
+ *
+ * It is the one editor path that takes **no** parameter of any kind — no date,
+ * no body, no query. Everything it answers is a fact about the repository
+ * rather than about a day, and a status that could be asked for "as of" some
+ * argument would be a status somebody could be shown the wrong one of.
+ *
+ * `GET` and nothing else, and that is the shape of the feature: the status is a
+ * read, and every act it might tempt a route into — commit, deploy — is
+ * deliberately absent from this tool. See `web/workingTree.ts` for why reading
+ * git is not one of the operations #162 bans.
+ *
+ * Dev only, and structurally so — `editorStatusPlugin` is `apply: "serve"`, so
+ * `configureServer` never runs in a production build and no deployed surface
+ * answers this path (ADR-0016).
+ */
+export const EDITOR_STATUS_PATH = "/api/editor/status";

@@ -12,6 +12,7 @@ import { indexAssetPlugin } from "./indexAssetPlugin.ts";
 import { editorAddPlugin } from "./editorAddPlugin.ts";
 import { editorDayPlugin } from "./editorDayPlugin.ts";
 import { editorDemotionPlugin } from "./editorDemotionPlugin.ts";
+import { editorStatusPlugin } from "./editorStatusPlugin.ts";
 import { editorTierPlugin } from "./editorTierPlugin.ts";
 import { feedbackPlugin } from "./feedbackPlugin.ts";
 import { supplementPlugin } from "./supplementPlugin.ts";
@@ -55,17 +56,20 @@ export default defineConfig(({ command }) => {
 
   return {
     root: rootDir,
-    // `feedbackPlugin`, `supplementPlugin`, `editorDayPlugin`,
-    // `editorTierPlugin`, `editorDemotionPlugin` and `editorAddPlugin` are
+    // `feedbackPlugin`, `supplementPlugin` and the five `editor*` plugins are
     // dev-only (`apply: "serve"`); `deployHeadersPlugin` and `indexAssetPlugin`
-    // are build-only. The last three editor plugins are the ones that write to
-    // `data/` — and `editorAddPlugin` also rebuilds `dist-data/` — which is why
-    // the build's inputs are named below rather than defaulted.
+    // are build-only. Three of the editor plugins write to `data/` — and
+    // `editorAddPlugin` also rebuilds `dist-data/` — which is why the build's
+    // inputs are named below rather than defaulted. `editorStatusPlugin` is the
+    // one that writes nothing at all: it reads the artifact's staleness and
+    // asks git about the written files, and #162 gives the tool no commit and
+    // no deploy to go with the answer.
     plugins: [
       react(),
       deployHeadersPlugin(),
       indexAssetPlugin(distDataDir),
       editorDayPlugin(),
+      editorStatusPlugin(),
       editorTierPlugin(),
       editorDemotionPlugin(),
       editorAddPlugin(),

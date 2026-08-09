@@ -473,6 +473,65 @@ code {
   color: #8e2a1f;
 }
 
+/* --- The status readout (#162) ---------------------------------------------
+   Above the day and quieter than it. Both facts here are about the repository
+   rather than the date on screen, and neither is an alarm most evenings — a
+   stale index is the ordinary end of a night's judgements — so the panel is
+   set flat and grey and lets the two states that matter carry the colour. */
+.editor-status {
+  margin: 0 0 1.1rem;
+  padding: 0.75rem 0.95rem 0.85rem;
+  background: #f7f4ee;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.editor-status-index {
+  margin: 0;
+}
+/* Green states nothing to do; amber states the one act Submit performs. Amber
+   rather than red on purpose: a stale index after a pass is expected, and a
+   colour that read as a failure would cry wolf every single night. */
+.editor-status-fresh strong {
+  color: #2f6b3a;
+}
+.editor-status-stale strong {
+  color: #8a5a00;
+}
+.editor-status-files {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.5rem 1.1rem;
+  margin: 0.7rem 0 0;
+}
+.editor-status-group h3 {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.editor-status-group p {
+  margin: 0.15rem 0 0.25rem;
+  font-size: 0.78rem;
+}
+.editor-status-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.editor-status-file {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+.editor-status-uncommitted strong,
+.editor-status-unknown strong {
+  color: #8a5a00;
+}
+/* The one state that is a defect rather than a report: a file git has been told
+   to ignore is a night's work that cannot be committed at all. */
+.editor-status-ignored strong {
+  color: #8e2a1f;
+}
+
 /* --- The add queue and Submit (#161) --------------------------------------
    Set on its own panel rather than styled like the day's figures, because it
    is not part of the readout: what is drawn here is a list the browser is

@@ -194,7 +194,20 @@ export type RebuildResult = { ok: true } | { ok: false; error: string };
  * exactly the pair that drifts.
  */
 export interface AddSubmitResult {
-  outcome: AddOutcome;
+  /**
+   * What became of the batch, or **null when there was no batch** — the empty
+   * Submit #162 added, where the pending work was already on disk and the only
+   * act left was the rebuild.
+   *
+   * Null rather than an `AddOutcome` with no words in it. An empty outcome
+   * would render as "0 readings written, 0 words deferred", which is true and
+   * is an answer to a question nobody asked; the editor pressed a button that
+   * said *rebuild*, and what they need told is whether the rebuild happened.
+   * It also keeps the two cases apart for anything downstream: "no words were
+   * submitted" and "every word in the batch was already known" are the same
+   * counts and completely different facts.
+   */
+  outcome: AddOutcome | null;
   rebuilt: RebuildResult;
   readout: DayReadout | null;
 }

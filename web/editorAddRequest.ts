@@ -50,12 +50,23 @@ export type AddWriteRequest =
 /**
  * The batch a request body carries.
  *
- * An empty list is **refused**, not accepted as a no-op. Submit is disabled in
- * the browser when nothing is queued, and this is the same rule where it can be
- * relied on: a Submit with no words still costs a full rebuild of the Rhyme
- * Index, which is precisely the cost #161 says a night of Tier judgements alone
- * must never pay. A route that answered 200 to it would make the disabled button
- * the only thing standing between an editor and a rebuild for nothing.
+ * An empty list is **allowed here and decided elsewhere**, which is a reversal
+ * of #161's rule and is #162's central widening. #161 refused it outright: a
+ * Submit with no words costs a full rebuild, and a rebuild for nothing is the
+ * cost a night of Tier judgements alone must never pay. What that missed is
+ * that a night of Tier judgements alone is not nothing — the verdicts are on
+ * disk, the artifact predates them, and the empty Submit is the *only* way to
+ * fold them in from the browser. So an empty batch is now refused exactly when
+ * the index is current and accepted when it is stale.
+ *
+ * That decision cannot be made in this module, and deliberately is not faked
+ * here. Staleness is a fact about `dist-data/` and `data/` on disk; this module
+ * reads no files, which is the whole reason it can be tested without a
+ * repository around it. The endpoint holds the rule, because the endpoint is
+ * what can ask. Taking the browser's word for it was rejected for the reason
+ * the date is re-resolved server-side: a client's copy of a fact about the
+ * maintainer's disk is a guess, and the guess that is wrong here rebuilds for
+ * nothing or refuses work that is genuinely waiting.
  *
  * Every word is normalised the way `gatherEvidence` normalises it on the way in,
  * so a word queued with a stray capital is the word that gets judged. Duplicates
@@ -83,12 +94,6 @@ export function addWriteRequest(body: string): AddWriteRequest {
   }
   if (!Array.isArray(words) || words.some((word) => typeof word !== "string")) {
     return { ok: false, error: "An add names words. Expected a list of them." };
-  }
-  if (words.length === 0) {
-    return {
-      ok: false,
-      error: "Nothing was queued. Submit rebuilds the Rhyme Index, which is not worth paying for nothing.",
-    };
   }
   if (words.length > MAX_QUEUED_WORDS) {
     return {

@@ -35,20 +35,47 @@
  * `show` is how Submit's re-read lands: the endpoint answers with the day read
  * off the index it has just rebuilt, and the readout is handed to the hook that
  * owns the day rather than kept a second time by the one that submitted.
+ *
+ * The status is the fourth hook and belongs to none of the three above it. It
+ * is about the repository rather than a day — whether the built Rhyme Index is
+ * stale, and whether the files the pass writes are committed (#162) — so it is
+ * fetched once, refreshed when a write lands or the window is focused, and
+ * never keyed to the date. It is drawn here, at the top, and passed down as far
+ * as the add queue for the one rule that reads it: Submit is enabled by a stale
+ * index as well as by a queued add.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAdder } from "./useAdder.ts";
 import { useDayReadout } from "./useDayReadout.ts";
 import { useDemoter } from "./useDemoter.ts";
+import { useEditorStatus } from "./useEditorStatus.ts";
 import { useTierPicker } from "./useTierPicker.ts";
 import { DayReadoutView } from "./DayReadoutView.tsx";
+import { StatusView } from "./StatusView.tsx";
 
 export function EditorApp() {
   const { readout, loading, error, goTo, show } = useDayReadout();
   const picker = useTierPicker(readout?.date ?? null);
   const demoter = useDemoter();
   const adder = useAdder(show);
+  const { status, error: statusError, refresh } = useEditorStatus();
+
+  // The status is refreshed by **observing** that a write happened, rather than
+  // by three callbacks threaded through three hooks. Each of these three values
+  // is set only on a write the file accepted — `picker.recorded` on a Tier
+  // verdict, `demoter.recorded` on a demotion, `adder.result` on a Submit — and
+  // each is a fresh object every time, so two identical verdicts in a row are
+  // still two refreshes. A callback per hook would be a second announcement of
+  // a fact each hook already publishes, and one more thing for a fourth write
+  // route to remember to call.
+  //
+  // A *failed* write sets none of them, and correctly triggers nothing: what it
+  // changed on disk is nothing.
+  useEffect(() => {
+    if (picker.recorded === null && demoter.recorded === null && adder.result === null) return;
+    refresh();
+  }, [picker.recorded, demoter.recorded, adder.result, refresh]);
   // The control shows the date the editor last entered in full, and otherwise
   // the day on screen — which is how the endpoint's choice of tomorrow becomes
   // visible without the browser having decided it.
@@ -83,12 +110,23 @@ export function EditorApp() {
 
       {error !== null && <section className="editor-alarm">{error}</section>}
 
+      {/* Above the day, and outside the block that dims while a day is fetched:
+          neither fact it shows is about the date on screen, so dimming it on a
+          jump would say it had gone stale when nothing about it had moved. */}
+      <StatusView status={status} error={statusError} />
+
       {/* The previous day stays on screen while the next one is fetched, dimmed
           rather than replaced: a blank screen between two days makes a jump feel
           like a failure, and a day's readout arrives in milliseconds. */}
       {readout !== null && (
         <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <DayReadoutView readout={readout} picker={picker} demoter={demoter} adder={adder} />
+          <DayReadoutView
+            readout={readout}
+            picker={picker}
+            demoter={demoter}
+            adder={adder}
+            status={status}
+          />
         </div>
       )}
 
