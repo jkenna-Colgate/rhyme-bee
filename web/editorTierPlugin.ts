@@ -49,6 +49,7 @@ import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
 import { editorDayRequest } from "./editorDayRequest.ts";
 import { reachOf, tierPickerState } from "./editorTierPayload.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "./editorTierRequest.ts";
+import { readCappedBody, sendJson } from "./editorTransport.ts";
 import { appendTierOverride, readTierOverrideText } from "./tierOverrideFile.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -72,51 +73,6 @@ export interface EditorTierDeps {
   /** When the judgement was made, as the file records it. */
   now: () => string;
   knownnessThreshold: () => number;
-}
-
-function sendJson(res: ServerResponse, status: number, payload: unknown): void {
-  res.statusCode = status;
-  res.setHeader("Content-Type", "application/json");
-  res.end(JSON.stringify(payload));
-}
-
-/**
- * Read a request body, refusing anything over the cap as the bytes arrive rather
- * than buffering the lot and measuring afterwards. `Content-Length` is an early
- * hint and never a fact — it is the sender's claim about the sender's own body —
- * so an oversize body that declared itself small is caught by the count instead.
- *
- * Resolves the body, or `null` when the request was refused; a `null` means the
- * refusal has already been sent and the caller returns. This is
- * `editorDayPlugin`'s `withinCap` with the body kept: that route has no body to
- * read and only has to decide whether to answer, and collapsing the two into one
- * helper would have handed the read route a buffer it has no use for.
- */
-function readCappedBody(req: IncomingMessage, res: ServerResponse): Promise<string | null> {
-  const declared = Number(req.headers["content-length"]);
-  if (Number.isFinite(declared) && declared > MAX_TIER_BODY_BYTES) {
-    sendJson(res, 413, { error: "That request is too large." });
-    return Promise.resolve(null);
-  }
-
-  return new Promise((settle) => {
-    const chunks: Buffer[] = [];
-    let size = 0;
-    req.on("data", (chunk: Buffer) => {
-      size += chunk.byteLength;
-      if (size > MAX_TIER_BODY_BYTES) {
-        req.destroy();
-        sendJson(res, 413, { error: "That request is too large." });
-        settle(null);
-        return;
-      }
-      chunks.push(chunk);
-    });
-    req.on("end", () => settle(size > MAX_TIER_BODY_BYTES ? null : Buffer.concat(chunks).toString("utf8")));
-    // A connection that broke mid-body is not a request to answer, and the
-    // response went with it — settle so nothing is left pending.
-    req.on("error", () => settle(null));
-  });
 }
 
 /**
@@ -170,7 +126,7 @@ export function editorTierHandler(deps: EditorTierDeps) {
     }
 
     void (async () => {
-      const body = await readCappedBody(req, res);
+      const body = await readCappedBody(req, res, MAX_TIER_BODY_BYTES);
       if (body === null) return;
 
       const asked = editorDayRequest(req.url ?? "/", deps.today());

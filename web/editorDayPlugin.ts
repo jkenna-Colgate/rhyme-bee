@@ -37,6 +37,7 @@ import { readScheduledDay } from "../scripts/editorDay.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { EDITOR_DAY_PATH } from "./src/endpoints.ts";
 import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "./editorDayRequest.ts";
+import { readCappedBody, sendJson } from "./editorTransport.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -52,47 +53,6 @@ export interface EditorDayDeps {
   openIndex: () => RhymeIndex;
   /** The editor's own calendar date, from which "tomorrow" is taken. */
   today: () => string;
-}
-
-function sendJson(res: ServerResponse, status: number, payload: unknown): void {
-  res.statusCode = status;
-  res.setHeader("Content-Type", "application/json");
-  res.end(JSON.stringify(payload));
-}
-
-/**
- * Refuse a request carrying more than the cap, counting bytes as they arrive
- * rather than buffering the lot and measuring afterwards. `Content-Length` is an
- * early hint and never a fact — it is the sender's claim about the sender's own
- * body — so an oversize body that declared itself small is caught by the count
- * instead. This mirrors `worker/http.ts`'s `readCappedBody`, minus the parsing
- * a read has no body to do.
- *
- * Resolves `true` when the request was within the cap and can be answered. When
- * it resolves `false` the refusal has already been sent, so the caller returns.
- */
-function withinCap(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
-  const declared = Number(req.headers["content-length"]);
-  if (Number.isFinite(declared) && declared > MAX_REQUEST_BODY_BYTES) {
-    sendJson(res, 413, { error: "That request is too large." });
-    return Promise.resolve(false);
-  }
-
-  return new Promise((settle) => {
-    let size = 0;
-    req.on("data", (chunk: Buffer) => {
-      size += chunk.byteLength;
-      if (size > MAX_REQUEST_BODY_BYTES) {
-        req.destroy();
-        sendJson(res, 413, { error: "That request is too large." });
-        settle(false);
-      }
-    });
-    req.on("end", () => settle(size <= MAX_REQUEST_BODY_BYTES));
-    // A connection that broke mid-body is not a request to answer, and the
-    // response went with it — settle so nothing is left pending.
-    req.on("error", () => settle(false));
-  });
 }
 
 /**
@@ -115,7 +75,10 @@ export function editorDayHandler(deps: EditorDayDeps) {
     }
 
     void (async () => {
-      if (!(await withinCap(req, res))) return;
+      // This route has no body to use — a `GET` carries none — so the read is
+      // only ever here to enforce the cap; the string it resolves to is not
+      // read. See `web/editorTransport.ts` for why the read happens anyway.
+      if ((await readCappedBody(req, res, MAX_REQUEST_BODY_BYTES)) === null) return;
 
       const asked = editorDayRequest(req.url ?? "/", deps.today());
       if (!asked.ok) return sendJson(res, 400, { error: asked.error });

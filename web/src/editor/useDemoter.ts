@@ -27,12 +27,23 @@
  * the word is still being served as an ordinary Answer. That is the failure
  * worth being noisy about: the editor's next act is to click the next word, and
  * a silently dropped write would leave a name in tomorrow's Puzzle.
+ *
+ * ## Why a 409 carries its own flag
+ *
+ * `alreadyDemoted` is the one refusal `error` cannot be read back to distinguish
+ * from the rest, and the view needs to: the endpoint's sentence on a 409 already
+ * says the word has no wordhood ("kate is already demoted, as proper-noun"), so
+ * appending the write-failed banner's usual reassurance — "the word is still a
+ * word" — there would assert the opposite of what the sentence just said. Every
+ * other refusal (400/413/500) never touched the file, so the reassurance is
+ * true for those and `DayReadoutView` still shows it, gated on this flag.
  */
 
 import { useCallback, useEffect, useState } from "react";
 import type { Demotion, DemotionReason } from "../../../src/demotions.ts";
 import { EDITOR_DEMOTION_PATH } from "../endpoints.ts";
 import type { DemotionState, DemotionWriteResult } from "./demote.ts";
+import { endpointFailure, errorIn } from "./fetchError.ts";
 
 export interface Demoter {
   state: DemotionState | null;
@@ -40,6 +51,8 @@ export interface Demoter {
   writing: string | null;
   /** A request that produced no state, or a write the file refused. */
   error: string | null;
+  /** True when `error` is the 409 the file sends for a word it already names. */
+  alreadyDemoted: boolean;
   /** The last demotion recorded, kept on screen until the next one. */
   recorded: Demotion | null;
   /** Demote a word. Resolves once the file has it and the state is refreshed. */
@@ -50,6 +63,7 @@ export function useDemoter(): Demoter {
   const [state, setState] = useState<DemotionState | null>(null);
   const [writing, setWriting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [alreadyDemoted, setAlreadyDemoted] = useState(false);
   const [recorded, setRecorded] = useState<Demotion | null>(null);
 
   useEffect(() => {
@@ -67,7 +81,7 @@ export function useDemoter(): Demoter {
         setError(null);
         setState(body as DemotionState);
       } catch (cause) {
-        if (current) setError(reason(cause));
+        if (current) setError(endpointFailure(cause, "demotion"));
       }
     })();
 
@@ -79,6 +93,7 @@ export function useDemoter(): Demoter {
   const demote = useCallback(async (word: string, chosen: DemotionReason) => {
     setWriting(word);
     setError(null);
+    setAlreadyDemoted(false);
     try {
       const response = await fetch(EDITOR_DEMOTION_PATH, {
         method: "POST",
@@ -88,30 +103,18 @@ export function useDemoter(): Demoter {
       const body: unknown = await response.json();
       if (!response.ok) {
         setError(errorIn(body) ?? `The demotion endpoint answered ${response.status}.`);
+        setAlreadyDemoted(response.status === 409);
         return;
       }
       const result = body as DemotionWriteResult;
       setRecorded(result.appended);
       setState(result.state);
     } catch (cause) {
-      setError(reason(cause));
+      setError(endpointFailure(cause, "demotion"));
     } finally {
       setWriting(null);
     }
   }, []);
 
-  return { state, writing, error, recorded, demote };
-}
-
-/** The sentence the endpoint sent, when it sent one. */
-function errorIn(body: unknown): string | null {
-  if (typeof body !== "object" || body === null) return null;
-  const { error } = body as { error?: unknown };
-  return typeof error === "string" ? error : null;
-}
-
-function reason(cause: unknown): string {
-  return cause instanceof Error
-    ? `${cause.message} — is the dev server still running? Nothing was written.`
-    : "The demotion endpoint could not be reached. Nothing was written.";
+  return { state, writing, error, alreadyDemoted, recorded, demote };
 }

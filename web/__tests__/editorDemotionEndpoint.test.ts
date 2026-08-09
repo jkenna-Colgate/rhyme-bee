@@ -240,18 +240,26 @@ describe("what the endpoint refuses, and writes nothing for", () => {
   });
 
   /**
-   * The demotion list has no last-wins resolution — `applyDemotions` runs every
-   * line — so two lines naming one word with two reasons would apply both, and
-   * which rejection the player received would fall out of the order the lines
-   * happened to be in. The committed file lists each word once, and the refusal
-   * is what keeps it that way.
+   * `applyDemotions` (`src/demotions.ts`) would not actually let a second line
+   * decide the player's rejection — `words.delete` and `names.add` are
+   * idempotent, so a `proper-noun` line anywhere in the file wins regardless of
+   * where a second line for the same word sits. What a second line *would* do is
+   * sit there inertly, breaking the "lists each word once" invariant
+   * `src/__tests__/demotions.test.ts` holds of the committed file for no effect
+   * on adjudication. The refusal keeps the file at one row per word.
    */
   it("refuses a word the file already demotes rather than writing it twice", async () => {
     const { handler, written } = endpoint({ file: "kate proper-noun\n" });
     const answered = await call(handler, post({ word: "kate", reason: "not-a-known-word" }));
 
     expect(answered.status).toBe(409);
-    expect(JSON.parse(answered.body).error).toMatch(/already demoted, as proper-noun/);
+    const error: string = JSON.parse(answered.body).error;
+    expect(error).toMatch(/already demoted, as proper-noun/);
+    // The sentence says the word has no wordhood; the client appends its own
+    // "still a word" reassurance to every *other* refusal, and must not find
+    // an excuse to on this one — see `showsDemotionReassurance` in
+    // `web/src/editor/demote.ts`.
+    expect(error).not.toMatch(/still a word/);
     expect(written).toEqual([]);
   });
 

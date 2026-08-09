@@ -27,10 +27,10 @@ import type {
   UnpinnableDayReadout,
   UnscheduledDateReadout,
 } from "../../../scripts/editorDay.ts";
-import { DEMOTION_REASONS, type DemotionReason } from "../../../src/demotions.ts";
+import { DEMOTION_REASONS, type Demotion, type DemotionReason } from "../../../src/demotions.ts";
 import type { DriftReason, PuzzleFacts } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
-import { demotedWords, withoutDemoted } from "./demote.ts";
+import { demotedWords, showsDemotionReassurance, withoutDemoted } from "./demote.ts";
 import { retierDay, type RetieredWord } from "./retier.ts";
 import type { Demoter } from "./useDemoter.ts";
 import type { TierPicker } from "./useTierPicker.ts";
@@ -174,6 +174,14 @@ function ScheduledDay({
     void demoter.demote(word, reason);
   };
 
+  // Exactly one of these is ever non-null: `WordList` disables every word
+  // button in both lists the instant either write starts (`disabled={writing
+  // !== null}`), so a second write cannot begin until the first has cleared
+  // its own `writing` back to null. The merge is safe for that reason rather
+  // than by construction, which is why it is named and explained once here
+  // instead of repeated inline at each of the two `<WordList>`s below.
+  const writing = picker.writing ?? demoter.writing;
+
   return (
     <>
       <header className="editor-day-head">
@@ -251,10 +259,19 @@ function ScheduledDay({
       )}
 
       {/* A refused demotion is the louder of the two: the word is still being
-          served, and the editor has already moved on to the next one. */}
+          served, and the editor has already moved on to the next one. Not on
+          a 409, though — that sentence already says the word has no wordhood
+          ("kate is already demoted, as proper-noun"), so appending "the word
+          is still a word" would contradict what the endpoint just said. */}
       {demoter.error !== null && (
         <p className="editor-write-failed">
-          {demoter.error} <strong>Nothing was demoted</strong> — the word is still a word.
+          {demoter.error}
+          {showsDemotionReassurance(demoter.alreadyDemoted) && (
+            <>
+              {" "}
+              <strong>Nothing was demoted</strong> — the word is still a word.
+            </>
+          )}
         </p>
       )}
 
@@ -283,7 +300,7 @@ function ScheduledDay({
           onPick={setPicking}
           onJudge={judge}
           onDemote={demote}
-          writing={picker.writing ?? demoter.writing}
+          writing={writing}
         />
         <WordList
           title="Bonus Words"
@@ -292,7 +309,7 @@ function ScheduledDay({
           onPick={setPicking}
           onJudge={judge}
           onDemote={demote}
-          writing={picker.writing ?? demoter.writing}
+          writing={writing}
         />
       </div>
     </>
@@ -653,7 +670,7 @@ function DemoteMenu({
  * editor who has just mis-clicked needs to know where the line is, at the moment
  * they need to know it.
  */
-function Demoted({ demotion }: { demotion: { word: string; reason: DemotionReason } }) {
+function Demoted({ demotion }: { demotion: Demotion }) {
   return (
     <section className="editor-written">
       <p>

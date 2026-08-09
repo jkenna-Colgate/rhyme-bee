@@ -66,10 +66,15 @@ export function readDemotionText(path: string): string {
  *   comment, demoting nothing and saying nothing.
  * - **Anything else, including no file at all** — nothing goes first.
  *
+ * A file holding only whitespace counts as empty, matching the override file's
+ * own `appendPrefix`: `parseDemotions` skips blank lines, so a whitespace-only
+ * file is "no demotions" and an entry appended after them should not become a
+ * stray blank first line the maintainer's diff has to explain.
+ *
  * Separated from the write so the decision can be read on its own.
  */
 function appendPrefix(existing: string): string {
-  if (existing === "") return "";
+  if (existing.trim() === "") return "";
   return existing.endsWith("\n") ? "" : "\n";
 }
 
@@ -83,13 +88,15 @@ function appendPrefix(existing: string): string {
  * is no window in which the file has gained a bare newline and not the entry it
  * was repaired for.
  *
- * A file that is empty or absent is written rather than appended to, so an
- * empty string on disk does not become a stray blank line at the top of a file
- * the maintainer reads in a diff.
+ * A file that is empty, absent, or holds only whitespace is written rather than
+ * appended to — the same whitespace-only case `appendPrefix` treats as empty —
+ * so neither an empty string nor stray whitespace on disk survives at the top
+ * of a file the maintainer reads in a diff, and a whitespace-only file with no
+ * trailing newline cannot fuse the appended entry onto it.
  */
 export function appendDemotion(path: string, demotion: Demotion): void {
   const existing = readDemotionText(path);
   const line = appendPrefix(existing) + serialiseDemotion(demotion);
-  if (existing === "") writeFileSync(path, line);
+  if (existing.trim() === "") writeFileSync(path, line);
   else appendFileSync(path, line);
 }

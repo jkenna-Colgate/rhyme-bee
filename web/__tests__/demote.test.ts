@@ -28,7 +28,7 @@ import type { PuzzleEntry, RhymeIndex } from "../../src/rhymeIndex.ts";
 import { TIER_OVERRIDE_HEADER } from "../../src/tierOverride.ts";
 import { buildTestIndex, makeTestIndex, type TestInputs } from "../../src/__fixtures__/index.ts";
 import { tierPickerState } from "../editorTierPayload.ts";
-import { demotedWords, withoutDemoted } from "../src/editor/demote.ts";
+import { demotedWords, showsDemotionReassurance, withoutDemoted } from "../src/editor/demote.ts";
 import { retierDay, type DayLists } from "../src/editor/retier.ts";
 
 /** See `retier.test.ts`: the override sentinels are calibrated for this. */
@@ -188,5 +188,18 @@ describe("a demotion takes the word out of the day", () => {
     expect(words(retiered.answers)).toEqual(words(rebuilt.answers));
     expect(words(retiered.bonusWords)).toEqual(words(rebuilt.bonusWords));
     expect(retiered.facts).toEqual(measureAnswers(rebuilt.answers));
+  });
+});
+
+describe("the write-failed banner's reassurance", () => {
+  // A 409 already says the word has no wordhood ("kate is already demoted, as
+  // proper-noun"); the reassurance ("the word is still a word") would
+  // contradict that sentence, so it is withheld only on this one refusal.
+  it("is withheld when the refusal is a 409 for a word already demoted", () => {
+    expect(showsDemotionReassurance(true)).toBe(false);
+  });
+
+  it("is shown for every other refusal — 400, 413, 500", () => {
+    expect(showsDemotionReassurance(false)).toBe(true);
   });
 });

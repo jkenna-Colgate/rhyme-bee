@@ -31,11 +31,25 @@
  * edit is a matter of deleting one line.
  *
  * That is also why a word the file already names is **refused** rather than
- * appended a second time. Unlike `data/tier-overrides.csv`, the demotion list
- * has no last-wins resolution — `applyDemotions` runs every line — so two lines
- * naming one word with two reasons would apply both, and which rejection the
- * player received would fall out of the order the lines happened to be in. The
- * committed file lists each word once, and this keeps it that way.
+ * appended a second time — though not because order would decide the
+ * player's rejection. It would not: `applyDemotions` (`src/demotions.ts`)
+ * applies each line as a set operation — `words.delete(word)`, and
+ * `names.add(word)` when the reason is `proper-noun` — and both are
+ * idempotent, so a `proper-noun` line anywhere in the file wins regardless of
+ * where a second line for the same word falls. A second line is not a second
+ * vote; it is inert. `hadWordhood` records only whether *that* line's delete
+ * found something, and the one reader of it is `scripts/build-index.ts`'s
+ * stale-entry report — a build-time diagnostic, not the adjudication the
+ * player's rejection is drawn from.
+ *
+ * The 409 exists for what a second, inert line would do to the file itself.
+ * `src/__tests__/demotions.test.ts` holds "lists each word once" as an
+ * invariant of the committed file, and a second row breaks it while changing
+ * nothing: a `proper-noun` line followed by a `not-a-known-word` line for the
+ * same word does not retract the first, so the second row reads to the next
+ * maintainer as a correction that never actually happened. Refusing the write
+ * keeps the file at the one row per word the suite already assumes, rather
+ * than let it silently grow rows with no effect.
  *
  * ## Why this route is dev-only, and structurally so
  *
@@ -57,6 +71,7 @@ import { EDITOR_DEMOTION_PATH } from "./src/endpoints.ts";
 import type { DemotionState, DemotionWriteResult } from "./src/editor/demote.ts";
 import { appendDemotion, readDemotionText } from "./demotionFile.ts";
 import { MAX_DEMOTION_BODY_BYTES, demotionWriteRequest } from "./editorDemotionRequest.ts";
+import { readCappedBody, sendJson } from "./editorTransport.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -74,53 +89,6 @@ export interface EditorDemotionDeps {
   /** `data/demotions.txt` as text; empty when there is no file. */
   demotions: () => string;
   append: (demotion: Demotion) => void;
-}
-
-function sendJson(res: ServerResponse, status: number, payload: unknown): void {
-  res.statusCode = status;
-  res.setHeader("Content-Type", "application/json");
-  res.end(JSON.stringify(payload));
-}
-
-/**
- * Read a request body, refusing anything over the cap as the bytes arrive rather
- * than buffering the lot and measuring afterwards. `Content-Length` is an early
- * hint and never a fact — it is the sender's claim about the sender's own body —
- * so an oversize body that declared itself small is caught by the count instead.
- *
- * Resolves the body, or `null` when the request was refused; a `null` means the
- * refusal has already been sent and the caller returns. The Tier route carries
- * the same helper against its own cap: sharing one would mean a change to either
- * route's cap being reasoned about as a change to both, which is the coupling
- * `editorTierRequest.ts` declined for the constants themselves.
- */
-function readCappedBody(req: IncomingMessage, res: ServerResponse): Promise<string | null> {
-  const declared = Number(req.headers["content-length"]);
-  if (Number.isFinite(declared) && declared > MAX_DEMOTION_BODY_BYTES) {
-    sendJson(res, 413, { error: "That request is too large." });
-    return Promise.resolve(null);
-  }
-
-  return new Promise((settle) => {
-    const chunks: Buffer[] = [];
-    let size = 0;
-    req.on("data", (chunk: Buffer) => {
-      size += chunk.byteLength;
-      if (size > MAX_DEMOTION_BODY_BYTES) {
-        req.destroy();
-        sendJson(res, 413, { error: "That request is too large." });
-        settle(null);
-        return;
-      }
-      chunks.push(chunk);
-    });
-    req.on("end", () =>
-      settle(size > MAX_DEMOTION_BODY_BYTES ? null : Buffer.concat(chunks).toString("utf8")),
-    );
-    // A connection that broke mid-body is not a request to answer, and the
-    // response went with it — settle so nothing is left pending.
-    req.on("error", () => settle(null));
-  });
 }
 
 /** The file's entries, read fresh: the screen's model of what is demoted is the file's. */
@@ -155,7 +123,7 @@ export function editorDemotionHandler(deps: EditorDemotionDeps) {
     }
 
     void (async () => {
-      const body = await readCappedBody(req, res);
+      const body = await readCappedBody(req, res, MAX_DEMOTION_BODY_BYTES);
       if (body === null) return;
 
       try {

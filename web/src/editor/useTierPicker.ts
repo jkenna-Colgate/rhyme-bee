@@ -30,6 +30,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { TierVerdict } from "../../../src/tierOverride.ts";
 import { EDITOR_TIER_PATH } from "../endpoints.ts";
+import { endpointFailure, errorIn } from "./fetchError.ts";
 import type { TierPickerState, TierWriteResult } from "./retier.ts";
 
 export interface TierPicker {
@@ -70,7 +71,7 @@ export function useTierPicker(date: string | null): TierPicker {
         setError(null);
         setState(body as TierPickerState);
       } catch (cause) {
-        if (current) setError(reason(cause));
+        if (current) setError(endpointFailure(cause, "Tier"));
       }
     })();
 
@@ -98,7 +99,7 @@ export function useTierPicker(date: string | null): TierPicker {
         setRecorded(result);
         setState(result.state);
       } catch (cause) {
-        setError(reason(cause));
+        setError(endpointFailure(cause, "Tier"));
       } finally {
         setWriting(null);
       }
@@ -107,17 +108,4 @@ export function useTierPicker(date: string | null): TierPicker {
   );
 
   return { state, writing, error, recorded, judge };
-}
-
-/** The sentence the endpoint sent, when it sent one. */
-function errorIn(body: unknown): string | null {
-  if (typeof body !== "object" || body === null) return null;
-  const { error } = body as { error?: unknown };
-  return typeof error === "string" ? error : null;
-}
-
-function reason(cause: unknown): string {
-  return cause instanceof Error
-    ? `${cause.message} — is the dev server still running? Nothing was written.`
-    : "The Tier endpoint could not be reached. Nothing was written.";
 }

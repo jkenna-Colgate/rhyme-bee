@@ -120,6 +120,20 @@ describe("appending a demotion to the committed list", () => {
     expect(readFileSync(path, "utf8")).toBe("algiers proper-noun\n");
   });
 
+  /**
+   * A whitespace-only file counts as empty, matching `tierOverrideFile.ts`'s own
+   * `appendPrefix`: `parseDemotions` skips blank lines regardless, so treating
+   * whitespace as content would only cost a stray leading blank line in the
+   * maintainer's diff — or, unterminated, a fused first entry.
+   */
+  it("writes no leading blank line into a file holding only whitespace", () => {
+    writeFileSync(path, "  \n");
+
+    appendDemotion(path, { word: "algiers", reason: "proper-noun" });
+
+    expect(readFileSync(path, "utf8")).toBe("algiers proper-noun\n");
+  });
+
   it("appends the reason that was chosen, not a default", () => {
     appendDemotion(path, { word: "oct", reason: "not-a-known-word" });
     appendDemotion(path, { word: "troy", reason: "proper-noun" });

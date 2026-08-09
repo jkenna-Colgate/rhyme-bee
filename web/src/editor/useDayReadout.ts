@@ -18,6 +18,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
 import { EDITOR_DAY_PATH } from "../endpoints.ts";
+import { errorIn } from "./fetchError.ts";
 
 export interface DayReadoutState {
   readout: DayReadout | null;
@@ -74,11 +75,4 @@ export function useDayReadout(): DayReadoutState {
 
   const goTo = useCallback((next: string | null) => setDate(next), []);
   return { readout, loading, error, goTo };
-}
-
-/** The sentence the endpoint sent, when it sent one. */
-function errorIn(body: unknown): string | null {
-  if (typeof body !== "object" || body === null) return null;
-  const { error } = body as { error?: unknown };
-  return typeof error === "string" ? error : null;
 }

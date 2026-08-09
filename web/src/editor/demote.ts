@@ -72,6 +72,22 @@ export function demotedWords(standing: readonly Demotion[]): ReadonlySet<string>
   return new Set(standing.map((entry) => entry.word));
 }
 
+/**
+ * Whether the write-failed banner's stock reassurance belongs after a refused
+ * demotion.
+ *
+ * A 409 already carries its own complete sentence from the endpoint — "kate is
+ * already demoted, as proper-noun. Reversing a demotion is a hand edit of
+ * data/demotions.txt." — because the word named already has no wordhood.
+ * Appending the banner's usual "Nothing was demoted — the word is still a
+ * word" there would assert the opposite of what the endpoint's own sentence
+ * just said. Every other refusal (400/413/500) never touched the file, so the
+ * reassurance is true for those and stays.
+ */
+export function showsDemotionReassurance(alreadyDemoted: boolean): boolean {
+  return !alreadyDemoted;
+}
+
 /** A day's two lists and its three figures, as one thing. */
 export interface ShownDay {
   lists: DayLists;
