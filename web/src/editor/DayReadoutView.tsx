@@ -36,6 +36,7 @@ import { retierDay, type RetieredWord } from "./retier.ts";
 import type { EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 import type { Demoter } from "./useDemoter.ts";
+import type { Disagreer } from "./useDisagreement.ts";
 import type { TierPicker } from "./useTierPicker.ts";
 
 export function DayReadoutView({
@@ -43,12 +44,15 @@ export function DayReadoutView({
   picker,
   demoter,
   adder,
+  disagreer,
   status,
 }: {
   readout: DayReadout;
   picker: TierPicker;
   demoter: Demoter;
   adder: Adder;
+  /** Read by nothing here — forwarded to `AddQueueView`, like `adder` itself. */
+  disagreer: Disagreer;
   /**
    * The repository's state, carried through to `AddQueueView`, which is the
    * actual reader: Submit's enabling rule is half the queue and half the index
@@ -81,6 +85,7 @@ export function DayReadoutView({
           picker={picker}
           demoter={demoter}
           adder={adder}
+          disagreer={disagreer}
           status={status}
         />
       );
@@ -159,12 +164,15 @@ function ScheduledDay({
   picker,
   demoter,
   adder,
+  disagreer,
   status,
 }: {
   readout: ScheduledDayReadout;
   picker: TierPicker;
   demoter: Demoter;
   adder: Adder;
+  /** Forwarded, unread here — see `AddQueueView`. */
+  disagreer: Disagreer;
   /** Read by nothing here either — forwarded to `AddQueueView` below, for the
    * reason given on `DayReadoutView`'s own `status` prop. */
   status: EditorStatus | null;
@@ -331,6 +339,7 @@ function ScheduledDay({
         date={readout.date}
         rhymeKey={readout.rhymeKey}
         adder={adder}
+        disagreer={disagreer}
         status={status}
       />
 

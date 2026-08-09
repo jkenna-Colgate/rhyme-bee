@@ -63,6 +63,21 @@ import { fail, root } from "./editorShell.ts";
 export interface AddTarget {
   target: RhymeKey;
   provenance: string;
+  /**
+   * The Seed Word the key belongs to, when the aim came from a scheduled day.
+   * Absent when the editor named a Rhyme Key outright on the command line —
+   * there is no Puzzle behind that aim and therefore no Seed.
+   *
+   * It exists because a `reads-on-another-key` outcome can be recorded as a
+   * Candidate, and a Candidate names the Seed Word the disagreement is about
+   * (#163). Read out of `provenance` it would be a sentence being parsed for a
+   * value it was written to *read* well, and taken from the day on screen it
+   * would be the wrong Seed the moment the editor looked at a neighbouring day
+   * with a batch's outcome still showing — a Candidate that looks right and
+   * names a Puzzle the word was never held against. So the outcome carries the
+   * Seed it was actually aimed at.
+   */
+  seed?: string;
 }
 
 /**
@@ -112,8 +127,11 @@ export interface AlreadyReadsOutcome {
  * Carries every direct reading CMUdict holds for the word, keys included —
  * where the index holds it *now* — because a maintainer reading this outcome
  * cannot act on "it disagrees" without also being told what it currently
- * says. A later slice offers to record this as a disagreement (#150); this is
- * the field that slice reads.
+ * says. The browser names every one of them beside its key, and records the
+ * *first* as the engine's respelling when the editor says the word rhymes
+ * anyway — `web/src/editor/disagreement.ts` argues why that is the reading the
+ * engine itself would have shown (#163). Nothing on either path proposes a
+ * correction; recording the disagreement is the whole of what is offered.
  */
 export interface ReadsOnAnotherKeyOutcome {
   outcome: "reads-on-another-key";
@@ -160,8 +178,10 @@ export type WordOutcome =
   | DeferredOutcome;
 
 /**
- * The whole of one `add` invocation, as a value: the target it was aimed at,
- * and every supplied word's outcome in the order it was given. `printAddOutcome`
+ * The whole of one `add` invocation, as a value: the aim it ran against — the
+ * Rhyme Key, where that key came from, and the Seed Word behind it when there
+ * was one — and every supplied word's outcome in the order it was given.
+ * `printAddOutcome`
  * below is the one renderer over it; a later slice's React view is the other
  * (#150).
  *
@@ -175,6 +195,8 @@ export type WordOutcome =
 export interface AddOutcome {
   target: RhymeKey;
   provenance: string;
+  /** The aim's Seed Word, carried through unchanged — see `AddTarget.seed`. */
+  seed?: string;
   words: WordOutcome[];
 }
 
@@ -211,7 +233,7 @@ export async function resolveAddOutcome(
   ctx: EvidenceContext,
   authorReading: AgentAuthor = authorWithAgent,
 ): Promise<AddOutcome> {
-  const { target, provenance } = aim;
+  const { target, provenance, seed } = aim;
   const results: WordOutcome[] = [];
 
   for (const supplied of words) {
@@ -252,7 +274,7 @@ export async function resolveAddOutcome(
     }
   }
 
-  return { target, provenance, words: results };
+  return { target, provenance, seed, words: results };
 }
 
 /**
@@ -558,7 +580,11 @@ function printWordOutcome(w: WordOutcome, target: RhymeKey): void {
 export function targetIn(schedule: Schedule, date: string): AddTarget | null {
   const day = schedule.days.find((d) => d.date === date);
   if (day === undefined) return null;
-  return { target: day.rhymeKey, provenance: `${day.date}, the ${day.seed} Puzzle` };
+  return {
+    target: day.rhymeKey,
+    provenance: `${day.date}, the ${day.seed} Puzzle`,
+    seed: day.seed,
+  };
 }
 
 /** The Rhyme Key an add is aimed at, for a command: a date off the run is fatal. */

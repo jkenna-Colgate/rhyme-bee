@@ -1,12 +1,21 @@
 /**
- * Reading a fetch to `/api/editor/*` back into either a value or a message,
- * shared by all five hooks that talk to that API: `useDayReadout.ts`,
- * `useTierPicker.ts`, `useDemoter.ts`, `useAdder.ts` and `useEditorStatus.ts`.
+ * Reading a fetch back into either a value or a message, shared by all six of
+ * the Editor's Pass hooks: `useDayReadout.ts`, `useTierPicker.ts`,
+ * `useDemoter.ts`, `useAdder.ts`, `useEditorStatus.ts` and
+ * `useDisagreement.ts`.
+ *
+ * Five of the six talk to `/api/editor/*`. The sixth does not: recording a
+ * disagreement posts to the *Appeal* endpoint (#163), because the record it
+ * writes is a Candidate and that queue already exists — the point of that slice
+ * was to introduce no endpoint of its own. It shares these helpers anyway, and
+ * for the reason they were extracted rather than by coincidence: that endpoint
+ * refuses in the same `{ error: string }` shape, from
+ * `src/supplementCandidate.ts`'s own sentence.
  *
  * `errorIn` is identical wherever it is called: every route answers a refusal
  * with `sendJson`'s `{ error: string }` shape (`web/editorTransport.ts`), and
  * reading that shape back is the same question regardless of which route asked
- * it — a day, a Tier verdict, a demotion, an add or the status read.
+ * it — a day, a Tier verdict, a demotion, an add, the status read or an Appeal.
  *
  * `readEndpointResponse` is the ok-check built on top of it: parse the body,
  * and on a non-2xx status turn it into the one sentence every hook then hands
@@ -26,9 +35,11 @@
  * everywhere, so it is not folded into `readEndpointResponse` either: only the
  * day route and the status route read without writing, so they keep their own
  * inline message ("is the dev server still running?" with no claim about what
- * was or was not written) rather than call this. The Tier picker and the
- * demoter both write, and both differ from each other only in which endpoint
- * they name, so that name is the one parameter. `useAdder`'s Submit differs
+ * was or was not written) rather than call this. The Tier picker, the demoter
+ * and the disagreer all write, and differ from each other only in which
+ * endpoint they name, so that name is the one parameter — and "Nothing was
+ * written" is true of all three, since each of their endpoints validates a
+ * whole report before touching anything. `useAdder`'s Submit differs
  * from all four: a broken connection there may have written part of the
  * batch, so its catch says the one true thing instead — that resubmitting is
  * safe — rather than either of these two.

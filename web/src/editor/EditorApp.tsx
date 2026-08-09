@@ -43,12 +43,25 @@
  * never keyed to the date. It is drawn here, at the top, and passed down as far
  * as the add queue for the one rule that reads it: Submit is enabled by a stale
  * index as well as by a queued add.
+ *
+ * The disagreement recorder is the fifth, and the only one whose writes are
+ * absent from that status — deliberately. `WRITTEN_GROUPS` names the files the
+ * pass is *accountable for committing*, and the supplement-candidate queue is
+ * not one of them: it is gitignored with the rest of `data/`, it is judged
+ * offline and pulled down rather than committed, and its deployed half writes to
+ * R2 where there is no working tree to be dirty. Listing it would put a heading
+ * on the status panel that could only ever read "ignored" — the state that panel
+ * added specifically to be alarming (#162) — about a file whose being ignored is
+ * correct. It is also why nothing here refreshes the status when a disagreement
+ * lands: a recorded Candidate moves no figure, no word list and no file the
+ * screen reports on.
  */
 
 import { useEffect, useState } from "react";
 import { useAdder } from "./useAdder.ts";
 import { useDayReadout } from "./useDayReadout.ts";
 import { useDemoter } from "./useDemoter.ts";
+import { useDisagreement } from "./useDisagreement.ts";
 import { useEditorStatus } from "./useEditorStatus.ts";
 import { useTierPicker } from "./useTierPicker.ts";
 import { DayReadoutView } from "./DayReadoutView.tsx";
@@ -59,6 +72,7 @@ export function EditorApp() {
   const picker = useTierPicker(readout?.date ?? null);
   const demoter = useDemoter();
   const adder = useAdder(show);
+  const disagreer = useDisagreement();
   const { status, error: statusError, refresh } = useEditorStatus();
 
   // The status is refreshed by **observing** that a write happened, rather than
@@ -125,6 +139,7 @@ export function EditorApp() {
             picker={picker}
             demoter={demoter}
             adder={adder}
+            disagreer={disagreer}
             status={status}
           />
         </div>

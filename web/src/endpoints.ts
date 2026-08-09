@@ -18,6 +18,14 @@
  * Where a should-have-counted Appeal is sent: the Submission a player believes
  * should have counted as an Answer, reported after the browser has already
  * judged it (ADR-0013).
+ *
+ * The Editor's Pass posts here too, and it is the one editor gesture that does
+ * not use a path below (#163). When a word an editor typed as missing turns out
+ * to be in the index on a Rhyme Key other than the day's, the disagreement is
+ * recorded as a **Candidate** — the same six fields, the same queue, the same
+ * offline judging pass. Giving that its own path would have been a second
+ * endpoint writing a second copy of one record, which is precisely what the
+ * slice was shaped to avoid.
  */
 export const APPEAL_PATH = "/api/supplement-candidate";
 

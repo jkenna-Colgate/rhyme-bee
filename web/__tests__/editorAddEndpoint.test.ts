@@ -195,10 +195,14 @@ describe("submitting a queue", () => {
     const answered = await call(handler, submit(batch));
 
     expect(answered.status).toBe(200);
+    // The Seed travels with the aim as its own field rather than only inside
+    // the provenance sentence: a `reads-on-another-key` outcome is recorded as a
+    // Candidate that names the Seed Word (#163), and parsing it back out of a
+    // sentence written to *read* well would be the wrong way to get it.
     expect(added).toEqual([
       {
         words: ["candleholder"],
-        aim: { target: "AH S T", provenance: "2026-08-10, the bust Puzzle" },
+        aim: { target: "AH S T", provenance: "2026-08-10, the bust Puzzle", seed: "bust" },
       },
     ]);
   });

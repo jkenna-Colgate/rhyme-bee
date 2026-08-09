@@ -725,3 +725,35 @@ code {
   white-space: pre-wrap;
   font-size: 0.78rem;
 }
+
+/* Recording a disagreement is a *report*, never a fix, and the button is
+   styled to say so: quiet and outlined, not the filled green of Submit, which
+   is the button that changes the repository. Nothing here writes a reading. */
+.editor-disagree {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.5rem;
+  margin-left: 0.15rem;
+  background: #fff;
+  border: 1px solid #cdc6b6;
+  border-radius: 999px;
+  color: #4a4438;
+  cursor: pointer;
+}
+
+.editor-disagree:hover:not(:disabled) {
+  border-color: #857e70;
+  background: #f4f1e9;
+}
+
+.editor-disagree:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Deliberately not `.editor-recorded`: that one is a block under the word
+   lists, and this sits inline at the end of a sentence. */
+.editor-disagree-recorded {
+  font-size: 0.8rem;
+  color: #2f5d3a;
+}

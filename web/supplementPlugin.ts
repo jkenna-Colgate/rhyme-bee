@@ -6,6 +6,12 @@
  * queue (`data/supplement-candidates.jsonl`), for a later run to judge and format
  * into the committed supplement (ADR-0009).
  *
+ * Two callers reach it in dev: the game's own should-have-counted button, and
+ * the Editor's Pass, which records a disagreement when the index holds a typed
+ * word on a Rhyme Key other than the day's (#163). Neither is a second shape —
+ * both post the five fields `candidateFromReport` recognises, and this endpoint
+ * cannot tell them apart, which is the point: the judge reads one queue.
+ *
  * Capture only records; it makes no wordhood, pronunciation, or add-vs-correct
  * decision — that reasoning is the judge's, run against the queue offline. The
  * record shape, its validation and its serialisation are the pure
