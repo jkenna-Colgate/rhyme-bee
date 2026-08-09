@@ -23,10 +23,14 @@
  * The add queue is neither. It is not fetched at all — it lives in the browser
  * and costs nothing until Submit (#161) — and it is deliberately **not** reset
  * when the day changes, because a queue keyed to the day would be a queue lost
- * every time an editor checked a neighbouring day mid-pass. Submit names the day
- * on screen at the moment it is pressed, which is the day the words were typed
- * against, so the aim is taken from the click rather than from a queue that has
- * to remember where it came from.
+ * every time an editor checked a neighbouring day mid-pass. It does, though,
+ * *remember* the day it was typed against: an add is aimed at the day's own
+ * Rhyme Key, resolved server-side from the date Submit sends, so a queue that
+ * forgot where it came from would take its aim from whichever day happened to be
+ * on screen at the click and write Monday's words against Tuesday's family. A
+ * queue standing on another day is shown in full and cannot be added to or
+ * submitted until the editor navigates back to it — `aimHeldFor`
+ * (`web/src/editor/add.ts`) is that rule and argues for it.
  *
  * `show` is how Submit's re-read lands: the endpoint answers with the day read
  * off the index it has just rebuilt, and the readout is handed to the hook that

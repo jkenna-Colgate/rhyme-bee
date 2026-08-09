@@ -56,6 +56,7 @@ import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { parseSchedule, type Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { add, targetIn, type AddOutcome, type AddTarget } from "../scripts/editorAdd.ts";
+import { message } from "../scripts/editorShell.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { rebuildIndex } from "./indexRebuild.ts";
 import { EDITOR_ADD_PATH } from "./src/endpoints.ts";
@@ -126,7 +127,7 @@ export function editorAddHandler(deps: EditorAddDeps) {
       try {
         aim = targetIn(deps.schedule(), asked.date);
       } catch (error) {
-        return sendJson(res, 500, { error: `Could not read the schedule: ${said(error)}` });
+        return sendJson(res, 500, { error: `Could not read the schedule: ${message(error)}` });
       }
       if (aim === null) {
         // Not a malformed request and not the file's fault: the run simply does
@@ -148,7 +149,7 @@ export function editorAddHandler(deps: EditorAddDeps) {
         // sentence guessing at the remedy reads as two diagnoses of one
         // problem. Relaying is safe in a way it would not be on a deployed
         // route: the reader is the maintainer, and the paths are their own.
-        return sendJson(res, 500, { error: `Could not add those words: ${said(error)}` });
+        return sendJson(res, 500, { error: `Could not add those words: ${message(error)}` });
       }
 
       const rebuilt = await deps.rebuild();
@@ -182,9 +183,6 @@ function readDay(deps: EditorAddDeps, date: string): AddSubmitResult["readout"] 
   }
 }
 
-function said(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
 
 /**
  * The reviewed schedule artifact, read per request rather than held — the same

@@ -43,6 +43,7 @@ import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
 import { overriddenValue, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
+import { message } from "../scripts/editorShell.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
 import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
@@ -147,9 +148,7 @@ export function editorTierHandler(deps: EditorTierDeps) {
         // problem. Relaying is safe in a way it would not be on a deployed
         // route: the reader is the maintainer, and the paths are their own.
         sendJson(res, 500, {
-          error: `Could not record that judgement: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
+          error: `Could not record that judgement: ${message(error)}`,
         });
       }
     })();

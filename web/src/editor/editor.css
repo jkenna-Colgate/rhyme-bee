@@ -544,6 +544,20 @@ code {
   color: #8e5a1f;
 }
 
+/* A queue standing on a day it was not typed against. Louder than a refusal and
+   quieter than a failure, because it is neither: nothing has gone wrong and
+   nothing is lost, but the words below it will not go anywhere until the editor
+   navigates back. Bordered so it reads as a state the whole section is in rather
+   than a note about the last thing typed. */
+.editor-add-held {
+  margin: 0.6rem 0 0;
+  padding: 0.5rem 0.65rem;
+  border-left: 3px solid #8e5a1f;
+  background: #fdf6ec;
+  font-size: 0.82rem;
+  color: #6b4415;
+}
+
 .editor-queued {
   display: flex;
   flex-wrap: wrap;

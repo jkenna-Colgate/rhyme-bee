@@ -22,7 +22,7 @@
 import { useState } from "react";
 import type { DeferredOutcome, WordOutcome } from "../../../scripts/editorAdd.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
-import { MAX_QUEUED_WORDS, type AddSubmitResult } from "./add.ts";
+import { MAX_QUEUED_WORDS, aimHeldFor, type AddSubmitResult } from "./add.ts";
 import type { Adder } from "./useAdder.ts";
 
 /**
@@ -46,9 +46,13 @@ export function AddQueueView({
 }) {
   const [typed, setTyped] = useState("");
   const { queue, submitting } = adder;
+  // The queue belongs to the day it was typed against, and this is the day on
+  // screen. When they differ the queue is shown but cannot act — see
+  // `aimHeldFor` for why it is neither cleared nor quietly resubmitted here.
+  const held = aimHeldFor(adder.queuedFor, date);
 
   const queueTyped = () => {
-    adder.queueWord(typed);
+    adder.queueWord(typed, date);
     // Cleared unconditionally, including on a refusal. The refusal names the
     // word it refused, so the field is not where the editor reads what went
     // wrong, and leaving a rejected word in it means the next word is typed
@@ -87,16 +91,35 @@ export function AddQueueView({
             value={typed}
             autoComplete="off"
             spellCheck={false}
-            disabled={submitting}
+            // Shut while a queue bound to another day is standing, so the one
+            // sentence explaining that is the only thing on screen saying it —
+            // typing into a field that refuses every word with the same message
+            // is the same message twice. `queueWord` refuses anyway.
+            disabled={submitting || held !== null}
             onChange={(event) => setTyped(event.target.value)}
           />
         </label>
-        <button type="submit" className="editor-add-queue" disabled={submitting || typed === ""}>
+        <button
+          type="submit"
+          className="editor-add-queue"
+          disabled={submitting || typed === "" || held !== null}
+        >
           Queue
         </button>
       </form>
 
-      {adder.error !== null && <p className="editor-add-refused">{adder.error}</p>}
+      {/* Superseded by the held sentence rather than shown beside it. A refusal
+          is about the last word typed, and the entry is shut while a queue is
+          held — so anything still standing here is from the day the editor has
+          just left, and reads as a second complaint about the day they are on. */}
+      {adder.error !== null && held === null && (
+        <p className="editor-add-refused">{adder.error}</p>
+      )}
+
+      {/* Above the queue, not below it: this sentence is the reason the words
+          under it cannot be submitted, and a reader who meets the list first
+          has already reached for the button. */}
+      {held !== null && <p className="editor-add-held">{held}</p>}
 
       <Queued adder={adder} />
 
@@ -107,7 +130,14 @@ export function AddQueueView({
           // Disabled on an empty queue, so a night of Tier judgements alone
           // never pays for a rebuild it does not need. The endpoint refuses an
           // empty batch too — a rule only a button enforces is not a rule.
-          disabled={queue.length === 0 || submitting}
+          //
+          // Disabled too on a queue typed against another day. That rule is
+          // not also enforced at the endpoint, because the endpoint cannot see
+          // it: the date it receives is the only aim it has, and a Submit from
+          // the wrong day is a perfectly well-formed request for the wrong
+          // Rhyme Key. `submit` checks it again instead, so it is not a rule
+          // only a button enforces.
+          disabled={queue.length === 0 || submitting || held !== null}
           onClick={() => void adder.submit(date)}
         >
           {submitting ? "Submitting…" : submitLabel(queue.length)}
@@ -277,7 +307,9 @@ function WordOutcomeLine({ word, target }: { word: WordOutcome; target: RhymeKey
     case "already-reads":
       return (
         <>
-          already reads on <code>{target}</code> — it is in the Puzzle already, nothing to add.
+          already reads on <code>{target}</code> — the reading an add would have written is there
+          already, so nothing was written. Whether it is an Answer, a Bonus Word or in neither list
+          is its wordhood and its Tier, which an add does not touch.
         </>
       );
     case "reads-on-another-key":

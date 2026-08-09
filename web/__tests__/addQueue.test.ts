@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { MAX_QUEUED_WORDS, queueAdd, unqueueAdd } from "../src/editor/add.ts";
+import { MAX_QUEUED_WORDS, aimHeldFor, queueAdd, unqueueAdd } from "../src/editor/add.ts";
 
 /** Queue a run of words, asserting each one lands. */
 function queueAll(words: string[]): string[] {
@@ -81,5 +81,39 @@ describe("taking a word back out", () => {
 
   it("leaves a queue that never held the word alone", () => {
     expect(unqueueAdd(queueAll(["bust"]), "abstract")).toEqual(["bust"]);
+  });
+});
+
+/**
+ * The queue is bound to the day it was typed against, and this is the assertion
+ * that the binding is what stops a batch landing on another day's Rhyme Key.
+ *
+ * The aim is resolved server-side from the date Submit sends, so nothing in the
+ * request itself can tell Monday's words apart from Tuesday's — the browser is
+ * the only layer that knows which day they were typed on, and `aimHeldFor` is
+ * where it says so. `useAdder` gates queueing *and* Submit on it, and
+ * `AddQueueView` disables both controls; all three read this one function.
+ */
+describe("the day a queue is aimed at", () => {
+  const monday = "2026-08-10";
+  const tuesday = "2026-08-11";
+
+  it("holds a queue typed against another day, and names the day to go back to", () => {
+    const held = aimHeldFor(monday, tuesday);
+    expect(held).not.toBeNull();
+    expect(held).toContain(monday);
+  });
+
+  it("lets a queue act on the day it was typed against", () => {
+    expect(aimHeldFor(monday, monday)).toBeNull();
+  });
+
+  /**
+   * An empty queue is bound to no day, which is what lets an editor who has just
+   * submitted — or emptied the queue by hand — start a fresh one wherever they
+   * are, rather than being sent back to a day they have finished with.
+   */
+  it("holds nothing when the queue is bound to no day", () => {
+    expect(aimHeldFor(null, tuesday)).toBeNull();
   });
 });

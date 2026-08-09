@@ -12,15 +12,25 @@
  * queue is a `string[]`, it is lost if the tab closes, and losing it costs
  * exactly the retyping — which is the trade the ticket asks for by name.
  *
- * ## Why the queue holds no Rhyme Key
+ * ## Why the queue holds no Rhyme Key, but does hold a day
  *
  * An add is aimed at the **day's** Rhyme Key, and the editor never types one.
- * The queue therefore carries words alone, and the day is named once, at Submit,
- * by date — from which the endpoint resolves the key out of `data/schedule.json`
- * itself. Carrying a key per queued word would let a queue survive a jump to
- * another day and land its words on the wrong family; carrying the key at all
- * would let a screen that had drifted from the schedule aim an add with a figure
- * of its own. Neither is worth the field.
+ * The queue therefore carries no key: the day is named at Submit by date, and
+ * the endpoint resolves the key out of `data/schedule.json` itself. A key
+ * carried in the browser would let a screen that had drifted from the schedule
+ * aim an add with a figure of its own, which is the hole the ticket closed.
+ *
+ * It does carry the **date it was typed against**, and that is not the same
+ * field. Without it, the aim was taken from whichever day happened to be on
+ * screen at the click — so a queue typed against Monday, left standing while the
+ * editor checked Tuesday, submitted its words at *Tuesday's* Rhyme Key with
+ * nothing having said so. `queuedFor` is what makes that mismatch a thing
+ * `aimHeldFor` can refuse rather than a thing the editor discovers in
+ * `data/supplement.dict` afterwards.
+ *
+ * A date is safe to carry where a key is not, because it is not an answer to
+ * anything: the endpoint still resolves the key from the schedule, and the date
+ * is only ever compared with the day on screen. The queue never *aims* itself.
  *
  * ## Why these are not Submissions, and not Candidates
  *
@@ -99,6 +109,54 @@ export function queueAdd(queue: readonly string[], typed: string): QueueResult {
  */
 export function unqueueAdd(queue: readonly string[], word: string): string[] {
   return queue.filter((queued) => queued !== word);
+}
+
+/**
+ * Whether a queue typed against `queuedFor` may act on the day now on screen —
+ * `null` when it may, and the sentence to show when it may not.
+ *
+ * ## Why a queue is bound to a day at all
+ *
+ * The Rhyme Key an add is aimed at is the day's, resolved server-side from the
+ * date Submit sends. So a queue that outlives the day it was typed against is a
+ * queue that will silently aim at whatever day is on screen when the button is
+ * pressed: type `readjust` while Monday's `AH S T` is open, glance at Tuesday,
+ * hit Submit, and the word is written against Tuesday's family instead. Nothing
+ * on screen contradicts it, and the wrong reading is in
+ * `data/supplement.dict` by the time anyone could. The whole point of taking the
+ * key from the day was that nobody should be able to aim an add at the wrong
+ * family; taking it from *the click* rather than from the queue put that back.
+ *
+ * ## Why the queue is not simply cleared on a day change
+ *
+ * Because that throws away typing the editor did, and the reason the queue
+ * survives a day change is a real one: a pass on Monday routinely involves
+ * opening Tuesday to check whether a word belongs there instead. Clearing makes
+ * that glance cost the batch. Between losing work silently and writing to the
+ * wrong family silently, the second is worse — but neither is the trade to make
+ * when a third option holds the queue and refuses the act.
+ *
+ * ## What this does instead
+ *
+ * The queue stays, whole, and stops being *submittable* anywhere but its own
+ * day. The editor is told which day it belongs to; going back there restores
+ * Submit, and the words can still be removed one by one from anywhere. Two
+ * further options were rejected: submitting to the queue's own date regardless
+ * of what is displayed would write to a day the editor is not looking at and
+ * then replace the screen with it, and a confirm dialog would make the correct
+ * answer the one behind an extra click.
+ *
+ * The same check gates queueing, not only Submit. A word typed on Tuesday that
+ * joined Monday's queue would be aimed at Monday — the identical mistake with
+ * the days swapped, and it would be *created* by the very design meant to stop
+ * it.
+ */
+export function aimHeldFor(queuedFor: string | null, date: string): string | null {
+  if (queuedFor === null || queuedFor === date) return null;
+  return (
+    `These words were typed against ${queuedFor}, and an add is aimed at the day's own Rhyme Key. ` +
+    `Go back to ${queuedFor} to submit them, or take them out of the queue to start one for this day.`
+  );
 }
 
 /** What one Submit asks for: a day, and the words queued against it. */

@@ -22,7 +22,7 @@ import { describe, expect, it } from "vitest";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
-import type { AddOutcome, AddTarget } from "../../scripts/editorAdd.ts";
+import { add, type AddOutcome, type AddTarget } from "../../scripts/editorAdd.ts";
 import type { AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "../editorAddRequest.ts";
 import { editorAddHandler } from "../editorAddPlugin.ts";
@@ -78,6 +78,14 @@ async function call(
   return answered;
 }
 
+/**
+ * One scheduled day, with `bust`'s **real** Rhyme Key on it. Real because the
+ * key is what a Submit aims at, and one test below drives the route with the
+ * real `add` over the real pinned sources — a key no word could read on would
+ * make that test assert about a family that does not exist. Keys carry no
+ * stress digits (`rhymeKeyOf`, `src/phonology.ts`), which is why this is
+ * `AH S T` and not `AH1 S T`.
+ */
 const SCHEDULE: Schedule = {
   startDate: "2026-08-10",
   days: [
@@ -86,7 +94,7 @@ const SCHEDULE: Schedule = {
       weekday: "Mon",
       week: 1,
       seed: "bust",
-      rhymeKey: "AH1 S T",
+      rhymeKey: "AH S T",
       answerCount: 20,
       difficulty: 0.3,
     },
@@ -178,7 +186,7 @@ describe("submitting a queue", () => {
     expect(added).toEqual([
       {
         words: ["candleholder"],
-        aim: { target: "AH1 S T", provenance: "2026-08-10, the bust Puzzle" },
+        aim: { target: "AH S T", provenance: "2026-08-10, the bust Puzzle" },
       },
     ]);
   });
@@ -202,7 +210,7 @@ describe("submitting a queue", () => {
     const result = JSON.parse(answered.body) as AddSubmitResult;
 
     expect(result.rebuilt).toEqual({ ok: true });
-    expect(result.outcome.target).toBe("AH1 S T");
+    expect(result.outcome.target).toBe("AH S T");
     expect(result.outcome.words.map((word) => word.word)).toEqual(["one", "two"]);
   });
 
@@ -289,19 +297,36 @@ describe("submitting a queue", () => {
  * written by a route nobody asked to write one would take a word out of every
  * Puzzle.
  *
- * What this proves is that the **handler and everything it reaches** leaves both
- * paths exactly as it found them. `add`'s own writes are `data/supplement.dict`
- * and `data/deferred-readings.jsonl`, named in `scripts/editorAdd.ts`, and are
- * stubbed out here; the point of the assertion is the route, which is where a
- * later slice might plausibly be tempted to fold a verdict in.
+ * Two assertions, because they fail for different reasons and one of them alone
+ * would overstate what is proved.
+ *
+ * The **first** drives the handler with `runAdds` stubbed. What it can catch is a
+ * write folded into the *route* — which is where a later slice would plausibly
+ * put one, since the route is the thing that already knows the date and the
+ * word. What it cannot catch is a write folded into `add`, because `add` is not
+ * running.
+ *
+ * The **second** closes that by handing the route the real `add`, pinned sources
+ * and all. It submits a word CMUdict already reads on the day's Rhyme Key, so
+ * the outcome is `already-reads` and the honest expectation is that *nothing*
+ * anywhere under `data/` moves — which is why the watch list widens to `add`'s
+ * own two write targets as well. Deliberately not a word that would be written:
+ * appending to `data/supplement.dict` inside the suite to prove a point about
+ * two other files means a run interrupted between the write and the restore
+ * leaves a committed source dirty, and a word no compound split reaches would
+ * additionally spawn the `claude` CLI and wait a minute on it. So what remains
+ * unproved by test, and rests on `EditorAddDeps` instead, is `applyAddOutcome`'s
+ * append path. That surface is the real enforcement: `add` is handed `words` and
+ * an `AddTarget` and hands back an `AddOutcome`, and there is no Tier or
+ * demotion in either direction.
  */
 describe("what Submit does not write", () => {
-  const watched = ["data/tier-overrides.csv", "data/demotions.txt"].map((name) =>
-    resolve(repoRoot, name),
-  );
+  const paths = (names: string[]) => names.map((name) => resolve(repoRoot, name));
+  const verdicts = paths(["data/tier-overrides.csv", "data/demotions.txt"]);
+  const addsOwn = paths(["data/supplement.dict", "data/deferred-readings.jsonl"]);
 
   /** A file's contents and mtime, or its absence — both count as unchanged. */
-  const snapshot = () =>
+  const snapshot = (watched: string[]) =>
     watched.map((path) =>
       existsSync(path)
         ? { path, text: readFileSync(path, "utf8"), mtimeMs: statSync(path).mtimeMs }
@@ -309,12 +334,29 @@ describe("what Submit does not write", () => {
     );
 
   it("leaves data/tier-overrides.csv and data/demotions.txt untouched", async () => {
-    const before = snapshot();
+    const before = snapshot(verdicts);
     const { handler } = endpoint();
     const answered = await call(handler, submit(batch));
 
     expect(answered.status).toBe(200);
-    expect(snapshot()).toEqual(before);
+    expect(snapshot(verdicts)).toEqual(before);
+  });
+
+  it("leaves them untouched across a real add, which is the call that could write", async () => {
+    const watched = [...verdicts, ...addsOwn];
+    const before = snapshot(watched);
+    // `rebuild` and `openIndex` stay recorders: a real rebuild is a subprocess
+    // and a real index is fifteen megabytes, and neither is what this asserts.
+    const { handler } = endpoint({ runAdds: add });
+    const answered = await call(handler, submit({ date: "2026-08-10", words: ["adjust"] }));
+
+    expect(answered.status).toBe(200);
+    const result = JSON.parse(answered.body) as AddSubmitResult;
+    // Held to `already-reads` on purpose. If CMUdict ever stopped reading
+    // `adjust` on this key the word would be *written*, and the assertion below
+    // would then be passing for a reason this test never intended.
+    expect(result.outcome.words.map((word) => word.outcome)).toEqual(["already-reads"]);
+    expect(snapshot(watched)).toEqual(before);
   });
 });
 

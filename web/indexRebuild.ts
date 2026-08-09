@@ -20,8 +20,14 @@
  *
  * The cost is a process start, and the whole rebuild was measured at **2.4
  * seconds** on the maintainer's machine (133,523 pronunciations, 370,079
- * words). That figure is what makes rebuild-on-Submit an act rather than an
- * interruption; the "four minutes" some older comments quote is stale (#152).
+ * words — the wordhood set the build ends with, which is 26 short of the
+ * 370,105 lines `data/words.txt` holds because `data/demotions.txt` takes that
+ * many out. The two figures are both right and are not interchangeable: the
+ * request modules and `web/src/editor/add.ts` quote 370,105, because what they
+ * bound is the shape of a word in that file, and this quotes what the build
+ * came out with.) That 2.4 seconds is what makes rebuild-on-Submit an act
+ * rather than an interruption; the "four minutes" some older comments quote is
+ * stale (#152).
  *
  * ## Why `npm run build:index` and not `tsx` directly
  *
@@ -29,8 +35,11 @@
  * pressing Submit should run the command the documentation tells them to run.
  * `shell: true` is what lets `npm` be found on Windows, where it is a `.cmd`
  * shim — the same accommodation `authorWithAgent` (`scripts/editorAdd.ts`)
- * makes, for the same reason. There is nothing caller-supplied in the argv, so
- * the shell has nothing to interpolate.
+ * makes, for the same reason, and it carries the same consequence: the child
+ * this module holds is the shell, not the build, so an abandoned rebuild is
+ * ended with that module's `killTree` rather than a bare `kill` that would
+ * leave the build running under a shell nobody is holding any more. There is
+ * nothing caller-supplied in the argv, so the shell has nothing to interpolate.
  *
  * ## Why the cache is forgotten here
  *
@@ -42,6 +51,7 @@
  */
 
 import { spawn } from "node:child_process";
+import { killTree } from "../scripts/editorAdd.ts";
 import { forgetBuiltIndex } from "./builtIndex.ts";
 import type { RebuildResult } from "./src/editor/add.ts";
 
@@ -50,9 +60,13 @@ import type { RebuildResult } from "./src/editor/add.ts";
  *
  * Measured at 2.4 seconds, so five minutes is not a guess at the duration — it
  * is the answer to a build that is not going to finish at all, and it errs long
- * for the same reason the agent timeout does: too short abandons a build that
- * would have succeeded and leaves the artifact half-written, which is worse
- * than any amount of waiting.
+ * for the same reason the agent timeout does. Too short abandons a build that
+ * would have succeeded, and what it leaves behind is genuinely unknown:
+ * `killTree` ends the build, but the kill races the write, so the artifact on
+ * disk afterwards may be the previous one, the new one, or a partial file — and
+ * the editor is told the rebuild timed out in all three cases. Waiting costs
+ * minutes. Guessing which of the three happened is what `rebuildIndex` below
+ * refuses to do, which is why it drops the loaded index on this path too.
  */
 const REBUILD_TIMEOUT_MS = 5 * 60_000;
 
@@ -66,10 +80,18 @@ const REBUILD_TIMEOUT_MS = 5 * 60_000;
  * that output names the input it choked on, and the reader is the maintainer
  * looking at their own repository.
  *
- * The cache is forgotten only on success. A failed build leaves the previous
- * artifact standing — `writeIndexArtifact` sweeps superseded indexes only after
- * writing the new one — so the copy in memory is still that artifact, and
- * dropping it would buy a needless half-second re-parse of the same bytes.
+ * The cache is forgotten on **every** outcome, success or failure, and that is
+ * deliberately not the cheaper rule it used to be. Keeping the copy on a
+ * failure was justified by "a failed build leaves the previous artifact
+ * standing", and this module cannot actually know that. A timed-out build is
+ * killed mid-flight and may have written and swept before the kill landed; even
+ * a non-zero exit can follow a completed `writeIndexArtifact`, which
+ * `scripts/build-index.ts` calls before it prints the counts it ends on. What
+ * the stale copy would then cost is the failure `web/builtIndex.ts` exists to
+ * prevent — a day re-read from an index that has been superseded, or off a
+ * content-addressed file the sweep has already deleted, reported as if it were
+ * fresh. Against that, the rejected optimisation was worth half a second of
+ * re-parse on a path the editor has to act on anyway.
  */
 export function rebuildIndex(root: string): Promise<RebuildResult> {
   return new Promise((settle) => {
@@ -80,12 +102,16 @@ export function rebuildIndex(root: string): Promise<RebuildResult> {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
-      if (result.ok) forgetBuiltIndex();
+      forgetBuiltIndex();
       settle(result);
     };
 
     const timer = setTimeout(() => {
-      child.kill();
+      // `killTree`, not `child.kill()`: `shell: true` means the child held here
+      // is the shell, and killing that alone would leave `npm` and the build
+      // under it running — writing and sweeping the artifact long after this
+      // route reported the rebuild abandoned.
+      killTree(child);
       done({
         ok: false,
         error: `npm run build:index did not finish within ${REBUILD_TIMEOUT_MS / 60_000} minutes.`,

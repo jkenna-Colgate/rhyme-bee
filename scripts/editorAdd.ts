@@ -77,11 +77,19 @@ export interface RefusedNameOutcome {
 }
 
 /**
- * A word CMUdict already reads on the target Rhyme Key — it is in the Puzzle
- * already, and there is nothing to add. Distinguished from
- * `ReadsOnAnotherKeyOutcome` because the two look alike (both are "no write
- * happened") but mean opposite things to the editor reading the outcome: this
- * one is confirmation, that one is a problem.
+ * A word CMUdict already reads on the target Rhyme Key: the reading an add would
+ * have written is there, so there is nothing to add. It does **not** follow that
+ * the word is in the Puzzle. Reading on the key is one of three properties, and
+ * an add supplies only this one — a demoted word has no wordhood and appears in
+ * neither list however well it reads, and a word that does have wordhood holds a
+ * Tier that decides whether it is an Answer or a Bonus Word. Saying "it is in
+ * the Puzzle already" would state a conclusion this outcome cannot reach, and
+ * the sentence `web/src/editor/AddQueueView.tsx` renders is written to the same
+ * limit.
+ *
+ * Distinguished from `ReadsOnAnotherKeyOutcome` because the two look alike (both
+ * are "no write happened") but mean opposite things to the editor reading the
+ * outcome: this one is confirmation, that one is a problem.
  *
  * Carries `readings` for the same reason `ReadsOnAnotherKeyOutcome` does: a
  * word can hold more than one CMUdict entry, and confirming *which* reading
@@ -387,8 +395,14 @@ const AGENT_TIMEOUT_MS = 60_000;
  * shell, and killing that alone would orphan the CLI under it. `taskkill /t`
  * takes the tree. Elsewhere the shell execs the command in place, so the signal
  * reaches the CLI directly.
+ *
+ * Exported for `web/indexRebuild.ts`, which spawns `npm run build:index` with
+ * the same `shell: true` for the same Windows reason and so inherits the same
+ * orphan. A second copy there would be the mitigation drifting away from the
+ * accommodation that forces it; this is the one place that knows what killing a
+ * shelled child costs on which platform.
  */
-function killTree(child: ChildProcess): void {
+export function killTree(child: ChildProcess): void {
   if (child.pid === undefined) return;
   if (process.platform === "win32") {
     spawn("taskkill", ["/pid", String(child.pid), "/f", "/t"]).on("error", () => {});
@@ -475,7 +489,10 @@ function printWordOutcome(w: WordOutcome, target: RhymeKey): void {
       console.log(`    refused: a Proper Noun stays a Proper Noun, however well it rhymes.`);
       return;
     case "already-reads":
-      console.log(`    already reads on ${target} — it is in the game already, nothing to add.`);
+      console.log(
+        `    already reads on ${target} — the reading an add would write is there, nothing to add.` +
+          ` Whether it is an Answer or a Bonus Word is its wordhood and its Tier, not this.`,
+      );
       for (const reading of w.readings) console.log(`      ${reading.phonemes.join(" ")}`);
       return;
     case "reads-on-another-key":

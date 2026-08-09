@@ -4,13 +4,16 @@
  *
  * ## Why queueing touches no server
  *
- * Everything up to Submit is `queueAdd` and `unqueueAdd` over a `string[]` in
- * this hook — no fetch, no optimistic state, nothing to fail. That is the
- * ticket's central property rather than an implementation shortcut: naming ten
- * words has to cost what naming one costs, and a mistyped word has to be
- * removable before it costs anything. The moment a queued word touched
- * `data/supplement.dict` it would stop being removable, and the editor would be
- * composing their list one irreversible act at a time.
+ * Everything up to Submit is `queueAdd`, `unqueueAdd` and `aimHeldFor` over a
+ * `string[]` and the date it was typed against — no fetch, no optimistic state,
+ * nothing to fail. That is the ticket's central property rather than an
+ * implementation shortcut: naming ten words has to cost what naming one costs,
+ * and a mistyped word has to be removable before it costs anything. The moment a
+ * queued word touched `data/supplement.dict` it would stop being removable, and
+ * the editor would be composing their list one irreversible act at a time.
+ *
+ * All three are pure and live in `add.ts`, which is where they are tested; this
+ * hook is the state around them and holds no rule of its own.
  *
  * ## Why the fresh readout is handed away rather than held
  *
@@ -50,12 +53,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
 import { EDITOR_ADD_PATH } from "../endpoints.ts";
-import { queueAdd, unqueueAdd, type AddSubmitResult } from "./add.ts";
+import { aimHeldFor, queueAdd, unqueueAdd, type AddSubmitResult } from "./add.ts";
 import { errorIn } from "./fetchError.ts";
 
 export interface Adder {
   /** The words waiting, in the order they were typed. */
   queue: readonly string[];
+  /**
+   * The date the standing queue was typed against, or `null` when it is empty.
+   * The screen compares it with the day on show; see `aimHeldFor`.
+   */
+  queuedFor: string | null;
   /** A word refused before it cost anything: a duplicate, a typo, a full queue. */
   error: string | null;
   /** True from the click until the whole act — adds, rebuild, re-read — is done. */
@@ -66,7 +74,8 @@ export interface Adder {
   result: AddSubmitResult | null;
   /** A Submit that produced no answer at all, or one the endpoint refused. */
   submitError: string | null;
-  queueWord: (typed: string) => void;
+  /** Queue a word against the day on screen, which binds the queue to it. */
+  queueWord: (typed: string, date: string) => void;
   unqueueWord: (word: string) => void;
   /** Run the queue against the day's Rhyme Key, rebuild, and re-read the day. */
   submit: (date: string) => Promise<void>;
@@ -77,6 +86,7 @@ const TICK_MS = 500;
 
 export function useAdder(onDay: (readout: DayReadout) => void): Adder {
   const [queue, setQueue] = useState<readonly string[]>([]);
+  const [queuedFor, setQueuedFor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -90,6 +100,27 @@ export function useAdder(onDay: (readout: DayReadout) => void): Adder {
   const day = useRef(onDay);
   day.current = onDay;
 
+  // The queue and the day it is bound to, mirrored in a ref, because the three
+  // callbacks below are deliberately stable across renders and so cannot read
+  // either off a closure. The obvious alternative — reading them out of a
+  // `setQueue` updater, which is what this hook used to do — leans on React
+  // evaluating updaters eagerly. That is an unguaranteed fast path: with an
+  // update already pending the updater is deferred, and `submit` would then post
+  // an empty batch and return having silently done nothing. A ref is the honest
+  // read, so every write goes through `hold` and nothing sets `queue` directly.
+  const standing = useRef<{ queue: readonly string[]; queuedFor: string | null }>({
+    queue: [],
+    queuedFor: null,
+  });
+  const hold = useCallback((next: readonly string[], date: string | null): void => {
+    // A queue with nothing in it is bound to no day, which is what lets the
+    // editor start a fresh one wherever they are after submitting or clearing.
+    const boundTo = next.length === 0 ? null : date;
+    standing.current = { queue: next, queuedFor: boundTo };
+    setQueue(next);
+    setQueuedFor(boundTo);
+  }, []);
+
   useEffect(() => {
     if (!submitting) return;
     const startedAt = Date.now();
@@ -98,29 +129,45 @@ export function useAdder(onDay: (readout: DayReadout) => void): Adder {
     return () => clearInterval(timer);
   }, [submitting]);
 
-  const queueWord = useCallback((typed: string) => {
-    setQueue((standing) => {
-      const asked = queueAdd(standing, typed);
-      setError(asked.ok ? null : asked.error);
-      return asked.ok ? asked.queue : standing;
-    });
-  }, []);
+  const queueWord = useCallback(
+    (typed: string, date: string) => {
+      // Refused before the word is normalised or judged: a word typed on one day
+      // cannot join a queue aimed at another, or it would be written against a
+      // Rhyme Key the editor was not looking at when they typed it.
+      const held = aimHeldFor(standing.current.queuedFor, date);
+      if (held !== null) return setError(held);
 
-  const unqueueWord = useCallback((word: string) => {
-    setError(null);
-    setQueue((standing) => unqueueAdd(standing, word));
-  }, []);
+      const asked = queueAdd(standing.current.queue, typed);
+      if (!asked.ok) return setError(asked.error);
+      setError(null);
+      hold(asked.queue, date);
+    },
+    [hold],
+  );
+
+  const unqueueWord = useCallback(
+    (word: string) => {
+      setError(null);
+      hold(unqueueAdd(standing.current.queue, word), standing.current.queuedFor);
+    },
+    [hold],
+  );
 
   const submit = useCallback(async (date: string) => {
-    // Read out of the setter rather than off the closure, so the batch posted is
-    // the queue as it stands at the click and not as it stood when this callback
+    // The queue as it stands at the click, not as it stood when this callback
     // was built — the callback is deliberately stable across renders.
-    let batch: readonly string[] = [];
-    setQueue((standing) => {
-      batch = standing;
-      return standing;
-    });
+    const { queue: batch, queuedFor: boundTo } = standing.current;
     if (batch.length === 0) return;
+
+    // The button that calls this is already disabled on a mismatch. It is
+    // checked again because a rule only a button enforces is not a rule, and
+    // because this is the last point at which a batch can still be stopped from
+    // landing on another day's Rhyme Key.
+    const held = aimHeldFor(boundTo, date);
+    if (held !== null) {
+      setSubmitError(held);
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
@@ -138,11 +185,11 @@ export function useAdder(onDay: (readout: DayReadout) => void): Adder {
       }
       const answered = body as AddSubmitResult;
       setResult(answered);
-      // The queue empties only on an answer. A refused or unreachable Submit
-      // leaves it exactly as it was, because the words are then still missing
-      // from the game and retyping them is the one cost this whole design
-      // exists to avoid.
-      setQueue([]);
+      // The queue empties only on an answer, and empties its binding with it. A
+      // refused or unreachable Submit leaves both exactly as they were, because
+      // the words are then still missing from the game and retyping them is the
+      // one cost this whole design exists to avoid.
+      hold([], null);
       if (answered.readout !== null) day.current(answered.readout);
     } catch (cause) {
       // Deliberately not `endpointFailure`, whose sentence ends "Nothing was
@@ -159,10 +206,11 @@ export function useAdder(onDay: (readout: DayReadout) => void): Adder {
     } finally {
       setSubmitting(false);
     }
-  }, []);
+  }, [hold]);
 
   return {
     queue,
+    queuedFor,
     error,
     submitting,
     elapsedMs,

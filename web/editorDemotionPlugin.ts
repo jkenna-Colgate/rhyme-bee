@@ -72,6 +72,7 @@ import type { DemotionState, DemotionWriteResult } from "./src/editor/demote.ts"
 import { appendDemotion, readDemotionText } from "./demotionFile.ts";
 import { MAX_DEMOTION_BODY_BYTES, demotionWriteRequest } from "./editorDemotionRequest.ts";
 import { readCappedBody, sendJson } from "./editorTransport.ts";
+import { message } from "../scripts/editorShell.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -157,9 +158,7 @@ export function editorDemotionHandler(deps: EditorDemotionDeps) {
         // is safe in a way it would not be on a deployed route: the reader is
         // the maintainer, and the paths are their own.
         sendJson(res, 500, {
-          error: `Could not record that demotion: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
+          error: `Could not record that demotion: ${message(error)}`,
         });
       }
     })();
