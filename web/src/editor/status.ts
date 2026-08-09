@@ -124,6 +124,21 @@ export const WRITTEN_FILES: readonly string[] = WRITTEN_GROUPS.flatMap((group) =
  * `npm run build:index` by hand. A stale index *is* pending work — rows written
  * since the last rebuild — so it enables Submit exactly as a queued add does.
  *
+ * "Rows written since the last rebuild" is `reason === "input-newer"` and
+ * nothing wider. `stale` alone is not the test, because two of its three
+ * reasons are not that: `no-artifact` is no build having happened at all, and
+ * `missing-input` is a build input absent from disk — `StatusView`'s
+ * `IndexLine` says as much on screen, "Submit's rebuild cannot supply it" for
+ * the second and "until it has, no day can be read" for the first, meaning a
+ * day cannot even reach this screen while it holds. A button reading "pending"
+ * off `stale` on its own would agree with neither sentence: it would light up
+ * over a fact its own click cannot fix, and a Submit run in that state would
+ * not be folding rows in so much as attempting a first build or a rebuild
+ * missing something it needs — a different act than the one the button and its
+ * label describe. Restricting to `input-newer` is what keeps the button, the
+ * panel above it and `submitLabel`'s "Rebuild and re-read" all describing the
+ * same act.
+ *
  * Stated as a function over two facts rather than read off the status inline,
  * because the button, the button's label and the endpoint's own refusal all
  * have to agree about what "pending" means, and three inline readings of it
@@ -131,10 +146,10 @@ export const WRITTEN_FILES: readonly string[] = WRITTEN_GROUPS.flatMap((group) =
  * cannot trust a browser's copy of a fact about the disk, and asks
  * `indexStaleness` itself — but it enforces the same sentence.
  *
- * A status that has not arrived yet counts as *not* stale, which is the
+ * A status that has not arrived yet counts as *not* pending, which is the
  * conservative direction: the worst it costs is a Submit that stays disabled
  * for the few milliseconds before the first status lands.
  */
 export function pendingWork(queued: number, status: EditorStatus | null): boolean {
-  return queued > 0 || (status?.index.stale ?? false);
+  return queued > 0 || status?.index.reason === "input-newer";
 }

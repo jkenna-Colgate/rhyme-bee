@@ -230,4 +230,32 @@ describe("what enables Submit", () => {
     expect(pendingWork(0, null)).toBe(false);
     expect(pendingWork(2, null)).toBe(true);
   });
+
+  /**
+   * The review finding this closes: `pendingWork` used to read `stale` on its
+   * own, which lit Submit up for `no-artifact` and `missing-input` too — the
+   * two reasons `StatusView`'s `IndexLine` says, correctly, that Submit's
+   * rebuild cannot answer ("Submit's rebuild cannot supply it" for a missing
+   * input; a day cannot even be read at all while no artifact exists, so the
+   * combination could only be reached by a status racing an artifact deleted
+   * out from under a day already on screen). Neither is "rows written since
+   * the last rebuild", which is the one thing this button's click actually
+   * folds in — so with nothing queued, only `input-newer` counts as pending.
+   */
+  it("is not enabled by a staleness reason its own rebuild cannot answer", () => {
+    const stale = (reason: "no-artifact" | "missing-input"): EditorStatus => ({
+      index: { stale: true, reason, input: reason === "missing-input" ? "data/words.txt" : null },
+      written: [],
+    });
+
+    expect(pendingWork(0, stale("no-artifact"))).toBe(false);
+    expect(pendingWork(0, stale("missing-input"))).toBe(false);
+  });
+
+  /** A queued add still wins regardless of why the index is stale, or isn't. */
+  it("is enabled by a queued add over an unanswerable staleness reason too", () => {
+    const status: EditorStatus = { index: { stale: true, reason: "no-artifact", input: null }, written: [] };
+
+    expect(pendingWork(1, status)).toBe(true);
+  });
 });

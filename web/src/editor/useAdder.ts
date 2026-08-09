@@ -54,7 +54,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
 import { EDITOR_ADD_PATH } from "../endpoints.ts";
 import { aimHeldFor, queueAdd, unqueueAdd, type AddSubmitResult } from "./add.ts";
-import { errorIn } from "./fetchError.ts";
+import { readEndpointResponse } from "./fetchError.ts";
 
 export interface Adder {
   /** The words waiting, in the order they were typed. */
@@ -192,12 +192,12 @@ export function useAdder(onDay: (readout: DayReadout) => void): Adder {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, words: batch }),
       });
-      const body: unknown = await response.json();
-      if (!response.ok) {
-        setSubmitError(errorIn(body) ?? `The add endpoint answered ${response.status}.`);
+      const outcome = await readEndpointResponse<AddSubmitResult>(response, "add");
+      if (!outcome.ok) {
+        setSubmitError(outcome.error);
         return;
       }
-      const answered = body as AddSubmitResult;
+      const answered = outcome.body;
       setResult(answered);
       // The queue empties only on an answer, and empties its binding with it. A
       // refused or unreachable Submit leaves both exactly as they were, because

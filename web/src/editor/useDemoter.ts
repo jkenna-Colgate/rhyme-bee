@@ -43,7 +43,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { Demotion, DemotionReason } from "../../../src/demotions.ts";
 import { EDITOR_DEMOTION_PATH } from "../endpoints.ts";
 import type { DemotionState, DemotionWriteResult } from "./demote.ts";
-import { endpointFailure, errorIn } from "./fetchError.ts";
+import { endpointFailure, readEndpointResponse } from "./fetchError.ts";
 
 export interface Demoter {
   state: DemotionState | null;
@@ -72,14 +72,14 @@ export function useDemoter(): Demoter {
     void (async () => {
       try {
         const response = await fetch(EDITOR_DEMOTION_PATH);
-        const body: unknown = await response.json();
+        const result = await readEndpointResponse<DemotionState>(response, "demotion");
         if (!current) return;
-        if (!response.ok) {
-          setError(errorIn(body) ?? `The demotion endpoint answered ${response.status}.`);
+        if (!result.ok) {
+          setError(result.error);
           return;
         }
         setError(null);
-        setState(body as DemotionState);
+        setState(result.body);
       } catch (cause) {
         if (current) setError(endpointFailure(cause, "demotion"));
       }
@@ -100,13 +100,13 @@ export function useDemoter(): Demoter {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word, reason: chosen }),
       });
-      const body: unknown = await response.json();
-      if (!response.ok) {
-        setError(errorIn(body) ?? `The demotion endpoint answered ${response.status}.`);
+      const outcome = await readEndpointResponse<DemotionWriteResult>(response, "demotion");
+      if (!outcome.ok) {
+        setError(outcome.error);
         setAlreadyDemoted(response.status === 409);
         return;
       }
-      const result = body as DemotionWriteResult;
+      const result = outcome.body;
       setRecorded(result.appended);
       setState(result.state);
     } catch (cause) {

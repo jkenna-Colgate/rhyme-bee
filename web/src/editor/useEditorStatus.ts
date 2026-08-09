@@ -47,7 +47,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { EDITOR_STATUS_PATH } from "../endpoints.ts";
-import { errorIn } from "./fetchError.ts";
+import { readEndpointResponse } from "./fetchError.ts";
 import type { EditorStatus } from "./status.ts";
 
 export interface EditorStatusState {
@@ -76,14 +76,14 @@ export function useEditorStatus(): EditorStatusState {
     void (async () => {
       try {
         const response = await fetch(EDITOR_STATUS_PATH);
-        const body: unknown = await response.json();
+        const result = await readEndpointResponse<EditorStatus>(response, "status");
         if (!current) return;
-        if (!response.ok) {
-          setError(errorIn(body) ?? `The status endpoint answered ${response.status}.`);
+        if (!result.ok) {
+          setError(result.error);
           return;
         }
         setError(null);
-        setStatus(body as EditorStatus);
+        setStatus(result.body);
       } catch (cause) {
         // Deliberately not `endpointFailure`, whose sentence ends "Nothing was
         // written." That reassurance is for the routes that write; here it

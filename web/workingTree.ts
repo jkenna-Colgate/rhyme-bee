@@ -112,6 +112,13 @@ export function uncommittedPorcelain(
       done(null);
     }, GIT_TIMEOUT_MS);
 
+    // `setEncoding` first: without it each chunk is a `Buffer`, and `+=`
+    // decodes it to a string on its own — correct for the four ASCII paths
+    // this route ever passes git, but a multi-byte character split across two
+    // chunks would decode wrong on both sides of the split. `setEncoding`
+    // hands the stream Node's own `StringDecoder`, which holds a partial
+    // sequence back until the rest of it arrives.
+    child.stdout.setEncoding("utf8");
     child.stdout.on("data", (chunk) => (output += chunk));
     // Read and discarded. Left unbound it would fill the pipe buffer and stall
     // a child that had plenty to say, which is the one way a five-second

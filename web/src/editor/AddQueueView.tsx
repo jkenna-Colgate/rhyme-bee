@@ -138,11 +138,15 @@ export function AddQueueView({
           // rebuild, and before this it could only be folded in by queueing a
           // word the day did not need. What the old rule was protecting — an
           // empty Submit paying for a rebuild that folds in nothing — is still
-          // protected: with nothing queued, `pendingWork` is true only on a
-          // status that came back stale, and false both when the index holds
-          // everything and when no status has arrived. The endpoint asks
-          // `indexStaleness` itself rather than trusting this: a rule only a
-          // button enforces is not a rule.
+          // protected: with nothing queued, `pendingWork` is true only when the
+          // index's own staleness reason is `input-newer` — rows written since
+          // the last rebuild, the one case this button's click actually folds
+          // in — and false when the index holds everything, when no status has
+          // arrived, and also when it is stale for a reason a rebuild cannot
+          // answer (`no-artifact`, `missing-input`), which is what keeps this
+          // button agreeing with what `StatusView` says about those two above
+          // it. The endpoint asks `indexStaleness` itself rather than trusting
+          // this: a rule only a button enforces is not a rule.
           //
           // Disabled too on a queue typed against another day. That rule is
           // not also enforced at the endpoint, because the endpoint cannot see
@@ -271,6 +275,14 @@ function Submitted({ result }: { result: AddSubmitResult }) {
   const { outcome, rebuilt, readout } = result;
   const written = outcome?.words.filter((w) => w.outcome === "written").length ?? 0;
   const deferred = outcome?.words.filter((w) => w.outcome === "deferred").length ?? 0;
+  // Named once and read four times below, rather than repeating `outcome ===
+  // null` at each site: the four sites are kept separate on purpose — a
+  // summary paragraph, a qualifying clause inside the reload message, a whole
+  // second sentence for a failed rebuild, and whether the per-word list
+  // renders at all — and merging them into one branch would mean interleaving
+  // four unrelated pieces of markup under one `if`. What they share is only
+  // the test, which this is.
+  const nothingQueued = outcome === null;
 
   return (
     <section className="editor-written">
@@ -279,7 +291,7 @@ function Submitted({ result }: { result: AddSubmitResult }) {
           question nobody asked: the button that ran it said *rebuild*, and
           what happened is that the verdicts and demotions already on disk
           became the artifact this day is now read off. */}
-      {outcome === null ? (
+      {nothingQueued ? (
         <p>
           No words were queued, so nothing was written. What was already on disk — Tier verdicts,
           demotions, earlier adds — is what the rebuild below folded in.
@@ -296,7 +308,7 @@ function Submitted({ result }: { result: AddSubmitResult }) {
         readout === null ? (
           <p className="editor-write-failed">
             The Rhyme Index was rebuilt, but this day could not be read back from it.
-            {outcome !== null && " The words above are written;"} reload to see the day.
+            {!nothingQueued && " The words above are written;"} reload to see the day.
           </p>
         ) : (
           <p className="editor-reach">
@@ -306,7 +318,7 @@ function Submitted({ result }: { result: AddSubmitResult }) {
         )
       ) : (
         <p className="editor-write-failed">
-          {outcome === null ? (
+          {nothingQueued ? (
             <>
               <code>npm run build:index</code> failed, so this day is still being read off the
               artifact from before your corrections. Nothing was lost — they are on disk. Run it
@@ -323,7 +335,7 @@ function Submitted({ result }: { result: AddSubmitResult }) {
         </p>
       )}
 
-      {outcome !== null && (
+      {!nothingQueued && (
         <ul className="editor-add-outcomes">
           {outcome.words.map((word) => (
             <li key={word.word} className={`editor-add-outcome editor-add-${word.outcome}`}>

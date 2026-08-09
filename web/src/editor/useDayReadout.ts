@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
 import { EDITOR_DAY_PATH } from "../endpoints.ts";
-import { errorIn } from "./fetchError.ts";
+import { readEndpointResponse } from "./fetchError.ts";
 
 export interface DayReadoutState {
   readout: DayReadout | null;
@@ -60,13 +60,13 @@ export function useDayReadout(): DayReadoutState {
       try {
         const url = date === null ? EDITOR_DAY_PATH : `${EDITOR_DAY_PATH}?date=${date}`;
         const response = await fetch(url);
-        const body: unknown = await response.json();
+        const result = await readEndpointResponse<DayReadout>(response, "day");
         if (!current) return;
-        if (!response.ok) {
-          setError(errorIn(body) ?? `The day endpoint answered ${response.status}.`);
+        if (!result.ok) {
+          setError(result.error);
           return;
         }
-        setReadout(body as DayReadout);
+        setReadout(result.body);
       } catch (cause) {
         if (!current) return;
         setError(

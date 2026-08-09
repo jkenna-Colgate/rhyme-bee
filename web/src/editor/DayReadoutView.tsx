@@ -50,10 +50,22 @@ export function DayReadoutView({
   demoter: Demoter;
   adder: Adder;
   /**
-   * The repository's state, carried through to the add queue. It is not a fact
-   * about the day and nothing on this screen renders it — `StatusView` does
-   * that, one level up — but Submit's enabling rule is half the queue and half
-   * the index (#162), and the button that reads it lives down here.
+   * The repository's state, carried through to `AddQueueView`, which is the
+   * actual reader: Submit's enabling rule is half the queue and half the index
+   * (#162), and the button that reads it lives inside the "day" case below.
+   * `StatusView` is what renders the fact itself, one level up in `EditorApp`,
+   * and does not need this value at all.
+   *
+   * `status`, `picker`, `demoter` and `adder` all cross this component the same
+   * way — as data the *switch on `readout.outcome`* below neither reads nor
+   * changes — because `EditorApp` is the one place all four are held, and this
+   * is the one component standing between it and the case that needs any of
+   * them. Giving `status` its own path around this switch (a second prop
+   * threaded straight into `ScheduledDay`'s render, say, or a context read
+   * lower down) would be a second mechanism for the one thing the other three
+   * already do by being threaded, to save one value one hop — and would still
+   * have to cross `ScheduledDay`, which forwards it exactly this component
+   * does, for the identical reason: `AddQueueView` is one level further in.
    */
   status: EditorStatus | null;
 }) {
@@ -153,6 +165,8 @@ function ScheduledDay({
   picker: TierPicker;
   demoter: Demoter;
   adder: Adder;
+  /** Read by nothing here either — forwarded to `AddQueueView` below, for the
+   * reason given on `DayReadoutView`'s own `status` prop. */
   status: EditorStatus | null;
 }) {
   const { drift } = readout;

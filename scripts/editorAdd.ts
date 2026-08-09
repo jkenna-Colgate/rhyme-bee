@@ -396,11 +396,19 @@ const AGENT_TIMEOUT_MS = 60_000;
  * takes the tree. Elsewhere the shell execs the command in place, so the signal
  * reaches the CLI directly.
  *
- * Exported for `web/indexRebuild.ts`, which spawns `npm run build:index` with
- * the same `shell: true` for the same Windows reason and so inherits the same
- * orphan. A second copy there would be the mitigation drifting away from the
- * accommodation that forces it; this is the one place that knows what killing a
- * shelled child costs on which platform.
+ * Exported for two callers outside this module, and not for the same reason.
+ * `web/indexRebuild.ts` spawns `npm run build:index` with the same `shell:
+ * true` for the same Windows reason, and so inherits the same orphan this
+ * function exists to close — a second copy there would be the mitigation
+ * drifting away from the accommodation that forces it. `web/workingTree.ts`
+ * spawns `git` directly, with no shell in the way and so no orphan to close;
+ * it reuses this anyway, because `taskkill /pid … /f /t` is the only place in
+ * this codebase that knows how to end a child reliably on Windows, and writing
+ * a second copy for a one-process case would still be a second thing to keep
+ * correct, not a smaller one. This is no longer the one place that knows what
+ * killing a *shelled* child costs — `web/indexRebuild.ts` argues that for its
+ * own case, and `web/workingTree.ts` has no shell to argue it about — but it
+ * stays the one place the kill itself is implemented.
  */
 export function killTree(child: ChildProcess): void {
   if (child.pid === undefined) return;

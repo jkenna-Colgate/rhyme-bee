@@ -30,7 +30,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { TierVerdict } from "../../../src/tierOverride.ts";
 import { EDITOR_TIER_PATH } from "../endpoints.ts";
-import { endpointFailure, errorIn } from "./fetchError.ts";
+import { endpointFailure, readEndpointResponse } from "./fetchError.ts";
 import type { TierPickerState, TierWriteResult } from "./retier.ts";
 
 export interface TierPicker {
@@ -62,14 +62,14 @@ export function useTierPicker(date: string | null): TierPicker {
     void (async () => {
       try {
         const response = await fetch(`${EDITOR_TIER_PATH}?date=${date}`);
-        const body: unknown = await response.json();
+        const result = await readEndpointResponse<TierPickerState>(response, "Tier");
         if (!current) return;
-        if (!response.ok) {
-          setError(errorIn(body) ?? `The Tier endpoint answered ${response.status}.`);
+        if (!result.ok) {
+          setError(result.error);
           return;
         }
         setError(null);
-        setState(body as TierPickerState);
+        setState(result.body);
       } catch (cause) {
         if (current) setError(endpointFailure(cause, "Tier"));
       }
@@ -90,12 +90,12 @@ export function useTierPicker(date: string | null): TierPicker {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ word, verdict }),
         });
-        const body: unknown = await response.json();
-        if (!response.ok) {
-          setError(errorIn(body) ?? `The Tier endpoint answered ${response.status}.`);
+        const outcome = await readEndpointResponse<TierWriteResult>(response, "Tier");
+        if (!outcome.ok) {
+          setError(outcome.error);
           return;
         }
-        const result = body as TierWriteResult;
+        const result = outcome.body;
         setRecorded(result);
         setState(result.state);
       } catch (cause) {

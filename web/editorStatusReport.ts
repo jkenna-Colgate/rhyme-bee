@@ -53,12 +53,18 @@ function withinRoot(path: string, root: string): string | null {
 
 /**
  * The `XY <path>` lines of `git status --porcelain --ignored` as a map from
- * path to its two-letter code.
+ * path that is uncommitted to its two-letter code.
  *
  * Parsed rather than pattern-matched, because the codes are the whole answer:
  * `!!` is a file git has been told to ignore and every other code is a file
  * with something uncommitted about it, and collapsing them at this stage would
- * lose the one distinction that matters most (see `writtenStatus`).
+ * lose the one distinction that matters most (see `writtenStatus`). The map
+ * carries the raw code and not a narrower `WrittenFileState`, because the only
+ * caller (`stateOf`, below) reads exactly one value out of it — `"!!"`,
+ * meaning ignored — and treats every other key's presence as "uncommitted"
+ * without inspecting what the code actually says; a `Map<string, "!!" |
+ * "other">` would say the same thing with less honesty about how little of
+ * git's alphabet this module reads.
  *
  * A rename prints `R  old -> new`, and the path taken is the new one — the
  * question being asked is about a path the tool writes, and a rename that
@@ -66,6 +72,21 @@ function withinRoot(path: string, root: string): string | null {
  * are dropped: the command is given an explicit pathspec so there should be
  * none, and a status readout is not the place to start reporting on files
  * nobody asked about.
+ *
+ * No quote-stripping and no backslash-to-slash pass: earlier drafts carried
+ * both, left over from treating this like a general porcelain parser rather
+ * than one reading four fixed ASCII paths handed to git as an explicit
+ * pathspec (`WRITTEN_FILES`) — none of `data/tier-overrides.csv`,
+ * `data/demotions.txt`, `data/supplement.dict` or `data/deferred-readings.jsonl`
+ * has a space, a quote or a non-ASCII byte in it, so git never C-quotes the
+ * line and `named` is exactly one of those four strings or the untouched tail
+ * of a rename. Had one fired, it would have been wrong regardless: git
+ * C-quotes by wrapping in `"` and backslash-escaping the body (a literal `"`
+ * becomes `\"`), so stripping the surrounding quotes without unescaping what
+ * is inside them yields a path that looks plausible and is not the one git
+ * meant — the exact failure a status panel exists not to have. If this parser
+ * is ever pointed at paths git can quote, the fix is a real unescaper, not the
+ * strip this used to be.
  */
 export function porcelainCodes(output: string): Map<string, string> {
   const codes = new Map<string, string>();
@@ -73,9 +94,7 @@ export function porcelainCodes(output: string): Map<string, string> {
     if (line.length < 4) continue;
     const code = line.slice(0, 2);
     const named = line.slice(3);
-    const path = (named.includes(" -> ") ? named.slice(named.indexOf(" -> ") + 4) : named)
-      .replace(/^"|"$/g, "")
-      .replaceAll("\\", "/");
+    const path = named.includes(" -> ") ? named.slice(named.indexOf(" -> ") + 4) : named;
     if (WRITTEN_FILES.includes(path)) codes.set(path, code);
   }
   return codes;
