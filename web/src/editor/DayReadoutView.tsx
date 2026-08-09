@@ -28,7 +28,7 @@ import type {
   UnscheduledDateReadout,
 } from "../../../scripts/editorDay.ts";
 import type { DriftReason, PuzzleFacts } from "../../../src/schedule.ts";
-import type { TierVerdict } from "../../../src/tierOverride.ts";
+import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
 import { retierDay, type RetieredWord } from "./retier.ts";
 import type { TierPicker } from "./useTierPicker.ts";
 
@@ -304,6 +304,11 @@ function Drift({ reasons }: { reasons: readonly DriftReason[] }) {
   );
 }
 
+// Every key `VERDICTS` names is required here — miss one and this object
+// literal fails to compile, which is the exhaustiveness check `VERDICTS` itself
+// cannot give: TypeScript enforces that a `Record<TierVerdict, string>` literal
+// carries all four keys and no others, so a verdict added to the type without a
+// label here is a build error rather than a button with no text.
 const VERDICT_LABEL: Record<TierVerdict, string> = {
   bonus: "Bonus Word",
   "answer-rare": "Answer, rare",
@@ -463,10 +468,11 @@ function Marks({ entry }: { entry: RetieredWord }) {
   );
 }
 
-const VERDICTS: TierVerdict[] = ["bonus", "answer-rare", "answer-common", "none"];
-
 /**
- * The four verdicts, offered together.
+ * The four verdicts, offered together, in the order `src/tierOverride.ts`
+ * names them — the same array the CSV parser and the write route validate a
+ * verdict against, so a fifth verdict added to the type shows up here without
+ * anyone hand-editing a second list.
  *
  * `none` is offered as a peer of the other three and never as an "undo", because
  * withdrawing an override and reversing one are different acts (ADR-0015):

@@ -12,7 +12,7 @@
  */
 
 import { normaliseWord } from "../src/cmudict.ts";
-import type { TierVerdict } from "../src/tierOverride.ts";
+import { isTierVerdict, notAVerdict, type TierVerdict } from "../src/tierOverride.ts";
 
 /**
  * What the endpoint will read of a request body before refusing it.
@@ -30,8 +30,6 @@ import type { TierVerdict } from "../src/tierOverride.ts";
  * would mean a change to either being reasoned about as a change to both.
  */
 export const MAX_TIER_BODY_BYTES = 512;
-
-const VERDICTS: readonly TierVerdict[] = ["bonus", "answer-rare", "answer-common", "none"];
 
 /**
  * Words are lower-case letters. `data/words.txt` holds 370,105 of them and every
@@ -79,12 +77,9 @@ export function tierWriteRequest(body: string): TierWriteRequest {
       error: `"${String(word)}" is not a word. A judgement names one word, in letters.`,
     };
   }
-  if (typeof verdict !== "string" || !VERDICTS.includes(verdict as TierVerdict)) {
-    return {
-      ok: false,
-      error: `"${String(verdict)}" is not a verdict. Expected one of ${VERDICTS.join(", ")}.`,
-    };
+  if (typeof verdict !== "string" || !isTierVerdict(verdict)) {
+    return { ok: false, error: notAVerdict(String(verdict)) };
   }
 
-  return { ok: true, word: normaliseWord(word), verdict: verdict as TierVerdict };
+  return { ok: true, word: normaliseWord(word), verdict };
 }

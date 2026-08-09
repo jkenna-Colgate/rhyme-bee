@@ -41,7 +41,7 @@ import type { Plugin } from "vite";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
-import { VERDICT_VALUE, type TierOverrideRow } from "../src/tierOverride.ts";
+import { overriddenValue, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
@@ -232,15 +232,10 @@ function record(
   const state = stateFor(deps, date);
   const standing = new Map(state.standing.map((row) => [row.word, row]));
   const measured = deps.measured();
-  // The same rule `applyTierOverrides` applies at build time: a patching verdict
-  // plants its sentinel, and a `none` leaves the measurement governing.
-  const valueOf = (candidate: string): number | undefined => {
-    const standingVerdict = standing.get(candidate)?.verdict;
-    if (standingVerdict !== undefined && standingVerdict !== "none") {
-      return VERDICT_VALUE[standingVerdict];
-    }
-    return measured.get(candidate);
-  };
+  // The sentinel-vs-measured rule `overriddenValue` shares with the build and
+  // with the picker's own re-tiering.
+  const valueOf = (candidate: string): number | undefined =>
+    overriddenValue(standing.get(candidate)?.verdict, measured.get(candidate));
 
   return { state, appended, reach: reachOf(word, deps.openIndex(), valueOf) };
 }

@@ -45,6 +45,31 @@ export type TierVerdict = "bonus" | "answer-rare" | "answer-common" | "none";
 export type PatchingVerdict = Exclude<TierVerdict, "none">;
 
 /**
+ * All four verdicts, in the order the picker's menu offers them.
+ *
+ * The header comment above claims this module is the whole of the layer's
+ * rules, "the verdicts" among them — true only if nowhere else hand-copies the
+ * list. The CSV parser below, the write route's validator and the picker's menu
+ * all import this one array, so a fifth verdict cannot be added to the type and
+ * silently missing from what a request or a CSV row is checked against.
+ */
+export const VERDICTS: readonly TierVerdict[] = ["bonus", "answer-rare", "answer-common", "none"];
+
+/** True when `value` names one of the four verdicts this layer recognises. */
+export function isTierVerdict(value: string): value is TierVerdict {
+  return (VERDICTS as readonly string[]).includes(value);
+}
+
+/**
+ * The sentence every site uses when a string fails to name a verdict, worded
+ * once so a caller can prepend its own context — a CSV line, a request body —
+ * without restating what "one of" lists.
+ */
+export function notAVerdict(value: string): string {
+  return `"${value}" is not a verdict. Expected one of ${VERDICTS.join(", ")}.`;
+}
+
+/**
  * What each verdict compiles to, fixed by ADR-0015.
  *
  * The layer carries **numbers rather than verdicts** deliberately. Storing the
@@ -65,6 +90,23 @@ export const VERDICT_VALUE: Record<PatchingVerdict, number> = {
   "answer-rare": 0.6,
   "answer-common": 3.0,
 };
+
+/**
+ * A candidate's value once the standing verdicts apply: the verdict's sentinel
+ * when it patches one, and the measured prevalence otherwise. This is the
+ * sentinel-vs-measured rule `applyTierOverrides` runs at build time, read here
+ * rather than copied — the picker and the write route both re-derive a day's
+ * figures from the standing file *before* the next build, and a hand-copied
+ * version of this comparison in either would drift from the one the build
+ * actually runs without either side noticing.
+ */
+export function overriddenValue(
+  verdict: TierVerdict | undefined,
+  measured: number | undefined,
+): number | undefined {
+  if (verdict !== undefined && verdict !== "none") return VERDICT_VALUE[verdict];
+  return measured;
+}
 
 /** One line of the file: what was decided about one word, and when. */
 export interface TierOverrideRow {
@@ -91,8 +133,6 @@ export interface TierOverrideRow {
 
 /** The column header the file carries, and the order the columns are written in. */
 export const TIER_OVERRIDE_HEADER = "word,verdict,measured,decided,note";
-
-const VERDICTS: readonly string[] = ["bonus", "answer-rare", "answer-common", "none"];
 
 const COLUMNS = 5;
 
@@ -160,10 +200,8 @@ export function parseTierOverrides(text: string): TierOverrideRow[] {
     }
 
     const verdict = fields[1]!.trim();
-    if (!VERDICTS.includes(verdict)) {
-      throw new Error(
-        `Tier override "${line}": "${verdict}" is not a verdict. Expected one of ${VERDICTS.join(", ")}.`,
-      );
+    if (!isTierVerdict(verdict)) {
+      throw new Error(`Tier override "${line}": ${notAVerdict(verdict)}`);
     }
 
     const rawMeasured = fields[2]!.trim();
@@ -177,7 +215,7 @@ export function parseTierOverrides(text: string): TierOverrideRow[] {
 
     out.push({
       word: normaliseWord(fields[0]!),
-      verdict: verdict as TierVerdict,
+      verdict,
       measured,
       decided: fields[3]!.trim(),
       note: fields[4]!,

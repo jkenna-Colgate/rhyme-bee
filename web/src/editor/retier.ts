@@ -52,7 +52,7 @@
 import { measureAnswers } from "../../../src/curation.ts";
 import type { PuzzleFacts } from "../../../src/schedule.ts";
 import {
-  VERDICT_VALUE,
+  overriddenValue,
   type TierOverrideRow,
   type TierVerdict,
 } from "../../../src/tierOverride.ts";
@@ -156,17 +156,11 @@ export function retierDay(lists: DayLists, state: TierPickerState): RetieredDay 
   const standing = new Map(state.standing.map((row) => [row.word, row]));
   const candidatesOf = new Map(state.lookups.map((l) => [l.word, l.candidates]));
 
-  /**
-   * The value a candidate carries now: its verdict's sentinel if it has one, and
-   * otherwise its measured prevalence. A `none` verdict patches nothing at all —
-   * it neither writes a value nor removes one — so it falls through to the
-   * measurement, which is exactly what `applyTierOverrides` does at build time.
-   */
-  const valueOf = (candidate: string): number | undefined => {
-    const verdict = standing.get(candidate)?.verdict;
-    if (verdict !== undefined && verdict !== "none") return VERDICT_VALUE[verdict];
-    return state.measured[candidate];
-  };
+  // The value a candidate carries now, by the sentinel-vs-measured rule
+  // `overriddenValue` shares with the build and with the write route's own
+  // reach report.
+  const valueOf = (candidate: string): number | undefined =>
+    overriddenValue(standing.get(candidate)?.verdict, state.measured[candidate]);
 
   const retier = (entry: DayWord): RetieredWord => {
     const own = standing.get(entry.word);
