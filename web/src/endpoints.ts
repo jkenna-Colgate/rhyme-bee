@@ -4,11 +4,11 @@
  * constants in one place rather than a literal at each end.
  *
  * The first two are the deployed Worker's, served by Vite plugins in dev and by
- * `worker/index.ts` in production. The last is a *dev-only* path with no
- * deployed half at all: no Worker route answers it, and the plugin that does is
- * `apply: "serve"`. It is declared beside them because the reason to keep paths
- * in one file is to be able to read the whole set, and a path that only ever
- * exists in dev is exactly the one worth being able to see.
+ * `worker/index.ts` in production. The rest are *dev-only* paths with no
+ * deployed half at all: no Worker route answers them, and the plugins that do
+ * are `apply: "serve"`. They are declared beside the first two because the
+ * reason to keep paths in one file is to be able to read the whole set, and a
+ * path that only ever exists in dev is exactly the one worth being able to see.
  *
  * Everything not listed here falls through to the static assets — the game
  * itself is untouched by any of this.
@@ -54,3 +54,20 @@ export const EDITOR_DAY_PATH = "/api/editor/day";
  * (ADR-0015).
  */
 export const EDITOR_TIER_PATH = "/api/editor/tier";
+
+/**
+ * Where the Editor's Pass demotes a word — removes its wordhood, so a Proper
+ * Noun or an abbreviation stops being served as an ordinary Answer: `GET` for
+ * the entries standing in `data/demotions.txt`, `POST` to append one.
+ *
+ * No date, unlike the two paths above. A demotion is a fact about a word rather
+ * than about a day, and the same word demoted from Monday's screen is gone from
+ * every day that ever held it.
+ *
+ * Dev only, and structurally so — `editorDemotionPlugin` is `apply: "serve"`,
+ * so `configureServer` never runs in a production build and no deployed surface
+ * answers this path (ADR-0016). Like the Tier path, this one **writes** to
+ * `data/`; unlike it, what it writes is committed and a mistake is reversible by
+ * hand, which is exactly how a demotion is reversed.
+ */
+export const EDITOR_DEMOTION_PATH = "/api/editor/demotion";

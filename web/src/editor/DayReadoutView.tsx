@@ -27,19 +27,30 @@ import type {
   UnpinnableDayReadout,
   UnscheduledDateReadout,
 } from "../../../scripts/editorDay.ts";
+import { DEMOTION_REASONS, type DemotionReason } from "../../../src/demotions.ts";
 import type { DriftReason, PuzzleFacts } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
+import { demotedWords, withoutDemoted } from "./demote.ts";
 import { retierDay, type RetieredWord } from "./retier.ts";
+import type { Demoter } from "./useDemoter.ts";
 import type { TierPicker } from "./useTierPicker.ts";
 
-export function DayReadoutView({ readout, picker }: { readout: DayReadout; picker: TierPicker }) {
+export function DayReadoutView({
+  readout,
+  picker,
+  demoter,
+}: {
+  readout: DayReadout;
+  picker: TierPicker;
+  demoter: Demoter;
+}) {
   switch (readout.outcome) {
     case "unpinnable":
       return <Disagreement readout={readout} />;
     case "not-scheduled":
       return <OutsideTheRun readout={readout} />;
     case "day":
-      return <ScheduledDay readout={readout} picker={picker} />;
+      return <ScheduledDay readout={readout} picker={picker} demoter={demoter} />;
   }
 }
 
@@ -110,27 +121,57 @@ function OutsideTheRun({ readout }: { readout: UnscheduledDateReadout }) {
   );
 }
 
-function ScheduledDay({ readout, picker }: { readout: ScheduledDayReadout; picker: TierPicker }) {
+function ScheduledDay({
+  readout,
+  picker,
+  demoter,
+}: {
+  readout: ScheduledDayReadout;
+  picker: TierPicker;
+  demoter: Demoter;
+}) {
   const { drift } = readout;
-  // Which word's verdicts are showing. One at a time: the menu is a choice about
-  // one word, and two open at once would invite a click meant for the other.
+  // Which word's menu is showing. One at a time: the menu is a choice about one
+  // word, and two open at once would invite a click meant for the other.
   const [picking, setPicking] = useState<string | null>(null);
 
   // A state fetched for another day must not be applied to this one — the two
-  // requests are independent and either can land first.
+  // requests are independent and either can land first. The demotion list needs
+  // no such check: it names words rather than a day, so it is the same list
+  // whichever day is on screen.
   const state = picker.state?.date === readout.date ? picker.state : null;
+
+  // The demoted words come out **before** anything is re-tiered, because a
+  // demotion is not a Tier: it withdraws wordhood, so the word leaves the Puzzle
+  // rather than moving between its two lists, and re-tiering a word that is no
+  // longer in the day would be asking which Tier a non-word is.
+  const day = withoutDemoted(
+    { answers: readout.answers, bonusWords: readout.bonusWords },
+    readout.facts,
+    demotedWords(demoter.state?.standing ?? []),
+  );
   const shown =
     state === null
-      ? { answers: readout.answers.map(unjudged), bonusWords: readout.bonusWords.map(unjudged), facts: readout.facts }
-      : retierDay({ answers: readout.answers, bonusWords: readout.bonusWords }, state);
+      ? {
+          answers: day.lists.answers.map(unjudged),
+          bonusWords: day.lists.bonusWords.map(unjudged),
+          facts: day.facts,
+        }
+      : retierDay(day.lists, state);
 
-  // Judgements made since the artifact was built. The band verdicts below were
-  // decided against the figures as built, so this is also what makes them stale.
+  // Corrections made since the artifact was built — a Tier verdict or a
+  // demotion, since both move the figures. The band verdicts below were decided
+  // against the figures as built, so this is also what makes them stale.
   const moved = !sameFigures(shown.facts, readout.facts);
 
   const judge = (word: string, verdict: TierVerdict) => {
     setPicking(null);
     void picker.judge(word, verdict);
+  };
+
+  const demote = (word: string, reason: DemotionReason) => {
+    setPicking(null);
+    void demoter.demote(word, reason);
   };
 
   return (
@@ -196,10 +237,10 @@ function ScheduledDay({ readout, picker }: { readout: ScheduledDayReadout; picke
 
       {moved && (
         <p className="editor-moved">
-          Your judgements have moved this day. The built index still reads{" "}
+          Your corrections have moved this day. The built index still reads{" "}
           {readout.facts.answerCount} Answers · Max Score {readout.facts.maxScore} · Difficulty{" "}
           {readout.facts.difficulty.toFixed(4)}, so the band verdicts are withheld until{" "}
-          <code>npm run build:index</code> folds the overrides in.
+          <code>npm run build:index</code> folds them in.
         </p>
       )}
 
@@ -209,7 +250,17 @@ function ScheduledDay({ readout, picker }: { readout: ScheduledDayReadout; picke
         <p className="editor-write-failed">{picker.error} The day is unchanged.</p>
       )}
 
+      {/* A refused demotion is the louder of the two: the word is still being
+          served, and the editor has already moved on to the next one. */}
+      {demoter.error !== null && (
+        <p className="editor-write-failed">
+          {demoter.error} <strong>Nothing was demoted</strong> — the word is still a word.
+        </p>
+      )}
+
       {picker.recorded !== null && <Recorded recorded={picker.recorded} />}
+
+      {demoter.recorded !== null && <Demoted demotion={demoter.recorded} />}
 
       {/* Said once, above both lists, rather than inside every verdict menu:
           it is the same sentence for every word, and the lists are columns
@@ -219,7 +270,9 @@ function ScheduledDay({ readout, picker }: { readout: ScheduledDayReadout; picke
         Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}
         <code>data/tier-overrides.csv</code> on click, with the prevalence measured at that moment
         beside it, and governs the word itself plus any inflected form that has no prevalence row
-        of its own.
+        of its own. The same menu removes a word that is a name or is not a word at all: that is
+        written to <code>data/demotions.txt</code>, takes the word out of every Puzzle, and is
+        reversed only by hand.
       </p>
 
       <div className="editor-lists">
@@ -229,7 +282,8 @@ function ScheduledDay({ readout, picker }: { readout: ScheduledDayReadout; picke
           picking={picking}
           onPick={setPicking}
           onJudge={judge}
-          writing={picker.writing}
+          onDemote={demote}
+          writing={picker.writing ?? demoter.writing}
         />
         <WordList
           title="Bonus Words"
@@ -237,7 +291,8 @@ function ScheduledDay({ readout, picker }: { readout: ScheduledDayReadout; picke
           picking={picking}
           onPick={setPicking}
           onJudge={judge}
-          writing={picker.writing}
+          onDemote={demote}
+          writing={picker.writing ?? demoter.writing}
         />
       </div>
     </>
@@ -385,6 +440,7 @@ function WordList({
   picking,
   onPick,
   onJudge,
+  onDemote,
   writing,
 }: {
   title: string;
@@ -392,6 +448,7 @@ function WordList({
   picking: string | null;
   onPick: (word: string | null) => void;
   onJudge: (word: string, verdict: TierVerdict) => void;
+  onDemote: (word: string, reason: DemotionReason) => void;
   writing: string | null;
 }) {
   const sorted = [...words].sort((a, b) => a.word.localeCompare(b.word));
@@ -417,7 +474,9 @@ function WordList({
                 <Marks entry={entry} />
                 {writing === entry.word && <span className="editor-mark">writing…</span>}
               </button>
-              {picking === entry.word && <VerdictMenu entry={entry} onJudge={onJudge} />}
+              {picking === entry.word && (
+                <VerdictMenu entry={entry} onJudge={onJudge} onDemote={onDemote} />
+              )}
             </li>
           ))}
         </ul>
@@ -490,22 +549,121 @@ function Marks({ entry }: { entry: RetieredWord }) {
 function VerdictMenu({
   entry,
   onJudge,
+  onDemote,
 }: {
   entry: RetieredWord;
   onJudge: (word: string, verdict: TierVerdict) => void;
+  onDemote: (word: string, reason: DemotionReason) => void;
 }) {
   return (
-    <div className="editor-verdicts" role="group" aria-label={`Tier for ${entry.word}`}>
-      {VERDICTS.map((verdict) => (
+    <div className="editor-menu">
+      <div className="editor-verdicts" role="group" aria-label={`Tier for ${entry.word}`}>
+        {VERDICTS.map((verdict) => (
+          <button
+            type="button"
+            key={verdict}
+            className={`editor-verdict${
+              entry.verdict === verdict ? " editor-verdict-standing" : ""
+            }`}
+            onClick={() => onJudge(entry.word, verdict)}
+          >
+            {VERDICT_LABEL[verdict]}
+          </button>
+        ))}
+      </div>
+      <DemoteMenu entry={entry} onDemote={onDemote} />
+    </div>
+  );
+}
+
+// Every key `DEMOTION_REASONS` names is required here — miss one and this object
+// literal fails to compile, so a reason added to the type cannot become a button
+// with no text. The labels name the rejection rather than the file's spelling,
+// because that is what the editor is choosing: the second column of
+// `data/demotions.txt` is the message the player receives.
+const DEMOTION_LABEL: Record<DemotionReason, string> = {
+  "proper-noun": "It’s a name",
+  "not-a-known-word": "It’s not a word",
+};
+
+const DEMOTION_TITLE: Record<DemotionReason, string> = {
+  "proper-noun": "Rejected as a Proper Noun — the player is told it is a name",
+  "not-a-known-word": "Rejected as not a known word — no claim that it is anybody’s name",
+};
+
+/**
+ * The demote gesture's **second click**. The first was the word, which opened
+ * this menu; the reason is chosen here, and that pair is the whole gesture — so
+ * no single misclick can take a word's wordhood, and no click can take it
+ * without saying why.
+ *
+ * The two reasons are offered as peers rather than as one "remove" button with a
+ * reason asked for afterwards, and that is not a shortcut: a third click would
+ * be a confirmation step, and a confirmation step is exactly what the reason
+ * already is. The reason cannot be defaulted either, because that column *is*
+ * the rejection the player receives — a name that rhymes must be told it is a
+ * name (CONTEXT.md), and calling an abbreviation somebody's name would be its
+ * own small lie.
+ *
+ * There is deliberately **no un-demote**, here or anywhere in the tool. Undoing
+ * one is a hand edit of `data/demotions.txt`, which is a committed file small
+ * enough to open and one line long per entry. The asymmetry is the point: a
+ * demotion says a string is not a word of the game, and the cost of a wrong one
+ * is a single word missing from a single Puzzle, where the cost of a button that
+ * puts wordhood back is a click away from serving a name as an Answer again.
+ *
+ * A demoted word is not in either list, so nothing in this menu ever renders for
+ * one, and the two buttons never need a "standing" state the way the verdicts
+ * above them do.
+ */
+function DemoteMenu({
+  entry,
+  onDemote,
+}: {
+  entry: RetieredWord;
+  onDemote: (word: string, reason: DemotionReason) => void;
+}) {
+  return (
+    <div className="editor-demote" role="group" aria-label={`Remove ${entry.word}`}>
+      <span className="editor-demote-lede">Not a word to serve:</span>
+      {DEMOTION_REASONS.map((reason) => (
         <button
           type="button"
-          key={verdict}
-          className={`editor-verdict${entry.verdict === verdict ? " editor-verdict-standing" : ""}`}
-          onClick={() => onJudge(entry.word, verdict)}
+          key={reason}
+          className="editor-demote-reason"
+          title={DEMOTION_TITLE[reason]}
+          onClick={() => onDemote(entry.word, reason)}
         >
-          {VERDICT_LABEL[verdict]}
+          {DEMOTION_LABEL[reason]}
         </button>
       ))}
     </div>
+  );
+}
+
+/**
+ * The last demotion written.
+ *
+ * It says the word is gone from *every* Puzzle rather than from this one, which
+ * is the fact most easily missed: the word left the list on screen, but what was
+ * actually withdrawn is its wordhood, so it is out of every Rhyme Key family it
+ * ever appeared in and a player who submits it is now rejected.
+ *
+ * And it names the hand edit, because there is no un-demote to point at. An
+ * editor who has just mis-clicked needs to know where the line is, at the moment
+ * they need to know it.
+ */
+function Demoted({ demotion }: { demotion: { word: string; reason: DemotionReason } }) {
+  return (
+    <section className="editor-written">
+      <p>
+        Removed <strong>{demotion.word}</strong>. {DEMOTION_TITLE[demotion.reason]}. It is out of
+        every Puzzle, not just this one.
+      </p>
+      <p className="editor-reach">
+        Written to <code>data/demotions.txt</code>. There is no undo here: delete the line to put
+        the word back.
+      </p>
+    </section>
   );
 }

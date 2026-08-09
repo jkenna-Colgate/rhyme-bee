@@ -349,15 +349,21 @@ code {
   font-style: italic;
 }
 
+/* The menu one click on a word opens: the four Tier verdicts, and beneath them
+   the two demote reasons. One frame, because it is one choice about one word —
+   the second click lands somewhere in here whichever it turns out to be. */
+.editor-menu {
+  margin: 0.35rem 0 0.6rem;
+  background: #fff;
+  border: 1px solid #cdc6b6;
+  border-radius: 5px;
+}
+
 .editor-verdicts {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  margin: 0.35rem 0 0.6rem;
   padding: 0.5rem;
-  background: #fff;
-  border: 1px solid #cdc6b6;
-  border-radius: 5px;
 }
 
 .editor-verdict {
@@ -380,6 +386,42 @@ code {
 .editor-verdict-standing {
   border-color: #857e70;
   font-weight: 600;
+}
+
+/* The demote half of the menu. Set apart from the verdicts above it by a rule
+   and a warmer ground rather than by a red button: taking a word's wordhood is
+   a different act from choosing its Tier, not a more dangerous version of one,
+   and it is reversed by hand rather than by a second click here. */
+.editor-demote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.5rem;
+  border-top: 1px solid #e3ded2;
+  background: #fbf6ef;
+  border-radius: 0 0 4px 4px;
+}
+
+.editor-demote-lede {
+  font-size: 0.78rem;
+  color: #857e70;
+}
+
+.editor-demote-reason {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.28rem 0.45rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  color: #7a5a2e;
+  cursor: pointer;
+}
+
+.editor-demote-reason:hover {
+  background: #f6ecdd;
+  border-color: #bfa982;
 }
 
 .editor-lists-note {

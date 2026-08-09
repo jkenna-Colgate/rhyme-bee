@@ -10,6 +10,7 @@ import {
 import { deployHeadersPlugin } from "./deployHeadersPlugin.ts";
 import { indexAssetPlugin } from "./indexAssetPlugin.ts";
 import { editorDayPlugin } from "./editorDayPlugin.ts";
+import { editorDemotionPlugin } from "./editorDemotionPlugin.ts";
 import { editorTierPlugin } from "./editorTierPlugin.ts";
 import { feedbackPlugin } from "./feedbackPlugin.ts";
 import { supplementPlugin } from "./supplementPlugin.ts";
@@ -53,17 +54,19 @@ export default defineConfig(({ command }) => {
 
   return {
     root: rootDir,
-    // `feedbackPlugin`, `supplementPlugin`, `editorDayPlugin` and
-    // `editorTierPlugin` are dev-only (`apply: "serve"`); `deployHeadersPlugin`
-    // and `indexAssetPlugin` are build-only. `editorTierPlugin` is the only one
-    // that writes to `data/`, which is why the build's inputs are named below
-    // rather than defaulted.
+    // `feedbackPlugin`, `supplementPlugin`, `editorDayPlugin`,
+    // `editorTierPlugin` and `editorDemotionPlugin` are dev-only
+    // (`apply: "serve"`); `deployHeadersPlugin` and `indexAssetPlugin` are
+    // build-only. The last two editor plugins are the only ones that write to
+    // `data/`, which is why the build's inputs are named below rather than
+    // defaulted.
     plugins: [
       react(),
       deployHeadersPlugin(),
       indexAssetPlugin(distDataDir),
       editorDayPlugin(),
       editorTierPlugin(),
+      editorDemotionPlugin(),
       feedbackPlugin(),
       supplementPlugin(),
     ],

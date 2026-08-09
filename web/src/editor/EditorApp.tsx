@@ -14,18 +14,24 @@
  * describing different days, which is why `DayReadoutView` checks the two dates
  * again before it applies one to the other.
  *
- * There is still no demote, no add and no Submit: those are #160–#162, and the
- * screen they land on is this one.
+ * The demote gesture is fetched once and not per day, unlike the picker: a
+ * demotion takes a word's wordhood, which is a property of the word rather than
+ * of a date, so the standing list is the same on every day the editor visits.
+ *
+ * There is still no add and no Submit: those are #161–#162, and the screen they
+ * land on is this one.
  */
 
 import { useState } from "react";
 import { useDayReadout } from "./useDayReadout.ts";
+import { useDemoter } from "./useDemoter.ts";
 import { useTierPicker } from "./useTierPicker.ts";
 import { DayReadoutView } from "./DayReadoutView.tsx";
 
 export function EditorApp() {
   const { readout, loading, error, goTo } = useDayReadout();
   const picker = useTierPicker(readout?.date ?? null);
+  const demoter = useDemoter();
   // The control shows the date the editor last entered in full, and otherwise
   // the day on screen — which is how the endpoint's choice of tomorrow becomes
   // visible without the browser having decided it.
@@ -65,7 +71,7 @@ export function EditorApp() {
           like a failure, and a day's readout arrives in milliseconds. */}
       {readout !== null && (
         <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <DayReadoutView readout={readout} picker={picker} />
+          <DayReadoutView readout={readout} picker={picker} demoter={demoter} />
         </div>
       )}
 
