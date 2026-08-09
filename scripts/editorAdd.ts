@@ -516,11 +516,31 @@ function printWordOutcome(w: WordOutcome, target: RhymeKey): void {
   }
 }
 
-/** The Rhyme Key an add is aimed at, taken from a scheduled day. */
-export function targetFor(schedule: Schedule, date: string): AddTarget {
+/**
+ * The Rhyme Key an add is aimed at, taken from a scheduled day, or `null` when
+ * the run does not cover the date.
+ *
+ * Split out of `targetFor` below because a date outside the run is a different
+ * event to the two surfaces that ask. To a command it is the end of the run —
+ * `fail` prints and exits, and there is nothing else the process was going to
+ * do. To the dev server behind the web mode it is one request to refuse: the
+ * editor's next act is to type a different date, and a `process.exit(1)` would
+ * take the server down and the player's shell with it, which is the same trap
+ * `editorDayPlugin.ts` avoids by not calling `loadSchedule`. So the lookup is
+ * here, without an opinion about what a caller does when it comes back empty,
+ * and each surface supplies its own.
+ */
+export function targetIn(schedule: Schedule, date: string): AddTarget | null {
   const day = schedule.days.find((d) => d.date === date);
-  if (day === undefined) {
+  if (day === undefined) return null;
+  return { target: day.rhymeKey, provenance: `${day.date}, the ${day.seed} Puzzle` };
+}
+
+/** The Rhyme Key an add is aimed at, for a command: a date off the run is fatal. */
+export function targetFor(schedule: Schedule, date: string): AddTarget {
+  const aim = targetIn(schedule, date);
+  if (aim === null) {
     fail(`No Daily Puzzle scheduled for ${date}. Pass --rhymeKey to add against a key directly.`);
   }
-  return { target: day.rhymeKey, provenance: `${day.date}, the ${day.seed} Puzzle` };
+  return aim;
 }

@@ -472,3 +472,183 @@ code {
   font-size: 0.88rem;
   color: #8e2a1f;
 }
+
+/* --- The add queue and Submit (#161) --------------------------------------
+   Set on its own panel rather than styled like the day's figures, because it
+   is not part of the readout: what is drawn here is a list the browser is
+   holding, and it sits between the figures and the word lists so the editor
+   can type a gap the instant they read one. */
+.editor-add {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 1rem 1rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-add h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.editor-add-note {
+  margin: 0.4rem 0 0.75rem;
+  font-size: 0.8rem;
+  color: #6b6558;
+}
+
+.editor-add-entry {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.editor-add-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b6558;
+}
+
+.editor-add-field input {
+  font: inherit;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid #cdc6b6;
+  border-radius: 4px;
+  background: #fff;
+  min-width: 14rem;
+}
+
+.editor-add-queue {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.32rem 0.6rem;
+  background: #f4f1e9;
+  border: 1px solid #cdc6b6;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-add-queue:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* A word refused before it cost anything. Quiet rather than alarming: nothing
+   was written, and the editor's next act is simply to retype it. */
+.editor-add-refused {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #8e5a1f;
+}
+
+.editor-queued {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  align-items: center;
+}
+
+/* The whole chip is the remove button: taking a mistyped word back out is what
+   makes queueing cheap, so it costs the same one click that queueing did. */
+.editor-queued-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.25rem 0.5rem;
+  background: #f4f1e9;
+  border: 1px solid #cdc6b6;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #1c1b18;
+}
+
+.editor-queued-word:hover:not(:disabled) {
+  background: #fdecec;
+  border-color: #c0392b;
+  color: #8e2a1f;
+}
+
+.editor-queued-word:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.editor-queued-remove {
+  color: #857e70;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.editor-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.editor-add-submit {
+  margin-top: 0.9rem;
+}
+
+.editor-submit {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  background: #2f5d3a;
+  border: 1px solid #2f5d3a;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.editor-submit:disabled {
+  background: #e7e3d9;
+  border-color: #cdc6b6;
+  color: #857e70;
+  cursor: default;
+}
+
+/* The seconds tick here while one request is in flight, which is what makes a
+   Submit that is legitimately slow legible as running rather than hung. */
+.editor-add-inflight {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #6b6558;
+}
+
+.editor-add-outcomes {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.editor-add-outcome {
+  padding: 0.2rem 0;
+  border-top: 1px solid #d8e3d4;
+}
+
+/* A refused name and a word that already reads are answers, not failures, so
+   neither is coloured as one; only a deferral is set apart, because it is the
+   line that names work still to do. */
+.editor-add-deferred {
+  color: #7a5a2e;
+}
+
+.editor-add-buildlog {
+  display: block;
+  margin-top: 0.4rem;
+  white-space: pre-wrap;
+  font-size: 0.78rem;
+}

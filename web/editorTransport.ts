@@ -1,16 +1,16 @@
 /**
- * The transport the three Editor's Pass routes share: writing a JSON reply, and
+ * The transport the Editor's Pass routes share: writing a JSON reply, and
  * reading a request body under a cap. `editorDayPlugin.ts`, `editorTierPlugin.ts`
  * and `editorDemotionPlugin.ts` each carried their own copy of both — the day
  * route's `readCappedBody` even discarded the body it read, since a `GET` has
  * none to use — and by the third copy the duplication stopped being a coincidence
  * three routes could each reasonably arrive at and started being one function
- * not written yet. Issues #161–#163 add more routes to this same shape, so it is
- * shared before a fourth copy makes the case again.
+ * not written yet. It was shared before a fourth copy could make the case again,
+ * and `editorAddPlugin.ts` (#161) is that fourth route, written against this.
  *
  * The **cap itself** stays out of here, on purpose, and stays declared in each
  * route's own request module (`editorDayRequest.ts`, `editorTierRequest.ts`,
- * `editorDemotionRequest.ts`) — each with a doc comment arguing that route's
+ * `editorDemotionRequest.ts`, `editorAddRequest.ts`) — each with a doc comment arguing that route's
  * ceiling is sized to what that route carries, not to what a caller might send,
  * and that tying two routes' caps together would mean a change to either being
  * reasoned about as a change to both. That argument is about the **constants**;

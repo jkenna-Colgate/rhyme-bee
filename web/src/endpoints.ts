@@ -71,3 +71,22 @@ export const EDITOR_TIER_PATH = "/api/editor/tier";
  * hand, which is exactly how a demotion is reversed.
  */
 export const EDITOR_DEMOTION_PATH = "/api/editor/demotion";
+
+/**
+ * Where the Editor's Pass submits its queued adds: `POST` alone, carrying the
+ * day and the words. It is the one path here with **no `GET`**, and that is the
+ * shape of the feature rather than an omission — the queue lives in the browser
+ * and costs nothing until Submit (#161), so there is no server-side list of
+ * pending adds for a read to return.
+ *
+ * One request does three things, because they are one act: the words are given
+ * readings and written, the Rhyme Index is rebuilt, and the day is re-read from
+ * the artifact that rebuild produced. Splitting them would leave an order for
+ * the editor to remember and a half-done pass to remember it in.
+ *
+ * Dev only, and structurally so — `editorAddPlugin` is `apply: "serve"`, so
+ * `configureServer` never runs in a production build and no deployed surface
+ * answers this path (ADR-0016). It is the heaviest of the four to leave
+ * reachable: it writes to `data/`, spawns a process and rewrites `dist-data/`.
+ */
+export const EDITOR_ADD_PATH = "/api/editor/add";

@@ -1,0 +1,343 @@
+/**
+ * The add queue and Submit, rendered to a screen — the half of the Editor's Pass
+ * that *corrects* the day rather than reads it (#161).
+ *
+ * Its own file rather than another section of `DayReadoutView.tsx`, which is
+ * already the longest module on this screen: what is drawn here is not a view of
+ * the day at all. It is a list the browser is holding, and it happens to sit
+ * beside a day because the day is what supplies the Rhyme Key.
+ *
+ * It renders above the two word lists on purpose. The pass is conducted by
+ * running the day's Answers and Bonus Words against a third-party rhyme list in
+ * another window, and a day can hold hundreds of words — a queue below them
+ * would be off the bottom of the screen at exactly the moment the editor spots
+ * the gap and wants to type it.
+ *
+ * The key is shown but never typed. Every queued word is aimed at the day's own
+ * Rhyme Key, resolved from `data/schedule.json` by the endpoint; showing it is
+ * how the editor can *check* the aim, and there is deliberately no control that
+ * changes it.
+ */
+
+import { useState } from "react";
+import type { DeferredOutcome, WordOutcome } from "../../../scripts/editorAdd.ts";
+import type { RhymeKey } from "../../../src/phonology.ts";
+import { MAX_QUEUED_WORDS, type AddSubmitResult } from "./add.ts";
+import type { Adder } from "./useAdder.ts";
+
+/**
+ * The worst case one word can cost, in milliseconds: the bound
+ * `scripts/editorAdd.ts` puts on the agent it asks to author a reading no
+ * compound split reaches. Restated here rather than imported because importing
+ * it would pull the module that spawns processes into the browser bundle; it is
+ * used only to say how long a Submit *might* take, so a copy that drifted would
+ * cost an inaccurate sentence rather than an incorrect act.
+ */
+const WORST_CASE_MS_PER_WORD = 60_000;
+
+export function AddQueueView({
+  date,
+  rhymeKey,
+  adder,
+}: {
+  date: string;
+  rhymeKey: RhymeKey;
+  adder: Adder;
+}) {
+  const [typed, setTyped] = useState("");
+  const { queue, submitting } = adder;
+
+  const queueTyped = () => {
+    adder.queueWord(typed);
+    // Cleared unconditionally, including on a refusal. The refusal names the
+    // word it refused, so the field is not where the editor reads what went
+    // wrong, and leaving a rejected word in it means the next word is typed
+    // onto the end of it.
+    setTyped("");
+  };
+
+  return (
+    <section className="editor-add">
+      <h3>
+        Add missing words{" "}
+        <span className="editor-muted">
+          aimed at <code>{rhymeKey}</code>
+        </span>
+      </h3>
+
+      <p className="editor-add-note">
+        Words queue here and cost nothing until you submit. Submit gives each queued word a reading,
+        writes what it can to <code>data/supplement.dict</code>, rebuilds the Rhyme Index and
+        re-reads this day from the artifact that rebuild produced. A word that is a name is refused,
+        and one that already reads correctly is left alone. It writes no Tier verdict and no
+        demotion — those are on disk already, made when you clicked them.
+      </p>
+
+      <form
+        className="editor-add-entry"
+        onSubmit={(event) => {
+          event.preventDefault();
+          queueTyped();
+        }}
+      >
+        <label className="editor-add-field">
+          Word
+          <input
+            type="text"
+            value={typed}
+            autoComplete="off"
+            spellCheck={false}
+            disabled={submitting}
+            onChange={(event) => setTyped(event.target.value)}
+          />
+        </label>
+        <button type="submit" className="editor-add-queue" disabled={submitting || typed === ""}>
+          Queue
+        </button>
+      </form>
+
+      {adder.error !== null && <p className="editor-add-refused">{adder.error}</p>}
+
+      <Queued adder={adder} />
+
+      <div className="editor-add-submit">
+        <button
+          type="button"
+          className="editor-submit"
+          // Disabled on an empty queue, so a night of Tier judgements alone
+          // never pays for a rebuild it does not need. The endpoint refuses an
+          // empty batch too — a rule only a button enforces is not a rule.
+          disabled={queue.length === 0 || submitting}
+          onClick={() => void adder.submit(date)}
+        >
+          {submitting ? "Submitting…" : submitLabel(queue.length)}
+        </button>
+        {submitting && <InFlight count={queue.length} elapsedMs={adder.elapsedMs} />}
+      </div>
+
+      {adder.submitError !== null && <p className="editor-write-failed">{adder.submitError}</p>}
+
+      {adder.result !== null && <Submitted result={adder.result} />}
+    </section>
+  );
+}
+
+function submitLabel(queued: number): string {
+  if (queued === 0) return "Submit";
+  return queued === 1 ? "Submit 1 word" : `Submit ${queued} words`;
+}
+
+/**
+ * The queue itself. Every word is its own remove button, because taking a
+ * mistyped word back out is the gesture that makes queueing cheap, and it should
+ * cost the same one click on the word that queueing it did.
+ *
+ * In the order typed rather than alphabetical, unlike the day's word lists: this
+ * list is short and the editor is looking for the word they just entered, which
+ * is the last one.
+ */
+function Queued({ adder }: { adder: Adder }) {
+  if (adder.queue.length === 0) {
+    return (
+      <p className="editor-muted">
+        Nothing queued. Type a word the day is missing — nothing is written until you submit.
+      </p>
+    );
+  }
+  return (
+    <ul className="editor-queued">
+      {adder.queue.map((word) => (
+        <li key={word}>
+          <button
+            type="button"
+            className="editor-queued-word"
+            title={`Take ${word} back out of the queue`}
+            disabled={adder.submitting}
+            onClick={() => adder.unqueueWord(word)}
+          >
+            <span className="editor-queued-text">{word}</span>
+            <span className="editor-queued-remove" aria-hidden="true">
+              ×
+            </span>
+            <span className="editor-visually-hidden">remove</span>
+          </button>
+        </li>
+      ))}
+      {adder.queue.length >= MAX_QUEUED_WORDS && (
+        <li className="editor-muted">Queue is full — submit these, then queue the rest.</li>
+      )}
+    </ul>
+  );
+}
+
+/**
+ * What a Submit shows while it runs.
+ *
+ * A Submit is one request that can legitimately take minutes: a word no compound
+ * split reaches is handed to an agent that is given up to a minute, and those
+ * waits are serial. A disabled button on its own would be indistinguishable from
+ * a hung tab at exactly that moment, so this says three things instead — what is
+ * happening, how long it has been happening, and the worst case it is running
+ * against. The seconds tick, which is what makes "slow" legible as "running".
+ *
+ * The bound is stated as a maximum and not as an estimate, because it is one:
+ * nearly every word is composed from a compound split in milliseconds and never
+ * reaches the agent at all. Quoting the typical case would be the number that
+ * makes the slow batch feel broken.
+ */
+function InFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
+  const worstCaseMinutes = Math.ceil((count * WORST_CASE_MS_PER_WORD) / 60_000);
+  return (
+    <p className="editor-add-inflight" role="status">
+      <strong>{Math.floor(elapsedMs / 1000)}s</strong> — writing {count === 1 ? "the word" : "the words"},
+      then rebuilding the Rhyme Index (about 2 seconds). A word no compound split reaches waits on an
+      agent for up to a minute, so this can run to {worstCaseMinutes}{" "}
+      {worstCaseMinutes === 1 ? "minute" : "minutes"}. Nothing is lost if it does: every word is
+      written or recorded as deferred.
+    </p>
+  );
+}
+
+/**
+ * What became of the batch: the counts first, then every word with its own
+ * outcome, in the order they were typed.
+ *
+ * The counts are the ticket's own two — written and deferred — and they are read
+ * off the outcome rather than tracked while it ran, because the outcome is the
+ * record of what reached the disk and a count kept anywhere else would be a
+ * second opinion about a write.
+ *
+ * Every word gets a line, including the ones that were neither written nor
+ * deferred. A word refused as a name and a word that already reads correctly are
+ * both *answers* rather than failures, and a batch that reported only its
+ * writes would leave the editor to work out which of the words they typed had
+ * simply vanished.
+ */
+function Submitted({ result }: { result: AddSubmitResult }) {
+  const { outcome, rebuilt, readout } = result;
+  const written = outcome.words.filter((w) => w.outcome === "written").length;
+  const deferred = outcome.words.filter((w) => w.outcome === "deferred").length;
+
+  return (
+    <section className="editor-written">
+      <p>
+        <strong>{written}</strong> {written === 1 ? "reading" : "readings"} written to{" "}
+        <code>data/supplement.dict</code>, <strong>{deferred}</strong>{" "}
+        {deferred === 1 ? "word" : "words"} deferred.
+      </p>
+
+      {rebuilt.ok ? (
+        readout === null ? (
+          <p className="editor-write-failed">
+            The Rhyme Index was rebuilt, but this day could not be read back from it. The words above
+            are written; reload to see the day.
+          </p>
+        ) : (
+          <p className="editor-reach">
+            The Rhyme Index was rebuilt and this day re-read from it — the figures above are the new
+            artifact’s.
+          </p>
+        )
+      ) : (
+        <p className="editor-write-failed">
+          The words above are written, but <code>npm run build:index</code> failed, so this day is
+          still the one from before them. Run it yourself and reload.
+          <br />
+          <code className="editor-add-buildlog">{rebuilt.error}</code>
+        </p>
+      )}
+
+      <ul className="editor-add-outcomes">
+        {outcome.words.map((word) => (
+          <li key={word.word} className={`editor-add-outcome editor-add-${word.outcome}`}>
+            <strong>{word.word}</strong> — <WordOutcomeLine word={word} target={outcome.target} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * One word's outcome in a sentence.
+ *
+ * The five cases are the ones `scripts/editorAdd.ts` distinguishes, and each is
+ * said in the terms that module argues for: a name is *refused* rather than
+ * deferred, because deferring says "later" and a name is never coming back; a
+ * word that already reads on the key is confirmation and a word that reads on
+ * another key is a correction, which is why the two are not one sentence about
+ * "already known".
+ */
+function WordOutcomeLine({ word, target }: { word: WordOutcome; target: RhymeKey }) {
+  switch (word.outcome) {
+    case "refused-name":
+      return (
+        <>refused: it is a Proper Noun, and a Proper Noun stays one however well it rhymes.</>
+      );
+    case "already-reads":
+      return (
+        <>
+          already reads on <code>{target}</code> — it is in the Puzzle already, nothing to add.
+        </>
+      );
+    case "reads-on-another-key":
+      return (
+        <>
+          already has a reading that does not rhyme, so this is a correction rather than an add and
+          nothing was written. Overriding an upstream pronunciation stays a hand edit of{" "}
+          <code>data/supplement.dict</code>.{" "}
+          <span className="editor-muted">
+            {word.readings.map((reading) => reading.phonemes.join(" ")).join("  ·  ")}
+          </span>
+        </>
+      );
+    case "written":
+      return (
+        <>
+          written as <code>{word.phonemes.join(" ")}</code>
+          {word.composed === null ? (
+            <> — no compound split reached the key, so an agent authored it and it was verified.</>
+          ) : (
+            <>
+              {" "}
+              — composed from {word.composed.head.word} + {word.composed.tail.word}.
+            </>
+          )}
+        </>
+      );
+    case "deferred":
+      return <Deferral word={word} target={target} />;
+    default: {
+      const exhaustive: never = word;
+      throw new Error(`unreachable word outcome: ${JSON.stringify(exhaustive)}`);
+    }
+  }
+}
+
+/**
+ * Why one word was deferred.
+ *
+ * Each deferral names its own reason, which is the ticket's requirement and not
+ * a nicety: a missing agent and a reading that failed verification are the same
+ * "no reading written" to the file and completely different facts to the editor.
+ * The first is a tooling problem to fix and retry; the second is a word the
+ * composition genuinely cannot reach, and the proposal is shown so the miss is
+ * inspectable rather than merely counted.
+ */
+function Deferral({ word, target }: { word: DeferredOutcome; target: RhymeKey }) {
+  if (word.reason === "agent-unavailable") {
+    return (
+      <>
+        deferred: no compound split reached <code>{target}</code> and the agent did not answer.
+        Recorded in <code>data/deferred-readings.jsonl</code> for a later pass.
+      </>
+    );
+  }
+  return (
+    <>
+      deferred: no compound split reached <code>{target}</code>, and the agent proposed{" "}
+      <code>{word.proposed?.join(" ")}</code>, which does not. Recorded in{" "}
+      <code>data/deferred-readings.jsonl</code> for a later pass.
+    </>
+  );
+}

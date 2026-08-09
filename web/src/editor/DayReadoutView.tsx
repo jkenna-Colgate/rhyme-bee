@@ -30,8 +30,10 @@ import type {
 import { DEMOTION_REASONS, type Demotion, type DemotionReason } from "../../../src/demotions.ts";
 import type { DriftReason, PuzzleFacts } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
+import { AddQueueView } from "./AddQueueView.tsx";
 import { demotedWords, showsDemotionReassurance, withoutDemoted } from "./demote.ts";
 import { retierDay, type RetieredWord } from "./retier.ts";
+import type { Adder } from "./useAdder.ts";
 import type { Demoter } from "./useDemoter.ts";
 import type { TierPicker } from "./useTierPicker.ts";
 
@@ -39,10 +41,12 @@ export function DayReadoutView({
   readout,
   picker,
   demoter,
+  adder,
 }: {
   readout: DayReadout;
   picker: TierPicker;
   demoter: Demoter;
+  adder: Adder;
 }) {
   switch (readout.outcome) {
     case "unpinnable":
@@ -50,7 +54,7 @@ export function DayReadoutView({
     case "not-scheduled":
       return <OutsideTheRun readout={readout} />;
     case "day":
-      return <ScheduledDay readout={readout} picker={picker} demoter={demoter} />;
+      return <ScheduledDay readout={readout} picker={picker} demoter={demoter} adder={adder} />;
   }
 }
 
@@ -125,10 +129,12 @@ function ScheduledDay({
   readout,
   picker,
   demoter,
+  adder,
 }: {
   readout: ScheduledDayReadout;
   picker: TierPicker;
   demoter: Demoter;
+  adder: Adder;
 }) {
   const { drift } = readout;
   // Which word's menu is showing. One at a time: the menu is a choice about one
@@ -283,6 +289,13 @@ function ScheduledDay({
           it is the same sentence for every word, and the lists are columns
           narrow enough that a paragraph in one of them squeezes the buttons
           it was meant to explain. */}
+      {/* Above the lists, not below: a day can hold hundreds of words, and the
+          moment the editor spots a gap is the moment they want somewhere to
+          type it. The queue is aimed at this day's Rhyme Key, which is why it
+          is drawn inside the scheduled-day case and nowhere else — the other
+          two readouts have no key to aim at. */}
+      <AddQueueView date={readout.date} rhymeKey={readout.rhymeKey} adder={adder} />
+
       <p className="editor-lists-note">
         Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}
         <code>data/tier-overrides.csv</code> on click, with the prevalence measured at that moment

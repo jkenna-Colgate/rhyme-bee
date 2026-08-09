@@ -28,6 +28,17 @@ export interface DayReadoutState {
   error: string | null;
   /** Jump to a day. `null` asks the endpoint for the day it opens on. */
   goTo: (date: string | null) => void;
+  /**
+   * Put a readout some other request produced on screen. Submit's is the one:
+   * it re-reads the day from the index it has just rebuilt and answers with it
+   * in the same response, so the fresh day arrives here rather than through a
+   * second `GET` that would leave a window showing the day from before the pass.
+   *
+   * It does not move the day the screen is *on* — the readout names the date it
+   * was built for, and Submit only ever builds the day already open — so no
+   * fetch is triggered and the date control does not flicker.
+   */
+  show: (readout: DayReadout) => void;
 }
 
 export function useDayReadout(): DayReadoutState {
@@ -74,5 +85,6 @@ export function useDayReadout(): DayReadoutState {
   }, [date]);
 
   const goTo = useCallback((next: string | null) => setDate(next), []);
-  return { readout, loading, error, goTo };
+  const show = useCallback((next: DayReadout) => setReadout(next), []);
+  return { readout, loading, error, goTo, show };
 }

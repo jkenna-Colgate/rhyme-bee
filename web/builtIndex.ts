@@ -56,3 +56,26 @@ export function builtKnownnessThreshold(): number {
   built ??= load();
   return built.knownnessThreshold;
 }
+
+/**
+ * Drop the loaded copy, so the next caller reads the artifact off disk again.
+ *
+ * This exists for exactly one caller — `rebuildIndex` (`web/indexRebuild.ts`),
+ * which is what Submit runs — and it is the difference between that feature
+ * working and appearing to. The cache above is a `let` in a module the dev
+ * server keeps for its whole lifetime, so a rebuild that left it standing would
+ * hand the re-read the *superseded* index: every figure on the day would come
+ * from the artifact as it was before the adds, look entirely plausible, and be
+ * wrong. Worse, the artifact is content-addressed (`scripts/indexArtifact.ts`),
+ * so the file the stale copy was parsed from has usually been swept off disk by
+ * the rebuild that replaced it — the screen would be reporting an index that no
+ * longer exists.
+ *
+ * Forgetting rather than eagerly reloading: the fifteen megabytes cost half a
+ * second to parse and the next request pays it, which is the request that
+ * actually needs the index. A reload here would pay it inside the rebuild, on
+ * behalf of a caller that may be about to jump to another day anyway.
+ */
+export function forgetBuiltIndex(): void {
+  built = undefined;
+}

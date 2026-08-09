@@ -1,6 +1,8 @@
 /**
- * The editor's screen: the day, the one control that changes which day, and the
- * Tier picker over the words on it.
+ * The editor's screen: the day, the one control that changes which day, the Tier
+ * picker over the words on it, and the queue of words the read turned up as
+ * missing — a read and the corrections it produces, which is what an Editor's
+ * Pass is (ADR-0016).
  *
  * It opens on tomorrow — the endpoint's default, asked for by naming no date at
  * all — because tomorrow is the day an Editor's Pass is nearly always about.
@@ -18,20 +20,31 @@
  * demotion takes a word's wordhood, which is a property of the word rather than
  * of a date, so the standing list is the same on every day the editor visits.
  *
- * There is still no add and no Submit: those are #161–#162, and the screen they
- * land on is this one.
+ * The add queue is neither. It is not fetched at all — it lives in the browser
+ * and costs nothing until Submit (#161) — and it is deliberately **not** reset
+ * when the day changes, because a queue keyed to the day would be a queue lost
+ * every time an editor checked a neighbouring day mid-pass. Submit names the day
+ * on screen at the moment it is pressed, which is the day the words were typed
+ * against, so the aim is taken from the click rather than from a queue that has
+ * to remember where it came from.
+ *
+ * `show` is how Submit's re-read lands: the endpoint answers with the day read
+ * off the index it has just rebuilt, and the readout is handed to the hook that
+ * owns the day rather than kept a second time by the one that submitted.
  */
 
 import { useState } from "react";
+import { useAdder } from "./useAdder.ts";
 import { useDayReadout } from "./useDayReadout.ts";
 import { useDemoter } from "./useDemoter.ts";
 import { useTierPicker } from "./useTierPicker.ts";
 import { DayReadoutView } from "./DayReadoutView.tsx";
 
 export function EditorApp() {
-  const { readout, loading, error, goTo } = useDayReadout();
+  const { readout, loading, error, goTo, show } = useDayReadout();
   const picker = useTierPicker(readout?.date ?? null);
   const demoter = useDemoter();
+  const adder = useAdder(show);
   // The control shows the date the editor last entered in full, and otherwise
   // the day on screen — which is how the endpoint's choice of tomorrow becomes
   // visible without the browser having decided it.
@@ -71,7 +84,7 @@ export function EditorApp() {
           like a failure, and a day's readout arrives in milliseconds. */}
       {readout !== null && (
         <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <DayReadoutView readout={readout} picker={picker} demoter={demoter} />
+          <DayReadoutView readout={readout} picker={picker} demoter={demoter} adder={adder} />
         </div>
       )}
 
