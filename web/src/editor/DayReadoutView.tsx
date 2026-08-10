@@ -4,10 +4,12 @@
  * it to a terminal (ADR-0016).
  *
  * **No figure on this page is this page's own.** Every number is either read
- * straight off the readout Node computed, or — once the Tier picker has moved a
- * word — recomputed by `retierDay`, which calls the engine's own `measureAnswers`
- * over the rearranged list. Neither path restates the scoring formula, the rare
- * cutoff or the Difficulty ratio here. Whether the day is inside its size band is
+ * straight off the readout Node computed, or — once a correction has moved the
+ * day — recomputed by `correctedDay`, whose two halves both call the engine's
+ * own `measureAnswers` over the rearranged list. Neither path restates the
+ * scoring formula, the rare cutoff or the Difficulty ratio here. The composition
+ * itself is that module's too, so this file decides none of it: what arrives
+ * here is a day and a `moved` flag. Whether the day is inside its size band is
  * *not* recomputed at all: that comparison is `checkDayDrift`'s, and the one case
  * where it would go stale — figures moved by a judgement the index has not been
  * rebuilt with — is answered by withdrawing the verdict rather than by guessing
@@ -22,17 +24,17 @@
 import { useState } from "react";
 import type {
   DayReadout,
-  DayWord,
   ScheduledDayReadout,
   UnpinnableDayReadout,
   UnscheduledDateReadout,
 } from "../../../scripts/editorDay.ts";
 import { DEMOTION_REASONS, type Demotion, type DemotionReason } from "../../../src/demotions.ts";
-import type { DriftReason, PuzzleFacts } from "../../../src/schedule.ts";
+import type { DriftReason } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
 import { AddQueueView } from "./AddQueueView.tsx";
-import { demotedWords, showsDemotionReassurance, withoutDemoted } from "./demote.ts";
-import { retierDay, type RetieredWord } from "./retier.ts";
+import { correctedDay } from "./correctedDay.ts";
+import { showsDemotionReassurance } from "./demote.ts";
+import type { RetieredWord } from "./retier.ts";
 import type { EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 import type { Demoter } from "./useDemoter.ts";
@@ -182,34 +184,13 @@ function ScheduledDay({
   // word, and two open at once would invite a click meant for the other.
   const [picking, setPicking] = useState<string | null>(null);
 
-  // A state fetched for another day must not be applied to this one — the two
-  // requests are independent and either can land first. The demotion list needs
-  // no such check: it names words rather than a day, so it is the same list
-  // whichever day is on screen.
-  const state = picker.state?.date === readout.date ? picker.state : null;
-
-  // The demoted words come out **before** anything is re-tiered, because a
-  // demotion is not a Tier: it withdraws wordhood, so the word leaves the Puzzle
-  // rather than moving between its two lists, and re-tiering a word that is no
-  // longer in the day would be asking which Tier a non-word is.
-  const day = withoutDemoted(
-    { answers: readout.answers, bonusWords: readout.bonusWords },
-    readout.facts,
-    demotedWords(demoter.state?.standing ?? []),
-  );
-  const shown =
-    state === null
-      ? {
-          answers: day.lists.answers.map(unjudged),
-          bonusWords: day.lists.bonusWords.map(unjudged),
-          facts: day.facts,
-        }
-      : retierDay(day.lists, state);
-
-  // Corrections made since the artifact was built — a Tier verdict or a
-  // demotion, since both move the figures. The band verdicts below were decided
-  // against the figures as built, so this is also what makes them stale.
-  const moved = !sameFigures(shown.facts, readout.facts);
+  // Every standing correction applied, and whether applying them moved the
+  // day's figures. `correctedDay` owns the rules — the cross-day guard on the
+  // picker state, and demotions coming out before anything is re-tiered — so
+  // what is left here is rendering a value rather than deciding one. `moved` is
+  // read four times below: it withdraws the two band verdicts, shows the notice
+  // that says why, and stands the drift report down.
+  const { answers, bonusWords, facts, moved } = correctedDay(readout, picker.state, demoter.state);
 
   const judge = (word: string, verdict: TierVerdict) => {
     setPicking(null);
@@ -256,7 +237,7 @@ function ScheduledDay({
       <section className="editor-figures">
         <Figure
           label="Answers"
-          value={String(shown.facts.answerCount)}
+          value={String(facts.answerCount)}
           band={
             drift.sizeBand === undefined
               ? null
@@ -268,10 +249,10 @@ function ScheduledDay({
               : !drift.reasons.includes("answer-count-out-of-band")
           }
         />
-        <Figure label="Max Score" value={String(shown.facts.maxScore)} band={null} inBand={null} />
+        <Figure label="Max Score" value={String(facts.maxScore)} band={null} inBand={null} />
         <Figure
           label="Difficulty"
-          value={shown.facts.difficulty.toFixed(4)}
+          value={facts.difficulty.toFixed(4)}
           band={
             drift.weekdayBand === null
               ? null
@@ -355,7 +336,7 @@ function ScheduledDay({
       <div className="editor-lists">
         <WordList
           title="Answers"
-          words={shown.answers}
+          words={answers}
           picking={picking}
           onPick={setPicking}
           onJudge={judge}
@@ -364,7 +345,7 @@ function ScheduledDay({
         />
         <WordList
           title="Bonus Words"
-          words={shown.bonusWords}
+          words={bonusWords}
           picking={picking}
           onPick={setPicking}
           onJudge={judge}
@@ -374,15 +355,6 @@ function ScheduledDay({
       </div>
     </>
   );
-}
-
-/** A day with no picker state yet: the readout's own words, judged by nobody. */
-function unjudged(entry: DayWord): RetieredWord {
-  return { ...entry, verdict: null, rows: 0, source: null, sourceVerdict: null };
-}
-
-function sameFigures(a: PuzzleFacts, b: PuzzleFacts): boolean {
-  return a.answerCount === b.answerCount && a.maxScore === b.maxScore && a.difficulty === b.difficulty;
 }
 
 function Figure({
