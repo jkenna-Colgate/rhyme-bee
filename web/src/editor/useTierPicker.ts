@@ -41,7 +41,10 @@ export interface TierPicker {
   error: string | null;
   /** The last judgement recorded, kept on screen until the next one. */
   recorded: TierWriteResult | null;
-  /** Record a verdict. Resolves once the file has it and the state is refreshed. */
+  /**
+   * Record a verdict against the day `state` was built for. Resolves once the
+   * file has it and the state is refreshed.
+   */
   judge: (word: string, verdict: TierVerdict) => Promise<void>;
 }
 
@@ -82,10 +85,26 @@ export function useTierPicker(date: string | null): TierPicker {
 
   const judge = useCallback(
     async (word: string, verdict: TierVerdict) => {
+      // The day posted is the one the *state* was built for, not the hook's
+      // `date` argument, and the two can differ: the argument changes as soon as
+      // the editor retypes the date, while `state` is only replaced when the read
+      // lands, so judging in that window would describe the new day against the
+      // old day's words. `state.date` exists to be read exactly here — "the day
+      // this state was built for, so a stale reply can be discarded".
+      //
+      // It is also what removes the fallback this line used to carry. An empty
+      // date is not refused by `editorDayRequest`: it reads as none named and
+      // resolves to the day after today, so the readback came home with another
+      // day's standing verdicts and reach over the words just judged. (The row
+      // written was always right — `TierOverrideRow` has no date field, because a
+      // Tier verdict is a property of the word.) There is nothing to fall back
+      // from now: `judge` is only reachable from a rendered verdict button, and a
+      // rendered button implies a state to have rendered it.
+      if (state === null) return;
       setWriting(word);
       setError(null);
       try {
-        const response = await fetch(`${EDITOR_TIER_PATH}?date=${date ?? ""}`, {
+        const response = await fetch(`${EDITOR_TIER_PATH}?date=${state.date}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ word, verdict }),
@@ -104,7 +123,7 @@ export function useTierPicker(date: string | null): TierPicker {
         setWriting(null);
       }
     },
-    [date],
+    [state],
   );
 
   return { state, writing, error, recorded, judge };
