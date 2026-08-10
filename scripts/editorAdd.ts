@@ -67,7 +67,7 @@ import { parseReading } from "./editorReading.ts";
 import { fail, root } from "./editorShell.ts";
 
 /** How an add asks an agent to author a reading — real in `add`, stubbed in tests. */
-type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | null>;
+export type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | null>;
 
 /**
  * The editor names words the pass turned up as missing, and nothing else — no
@@ -91,10 +91,12 @@ type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | n
  * shelled out to here, the same move `readScheduledDay` makes for its index:
  * it is what makes this function callable over a fixture with a stubbed
  * agent, with no pinned source on disk and no subprocess in flight, which is
- * the whole of what makes it testable. `add` below supplies the real ones.
+ * the whole of what makes it testable. `add` below supplies the real context
+ * and hands on whatever author its own caller named, which is nothing on both
+ * live paths — so `authorWithAgent` is what they get.
  */
 export async function resolveAddOutcome(
-  words: string[],
+  words: readonly string[],
   aim: AddTarget,
   ctx: EvidenceContext,
   authorReading: AgentAuthor = authorWithAgent,
@@ -144,6 +146,34 @@ export async function resolveAddOutcome(
 }
 
 /**
+ * What `add` will take from a caller instead of reaching for itself. Every
+ * field is optional and every default is the real thing, so the two live
+ * surfaces — `web/editorAddPlugin.ts` and the CLI — pass nothing and get the
+ * real agent and the real `data/` files, exactly as before.
+ *
+ * The seam is here rather than one level down at `resolveAddOutcome` because
+ * that is where it was unreachable: `AgentAuthor` was injectable at the
+ * judgement, but no live path calls the judgement — both go through `add`,
+ * which always supplied the real `claude -p` spawn. A seam only the tests can
+ * see is a seam only the tests can see.
+ *
+ * The two paths are what make the seam worth having. With the author stubbed
+ * and the paths left real, `add` is testable right up to the point it writes,
+ * and then writes to the repository's own `data/`. Injecting them is what lets
+ * a temp dir stand in — the technique `web/__tests__/tierOverrideFile.test.ts`
+ * already uses — so the two appends can be asserted end to end rather than
+ * inferred from the returned value.
+ */
+export interface AddDeps {
+  /** How a word no split resolves gets a reading. `authorWithAgent`, live. */
+  author?: AgentAuthor;
+  /** Where accepted readings land. `data/supplement.dict`, live. */
+  supplementPath?: string;
+  /** Where misses land. `data/deferred-readings.jsonl`, live. */
+  deferredPath?: string;
+}
+
+/**
  * The real entry point: builds the real pinned-source context, judges the
  * words against it, writes what `resolveAddOutcome` decided reached a reading
  * to `data/supplement.dict` and what it deferred to the deferred queue, and
@@ -157,11 +187,18 @@ export async function resolveAddOutcome(
  * (ADR-0016). A value that only *describes* a write some other layer must
  * remember to perform is a bug waiting for a caller that forgets — every
  * consumer of `AddOutcome` gets a value the write has already happened for.
+ *
+ * `deps` defaults to nothing at all, so a caller that wants the real add keeps
+ * writing `add(words, aim)`. See `AddDeps` for why the three are injectable.
  */
-export async function add(words: string[], aim: AddTarget): Promise<AddOutcome> {
-  const outcome = await resolveAddOutcome(words, aim, evidenceContext());
-  appendToSupplement(writtenReadings(outcome));
-  appendToDeferredQueue(deferredReadings(outcome));
+export async function add(
+  words: readonly string[],
+  aim: AddTarget,
+  deps: AddDeps = {},
+): Promise<AddOutcome> {
+  const outcome = await resolveAddOutcome(words, aim, evidenceContext(), deps.author);
+  appendToSupplement(writtenReadings(outcome), deps.supplementPath ?? resolve(root, "data", SUPPLEMENT));
+  appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? resolve(root, "data", DEFERRED_QUEUE));
   return outcome;
 }
 
@@ -288,9 +325,8 @@ const EDITOR_SECTION =
   "# --- Adds by the Editor's Pass: composed from a compound split and verified\n" +
   "# against the day's Rhyme Key before being written here (ADR-0014). ---";
 
-function appendToSupplement(readings: WordReading[]): void {
+function appendToSupplement(readings: WordReading[], path: string): void {
   if (readings.length === 0) return;
-  const path = resolve(root, "data", SUPPLEMENT);
   const existing = readFileSync(path, "utf8");
   const section = existing.includes(EDITOR_SECTION) ? "" : `\n${EDITOR_SECTION}\n`;
   const lines = readings.map((r) => `${r.word} ${r.phonemes.join(" ")}`).join("\n");
@@ -305,11 +341,11 @@ function appendToSupplement(readings: WordReading[]): void {
  * would forfeit that, and a second composition rule is meant to be decided from
  * this file's contents rather than from the next frustrating word.
  */
-function appendToDeferredQueue(deferred: DeferredReading[]): void {
+function appendToDeferredQueue(deferred: DeferredReading[], path: string): void {
   if (deferred.length === 0) return;
   const timestamp = new Date().toISOString();
   const lines = deferred.map((d) => JSON.stringify({ ...d, timestamp })).join("\n");
-  appendFileSync(resolve(root, "data", DEFERRED_QUEUE), `${lines}\n`);
+  appendFileSync(path, `${lines}\n`);
 }
 
 /**
