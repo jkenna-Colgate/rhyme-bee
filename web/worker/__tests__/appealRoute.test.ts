@@ -43,7 +43,7 @@ const report = {
 
 function post(body: unknown, headers: Record<string, string> = {}): Request {
   const payload = typeof body === "string" ? body : JSON.stringify(body);
-  return new Request("https://bramble-bee.jackkenna8.workers.dev/api/supplement-candidate", {
+  return new Request("https://bramble-bee.kenna-dev.workers.dev/api/supplement-candidate", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...headers },
     body: payload,

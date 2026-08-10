@@ -468,7 +468,7 @@ See [docs/deploy.md](./deploy.md) for the full picture, including
 
 ## 8. See it land in the live game
 
-Open <https://bramble-bee.jackkenna8.workers.dev> on the date you added against
+Open <https://bramble-bee.kenna-dev.workers.dev> on the date you added against
 — or any date whose Puzzle the word rhymes in; a supplement entry is not scoped
 to one day.
 
