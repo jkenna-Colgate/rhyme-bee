@@ -48,15 +48,51 @@
  * the artifact as it was before the adds and every figure would be plausible.
  * Pairing the two here means no caller can perform half of a rebuild — the
  * endpoint asks for one act and gets one.
+ *
+ * ## Why the pairing is built rather than written straight down
+ *
+ * That guarantee — forgotten on every outcome — was held by nothing but the
+ * code below, because nothing could reach the code below: it opened a real
+ * subprocess against the real cache. `makeRebuild` takes the four things that
+ * made it unreachable, and `rebuildIndex` is one instance of it holding the
+ * four the dev server wants. The live path is that construction, not a
+ * fallback around it.
+ *
+ * `spawn` and `kill` are separate deps because `killTree` runs a real
+ * `taskkill /pid <n> /f /t` on win32, which is the maintainer's platform: a
+ * test driving the timeout with a fabricated child would fire a real kill at a
+ * fabricated pid, so the abandon path could not be reached at all. Folding
+ * spawn, argv, `shell: true` and the kill into one injectable `startBuild`
+ * would be a narrower seam, but it would push `killTree` and the shell
+ * reasoning *behind* it and back out of reach.
+ *
+ * `timeoutMs` is a dep for the same reason and not a fake timer: this suite
+ * has no fake timers anywhere, and five minutes cannot be waited out.
  */
 
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcess } from "node:child_process";
 import { killTree } from "../scripts/editorAdd.ts";
-import { forgetBuiltIndex } from "./builtIndex.ts";
+import {
+  builtIndex,
+  builtKnownnessThreshold,
+  forgetBuiltIndex,
+  type IndexCache,
+} from "./builtIndex.ts";
 import type { RebuildResult } from "./src/editor/add.ts";
 
+export interface RebuildDeps {
+  /** The loaded index this rebuild invalidates. */
+  cache: IndexCache;
+  spawn: typeof spawn;
+  /** How an abandoned build is ended. `killTree`, in the dev server. */
+  kill: (child: ChildProcess) => void;
+  /** How long the build gets. `REBUILD_TIMEOUT_MS`, in the dev server. */
+  timeoutMs: number;
+}
+
 /**
- * How long the build gets before it is abandoned.
+ * How long the build gets before it is abandoned — the value the dev server's
+ * `rebuildIndex` is bound with.
  *
  * Measured at 2.4 seconds, so five minutes is not a guess at the duration — it
  * is the answer to a build that is not going to finish at all, and it errs long
@@ -71,8 +107,8 @@ import type { RebuildResult } from "./src/editor/add.ts";
 const REBUILD_TIMEOUT_MS = 5 * 60_000;
 
 /**
- * Run `npm run build:index` and forget the loaded index, so the next read comes
- * off the new artifact.
+ * A rebuild: run `npm run build:index` in `root` and forget the loaded index,
+ * so the next read comes off the new artifact.
  *
  * Never throws: a build that failed is a thing the editor needs *told*, beside
  * a readout of the words that were nevertheless written, rather than an
@@ -93,45 +129,70 @@ const REBUILD_TIMEOUT_MS = 5 * 60_000;
  * fresh. Against that, the rejected optimisation was worth half a second of
  * re-parse on a path the editor has to act on anyway.
  */
-export function rebuildIndex(root: string): Promise<RebuildResult> {
-  return new Promise((settle) => {
-    const child = spawn("npm", ["run", "build:index"], { cwd: root, shell: true });
-    let output = "";
-    let settled = false;
-    const done = (result: RebuildResult): void => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      forgetBuiltIndex();
-      settle(result);
-    };
+export function makeRebuild(deps: RebuildDeps): (root: string) => Promise<RebuildResult> {
+  return (root) =>
+    new Promise((settle) => {
+      const child = deps.spawn("npm", ["run", "build:index"], { cwd: root, shell: true });
+      let output = "";
+      let settled = false;
+      const done = (result: RebuildResult): void => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        deps.cache.forget();
+        settle(result);
+      };
 
-    const timer = setTimeout(() => {
-      // `killTree`, not `child.kill()`: `shell: true` means the child held here
-      // is the shell, and killing that alone would leave `npm` and the build
-      // under it running — writing and sweeping the artifact long after this
-      // route reported the rebuild abandoned.
-      killTree(child);
-      done({
-        ok: false,
-        error: `npm run build:index did not finish within ${REBUILD_TIMEOUT_MS / 60_000} minutes.`,
-      });
-    }, REBUILD_TIMEOUT_MS);
+      const timer = setTimeout(() => {
+        // `deps.kill`, not `child.kill()`: `shell: true` means the child held
+        // here is the shell, and killing that alone would leave `npm` and the
+        // build under it running — writing and sweeping the artifact long after
+        // this route reported the rebuild abandoned. The dev server passes
+        // `killTree`, which is the only thing in this codebase that ends a
+        // process tree on Windows.
+        deps.kill(child);
+        done({
+          ok: false,
+          error: `npm run build:index did not finish within ${deps.timeoutMs / 60_000} minutes.`,
+        });
+      }, deps.timeoutMs);
 
-    // Both streams, because a build failure announces itself on stderr and the
-    // line that says which input broke is often the last thing on stdout.
-    child.stdout.on("data", (chunk) => (output += chunk));
-    child.stderr.on("data", (chunk) => (output += chunk));
-    child.on("error", (cause) => done({ ok: false, error: `${cause.message}` }));
-    child.on("close", (code) =>
-      done(
-        code === 0
-          ? { ok: true }
-          : { ok: false, error: `npm run build:index exited ${code}.\n${tail(output)}` },
-      ),
-    );
-  });
+      // Both streams, because a build failure announces itself on stderr and the
+      // line that says which input broke is often the last thing on stdout.
+      child.stdout.on("data", (chunk) => (output += chunk));
+      child.stderr.on("data", (chunk) => (output += chunk));
+      child.on("error", (cause) => done({ ok: false, error: `${cause.message}` }));
+      child.on("close", (code) =>
+        done(
+          code === 0
+            ? { ok: true }
+            : { ok: false, error: `npm run build:index exited ${code}.\n${tail(output)}` },
+        ),
+      );
+    });
 }
+
+/**
+ * The dev server's own loaded index, as an `IndexCache`.
+ *
+ * Assembled from `web/builtIndex.ts`'s three named exports rather than from the
+ * instance behind them, so this goes through the same three functions the
+ * editor plugins call. There is one parsed index in the dev server, and one way
+ * to reach it.
+ */
+const devServerCache: IndexCache = {
+  index: builtIndex,
+  knownnessThreshold: builtKnownnessThreshold,
+  forget: forgetBuiltIndex,
+};
+
+/** {@link makeRebuild} as the dev server runs it. See the module comment. */
+export const rebuildIndex = makeRebuild({
+  cache: devServerCache,
+  spawn,
+  kill: killTree,
+  timeoutMs: REBUILD_TIMEOUT_MS,
+});
 
 /**
  * The end of the build's output, which is where a failure says what it was.
