@@ -72,7 +72,7 @@ export function EditorApp() {
   const { readout, loading, error, goTo, show } = useDayReadout();
   const picker = useTierPicker(readout?.date ?? null);
   const demoter = useDemoter(readout?.date ?? null);
-  const adder = useAdder(show);
+  const adder = useAdder(show, readout?.date ?? null);
   const disagreer = useDisagreement();
   const { status, error: statusError, refresh } = useEditorStatus();
 

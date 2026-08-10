@@ -70,7 +70,7 @@ export interface Adder {
   submitting: boolean;
   /** Milliseconds since the click, so a long Submit is visibly running. */
   elapsedMs: number;
-  /** The last Submit's answer, kept on screen until the next one. */
+  /** The last Submit's answer, kept on screen until the next one or a day change. */
   result: AddSubmitResult | null;
   /** A Submit that produced no answer at all, or one the endpoint refused. */
   submitError: string | null;
@@ -84,7 +84,7 @@ export interface Adder {
 /** How often the elapsed clock is redrawn while a Submit is in flight. */
 const TICK_MS = 500;
 
-export function useAdder(onDay: (readout: DayReadout) => void): Adder {
+export function useAdder(onDay: (readout: DayReadout) => void, date: string | null): Adder {
   const [queue, setQueue] = useState<readonly string[]>([]);
   const [queuedFor, setQueuedFor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +128,21 @@ export function useAdder(onDay: (readout: DayReadout) => void): Adder {
     const timer = setInterval(() => setElapsedMs(Date.now() - startedAt), TICK_MS);
     return () => clearInterval(timer);
   }, [submitting]);
+
+  // The Submitted section reports what a batch did to *a* day — each word's
+  // outcome and the Rhyme Key it was judged against — so it stops being true the
+  // moment the editor moves to another day, and is cleared rather than left to
+  // sit under the wrong Daily Puzzle.
+  //
+  // This `date` is a display key and nothing more. It does not replace the `date`
+  // that `queueWord` and `submit` are each given at the call: the queue's binding
+  // is `queuedFor`, checked by `aimHeldFor` below, and the `standing` ref this
+  // effect deliberately does not touch. Letting `AddQueueView` hold the day
+  // alongside `result` and decide whether to render it was rejected — that puts a
+  // correctness rule in a view no test can reach.
+  useEffect(() => {
+    setResult(null);
+  }, [date]);
 
   const queueWord = useCallback(
     (typed: string, date: string) => {
