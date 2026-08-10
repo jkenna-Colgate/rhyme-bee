@@ -1,10 +1,11 @@
 /**
  * The evidence a supplement judge needs for one word against one target Rhyme
  * Key (ADR-0009): wordhood, name status, any direct reading the word already
- * carries (the *correction* case), and — only when it has no direct reading —
- * its inflectional relatives' readings (the *derivation* case). Pulled out of
- * the queue-driven report so a maintainer's supplied word list gets identical
- * evidence, one word at a time, without a captured candidate to drive it (#70).
+ * carries (the *pronunciation correction* case), and — only when it has no
+ * direct reading — its inflectional relatives' readings (the *derivation*
+ * case). Pulled out of the queue-driven report so a maintainer's supplied word
+ * list gets identical evidence, one word at a time, without a captured
+ * candidate to drive it (#70).
  *
  * This module answers "what is true of this word", nothing more: it decides no
  * add/correct/derive/defer call, matching the report's own rule.
@@ -35,7 +36,7 @@ export interface WordEvidence {
   target: RhymeKey;
   isWord: boolean;
   isName: boolean;
-  /** This word's own CMUdict readings — the correction case, when non-empty. */
+  /** Its own CMUdict readings — the pronunciation-correction case, when non-empty. */
   direct: ReadingEvidence[];
   /** True if any direct reading's Rhyme Key already equals the target. */
   rhymesDirectly: boolean;
@@ -199,7 +200,7 @@ export function composeReading(
   return null;
 }
 
-/** Gather the correction/derivation evidence for `word` against `target`. */
+/** Gather the pronunciation-correction/derivation evidence for `word` against `target`. */
 export function gatherEvidence(word: string, target: RhymeKey, ctx: EvidenceContext): WordEvidence {
   const w = normaliseWord(word);
   const direct = readingsOf(w, ctx.pronunciations);
@@ -222,9 +223,10 @@ export function gatherEvidence(word: string, target: RhymeKey, ctx: EvidenceCont
     rhymesDirectly: rhymesOnTarget(direct, target),
     relatives,
     // Scoped to a word with no direct reading, like the relatives above and for
-    // the same reason: a word that already reads, wrongly, is a *correction*,
-    // and overriding an upstream pronunciation by machine is a bigger claim
-    // than filling a gap. That stays the deliberate hand-edit it is today.
+    // the same reason: a word that already reads, wrongly, is a *pronunciation
+    // correction*, and overriding an upstream pronunciation by machine is a
+    // bigger claim than filling a gap. That stays the deliberate hand-edit it
+    // is today.
     composed: direct.length > 0 ? null : composeReading(w, target, ctx),
   };
 }

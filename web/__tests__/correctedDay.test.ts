@@ -132,19 +132,20 @@ function stateFor(
 describe("a day nobody has corrected", () => {
   it("shows the readout's own words and figures, and has not moved", () => {
     const readout = readoutFor(index());
-    const shown = correctedDay(readout, null, null);
+    const corrected = correctedDay(readout, null, null);
 
-    expect(words(shown.answers)).toEqual(words(readout.answers));
-    expect(words(shown.bonusWords)).toEqual(words(readout.bonusWords));
-    expect(shown.facts).toBe(readout.facts);
-    expect(shown.moved).toBe(false);
+    expect(words(corrected.answers)).toEqual(words(readout.answers));
+    expect(words(corrected.bonusWords)).toEqual(words(readout.bonusWords));
+    expect(corrected.facts).toBe(readout.facts);
+    expect(corrected.moved).toBe(false);
   });
 
   it("carries no verdict on any word, because no state has been applied", () => {
-    const shown = correctedDay(readoutFor(index()), null, null);
+    const corrected = correctedDay(readoutFor(index()), null, null);
 
-    expect(shown.answers.length).toBeGreaterThan(5);
-    expect([...shown.answers, ...shown.bonusWords].every((w) => w.verdict === null)).toBe(true);
+    expect(corrected.answers.length).toBeGreaterThan(5);
+    const all = [...corrected.answers, ...corrected.bonusWords];
+    expect(all.every((w) => w.verdict === null)).toBe(true);
   });
 
   /**
@@ -158,11 +159,11 @@ describe("a day nobody has corrected", () => {
     const readout = readoutFor(built);
     const state = stateFor(built, listsOf(built, ATE), "");
 
-    const shown = correctedDay(readout, state, { standing: [] });
+    const corrected = correctedDay(readout, state, { standing: [] });
 
-    expect(shown.facts).toEqual(readout.facts);
-    expect(shown.facts.difficulty).toBe(readout.facts.difficulty);
-    expect(shown.moved).toBe(false);
+    expect(corrected.facts).toEqual(readout.facts);
+    expect(corrected.facts.difficulty).toBe(readout.facts.difficulty);
+    expect(corrected.moved).toBe(false);
   });
 });
 
@@ -180,14 +181,14 @@ describe("a picker state fetched for another day", () => {
     const file = overrideFile("collate,bonus,1.8,2026-08-09T10:00:00.000Z,");
     const yesterday = stateFor(built, listsOf(built, ATE), file, "2026-08-09");
 
-    const shown = correctedDay(readout, yesterday, null);
+    const corrected = correctedDay(readout, yesterday, null);
     const untouched = correctedDay(readout, null, null);
 
-    expect(words(shown.answers)).toContain("collate");
-    expect(words(shown.answers)).toEqual(words(untouched.answers));
-    expect(words(shown.bonusWords)).toEqual(words(untouched.bonusWords));
-    expect(shown.facts).toEqual(untouched.facts);
-    expect(shown.moved).toBe(false);
+    expect(words(corrected.answers)).toContain("collate");
+    expect(words(corrected.answers)).toEqual(words(untouched.answers));
+    expect(words(corrected.bonusWords)).toEqual(words(untouched.bonusWords));
+    expect(corrected.facts).toEqual(untouched.facts);
+    expect(corrected.moved).toBe(false);
   });
 });
 
@@ -207,19 +208,19 @@ describe("the two corrections composed", () => {
     const readout = readoutFor(built);
     const rebuilt = listsOf(index({ demotions: demotionFile(KATE), tierOverrides: overrides }), ATE);
 
-    const shown = correctedDay(
+    const corrected = correctedDay(
       readout,
       stateFor(built, listsOf(built, ATE), overrides),
       { standing: [KATE] },
     );
 
     expect(words(readout.answers)).toContain("kate");
-    expect(words(shown.answers)).not.toContain("kate");
-    expect(words(shown.bonusWords)).not.toContain("kate");
-    expect(words(shown.answers)).toEqual(words(rebuilt.answers));
-    expect(words(shown.bonusWords)).toEqual(words(rebuilt.bonusWords));
-    expect(shown.facts).toEqual(measureAnswers(rebuilt.answers));
-    expect(shown.moved).toBe(true);
+    expect(words(corrected.answers)).not.toContain("kate");
+    expect(words(corrected.bonusWords)).not.toContain("kate");
+    expect(words(corrected.answers)).toEqual(words(rebuilt.answers));
+    expect(words(corrected.bonusWords)).toEqual(words(rebuilt.bonusWords));
+    expect(corrected.facts).toEqual(measureAnswers(rebuilt.answers));
+    expect(corrected.moved).toBe(true);
   });
 
   it("moves the day on a Tier verdict alone, to where a rebuild would put it", () => {
@@ -228,22 +229,22 @@ describe("the two corrections composed", () => {
     const readout = readoutFor(built);
     const rebuilt = listsOf(index({ tierOverrides: overrides }), ATE);
 
-    const shown = correctedDay(readout, stateFor(built, listsOf(built, ATE), overrides), null);
+    const corrected = correctedDay(readout, stateFor(built, listsOf(built, ATE), overrides), null);
 
-    expect(words(shown.bonusWords)).toContain("collate");
-    expect(words(shown.answers)).toEqual(words(rebuilt.answers));
-    expect(shown.facts).toEqual(measureAnswers(rebuilt.answers));
-    expect(shown.moved).toBe(true);
+    expect(words(corrected.bonusWords)).toContain("collate");
+    expect(words(corrected.answers)).toEqual(words(rebuilt.answers));
+    expect(corrected.facts).toEqual(measureAnswers(rebuilt.answers));
+    expect(corrected.moved).toBe(true);
   });
 
   it("moves the day on a demotion alone, with no picker state in sight", () => {
     const rebuilt = listsOf(index({ demotions: demotionFile(KATE) }), ATE);
 
-    const shown = correctedDay(readoutFor(index()), null, { standing: [KATE] });
+    const corrected = correctedDay(readoutFor(index()), null, { standing: [KATE] });
 
-    expect(words(shown.answers)).toEqual(words(rebuilt.answers));
-    expect(shown.facts).toEqual(measureAnswers(rebuilt.answers));
-    expect(shown.moved).toBe(true);
+    expect(words(corrected.answers)).toEqual(words(rebuilt.answers));
+    expect(corrected.facts).toEqual(measureAnswers(rebuilt.answers));
+    expect(corrected.moved).toBe(true);
   });
 
   /**
@@ -257,10 +258,10 @@ describe("the two corrections composed", () => {
     const readout = readoutFor(built);
     const bonus = readout.bonusWords[0]!.word;
 
-    const shown = correctedDay(readout, null, { standing: [{ word: bonus, reason: "not-a-word" }] });
+    const corrected = correctedDay(readout, null, { standing: [{ word: bonus, reason: "not-a-word" }] });
 
-    expect(words(shown.bonusWords)).not.toContain(bonus);
-    expect(shown.facts).toEqual(readout.facts);
-    expect(shown.moved).toBe(false);
+    expect(words(corrected.bonusWords)).not.toContain(bonus);
+    expect(corrected.facts).toEqual(readout.facts);
+    expect(corrected.moved).toBe(false);
   });
 });

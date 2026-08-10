@@ -70,7 +70,7 @@ export function correctedDay(
     demotedWords(demotions?.standing ?? []),
   );
 
-  const shown =
+  const corrected =
     verdicts === null
       ? {
           answers: day.lists.answers.map(unjudged),
@@ -79,7 +79,7 @@ export function correctedDay(
         }
       : retierDay(day.lists, verdicts);
 
-  return { ...shown, moved: !sameFigures(shown.facts, readout.facts) };
+  return { ...corrected, moved: !sameFigures(corrected.facts, readout.facts) };
 }
 
 /** A day with no picker state yet: the readout's own words, judged by nobody. */
