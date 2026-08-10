@@ -1,0 +1,318 @@
+/**
+ * The socket ceremony the five dev-only editor routes share, tested once
+ * instead of five times.
+ *
+ * What is under test here is the part `web/editorRoute.ts` took over: the verb
+ * check and its `Allow` header, the body cap, that `next()` is never called on
+ * any path, and that a route always answers even when its own handler does not.
+ * The per-route suites keep their own 405 *sentence* — the sentences differ and
+ * saying what a route is for is the point of them — and keep everything about
+ * the work each route does. Only the mechanism moved here.
+ *
+ * This is also the first test `web/editorTransport.ts` has ever had. Its
+ * `readCappedBody` was covered five times over as a side effect of testing five
+ * routes, which is coverage of a shared function by accident rather than on
+ * purpose; the two 413 paths it distinguishes — the `Content-Length` claim and
+ * the byte count that catches a claim that lied — are asserted below as its own
+ * behaviour.
+ *
+ * `AGENTS.md` records that the Worker routes were tested despite a convention
+ * calling transport untested, and that the convention lost.
+ */
+
+import { Readable } from "node:stream";
+import { describe, expect, it } from "vitest";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Plugin } from "vite";
+import { editorMiddleware, editorRoute, type EditorRouteSpec } from "../editorRoute.ts";
+
+interface Answered {
+  status: number;
+  headers: Record<string, string>;
+  body: string;
+  nexted: boolean;
+}
+
+/** Call the middleware the way connect does, mounted prefix already stripped. */
+async function call(
+  middleware: ReturnType<typeof editorMiddleware>,
+  options: {
+    method?: string;
+    url?: string;
+    body?: string;
+    headers?: Record<string, string>;
+  } = {},
+): Promise<Answered> {
+  const body = options.body ?? "";
+  const req = Readable.from(body.length > 0 ? [Buffer.from(body)] : []) as IncomingMessage;
+  req.method = options.method ?? "GET";
+  req.url = options.url ?? "/";
+  req.headers = options.headers ?? {};
+
+  const answered: Answered = { status: 0, headers: {}, body: "", nexted: false };
+  let ended = false;
+  let finish: () => void;
+  const done = new Promise<void>((settle) => (finish = settle));
+  const res = {
+    set statusCode(value: number) {
+      answered.status = value;
+    },
+    get statusCode() {
+      return answered.status;
+    },
+    setHeader(name: string, value: string) {
+      answered.headers[name] = value;
+    },
+    // Modelled because the skeleton's last-resort catch asks: a handler that
+    // answered and *then* threw must not have a second reply written over it.
+    get writableEnded() {
+      return ended;
+    },
+    end(payload?: string) {
+      answered.body = payload ?? "";
+      ended = true;
+      finish();
+    },
+  } as unknown as ServerResponse;
+
+  middleware(req, res, () => {
+    answered.nexted = true;
+    finish();
+  });
+  await done;
+  return answered;
+}
+
+/**
+ * A route that records what reached it, so "the handler was never entered" is
+ * asserted rather than inferred from the status code.
+ */
+function route(overrides: Partial<EditorRouteSpec> = {}) {
+  const reached: string[] = [];
+  const spec: EditorRouteSpec = {
+    path: "/api/editor/example",
+    verbs: ["GET"],
+    refusal: "Read the example with GET.",
+    cap: 32,
+    handle: (_req, res, body) => {
+      reached.push(body);
+      res.statusCode = 200;
+      res.end(JSON.stringify({ saw: body }));
+    },
+    ...overrides,
+  };
+  return { middleware: editorMiddleware(spec), reached, spec };
+}
+
+describe("the verb a route answers", () => {
+  it("answers a verb the route names, and never falls through", async () => {
+    const { middleware, reached } = route();
+    const answered = await call(middleware, { method: "GET" });
+
+    expect(answered.status).toBe(200);
+    expect(answered.nexted).toBe(false);
+    expect(reached).toEqual([""]);
+  });
+
+  it("refuses every other verb with the route's own sentence, reaching no handler", async () => {
+    const { middleware, reached } = route();
+    for (const method of ["POST", "PUT", "DELETE", "PATCH", "HEAD"]) {
+      const answered = await call(middleware, { method });
+
+      expect(answered.status).toBe(405);
+      expect(answered.headers["Allow"]).toBe("GET");
+      expect(JSON.parse(answered.body)).toEqual({ error: "Read the example with GET." });
+      expect(answered.nexted).toBe(false);
+    }
+    expect(reached).toEqual([]);
+  });
+
+  it("lists every named verb in Allow, in the order the route named them", async () => {
+    const { middleware } = route({
+      verbs: ["GET", "POST"],
+      refusal: "Read it with GET, write it with POST.",
+    });
+    const answered = await call(middleware, { method: "DELETE" });
+
+    expect(answered.status).toBe(405);
+    expect(answered.headers["Allow"]).toBe("GET, POST");
+    expect(JSON.parse(answered.body).error).toBe("Read it with GET, write it with POST.");
+  });
+
+  it("answers each of a two-verb route's verbs", async () => {
+    const { middleware, reached } = route({ verbs: ["GET", "POST"] });
+    for (const method of ["GET", "POST"]) {
+      expect((await call(middleware, { method })).status).toBe(200);
+    }
+    expect(reached).toHaveLength(2);
+  });
+
+  it("reads a request with no method at all as a GET", async () => {
+    // Connect always sets one; the two-verb routes already took this reading,
+    // and a request with no method is not a request some other verb was meant by.
+    const { middleware } = route();
+    const answered = await call(middleware, { method: undefined });
+
+    expect(answered.status).toBe(200);
+  });
+
+  it("refuses the wrong verb with JSON, so no refusal reads as the shell's HTML", async () => {
+    const { middleware } = route();
+    const answered = await call(middleware, { method: "POST" });
+
+    expect(answered.headers["Content-Type"]).toBe("application/json");
+  });
+});
+
+describe("the body cap", () => {
+  it("hands the handler a body within the cap", async () => {
+    const { middleware, reached } = route({ verbs: ["POST"] });
+    const answered = await call(middleware, { method: "POST", body: "x".repeat(32) });
+
+    expect(answered.status).toBe(200);
+    expect(reached).toEqual(["x".repeat(32)]);
+  });
+
+  it("refuses a declared size over the cap before a byte of it arrives", async () => {
+    const { middleware, reached } = route({ verbs: ["POST"] });
+    const answered = await call(middleware, {
+      method: "POST",
+      headers: { "content-length": "33" },
+    });
+
+    expect(answered.status).toBe(413);
+    expect(JSON.parse(answered.body)).toEqual({ error: "That request is too large." });
+    expect(reached).toEqual([]);
+  });
+
+  it("refuses an oversize body that declared itself small", async () => {
+    // `Content-Length` is the sender's claim about the sender's own body, so
+    // the count is what actually holds the ceiling.
+    const { middleware, reached } = route({ verbs: ["POST"] });
+    const answered = await call(middleware, {
+      method: "POST",
+      body: "x".repeat(33),
+      headers: { "content-length": "4" },
+    });
+
+    expect(answered.status).toBe(413);
+    expect(reached).toEqual([]);
+  });
+
+  it("refuses an oversize body that declared nothing", async () => {
+    const { middleware, reached } = route({ verbs: ["POST"] });
+    const answered = await call(middleware, { method: "POST", body: "x".repeat(33) });
+
+    expect(answered.status).toBe(413);
+    expect(reached).toEqual([]);
+  });
+
+  it("never falls through on a refused body", async () => {
+    const { middleware } = route({ verbs: ["POST"] });
+    const answered = await call(middleware, { method: "POST", body: "x".repeat(33) });
+
+    expect(answered.nexted).toBe(false);
+  });
+
+  it("reads and discards the body of a GET, which is what the cap is there for", async () => {
+    // Day and status answer `GET` and use no body; the read is only ever the
+    // cap being enforced against a stream connect hands them regardless.
+    const { middleware, reached } = route();
+    const within = await call(middleware, { method: "GET", body: "x".repeat(8) });
+    expect(within.status).toBe(200);
+    expect(reached).toEqual(["x".repeat(8)]);
+
+    const over = await call(middleware, { method: "GET", body: "x".repeat(33) });
+    expect(over.status).toBe(413);
+  });
+});
+
+describe("a route that does not answer for itself", () => {
+  it("answers a handler that throws synchronously rather than leaving the socket open", async () => {
+    const { middleware } = route({
+      handle: () => {
+        throw new Error("the day would not read");
+      },
+    });
+    const answered = await call(middleware);
+
+    expect(answered.status).toBe(500);
+    expect(JSON.parse(answered.body).error).toBe(
+      "That request could not be answered: the day would not read",
+    );
+    expect(answered.nexted).toBe(false);
+  });
+
+  it("answers a handler whose promise rejects", async () => {
+    const { middleware } = route({
+      handle: () => Promise.reject(new Error("the append would not land")),
+    });
+    const answered = await call(middleware);
+
+    expect(answered.status).toBe(500);
+    expect(JSON.parse(answered.body).error).toBe(
+      "That request could not be answered: the append would not land",
+    );
+  });
+
+  it("leaves a reply that was already sent alone when the handler then throws", async () => {
+    const { middleware } = route({
+      handle: (_req, res) => {
+        res.statusCode = 200;
+        res.end(JSON.stringify({ outcome: "day" }));
+        throw new Error("something after the reply");
+      },
+    });
+    const answered = await call(middleware);
+
+    expect(answered.status).toBe(200);
+    expect(JSON.parse(answered.body)).toEqual({ outcome: "day" });
+  });
+});
+
+describe("the plugin the spec becomes", () => {
+  it("is dev-only, which is what keeps an editor route out of a production build", async () => {
+    const plugin = editorRoute(route().spec);
+
+    expect(plugin.apply).toBe("serve");
+  });
+
+  it("takes the name its path already had", () => {
+    expect(editorRoute(route({ path: "/api/editor/day" }).spec).name).toBe("rhyme-bee-editor-day");
+    expect(editorRoute(route({ path: "/api/editor/tier" }).spec).name).toBe(
+      "rhyme-bee-editor-tier",
+    );
+    expect(editorRoute(route({ path: "/api/editor/demotion" }).spec).name).toBe(
+      "rhyme-bee-editor-demotion",
+    );
+  });
+
+  it("mounts one middleware, on the path the spec names", async () => {
+    const plugin = editorRoute(route({ path: "/api/editor/example" }).spec);
+    const mounted: Array<[string, unknown]> = [];
+    const server = {
+      middlewares: { use: (path: string, fn: unknown) => mounted.push([path, fn]) },
+    };
+
+    // `configureServer` is the hook Vite calls, and only during `npm run dev`.
+    await (plugin.configureServer as (s: unknown) => void)(server);
+
+    expect(mounted).toHaveLength(1);
+    expect(mounted[0]![0]).toBe("/api/editor/example");
+    expect(typeof mounted[0]![1]).toBe("function");
+  });
+
+  it("answers through the middleware it mounted", async () => {
+    const plugin: Plugin = editorRoute(route({ verbs: ["POST"] }).spec);
+    let mounted: ReturnType<typeof editorMiddleware> | undefined;
+    const server = {
+      middlewares: {
+        use: (_path: string, fn: ReturnType<typeof editorMiddleware>) => (mounted = fn),
+      },
+    };
+    await (plugin.configureServer as (s: unknown) => void)(server);
+
+    const answered = await call(mounted!, { method: "POST", body: "hello" });
+    expect(JSON.parse(answered.body)).toEqual({ saw: "hello" });
+  });
+});
