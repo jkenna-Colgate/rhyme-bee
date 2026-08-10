@@ -29,7 +29,7 @@ describe("parseEditorArgs", () => {
     });
   });
 
-  describe("equals form (survives PowerShell's -- handling)", () => {
+  describe("equals form (parsed identically to the space form)", () => {
     it("reads --date=<iso>", () => {
       expect(parseEditorArgs(["read", "--date=2026-08-20"])).toEqual({
         command: "read",

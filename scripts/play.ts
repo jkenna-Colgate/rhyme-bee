@@ -2,16 +2,19 @@
  * A playable terminal REPL over one real Puzzle, so a human can finally *feel*
  * whether rhyme-hunting is fun.
  *
- *   npm run play                     # a random in-band Puzzle
- *   npm run play -- --day 3           # a Puzzle of weekday-3 Difficulty
- *   npm run play -- --seed book       # replay a specific Seed Word
+ *   npm run play                       # a random in-band Puzzle
+ *   npx tsx scripts/play.ts --day 3    # a Puzzle of weekday-3 Difficulty
+ *   npx tsx scripts/play.ts --seed book  # replay a specific Seed Word
  *
- * On Windows PowerShell the bare `--` separator (and the token after it) is
- * stripped before npm forwards anything, so `--day 3` never reaches the script.
- * Use the equals form, which survives it, or invoke tsx directly:
- *
- *   npm run play -- --day=3           # equals form — works in PowerShell
- *   npx tsx scripts/play.ts --day 3   # bypasses npm's `--` handling entirely
+ * **Do not reach these through `npm run` on Windows PowerShell.** PowerShell
+ * eats the bare `--` separator itself, so it never reaches npm; npm then reads
+ * the flags that follow as its own configuration and forwards them nowhere. The
+ * equals form is not the fix — it fails the same way. `npm run play -- --day=3`
+ * happens to leak a bare `3` through, which the parser accepts as the day, so it
+ * looks like it worked; `--date=…` on the Editor's Pass vanishes outright. What
+ * survives depends on the flag name and is not worth learning. Either quote the
+ * separator (`npm run play '--' '--day=3'`) or invoke tsx as above, which has no
+ * separator to lose.
  *
  * The playable size band is set by the BAND_MIN / BAND_MAX env vars, defaulting
  * to the shared `DEFAULT_PLAYABLE_BAND` and mirroring `histogram`; narrow or
