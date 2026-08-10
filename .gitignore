@@ -40,7 +40,8 @@ desktop.ini
 # a Tier verdict is a judgement about Retrieval that only the editor who made it
 # holds, and `*.csv` was quietly making a night of them uncommittable.
 !/data/tier-overrides.csv
-
+# Docs
+deploy_walkthrough.md
 # Dependencies / build
 node_modules/
 dist/
