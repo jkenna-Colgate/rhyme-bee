@@ -70,9 +70,12 @@ import { StatusView } from "./StatusView.tsx";
 
 export function EditorApp() {
   const { readout, loading, error, goTo, show } = useDayReadout();
-  const picker = useTierPicker(readout?.date ?? null);
-  const demoter = useDemoter(readout?.date ?? null);
-  const adder = useAdder(show, readout?.date ?? null);
+  // The day on screen, which is the readout's own — the three hooks below are
+  // all day-scoped against it, so they read it from one place.
+  const day = readout?.date ?? null;
+  const picker = useTierPicker(day);
+  const demoter = useDemoter(day);
+  const adder = useAdder(show, day);
   const disagreer = useDisagreement();
   const { status, error: statusError, refresh } = useEditorStatus();
 

@@ -57,7 +57,7 @@ export interface Demoter {
   error: string | null;
   /** True when `error` is the 409 the file sends for a word it already names. */
   alreadyDemoted: boolean;
-  /** The last demotion recorded, kept on screen until the next one. */
+  /** The last demotion recorded, kept on screen until the next one or a day change. */
   recorded: Demotion | null;
   /** Demote a word. Resolves once the file has it and the state is refreshed. */
   demote: (word: string, reason: DemotionReason) => Promise<void>;
