@@ -1,0 +1,759 @@
+/*
+ * The editor's own stylesheet, loaded only by `editor.html`. It shares nothing
+ * with the player's `styles.css` on purpose: this is a dense reading surface for
+ * one person on a desktop, and the game's is a playing surface for anyone on a
+ * phone. Keeping them apart is also what keeps the player's bundle free of
+ * anything the editor needs.
+ */
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: #fbfaf7;
+  color: #1c1b18;
+  font: 15px/1.5 ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+}
+
+.editor {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+.editor-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e3ded2;
+  padding-bottom: 0.75rem;
+}
+
+.editor-head h1 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.editor-jump {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b6558;
+}
+
+.editor-jump input {
+  font: inherit;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid #cdc6b6;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.editor-muted {
+  color: #857e70;
+  font-weight: 400;
+}
+
+/* Dimmed, not blanked, while the next day is fetched. */
+.editor-loading {
+  opacity: 0.45;
+  transition: opacity 120ms ease-in;
+}
+
+.editor-day-head h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0;
+}
+
+/* The Seed Word and the reading it adjudicates against, given the most room on
+   the page — every judgement the editor is about to make depends on it. */
+.editor-seed {
+  margin: 0.75rem 0 1.25rem;
+  padding: 0.9rem 1rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-seed-word {
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.editor-seed-said {
+  color: #6b6558;
+  margin-top: 0.15rem;
+}
+
+.editor-seed-key {
+  margin-top: 0.45rem;
+  font-size: 0.85rem;
+  color: #6b6558;
+}
+
+.editor-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.editor-figure {
+  flex: 1 1 12rem;
+  padding: 0.7rem 0.85rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-figure-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #857e70;
+}
+
+.editor-figure-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.editor-figure-band {
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-out-of-band {
+  color: #8a5a00;
+  font-weight: 600;
+}
+
+.editor-recorded {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: #857e70;
+}
+
+/* Advisory. Warm, not red — drift never blocks anything. */
+.editor-warning {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: #fff6e0;
+  border: 1px solid #e6cf95;
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.editor-warning ul {
+  margin: 0 0 0.4rem;
+  padding-left: 1.1rem;
+}
+
+.editor-warning p {
+  margin: 0;
+  color: #6b6558;
+}
+
+/* The schedule/index disagreement: the one thing on this screen that must be
+   impossible to skim past, so it is the only red on the page. */
+.editor-alarm {
+  margin: 1.5rem 0;
+  padding: 1rem 1.1rem;
+  background: #fdecec;
+  border: 2px solid #c0392b;
+  border-radius: 6px;
+}
+
+.editor-alarm h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: #8e2a1f;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.editor-alarm-lede {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.editor-alarm p {
+  margin: 0.5rem 0 0;
+}
+
+.editor-detail {
+  font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.82rem;
+  color: #6b3b34;
+}
+
+.editor-pairs {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.3rem 1rem;
+  margin: 0;
+}
+
+.editor-pairs dt {
+  font-size: 0.8rem;
+  color: #6b6558;
+}
+
+.editor-pairs dd {
+  margin: 0;
+}
+
+.editor-key + .editor-key {
+  margin-left: 0.5rem;
+}
+
+.editor-empty {
+  margin: 2rem 0;
+}
+
+.editor-empty h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.85em;
+  background: #f0ece2;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* Two lists, side by side and never merged: the Tier split is what the editor is
+   here to check, and a single list with a marker on it hides exactly that. */
+.editor-lists {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 46rem) {
+  .editor-lists {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editor-list h3 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #e3ded2;
+}
+
+/* Alphabetical in columns, so the list can be run against a third-party rhyme
+   list in another window by eye. */
+.editor-words {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 11rem;
+  column-gap: 1.25rem;
+}
+
+.editor-words li {
+  break-inside: avoid;
+  padding: 0.05rem 0;
+}
+
+/* Every word is a button: setting a word's Tier is the act this mode exists for,
+   and it costs one click on the word itself. Styled flat so a list of two
+   hundred of them still reads as a list rather than as a wall of controls. */
+.editor-word {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+  cursor: pointer;
+}
+
+.editor-word:hover,
+.editor-word[aria-expanded="true"] {
+  background: #fff;
+  border-color: #cdc6b6;
+}
+
+.editor-word:disabled {
+  cursor: progress;
+  opacity: 0.55;
+}
+
+/* What is already true of a word, at a glance. Small and quiet: the word is the
+   thing being read, and the marks are the footnotes on it. */
+.editor-mark {
+  font-size: 0.68rem;
+  line-height: 1.4;
+  padding: 0 0.28rem;
+  border-radius: 3px;
+  white-space: nowrap;
+  background: #efece4;
+  color: #6b6558;
+}
+
+.editor-verdict-bonus {
+  background: #ece4f3;
+  color: #5a3b78;
+}
+
+.editor-verdict-answer-rare {
+  background: #e2eef0;
+  color: #275f68;
+}
+
+.editor-verdict-answer-common {
+  background: #e5efe2;
+  color: #3a6330;
+}
+
+.editor-verdict-none {
+  background: #efece4;
+  color: #6b6558;
+}
+
+/* A word carrying more than one row. ADR-0015 asks for this by name: the file is
+   append-only, so a reversal is a second row and must never be invisible. */
+.editor-reversed {
+  background: #fff1d6;
+  color: #8a5a00;
+  font-weight: 600;
+}
+
+/* A knownness that is not the word's own — the lemma-family reach, standing. */
+.editor-inherited {
+  background: #f3efe6;
+  color: #857e70;
+  font-style: italic;
+}
+
+/* The menu one click on a word opens: the four Tier verdicts, and beneath them
+   the two demote reasons. One frame, because it is one choice about one word —
+   the second click lands somewhere in here whichever it turns out to be. */
+.editor-menu {
+  margin: 0.35rem 0 0.6rem;
+  background: #fff;
+  border: 1px solid #cdc6b6;
+  border-radius: 5px;
+}
+
+.editor-verdicts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+.editor-verdict {
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 0.28rem 0.45rem;
+  background: #f7f5ef;
+  border: 1px solid #e3ded2;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-verdict:hover {
+  background: #efece4;
+  border-color: #cdc6b6;
+}
+
+/* The verdict already standing on the word, so the menu shows where it is. */
+.editor-verdict-standing {
+  border-color: #857e70;
+  font-weight: 600;
+}
+
+/* The demote half of the menu. Set apart from the verdicts above it by a rule
+   and a warmer ground rather than by a red button: taking a word's wordhood is
+   a different act from choosing its Tier, not a more dangerous version of one,
+   and it is reversed by hand rather than by a second click here. */
+.editor-demote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.5rem;
+  border-top: 1px solid #e3ded2;
+  background: #fbf6ef;
+  border-radius: 0 0 4px 4px;
+}
+
+.editor-demote-lede {
+  font-size: 0.78rem;
+  color: #857e70;
+}
+
+.editor-demote-reason {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.28rem 0.45rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  color: #7a5a2e;
+  cursor: pointer;
+}
+
+.editor-demote-reason:hover {
+  background: #f6ecdd;
+  border-color: #bfa982;
+}
+
+.editor-lists-note {
+  margin: 1.25rem 0 -0.75rem;
+  font-size: 0.8rem;
+  color: #6b6558;
+}
+
+/* The judgement just written, and what else it reached. */
+.editor-written {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: #eef4ec;
+  border: 1px solid #b9cfb2;
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.editor-written p {
+  margin: 0;
+}
+
+.editor-reach {
+  margin-top: 0.4rem !important;
+  color: #47563f;
+}
+
+.editor-reach-words {
+  font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.82em;
+}
+
+/* Figures the editor has moved but the built index has not caught up with. */
+.editor-moved {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: #6b6558;
+}
+
+/* A judgement the file refused. Loud, because the editor's next act would
+   otherwise be to click the next word and lose this one. */
+.editor-write-failed {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  background: #fdecec;
+  border: 1px solid #c0392b;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: #8e2a1f;
+}
+
+/* --- The status readout (#162) ---------------------------------------------
+   Above the day and quieter than it. Both facts here are about the repository
+   rather than the date on screen, and neither is an alarm most evenings — a
+   stale index is the ordinary end of a night's judgements — so the panel is
+   set flat and grey and lets the two states that matter carry the colour. */
+.editor-status {
+  margin: 0 0 1.1rem;
+  padding: 0.75rem 0.95rem 0.85rem;
+  background: #f7f4ee;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.editor-status-index {
+  margin: 0;
+}
+/* Green states nothing to do; amber states the one act Submit performs. Amber
+   rather than red on purpose: a stale index after a pass is expected, and a
+   colour that read as a failure would cry wolf every single night. */
+.editor-status-fresh strong {
+  color: #2f6b3a;
+}
+.editor-status-stale strong {
+  color: #8a5a00;
+}
+.editor-status-files {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.5rem 1.1rem;
+  margin: 0.7rem 0 0;
+}
+.editor-status-group h3 {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.editor-status-group p {
+  margin: 0.15rem 0 0.25rem;
+  font-size: 0.78rem;
+}
+.editor-status-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.editor-status-file {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+.editor-status-uncommitted strong,
+.editor-status-unknown strong {
+  color: #8a5a00;
+}
+/* The one state that is a defect rather than a report: a file git has been told
+   to ignore is a night's work that cannot be committed at all. */
+.editor-status-ignored strong {
+  color: #8e2a1f;
+}
+
+/* --- The add queue and Submit (#161) --------------------------------------
+   Set on its own panel rather than styled like the day's figures, because it
+   is not part of the readout: what is drawn here is a list the browser is
+   holding, and it sits between the figures and the word lists so the editor
+   can type a gap the instant they read one. */
+.editor-add {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 1rem 1rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-add h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.editor-add-note {
+  margin: 0.4rem 0 0.75rem;
+  font-size: 0.8rem;
+  color: #6b6558;
+}
+
+.editor-add-entry {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.editor-add-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #6b6558;
+}
+
+.editor-add-field input {
+  font: inherit;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid #cdc6b6;
+  border-radius: 4px;
+  background: #fff;
+  min-width: 14rem;
+}
+
+.editor-add-queue {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.32rem 0.6rem;
+  background: #f4f1e9;
+  border: 1px solid #cdc6b6;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-add-queue:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* A word refused before it cost anything. Quiet rather than alarming: nothing
+   was written, and the editor's next act is simply to retype it. */
+.editor-add-refused {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #8e5a1f;
+}
+
+/* A queue standing on a day it was not typed against. Louder than a refusal and
+   quieter than a failure, because it is neither: nothing has gone wrong and
+   nothing is lost, but the words below it will not go anywhere until the editor
+   navigates back. Bordered so it reads as a state the whole section is in rather
+   than a note about the last thing typed. */
+.editor-add-held {
+  margin: 0.6rem 0 0;
+  padding: 0.5rem 0.65rem;
+  border-left: 3px solid #8e5a1f;
+  background: #fdf6ec;
+  font-size: 0.82rem;
+  color: #6b4415;
+}
+
+.editor-queued {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  align-items: center;
+}
+
+/* The whole chip is the remove button: taking a mistyped word back out is what
+   makes queueing cheap, so it costs the same one click that queueing did. */
+.editor-queued-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.25rem 0.5rem;
+  background: #f4f1e9;
+  border: 1px solid #cdc6b6;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #1c1b18;
+}
+
+.editor-queued-word:hover:not(:disabled) {
+  background: #fdecec;
+  border-color: #c0392b;
+  color: #8e2a1f;
+}
+
+.editor-queued-word:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.editor-queued-remove {
+  color: #857e70;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.editor-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.editor-add-submit {
+  margin-top: 0.9rem;
+}
+
+.editor-submit {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  background: #2f5d3a;
+  border: 1px solid #2f5d3a;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.editor-submit:disabled {
+  background: #e7e3d9;
+  border-color: #cdc6b6;
+  color: #857e70;
+  cursor: default;
+}
+
+/* The seconds tick here while one request is in flight, which is what makes a
+   Submit that is legitimately slow legible as running rather than hung. */
+.editor-add-inflight {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #6b6558;
+}
+
+.editor-add-outcomes {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.editor-add-outcome {
+  padding: 0.2rem 0;
+  border-top: 1px solid #d8e3d4;
+}
+
+/* A refused name and a word that already reads are answers, not failures, so
+   neither is coloured as one; only a deferral is set apart, because it is the
+   line that names work still to do. */
+.editor-add-deferred {
+  color: #7a5a2e;
+}
+
+.editor-add-buildlog {
+  display: block;
+  margin-top: 0.4rem;
+  white-space: pre-wrap;
+  font-size: 0.78rem;
+}
+
+/* Recording a disagreement is a *report*, never a fix, and the button is
+   styled to say so: quiet and outlined, not the filled green of Submit, which
+   is the button that changes the repository. Nothing here writes a reading. */
+.editor-disagree {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.5rem;
+  margin-left: 0.15rem;
+  background: #fff;
+  border: 1px solid #cdc6b6;
+  border-radius: 999px;
+  color: #4a4438;
+  cursor: pointer;
+}
+
+.editor-disagree:hover:not(:disabled) {
+  border-color: #857e70;
+  background: #f4f1e9;
+}
+
+.editor-disagree:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Deliberately not `.editor-recorded`: that one is a block under the word
+   lists, and this sits inline at the end of a sentence. */
+.editor-disagree-recorded {
+  font-size: 0.8rem;
+  color: #2f5d3a;
+}

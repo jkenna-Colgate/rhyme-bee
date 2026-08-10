@@ -1,0 +1,18 @@
+<!doctype html>
+<!--
+  The Editor's Pass, as its own entry point rather than a route in the player's
+  app (ADR-0016). Vite serves every HTML file under the root in dev, but builds
+  only the inputs it is given — and `vite.config.ts` names `index.html` alone —
+  so this page and everything it imports are absent from a production build.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editor's Pass — Rhyme Bee</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/editor/main.tsx"></script>
+  </body>
+</html>

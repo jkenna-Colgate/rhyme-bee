@@ -22,7 +22,25 @@ export function fail(text: string): never {
   process.exit(1);
 }
 
-/** What a thrown thing has to say for itself, whether or not it is an Error. */
+/**
+ * What a thrown thing has to say for itself, whether or not it is an Error.
+ *
+ * Also the four dev-server routes' (`web/editorDayPlugin.ts`,
+ * `editorTierPlugin.ts`, `editorDemotionPlugin.ts`, `editorAddPlugin.ts`), each
+ * of which had grown its own byte-identical copy inside the 500 it relays. They
+ * import this one rather than a fifth declaration in `web/editorTransport.ts`,
+ * which is where the transport those routes share otherwise lives: a copy there
+ * could not be imported *back* here without the commands depending on the dev
+ * server's transport module, and the commands run with no Vite in sight. The
+ * dependency already runs the other way — every one of those routes imports
+ * `scripts/editorDay.ts` or `scripts/editorAdd.ts` — so this adds no direction
+ * that was not already there.
+ *
+ * Importing this module is not importing `loadSchedule`, which those routes
+ * deliberately do not call: it answers an unreadable artifact with
+ * `process.exit(1)`, which would take the dev server down. Naming `message` in
+ * an import list calls nothing.
+ */
 export function message(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }

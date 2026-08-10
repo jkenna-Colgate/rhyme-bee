@@ -9,6 +9,11 @@ import {
 } from "../scripts/indexArtifact.ts";
 import { deployHeadersPlugin } from "./deployHeadersPlugin.ts";
 import { indexAssetPlugin } from "./indexAssetPlugin.ts";
+import { editorAddPlugin } from "./editorAddPlugin.ts";
+import { editorDayPlugin } from "./editorDayPlugin.ts";
+import { editorDemotionPlugin } from "./editorDemotionPlugin.ts";
+import { editorStatusPlugin } from "./editorStatusPlugin.ts";
+import { editorTierPlugin } from "./editorTierPlugin.ts";
 import { feedbackPlugin } from "./feedbackPlugin.ts";
 import { supplementPlugin } from "./supplementPlugin.ts";
 
@@ -51,15 +56,44 @@ export default defineConfig(({ command }) => {
 
   return {
     root: rootDir,
-    // `feedbackPlugin` and `supplementPlugin` are dev-only (`apply: "serve"`);
-    // `deployHeadersPlugin` and `indexAssetPlugin` are build-only.
+    // `feedbackPlugin`, `supplementPlugin` and the five `editor*` plugins are
+    // dev-only (`apply: "serve"`); `deployHeadersPlugin` and `indexAssetPlugin`
+    // are build-only. Three of the editor plugins write to `data/` — and
+    // `editorAddPlugin` also rebuilds `dist-data/` — which is why the build's
+    // inputs are named below rather than defaulted. `editorStatusPlugin` is the
+    // one that writes nothing at all: it reads the artifact's staleness and
+    // asks git about the written files, and #162 gives the tool no commit and
+    // no deploy to go with the answer.
     plugins: [
       react(),
       deployHeadersPlugin(),
       indexAssetPlugin(distDataDir),
+      editorDayPlugin(),
+      editorStatusPlugin(),
+      editorTierPlugin(),
+      editorDemotionPlugin(),
+      editorAddPlugin(),
       feedbackPlugin(),
       supplementPlugin(),
     ],
+    build: {
+      /**
+       * The build's inputs, named rather than defaulted. `web/` holds a second
+       * HTML entry point — `editor.html`, the Editor's Pass (ADR-0016) — which
+       * the dev server serves and a production build must not contain: it reads
+       * `data/`, and the later slices of the pass write it.
+       *
+       * Vite's default input is this same single `index.html`, so naming it
+       * changes nothing about what is built today. What it changes is *why*
+       * `editor.html` is excluded: by default it is excluded because nothing
+       * happens to reference it, which is a fact about the absence of a line of
+       * configuration and would be reversed by anyone adding a second entry for
+       * an unrelated reason. Named, the deploy's contents are a list, and the
+       * editor is off it — the same shape of guarantee, and for the same
+       * reason, as `indexAssetPlugin`'s allow-list over `dist-data`.
+       */
+      rollupOptions: { input: resolve(rootDir, "index.html") },
+    },
     // The deploy contains only runtime assets, so a build takes nothing from
     // `dist-data` wholesale — `indexAssetPlugin` names the two files that ship.
     // The dev server has no upload to pay for and keeps the whole directory.

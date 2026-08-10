@@ -27,7 +27,7 @@
  */
 
 import { localCalendarDate } from "../src/schedule.ts";
-import { add, targetFor, type AddTarget } from "./editorAdd.ts";
+import { add, printAddOutcome, targetFor, type AddTarget } from "./editorAdd.ts";
 import { parseEditorArgs, tomorrow, type EditorArgs } from "./editorArgs.ts";
 import { audition, readDay } from "./editorRead.ts";
 import { fail, loadSchedule, message } from "./editorShell.ts";
@@ -46,7 +46,7 @@ if (args.command === "add") {
     args.rhymeKey !== undefined
       ? { target: args.rhymeKey, provenance: "an explicit Rhyme Key" }
       : targetFor(schedule, args.date ?? tomorrow(localCalendarDate()));
-  await add(args.words!, aim);
+  printAddOutcome(await add(args.words!, aim));
 } else if (args.seed !== undefined) {
   audition(schedule, args.seed);
 } else {

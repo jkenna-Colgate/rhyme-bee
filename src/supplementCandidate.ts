@@ -9,13 +9,22 @@
  * stays there (ADR-0013); a candidate is a report *about* a verdict already
  * given, never a request for one.
  *
- * Two capture paths write the same record. In dev it is a button → the dev
+ * Three capture paths write the same record. In dev it is a button → the dev
  * server, appending to `data/supplement-candidates.jsonl` (a scratch file,
  * gitignored with the rest of `data/`). Deployed it is a button → a route on the
  * Worker, writing one R2 object per Appeal. Both reach a queue of JSON Lines,
  * which is why `serialiseCandidate` is the serialisation on both paths and why
  * the pull-down that reassembles the objects gets a queue `parseCandidates`
  * already reads.
+ *
+ * The third is the Editor's Pass (#163), which posts to the dev path above when
+ * a word an editor typed as missing turns out to be in the index on a Rhyme Key
+ * other than the day's. Nobody played that word: it is an *add*, not a
+ * Submission, and no verdict was ever delivered against it. What it shares with
+ * an Appeal is the claim — the engine reads this word this way, and somebody
+ * says it rhymes anyway — and that claim is the whole of what a judge acts on,
+ * which is why the same six fields hold it and why a second queue would only be
+ * a second thing to pull down and a second place to forget.
  *
  * This module is the pure record shape: its (de)serialisation, the validation
  * that turns an *untrusted* report into one, and the key one is stored under.
@@ -27,9 +36,13 @@ import { hasOnlyFields, refuse, type Validated } from "./report.ts";
 import { REJECTION_MESSAGE, type RejectionReason } from "./verdict.ts";
 
 export interface SupplementCandidate {
-  /** The Submission the player says should have counted as an Answer. */
+  /**
+   * The word said to rhyme: a player's Submission on the Appeal paths, an
+   * editor's add on the Editor's Pass one. Either way it is the word the judge
+   * is being asked about.
+   */
   word: string;
-  /** The Seed Word it was played against — what it must rhyme with. */
+  /** The Seed Word it was held against — what it must rhyme with. */
   seedWord: string;
   /** The Seed's pinned Rhyme Key — the target the judge authors stress toward. */
   seedRhymeKey: string;

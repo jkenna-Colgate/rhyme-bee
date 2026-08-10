@@ -10,7 +10,13 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { applyDemotions, parseDemotions } from "../demotions.ts";
+import {
+  DEMOTION_REASONS,
+  applyDemotions,
+  parseDemotions,
+  serialiseDemotion,
+  type Demotion,
+} from "../demotions.ts";
 import { makeTestIndex, type TestInputs } from "../__fixtures__/index.ts";
 import type { Pronunciation } from "../phonology.ts";
 
@@ -78,6 +84,43 @@ describe("applyDemotions", () => {
 
     expect(applied.find((e) => e.word === "heinz")?.hadWordhood).toBe(true);
     expect(applied.find((e) => e.word === "zzyzx")?.hadWordhood).toBe(false);
+  });
+});
+
+/**
+ * The write half of the format, held against the read half. The Editor's Pass
+ * appends to `data/demotions.txt` (#160), and a serialiser that spelled a line
+ * differently from the way `parseDemotions` reads one would put a word in the
+ * file that never reaches the wordhood gate — the exact defect the file exists
+ * to fix, arrived at from the other end.
+ */
+describe("serialiseDemotion", () => {
+  it.each(DEMOTION_REASONS)("round-trips a %s through the parser", (reason) => {
+    const demotion: Demotion = { word: "algiers", reason };
+
+    expect(parseDemotions(serialiseDemotion(demotion))).toEqual([demotion]);
+  });
+
+  it("terminates the line, so the next append starts one of its own", () => {
+    expect(serialiseDemotion({ word: "lbs", reason: "not-a-known-word" })).toBe(
+      "lbs not-a-known-word\n",
+    );
+  });
+
+  it("normalises the word the way the parser does, so one spelling reaches the file", () => {
+    expect(parseDemotions(serialiseDemotion({ word: "  Marx  ", reason: "proper-noun" }))).toEqual([
+      { word: "marx", reason: "proper-noun" },
+    ]);
+  });
+
+  it("round-trips a whole file's worth without the rows running together", () => {
+    const demotions: Demotion[] = [
+      { word: "heinz", reason: "proper-noun" },
+      { word: "oct", reason: "not-a-known-word" },
+      { word: "troy", reason: "proper-noun" },
+    ];
+
+    expect(parseDemotions(demotions.map(serialiseDemotion).join(""))).toEqual(demotions);
   });
 });
 

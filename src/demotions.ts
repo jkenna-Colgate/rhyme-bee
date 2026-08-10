@@ -32,7 +32,21 @@ import { normaliseWord } from "./cmudict.ts";
 /** The rejection a demoted word will earn — the file's second column. */
 export type DemotionReason = "proper-noun" | "not-a-known-word";
 
-const REASONS: readonly string[] = ["proper-noun", "not-a-known-word"];
+/**
+ * Both reasons the format allows, in the order the demote gesture offers them.
+ *
+ * Exported so the parser below, the write route's validator and the day view's
+ * two buttons all check against one array: a third reason added to the type
+ * cannot then be missing from what a request or a file line is checked against,
+ * and cannot be a reason the editor has no way to choose. This is the shape
+ * `VERDICTS` takes in `src/tierOverride.ts`, for the same reason.
+ */
+export const DEMOTION_REASONS: readonly DemotionReason[] = ["proper-noun", "not-a-known-word"];
+
+/** True when `value` names one of the two reasons this file recognises. */
+export function isDemotionReason(value: string): value is DemotionReason {
+  return (DEMOTION_REASONS as readonly string[]).includes(value);
+}
 
 export interface Demotion {
   word: string;
@@ -54,6 +68,30 @@ export interface DemotionTarget {
 }
 
 /**
+ * Serialise one demotion as a single newline-terminated line, ready to append —
+ * the write half of the format, so that the Editor's Pass (ADR-0016) can add an
+ * entry without knowing how a line is spelled. `src/supplementCandidate.ts` is
+ * the precedent: one module holds both halves, because a serialiser living apart
+ * from its parser is a second spelling of the format waiting to drift.
+ *
+ * The columns are separated by one space, and the entries the maintainer wrote
+ * by hand are aligned into columns with a trailing `#` gloss. That difference is
+ * deliberate rather than a shortfall. Alignment is a property of the file as a
+ * whole — the widest word in it decides the column — so a line appended in
+ * isolation cannot know where the column sits, and a serialiser that guessed
+ * would misalign the file rather than preserve it. `parseDemotions` splits on
+ * any run of whitespace, so both spellings read back identically, and a
+ * maintainer who wants the file re-aligned can do it in the same hand edit that
+ * a reversal takes.
+ *
+ * The word is normalised here rather than only on the way back in, so the file
+ * receives the one spelling the wordhood gate will look the word up under.
+ */
+export function serialiseDemotion(demotion: Demotion): string {
+  return `${normaliseWord(demotion.word)} ${demotion.reason}\n`;
+}
+
+/**
  * Parse the demotion list: one `word reason` pair per line, `#` comments and
  * blanks ignored. A line that names no reason, or a reason outside the closed
  * set, throws rather than being skipped — a typo in this file would otherwise
@@ -65,13 +103,13 @@ export function parseDemotions(text: string): Demotion[] {
     const line = raw.split("#")[0]!.trim();
     if (line === "") continue;
     const [word, reason, ...rest] = line.split(/\s+/);
-    if (reason === undefined || rest.length > 0 || !REASONS.includes(reason)) {
+    if (reason === undefined || rest.length > 0 || !isDemotionReason(reason)) {
       throw new Error(
-        `Demotion "${line}": expected "<word> ${REASONS.join("|")}" — the reason ` +
+        `Demotion "${line}": expected "<word> ${DEMOTION_REASONS.join("|")}" — the reason ` +
           `is the verdict the player receives, so it is not optional.`,
       );
     }
-    out.push({ word: normaliseWord(word!), reason: reason as DemotionReason });
+    out.push({ word: normaliseWord(word!), reason });
   }
   return out;
 }

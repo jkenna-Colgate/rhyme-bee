@@ -40,8 +40,12 @@ function touch(path: string, at: Date = new Date()): void {
  * A repo with every input present and an artifact built after all of them.
  * Timestamps are set explicitly: the filesystem's own resolution is coarse
  * enough that "written second" and "newer" are not the same claim.
+ *
+ * `skip` leaves named inputs (basenames) off the disk entirely — for exercising
+ * what an *absent* input does, `tier-overrides.csv` above all, without
+ * tripping over one of the other inputs being absent for the same reason.
  */
-function repo(): { root: string; artifact: string } {
+function repo(skip: string[] = []): { root: string; artifact: string } {
   const root = mkdtempSync(resolve(tmpdir(), "rhyme-bee-staleness-"));
   // One engine module and one test beside it, written before the inputs are
   // enumerated so the sweep of `src/` has something to find and something to
@@ -51,6 +55,7 @@ function repo(): { root: string; artifact: string } {
   writeFileSync(resolve(root, "src/__tests__/normalise.test.ts"), "// the tests");
 
   for (const input of indexInputs(root)) {
+    if (skip.some((name) => input.endsWith(name))) continue;
     mkdirSync(resolve(input, ".."), { recursive: true });
     writeFileSync(input, "input");
     touch(input, DAY_AGO);
@@ -83,6 +88,7 @@ describe("the Rhyme Index input list", () => {
         "/data/prevalence.csv",
         "/data/demotions.txt",
         "/data/supplement.dict",
+        "/data/tier-overrides.csv",
       ]),
     );
   });
@@ -136,6 +142,27 @@ describe("the staleness predicate", () => {
     const staleness = indexStaleness(root);
     expect(staleness.stale).toBe(true);
     expect(staleness.reason).toBe("missing-input");
+  });
+
+  it("does not report stale when only tier-overrides.csv is missing", () => {
+    // ADR-0015 fixes a missing override file as a legitimate no-op, the same
+    // standing an empty one has — unlike every other input here, which is
+    // missing only because a setup step has not run yet.
+    const { root } = repo(["tier-overrides.csv"]);
+    expect(indexStaleness(root)).toEqual({ stale: false, reason: null });
+  });
+
+  it("reports stale once tier-overrides.csv exists and is newer than the artifact", () => {
+    // The other half of the same rule: absence is a no-op, but a real edit —
+    // an Editor's Pass appending a row — must still trigger the rebuild that
+    // ships it, the same as any other input.
+    const { root } = repo();
+    touch(resolve(root, "data/tier-overrides.csv"));
+    expect(indexStaleness(root)).toEqual({
+      stale: true,
+      reason: "input-newer",
+      input: resolve(root, "data/tier-overrides.csv"),
+    });
   });
 
   it("reports stale when no index has been built at all", () => {

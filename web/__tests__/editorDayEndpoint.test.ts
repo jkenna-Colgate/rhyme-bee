@@ -1,0 +1,319 @@
+/**
+ * The dev-only endpoint the Editor's Pass reads a day through. What a day *is*
+ * is `scripts/editorDay.ts` and is tested there; what is tested here is the
+ * transport around it — that only a read verb is answered, that a request body
+ * is refused rather than buffered, that a malformed date is named as one, and
+ * that the three cases of the readout reach the browser unaltered.
+ *
+ * `AGENTS.md` records that the Worker routes were tested despite a convention
+ * calling transport untested, and that the convention lost;
+ * `web/worker/__tests__/feedbackRoute.test.ts` is the shape those tests took and
+ * the shape these follow.
+ */
+
+import { Readable } from "node:stream";
+import { describe, expect, it } from "vitest";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import type { RhymeIndex } from "../../src/rhymeIndex.ts";
+import type { Schedule } from "../../src/schedule.ts";
+import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "../editorDayRequest.ts";
+import { editorDayHandler } from "../editorDayPlugin.ts";
+
+// --- the schedule and index the endpoint answers over --------------------------
+
+const SCHEDULE: Schedule = {
+  startDate: "2026-08-03",
+  band: { min: 20, max: 120 },
+  days: [
+    {
+      date: "2026-08-03",
+      weekday: "Mon",
+      week: 1,
+      seed: "ate",
+      rhymeKey: "EY T",
+      answerCount: 2,
+      difficulty: 0.5,
+    },
+    {
+      date: "2026-08-04",
+      weekday: "Tue",
+      week: 1,
+      seed: "unpinnable",
+      rhymeKey: "AH B AH L",
+      answerCount: 2,
+      difficulty: 0.5,
+    },
+  ],
+};
+
+/**
+ * Enough of a `RhymeIndex` for the endpoint: one Seed it can pin and one it
+ * cannot. Typed through `unknown` because the endpoint reaches for exactly the
+ * three members `readScheduledDay` uses, and standing up a real index here would
+ * test `buildPuzzle` rather than the transport.
+ */
+function stubIndex(): RhymeIndex {
+  return {
+    pinSeed(word: string, rhymeKey?: string) {
+      if (word === "unpinnable") throw new Error(`No reading of "unpinnable" is ${rhymeKey}.`);
+      return { word, rhymeKey: rhymeKey ?? "EY T" };
+    },
+    buildPuzzle() {
+      return {
+        seedRespelling: "AYT",
+        answers: [
+          { word: "eight", length: 5, knownness: 0.9 },
+          { word: "sedate", length: 6, knownness: 0.2 },
+        ],
+        bonusWords: [{ word: "objurgate", length: 9, knownness: 0.01 }],
+      };
+    },
+    rhymeKeysOf: (word: string) => (word === "unpinnable" ? ["AH N P IH N"] : []),
+  } as unknown as RhymeIndex;
+}
+
+// --- driving the middleware ----------------------------------------------------
+
+interface Answered {
+  status: number;
+  headers: Record<string, string>;
+  body: string;
+  nexted: boolean;
+}
+
+/**
+ * Call the handler the way connect does. `server.middlewares.use(PATH, fn)`
+ * strips the mounted prefix before the handler sees it, so `url` here is what
+ * survives that — `/` with the query still attached.
+ */
+async function call(
+  handler: ReturnType<typeof editorDayHandler>,
+  options: {
+    method?: string;
+    url?: string;
+    body?: string;
+    headers?: Record<string, string>;
+  } = {},
+): Promise<Answered> {
+  const body = options.body ?? "";
+  const req = Readable.from(body.length > 0 ? [Buffer.from(body)] : []) as IncomingMessage;
+  req.method = options.method ?? "GET";
+  req.url = options.url ?? "/";
+  req.headers = options.headers ?? {};
+
+  const answered: Answered = { status: 0, headers: {}, body: "", nexted: false };
+  let finish: () => void;
+  const done = new Promise<void>((resolve) => (finish = resolve));
+  const res = {
+    set statusCode(value: number) {
+      answered.status = value;
+    },
+    get statusCode() {
+      return answered.status;
+    },
+    setHeader(name: string, value: string) {
+      answered.headers[name] = value;
+    },
+    end(payload?: string) {
+      answered.body = payload ?? "";
+      finish();
+    },
+  } as unknown as ServerResponse;
+
+  handler(req, res, () => {
+    answered.nexted = true;
+    finish();
+  });
+  await done;
+  return answered;
+}
+
+/** The endpoint with everything it depends on stubbed and nothing loaded. */
+function endpoint(overrides: Partial<Parameters<typeof editorDayHandler>[0]> = {}) {
+  const opened: string[] = [];
+  const handler = editorDayHandler({
+    schedule: () => SCHEDULE,
+    openIndex: () => {
+      opened.push("opened");
+      return stubIndex();
+    },
+    today: () => "2026-08-02",
+    ...overrides,
+  });
+  return { handler, opened };
+}
+
+describe("the dev-only day endpoint", () => {
+  it("answers a read with the day the schedule holds", async () => {
+    const { handler } = endpoint();
+    const answered = await call(handler, { url: "/?date=2026-08-03" });
+
+    expect(answered.status).toBe(200);
+    expect(answered.headers["Content-Type"]).toBe("application/json");
+    expect(JSON.parse(answered.body)).toMatchObject({
+      outcome: "day",
+      date: "2026-08-03",
+      seed: "ate",
+      seedRespelling: "AYT",
+      rhymeKey: "EY T",
+      answers: [
+        { word: "eight", length: 5, knownness: 0.9 },
+        { word: "sedate", length: 6, knownness: 0.2 },
+      ],
+      bonusWords: [{ word: "objurgate", length: 9, knownness: 0.01 }],
+    });
+  });
+
+  it("opens on tomorrow when no date is named", async () => {
+    const { handler } = endpoint();
+    const answered = await call(handler, { url: "/" });
+
+    expect(JSON.parse(answered.body)).toMatchObject({ outcome: "day", date: "2026-08-03" });
+  });
+
+  it("names the run's edges for a date outside it, without opening the index", async () => {
+    const { handler, opened } = endpoint();
+    const answered = await call(handler, { url: "/?date=2027-01-01" });
+
+    expect(answered.status).toBe(200);
+    expect(JSON.parse(answered.body)).toEqual({
+      outcome: "not-scheduled",
+      date: "2027-01-01",
+      firstDate: "2026-08-03",
+      lastDate: "2026-08-04",
+    });
+    expect(opened).toEqual([]);
+  });
+
+  it("renders the schedule/index disagreement rather than failing the request", async () => {
+    const { handler } = endpoint();
+    const answered = await call(handler, { url: "/?date=2026-08-04" });
+
+    expect(answered.status).toBe(200);
+    expect(JSON.parse(answered.body)).toMatchObject({
+      outcome: "unpinnable",
+      seed: "unpinnable",
+      scheduledRhymeKey: "AH B AH L",
+      indexRhymeKeys: ["AH N P IH N"],
+    });
+  });
+
+  it("answers anything but GET with a method refusal, reading nothing", async () => {
+    const { handler, opened } = endpoint();
+    for (const method of ["POST", "PUT", "DELETE", "PATCH"]) {
+      const answered = await call(handler, { method, url: "/?date=2026-08-03" });
+
+      expect(answered.status).toBe(405);
+      expect(answered.headers["Allow"]).toBe("GET");
+      expect(answered.nexted).toBe(false);
+    }
+    expect(opened).toEqual([]);
+  });
+
+  it("refuses a body over the cap, and reads no day", async () => {
+    const { handler, opened } = endpoint();
+    const answered = await call(handler, {
+      url: "/?date=2026-08-03",
+      body: "x".repeat(MAX_REQUEST_BODY_BYTES + 1),
+    });
+
+    expect(answered.status).toBe(413);
+    expect(opened).toEqual([]);
+  });
+
+  it("refuses an oversize body that declared itself small", async () => {
+    const { handler, opened } = endpoint();
+    const answered = await call(handler, {
+      url: "/?date=2026-08-03",
+      body: "x".repeat(MAX_REQUEST_BODY_BYTES + 1),
+      headers: { "content-length": "42" },
+    });
+
+    expect(answered.status).toBe(413);
+    expect(opened).toEqual([]);
+  });
+
+  it("refuses a declared size over the cap before a byte of it arrives", async () => {
+    const { handler, opened } = endpoint();
+    const answered = await call(handler, {
+      url: "/?date=2026-08-03",
+      headers: { "content-length": String(MAX_REQUEST_BODY_BYTES + 1) },
+    });
+
+    expect(answered.status).toBe(413);
+    expect(opened).toEqual([]);
+  });
+
+  it("names a malformed date rather than reading a day for it", async () => {
+    const { handler, opened } = endpoint();
+    for (const date of ["tomorrow", "2026-8-3", "2026/08/03", "03-08-2026"]) {
+      const answered = await call(handler, { url: `/?date=${encodeURIComponent(date)}` });
+
+      expect(answered.status).toBe(400);
+      expect(JSON.parse(answered.body).error).toMatch(/YYYY-MM-DD/);
+    }
+    expect(opened).toEqual([]);
+  });
+
+  // The two things that can throw past `readScheduledDay` are a missing index
+  // and an unreadable schedule, and both already name their file and their
+  // remedy. The endpoint relays that whole and adds nothing, so the editor gets
+  // one diagnosis rather than two guesses at one.
+  it("relays a missing built index, remedy and all", async () => {
+    const { handler } = endpoint({
+      openIndex: () => {
+        throw new Error(
+          "No built Rhyme Index in /repo/dist-data. Run `npm run build:index` from the repo root.",
+        );
+      },
+    });
+    const answered = await call(handler, { url: "/?date=2026-08-03" });
+
+    expect(answered.status).toBe(500);
+    expect(JSON.parse(answered.body).error).toBe(
+      "Could not read 2026-08-03: No built Rhyme Index in /repo/dist-data. " +
+        "Run `npm run build:index` from the repo root.",
+    );
+  });
+
+  it("relays an unreadable schedule artifact", async () => {
+    const { handler } = endpoint({
+      schedule: () => {
+        throw new Error("/repo/data/schedule.json is not a readable schedule artifact.");
+      },
+    });
+    const answered = await call(handler, { url: "/?date=2026-08-03" });
+
+    expect(answered.status).toBe(500);
+    expect(JSON.parse(answered.body).error).toBe(
+      "Could not read 2026-08-03: /repo/data/schedule.json is not a readable schedule artifact.",
+    );
+  });
+});
+
+describe("which day a request asks for", () => {
+  it("defaults to tomorrow, which is the day most likely to need reviewing", () => {
+    expect(editorDayRequest("/", "2026-08-02")).toEqual({ ok: true, date: "2026-08-03" });
+    // Month and year ends are the two the arithmetic gets wrong.
+    expect(editorDayRequest("/", "2026-08-31")).toEqual({ ok: true, date: "2026-09-01" });
+    expect(editorDayRequest("/", "2026-12-31")).toEqual({ ok: true, date: "2027-01-01" });
+    expect(editorDayRequest("/", "2028-02-28")).toEqual({ ok: true, date: "2028-02-29" });
+  });
+
+  it("takes the named date, however the mount rewrote the URL", () => {
+    for (const url of ["/?date=2026-08-20", "/api/editor/day?date=2026-08-20"]) {
+      expect(editorDayRequest(url, "2026-08-02")).toEqual({ ok: true, date: "2026-08-20" });
+    }
+  });
+
+  it("treats an empty date as none named, which is what a cleared field sends", () => {
+    expect(editorDayRequest("/?date=", "2026-08-02")).toEqual({ ok: true, date: "2026-08-03" });
+  });
+
+  it("refuses anything that is not an ISO date", () => {
+    for (const date of ["tomorrow", "2026-8-3", "2026/08/03", "2026-08-03T00:00:00Z"]) {
+      const request = editorDayRequest(`/?date=${encodeURIComponent(date)}`, "2026-08-02");
+      expect(request.ok).toBe(false);
+    }
+  });
+});
