@@ -238,7 +238,7 @@ describe("submitting a queue", () => {
    * shows up as the *old* Answer list rather than as an error.
    *
    * In the dev server the same guarantee is `forgetBuiltIndex`, which
-   * `rebuildIndex` calls on success — see `web/builtIndex.ts`.
+   * `rebuildIndex` calls on every outcome — see `web/indexRebuild.ts`.
    */
   it("re-reads the day from the index as it stands after the rebuild", async () => {
     const { handler } = endpoint();
