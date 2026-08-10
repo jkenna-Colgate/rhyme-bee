@@ -48,7 +48,8 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { indexStaleness, type IndexStaleness } from "../scripts/indexArtifact.ts";
 import { indexStatus, porcelainCodes, writtenStatus } from "./editorStatusReport.ts";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
+import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { sendJson } from "./editorTransport.ts";
 import { EDITOR_STATUS_PATH } from "./src/endpoints.ts";
 import { WRITTEN_FILES, type EditorStatus } from "./src/editor/status.ts";
 import { uncommittedPorcelain } from "./workingTree.ts";
@@ -86,11 +87,14 @@ export interface EditorStatusDeps {
 }
 
 /**
- * The endpoint, apart from the dev server it is mounted on.
+ * The route's own work. There is no request to parse — this is the one editor
+ * route with no date, no words and no verdict — so the body the shared skeleton
+ * read is only ever the cap being enforced, and nothing here looks at it.
  *
- * Every refusal is a status and a sentence, and none of them is `next()`: this
- * path is the editor's alone, and falling through would hand a bad request the
- * static shell's HTML with a 200 on it.
+ * The `try` covers the staleness read **only**. The git read below it and the
+ * compose after are deliberately outside: `porcelain` resolving to `null` is
+ * git declining to answer and is a case the screen renders rather than an error
+ * this route reports, and a wider scope would turn it into one.
  *
  * **Nothing about the environment reaches the response**, and this route is
  * stricter about that than its four neighbours. They relay a cause whole — "the
@@ -103,55 +107,44 @@ export interface EditorStatusDeps {
  * server's own console, where the maintainer can read the whole of it.
  */
 export function editorStatusHandler(deps: EditorStatusDeps) {
-  // `next` is connect's and is named here only to be visibly never called.
-  return (req: IncomingMessage, res: ServerResponse, _next?: () => void): void => {
-    if (req.method !== "GET") {
-      res.setHeader("Allow", "GET");
-      sendJson(res, 405, { error: "Read the status with GET. It changes nothing." });
-      return;
+  return async (_req: IncomingMessage, res: ServerResponse): Promise<void> => {
+    let index: EditorStatus["index"];
+    try {
+      index = indexStatus(deps.staleness(), repoRoot);
+    } catch {
+      return sendJson(res, 500, {
+        error:
+          "The status could not be read. The dev server's console has the reason; " +
+          "the day on screen is unaffected.",
+      });
     }
 
-    void (async () => {
-      // This route has no body to use — a `GET` carries none — so the read is
-      // only ever here to enforce the cap; the string it resolves to is not
-      // read. See `web/editorTransport.ts` for why the read happens anyway.
-      if ((await readCappedBody(req, res, MAX_STATUS_BODY_BYTES)) === null) return;
+    const porcelain = await deps.porcelain();
+    const status: EditorStatus = {
+      index,
+      written: writtenStatus(porcelain === null ? null : porcelainCodes(porcelain), deps.present()),
+    };
+    sendJson(res, 200, status);
+  };
+}
 
-      let index: EditorStatus["index"];
-      try {
-        index = indexStatus(deps.staleness(), repoRoot);
-      } catch {
-        return sendJson(res, 500, {
-          error:
-            "The status could not be read. The dev server's console has the reason; " +
-            "the day on screen is unaffected.",
-        });
-      }
-
-      const porcelain = await deps.porcelain();
-      const status: EditorStatus = {
-        index,
-        written: writtenStatus(porcelain === null ? null : porcelainCodes(porcelain), deps.present()),
-      };
-      sendJson(res, 200, status);
-    })();
+/** The route, as everything the shared skeleton needs to mount and guard it. */
+export function editorStatusSpec(deps: EditorStatusDeps): EditorRouteSpec {
+  return {
+    path: EDITOR_STATUS_PATH,
+    verbs: ["GET"],
+    refusal: "Read the status with GET. It changes nothing.",
+    cap: MAX_STATUS_BODY_BYTES,
+    handle: editorStatusHandler(deps),
   };
 }
 
 export function editorStatusPlugin(): Plugin {
-  return {
-    name: "rhyme-bee-editor-status",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use(
-        EDITOR_STATUS_PATH,
-        editorStatusHandler({
-          staleness: () => indexStaleness(repoRoot),
-          porcelain: () => uncommittedPorcelain(repoRoot, WRITTEN_FILES),
-          present: () =>
-            new Set(WRITTEN_FILES.filter((path) => existsSync(resolve(repoRoot, path)))),
-        }),
-      );
-    },
-  };
+  return editorRoute(
+    editorStatusSpec({
+      staleness: () => indexStaleness(repoRoot),
+      porcelain: () => uncommittedPorcelain(repoRoot, WRITTEN_FILES),
+      present: () => new Set(WRITTEN_FILES.filter((path) => existsSync(resolve(repoRoot, path)))),
+    }),
+  );
 }

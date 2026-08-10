@@ -38,7 +38,8 @@ import { message } from "../scripts/editorShell.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { EDITOR_DAY_PATH } from "./src/endpoints.ts";
 import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "./editorDayRequest.ts";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
+import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { sendJson } from "./editorTransport.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -57,48 +58,46 @@ export interface EditorDayDeps {
 }
 
 /**
- * The endpoint, apart from the dev server it is mounted on.
+ * The route's own work, over a body the skeleton has already read and capped —
+ * and which this route has no use for, a `GET` carrying none.
  *
- * Every refusal is a status and a sentence, and none of them is `next()`: this
- * path is the editor's alone, and falling through would hand a bad request the
- * static shell's HTML with a 200 on it — a failure that reads as a success is
- * the one shape of failure worth ruling out here. The three cases of the readout
- * are *not* refusals: a date outside the run and a Seed the index cannot pin are
- * both things the editor needs rendered, so both are 200s carrying the case.
+ * The refusals the shared skeleton makes (the verb, the size) and the reason
+ * none of them is `next()` are `web/editorRoute.ts`'s. What is this route's own
+ * is the date: an unparseable one is a 400 and reads no day. The three cases of
+ * the readout are *not* refusals — a date outside the run and a Seed the index
+ * cannot pin are both things the editor needs rendered, so both are 200s
+ * carrying the case.
  */
 export function editorDayHandler(deps: EditorDayDeps) {
-  // `next` is connect's and is named here only to be visibly never called.
-  return (req: IncomingMessage, res: ServerResponse, _next?: () => void): void => {
-    if (req.method !== "GET") {
-      res.setHeader("Allow", "GET");
-      sendJson(res, 405, { error: "Read a day with GET." });
-      return;
+  return (req: IncomingMessage, res: ServerResponse): void => {
+    const asked = editorDayRequest(req.url ?? "/", deps.today());
+    if (!asked.ok) return sendJson(res, 400, { error: asked.error });
+
+    try {
+      sendJson(res, 200, readScheduledDay(deps.openIndex, deps.schedule(), asked.date));
+    } catch (error) {
+      // What throws past `readScheduledDay` is a missing or unreadable
+      // artifact, never anything about the day, and both of those errors
+      // already name their file and their remedy. So the cause is relayed
+      // whole and nothing is added to it: a second sentence guessing at the
+      // remedy reads as two different diagnoses of one problem. Relaying is
+      // safe here in a way it would not be on a deployed route — the reader
+      // is the maintainer, and the paths are their own.
+      sendJson(res, 500, {
+        error: `Could not read ${asked.date}: ${message(error)}`,
+      });
     }
+  };
+}
 
-    void (async () => {
-      // This route has no body to use — a `GET` carries none — so the read is
-      // only ever here to enforce the cap; the string it resolves to is not
-      // read. See `web/editorTransport.ts` for why the read happens anyway.
-      if ((await readCappedBody(req, res, MAX_REQUEST_BODY_BYTES)) === null) return;
-
-      const asked = editorDayRequest(req.url ?? "/", deps.today());
-      if (!asked.ok) return sendJson(res, 400, { error: asked.error });
-
-      try {
-        sendJson(res, 200, readScheduledDay(deps.openIndex, deps.schedule(), asked.date));
-      } catch (error) {
-        // What throws past `readScheduledDay` is a missing or unreadable
-        // artifact, never anything about the day, and both of those errors
-        // already name their file and their remedy. So the cause is relayed
-        // whole and nothing is added to it: a second sentence guessing at the
-        // remedy reads as two different diagnoses of one problem. Relaying is
-        // safe here in a way it would not be on a deployed route — the reader
-        // is the maintainer, and the paths are their own.
-        sendJson(res, 500, {
-          error: `Could not read ${asked.date}: ${message(error)}`,
-        });
-      }
-    })();
+/** The route, as everything the shared skeleton needs to mount and guard it. */
+export function editorDaySpec(deps: EditorDayDeps): EditorRouteSpec {
+  return {
+    path: EDITOR_DAY_PATH,
+    verbs: ["GET"],
+    refusal: "Read a day with GET.",
+    cap: MAX_REQUEST_BODY_BYTES,
+    handle: editorDayHandler(deps),
   };
 }
 
@@ -121,18 +120,11 @@ function readSchedule(): Schedule {
 }
 
 export function editorDayPlugin(): Plugin {
-  return {
-    name: "rhyme-bee-editor-day",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use(
-        EDITOR_DAY_PATH,
-        editorDayHandler({
-          schedule: readSchedule,
-          openIndex: builtIndex,
-          today: () => localCalendarDate(),
-        }),
-      );
-    },
-  };
+  return editorRoute(
+    editorDaySpec({
+      schedule: readSchedule,
+      openIndex: builtIndex,
+      today: () => localCalendarDate(),
+    }),
+  );
 }

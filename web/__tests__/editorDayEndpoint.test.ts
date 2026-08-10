@@ -1,9 +1,13 @@
 /**
  * The dev-only endpoint the Editor's Pass reads a day through. What a day *is*
  * is `scripts/editorDay.ts` and is tested there; what is tested here is the
- * transport around it — that only a read verb is answered, that a request body
- * is refused rather than buffered, that a malformed date is named as one, and
- * that the three cases of the readout reach the browser unaltered.
+ * transport around it — that a malformed date is named as one, and that the
+ * three cases of the readout reach the browser unaltered.
+ *
+ * The socket ceremony this route shares with the other four — the body cap, and
+ * that no path falls through — is `web/editorRoute.ts`'s and is tested in
+ * `editorRoute.test.ts`. What stays here is this route's own 405 *sentence*,
+ * which is not shared and says what this route is for.
  *
  * `AGENTS.md` records that the Worker routes were tested despite a convention
  * calling transport untested, and that the convention lost;
@@ -16,8 +20,9 @@ import { describe, expect, it } from "vitest";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
-import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "../editorDayRequest.ts";
-import { editorDayHandler } from "../editorDayPlugin.ts";
+import { editorDayRequest } from "../editorDayRequest.ts";
+import { editorDaySpec } from "../editorDayPlugin.ts";
+import { editorMiddleware } from "../editorRoute.ts";
 
 // --- the schedule and index the endpoint answers over --------------------------
 
@@ -82,12 +87,12 @@ interface Answered {
 }
 
 /**
- * Call the handler the way connect does. `server.middlewares.use(PATH, fn)`
- * strips the mounted prefix before the handler sees it, so `url` here is what
- * survives that — `/` with the query still attached.
+ * Call the route the way connect does. `server.middlewares.use(PATH, fn)`
+ * strips the mounted prefix before the middleware sees it, so `url` here is
+ * what survives that — `/` with the query still attached.
  */
 async function call(
-  handler: ReturnType<typeof editorDayHandler>,
+  handler: ReturnType<typeof editorMiddleware>,
   options: {
     method?: string;
     url?: string;
@@ -128,18 +133,24 @@ async function call(
   return answered;
 }
 
-/** The endpoint with everything it depends on stubbed and nothing loaded. */
-function endpoint(overrides: Partial<Parameters<typeof editorDayHandler>[0]> = {}) {
+/**
+ * The endpoint with everything it depends on stubbed and nothing loaded, driven
+ * through the shared skeleton so that what is tested is the route as mounted —
+ * its own 405 sentence included.
+ */
+function endpoint(overrides: Partial<Parameters<typeof editorDaySpec>[0]> = {}) {
   const opened: string[] = [];
-  const handler = editorDayHandler({
-    schedule: () => SCHEDULE,
-    openIndex: () => {
-      opened.push("opened");
-      return stubIndex();
-    },
-    today: () => "2026-08-02",
-    ...overrides,
-  });
+  const handler = editorMiddleware(
+    editorDaySpec({
+      schedule: () => SCHEDULE,
+      openIndex: () => {
+        opened.push("opened");
+        return stubIndex();
+      },
+      today: () => "2026-08-02",
+      ...overrides,
+    }),
+  );
   return { handler, opened };
 }
 
@@ -198,49 +209,19 @@ describe("the dev-only day endpoint", () => {
     });
   });
 
-  it("answers anything but GET with a method refusal, reading nothing", async () => {
+  // The mechanism is `web/editorRoute.ts`'s and is tested there. The sentence
+  // is this route's own, and says what the route is *for* rather than what it
+  // refused — so it is asserted here, where changing it would be noticed.
+  it("answers anything but GET with this route's own refusal, reading nothing", async () => {
     const { handler, opened } = endpoint();
     for (const method of ["POST", "PUT", "DELETE", "PATCH"]) {
       const answered = await call(handler, { method, url: "/?date=2026-08-03" });
 
       expect(answered.status).toBe(405);
       expect(answered.headers["Allow"]).toBe("GET");
+      expect(JSON.parse(answered.body)).toEqual({ error: "Read a day with GET." });
       expect(answered.nexted).toBe(false);
     }
-    expect(opened).toEqual([]);
-  });
-
-  it("refuses a body over the cap, and reads no day", async () => {
-    const { handler, opened } = endpoint();
-    const answered = await call(handler, {
-      url: "/?date=2026-08-03",
-      body: "x".repeat(MAX_REQUEST_BODY_BYTES + 1),
-    });
-
-    expect(answered.status).toBe(413);
-    expect(opened).toEqual([]);
-  });
-
-  it("refuses an oversize body that declared itself small", async () => {
-    const { handler, opened } = endpoint();
-    const answered = await call(handler, {
-      url: "/?date=2026-08-03",
-      body: "x".repeat(MAX_REQUEST_BODY_BYTES + 1),
-      headers: { "content-length": "42" },
-    });
-
-    expect(answered.status).toBe(413);
-    expect(opened).toEqual([]);
-  });
-
-  it("refuses a declared size over the cap before a byte of it arrives", async () => {
-    const { handler, opened } = endpoint();
-    const answered = await call(handler, {
-      url: "/?date=2026-08-03",
-      headers: { "content-length": String(MAX_REQUEST_BODY_BYTES + 1) },
-    });
-
-    expect(answered.status).toBe(413);
     expect(opened).toEqual([]);
   });
 

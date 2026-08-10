@@ -2,11 +2,15 @@
  * The dev-only endpoint the Editor's Pass reads its own state through (#162).
  * What the status *means* is `web/editorStatusReport.ts` and `status.ts`, and
  * is tested in `web/__tests__/editorStatus.test.ts`. What is tested here is the
- * transport around them — that only the one verb it answers is answered, that a
- * body is capped rather than buffered, and that **nothing about the environment
+ * transport around them — and above all that **nothing about the environment
  * reaches the response**, which is the acceptance criterion this route is most
  * able to break: it handles absolute paths by design and shells out to `git`,
  * whose failures quote both.
+ *
+ * The socket ceremony this route shares with the other four — the body cap, and
+ * that no path falls through — is `web/editorRoute.ts`'s and is tested in
+ * `editorRoute.test.ts`. What stays here is this route's own 405 *sentence*,
+ * and the claim that a refusal asks git and the artifact nothing.
  *
  * The last describe drives the real `git`, against a repository built in a temp
  * directory for the purpose. It is the only way to hold `uncommittedPorcelain`
@@ -30,7 +34,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { IndexStaleness } from "../../scripts/indexArtifact.ts";
-import { editorStatusHandler } from "../editorStatusPlugin.ts";
+import { editorStatusSpec } from "../editorStatusPlugin.ts";
+import { editorMiddleware } from "../editorRoute.ts";
 import { porcelainCodes, writtenStatus } from "../editorStatusReport.ts";
 import { WRITTEN_FILES, type EditorStatus } from "../src/editor/status.ts";
 import { uncommittedPorcelain } from "../workingTree.ts";
@@ -44,9 +49,9 @@ interface Answered {
   nexted: boolean;
 }
 
-/** Call the handler the way connect does, mounted prefix already stripped. */
+/** Call the route the way connect does, mounted prefix already stripped. */
 async function call(
-  handler: ReturnType<typeof editorStatusHandler>,
+  handler: ReturnType<typeof editorMiddleware>,
   options: { method?: string; body?: string; headers?: Record<string, string> } = {},
 ): Promise<Answered> {
   const body = options.body ?? "";
@@ -95,26 +100,28 @@ function endpoint(
   } = {},
 ) {
   const asks: string[] = [];
-  const handler = editorStatusHandler({
-    staleness:
-      options.staleness ??
-      (() => {
-        asks.push("staleness");
-        return { stale: false, reason: null };
-      }),
-    porcelain:
-      options.porcelain ??
-      (() => {
-        asks.push("porcelain");
-        return Promise.resolve("");
-      }),
-    present:
-      options.present ??
-      (() => {
-        asks.push("present");
-        return new Set(WRITTEN_FILES);
-      }),
-  });
+  const handler = editorMiddleware(
+    editorStatusSpec({
+      staleness:
+        options.staleness ??
+        (() => {
+          asks.push("staleness");
+          return { stale: false, reason: null };
+        }),
+      porcelain:
+        options.porcelain ??
+        (() => {
+          asks.push("porcelain");
+          return Promise.resolve("");
+        }),
+      present:
+        options.present ??
+        (() => {
+          asks.push("present");
+          return new Set(WRITTEN_FILES);
+        }),
+    }),
+  );
   return { handler, asks };
 }
 
@@ -190,32 +197,27 @@ describe("reading the status", () => {
  * else, on any path.
  */
 describe("what the endpoint will not do or say", () => {
-  it("answers anything but GET with a method refusal, and asks nothing", async () => {
+  // The mechanism is `web/editorRoute.ts`'s and is tested there. The sentence
+  // is this route's own — it says the status changes nothing, which is #162's
+  // whole position on this screen — and so is "a refusal asks git nothing".
+  it("answers anything but GET with this route's own refusal, and asks nothing", async () => {
     const { handler, asks } = endpoint();
     for (const method of ["POST", "PUT", "DELETE", "PATCH"]) {
       const answered = await call(handler, { method });
 
       expect(answered.status).toBe(405);
       expect(answered.headers["Allow"]).toBe("GET");
+      expect(JSON.parse(answered.body)).toEqual({
+        error: "Read the status with GET. It changes nothing.",
+      });
       expect(answered.nexted).toBe(false);
     }
     expect(asks).toEqual([]);
   });
 
-  it("refuses a declared size over the cap before a byte of it arrives", async () => {
+  it("asks git and the artifact nothing when the body was refused", async () => {
     const { handler, asks } = endpoint();
     const answered = await call(handler, { headers: { "content-length": "99999" } });
-
-    expect(answered.status).toBe(413);
-    expect(asks).toEqual([]);
-  });
-
-  it("refuses an oversize body that declared itself small", async () => {
-    const { handler, asks } = endpoint();
-    const answered = await call(handler, {
-      body: "x".repeat(1024),
-      headers: { "content-length": "42" },
-    });
 
     expect(answered.status).toBe(413);
     expect(asks).toEqual([]);
