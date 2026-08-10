@@ -26,6 +26,15 @@
  * offline judging pass. Giving that its own path would have been a second
  * endpoint writing a second copy of one record, which is precisely what the
  * slice was shaped to avoid.
+ *
+ * The constant keeps the player's word because the path was built for a
+ * player's act and still serves one: an Appeal is a report about a Submission
+ * the game rejected, and only the player half has either. The editor half is a
+ * word typed as an *add*, adjudicated against nothing — so no sentence the
+ * editor is ever shown says "Appeal", and the failure messages
+ * `web/src/editor/useDisagreement.ts` builds name the queue this path writes to
+ * instead. The URL says `supplement-candidate` for the same reason: the record
+ * is what both ends have in common, and the act is not.
  */
 export const APPEAL_PATH = "/api/supplement-candidate";
 
@@ -82,8 +91,9 @@ export const EDITOR_DEMOTION_PATH = "/api/editor/demotion";
 
 /**
  * Where the Editor's Pass submits its queued adds: `POST` alone, carrying the
- * day and the words. It is the one path here with **no `GET`**, and that is the
- * shape of the feature rather than an omission — the queue lives in the browser
+ * day and the words. It is the one **editor** path with no `GET` — the two
+ * report paths above it have none either, and for their own reason — and that
+ * is the shape of the feature rather than an omission: the queue lives in the browser
  * and costs nothing until Submit (#161), so there is no server-side list of
  * pending adds for a read to return.
  *

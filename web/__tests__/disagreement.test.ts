@@ -26,7 +26,11 @@ import {
   serialiseCandidate,
 } from "../../src/supplementCandidate.ts";
 import { evidenceContextFrom, gatherEvidence } from "../../src/supplementEvidence.ts";
-import { disagreementReport } from "../src/editor/disagreement.ts";
+import {
+  disagreementKey,
+  disagreementReport,
+  failureFor,
+} from "../src/editor/disagreement.ts";
 
 /** The fixture's widest family, and the day the editor is imagined to be on. */
 const SEED = "ate";
@@ -232,5 +236,71 @@ describe("the report the existing endpoint is sent", () => {
 
     expect(line.endsWith("\n")).toBe(true);
     expect(JSON.parse(line.trim())).toEqual(outcome.candidate);
+  });
+});
+
+/**
+ * What the screen remembers, and for how long. Both of these were bugs: the set
+ * of recorded disagreements was keyed on the word alone, and the failure banner
+ * was a bare sentence that outlived the Puzzle it was about.
+ *
+ * They are pure functions rather than a rendered hook because `web/` has no
+ * React test harness, and that shaped the design rather than merely surviving
+ * it: `failureFor` is a render-time predicate, not an effect on the date, so the
+ * rule is reachable from here at all.
+ */
+describe("what makes one disagreement distinct from another", () => {
+  /**
+   * The bug. Record `bluebeard` on the `beard` day, meet it again on a later
+   * Puzzle, and keyed on the word alone the button was already gone — replaced
+   * by a sentence naming the new Seed Word about a record that had never been
+   * made against it. A genuinely different claim, unrecordable and misdescribed.
+   */
+  it("keys on the Seed Word as well as the word", () => {
+    const recorded = new Set([disagreementKey("bluebeard", "beard")]);
+
+    expect(recorded.has(disagreementKey("bluebeard", "beard"))).toBe(true);
+    expect(recorded.has(disagreementKey("bluebeard", "bust"))).toBe(false);
+  });
+
+  it("keeps two words on one Seed Word apart", () => {
+    expect(disagreementKey("bluebeard", "beard")).not.toBe(disagreementKey("weird", "beard"));
+  });
+
+  /**
+   * The separator is a space because neither end can contain one: the word comes
+   * back from the endpoint, which refuses anything but `^[a-z]+$`, and the Seed
+   * Word comes out of `data/schedule.json` already in that shape. So no two
+   * pairs can collide by running into each other — which is the claim that makes
+   * a string key safe here at all.
+   */
+  it("cannot be made to collide by two pairs running into each other", () => {
+    expect(disagreementKey("blue", "beardbust")).not.toBe(disagreementKey("bluebeard", "bust"));
+    // Asked of the validator itself rather than asserted: a word with a space in
+    // it never comes back from the endpoint, so it never reaches a key.
+    const spaced = { ...disagreementReport("bluebeard", [], SEED, SEED_KEY), word: "blue beard" };
+    expect(candidateFromReport(spaced, "2026-08-09T22:15:00.000Z").ok).toBe(false);
+  });
+});
+
+describe("the failure sentence, and the Puzzle it belongs to", () => {
+  const FAILED = { message: "The supplement-candidate endpoint answered 500.", seedWord: "beard" };
+
+  it("shows over the readout it was posted from", () => {
+    expect(failureFor(FAILED, "beard")).toBe(FAILED.message);
+  });
+
+  /**
+   * The bug: a post that failed on one day left its banner standing over the
+   * next day's readout, telling the editor nothing was recorded about words they
+   * had never tried to record.
+   */
+  it("is silent over a readout about another Seed Word", () => {
+    expect(failureFor(FAILED, "bust")).toBeNull();
+  });
+
+  it("is silent when there is no failure, and when there is no Puzzle to compare", () => {
+    expect(failureFor(null, "beard")).toBeNull();
+    expect(failureFor(FAILED, null)).toBeNull();
   });
 });

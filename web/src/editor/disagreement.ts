@@ -116,3 +116,62 @@ export function disagreementReport(
     engineRespelling: used ? respell(used.phonemes) : null,
   };
 }
+
+/**
+ * What makes one disagreement distinct from another: the word **and the Seed
+ * Word**, never the word alone.
+ *
+ * The same word is a different observation against a different Seed. `bluebeard`
+ * recorded on the `beard` day and `bluebeard` met again on some later `bust` day
+ * are two claims about two Puzzles, and the judge rules on them separately — the
+ * reading the engine holds is the same, and whether *that* reading rhymes is a
+ * different question each time it is asked against a different key. Keyed on the
+ * word alone, the second one could not be recorded at all: the button would
+ * already be gone, replaced by a sentence naming the new Seed Word about a
+ * record that was never made against it — a screen misdescribing the queue, on
+ * the one gesture whose entire purpose is that an observation survives.
+ *
+ * A space separates the two because neither can contain one. Both ends of the
+ * pair are `^[a-z]+$`: the word comes back from the endpoint, which refuses
+ * anything else (`SUBMISSION_SHAPE`, `src/supplementCandidate.ts`), and the Seed
+ * Word comes out of `data/schedule.json` already in that shape. So no two pairs
+ * can collide by running into each other.
+ */
+export function disagreementKey(word: string, seedWord: string): string {
+  return `${word} ${seedWord}`;
+}
+
+/**
+ * A post the endpoint refused or never received, and the Seed Word it was about.
+ *
+ * The Seed is carried for the same reason the key above pairs on it: a failure
+ * is about one disagreement, and a disagreement is a word against a Seed Word.
+ * Without it the sentence outlived what it was about — record on the `beard`
+ * day, fail, submit a batch on some other day, and the banner was still standing
+ * over a readout it had nothing to do with, telling the editor that nothing was
+ * recorded about words they had not tried to record.
+ */
+export interface DisagreementFailure {
+  message: string;
+  seedWord: string;
+}
+
+/**
+ * The failure sentence to show over a readout aimed at `seedWord`, or `null`
+ * when the standing failure is about some other Puzzle.
+ *
+ * Pure and read at the render rather than cleared by an effect on the day
+ * changing, which was the other option. An effect would have needed the hook to
+ * be told the date — a second thing for it to know, and the wrong one, since a
+ * date change is not what makes the sentence stale: it goes stale when the
+ * readout under it is replaced by one about a different Seed Word, which is what
+ * this compares. It is also the half of the rule a test can reach, `web/` having
+ * no way to render a hook.
+ */
+export function failureFor(
+  failure: DisagreementFailure | null,
+  seedWord: string | null,
+): string | null {
+  if (failure === null || seedWord === null) return null;
+  return failure.seedWord === seedWord ? failure.message : null;
+}

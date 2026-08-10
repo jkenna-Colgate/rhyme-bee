@@ -81,6 +81,33 @@ export interface AddTarget {
 }
 
 /**
+ * An aim taken from a scheduled day, where the Seed Word is not in question.
+ *
+ * `AddTarget.seed` is optional because one aim genuinely has no Seed — the
+ * command line's `--rhymeKey`, which names a Rhyme Key outright with no Puzzle
+ * behind it. That optionality is correct for the union of the two aims and
+ * wrong for either one taken alone: every aim `targetIn` builds comes off a
+ * scheduled day and therefore *always* carries a Seed, and typing it as though
+ * it might not made a real gap on the screen. The browser's record-a-
+ * disagreement button needs the Seed Word, so it rendered `seed !== null &&
+ * (…)` and a null Seed made the button silently vanish — the editor watching a
+ * word do nothing, which is the exact failure the gesture exists to prevent.
+ *
+ * Narrowing here rather than making `seed` required on `AddTarget` because the
+ * `--rhymeKey` aim is not a degenerate scheduled one, it is a second kind of
+ * aim, and a required field would have to be filled with a lie. It does not
+ * reach all the way to the browser either: `AddOutcome.seed` stays optional
+ * because the outcome is the union again, and a wire type cannot carry a
+ * guarantee about which caller built it. What this buys is that the one server
+ * path a browser can reach (`web/editorAddPlugin.ts`, which aims only through
+ * `targetIn`) provably has a Seed — so the null case on screen is a sentence
+ * about the CLI's aim rather than a hole the web mode can fall into.
+ */
+export interface ScheduledAddTarget extends AddTarget {
+  seed: string;
+}
+
+/**
  * A word that needed nothing: a Proper Noun, refused outright. The space of
  * names is unbounded and has no defensible edge, however well the name
  * rhymes. It is its own case rather than a `deferred` reason — deferring
@@ -577,7 +604,7 @@ function printWordOutcome(w: WordOutcome, target: RhymeKey): void {
  * here, without an opinion about what a caller does when it comes back empty,
  * and each surface supplies its own.
  */
-export function targetIn(schedule: Schedule, date: string): AddTarget | null {
+export function targetIn(schedule: Schedule, date: string): ScheduledAddTarget | null {
   const day = schedule.days.find((d) => d.date === date);
   if (day === undefined) return null;
   return {
@@ -588,7 +615,7 @@ export function targetIn(schedule: Schedule, date: string): AddTarget | null {
 }
 
 /** The Rhyme Key an add is aimed at, for a command: a date off the run is fatal. */
-export function targetFor(schedule: Schedule, date: string): AddTarget {
+export function targetFor(schedule: Schedule, date: string): ScheduledAddTarget {
   const aim = targetIn(schedule, date);
   if (aim === null) {
     fail(`No Daily Puzzle scheduled for ${date}. Pass --rhymeKey to add against a key directly.`);

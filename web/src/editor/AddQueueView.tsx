@@ -18,22 +18,19 @@
  * how the editor can *check* the aim, and there is deliberately no control that
  * changes it.
  *
- * The one gesture here that is not an add is `ReadsElsewhere` below: a word the
- * index turns out to hold on another key, reported with the keys it is held on,
- * and offered a single click that records the disagreement as a Candidate
- * (#163). It writes no reading and proposes none — see that component for why
- * the two acts are kept apart.
+ * The one gesture here that is not an add is `ReadsElsewhere`, which has its own
+ * file: a word the index turns out to hold on another key, reported with the
+ * keys it is held on, and offered a single click that records the disagreement
+ * as a Candidate (#163). It writes no reading and proposes none — see that
+ * module for why the two acts are kept apart.
  */
 
 import { useState } from "react";
-import type {
-  DeferredOutcome,
-  ReadsOnAnotherKeyOutcome,
-  WordOutcome,
-} from "../../../scripts/editorAdd.ts";
+import type { AddTarget, DeferredOutcome, WordOutcome } from "../../../scripts/editorAdd.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
 import { MAX_QUEUED_WORDS, aimHeldFor, type AddSubmitResult } from "./add.ts";
-import { disagreementReport } from "./disagreement.ts";
+import { failureFor } from "./disagreement.ts";
+import { ReadsElsewhere } from "./ReadsElsewhere.tsx";
 import { pendingWork, type EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 import type { Disagreer } from "./useDisagreement.ts";
@@ -298,6 +295,10 @@ function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: 
   // four unrelated pieces of markup under one `if`. What they share is only
   // the test, which this is.
   const nothingQueued = outcome === null;
+  // A standing failure belongs to the Puzzle it was posted against, and this
+  // readout names the one on screen. An empty Submit aimed at nothing has no
+  // Seed Word, and no disagreement can have been posted from it either.
+  const standingFailure = failureFor(disagreer.failure, outcome?.seed ?? null);
 
   return (
     <section className="editor-written">
@@ -352,10 +353,15 @@ function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: 
 
       {/* One banner for the whole readout rather than one per word: a failed
           post is a fact about the endpoint, and every button on the list is
-          about to fail the same way. */}
-      {disagreer.error !== null && (
+          about to fail the same way.
+
+          Shown only while the readout under it is still the one the failed post
+          was made from. A failure held as a bare sentence outlived what it was
+          about — record on one day, fail, submit a batch on another, and the
+          banner was still standing over a readout it had nothing to do with. */}
+      {standingFailure !== null && (
         <p className="editor-write-failed">
-          {disagreer.error} <strong>Nothing was recorded</strong> — the disagreement is still only
+          {standingFailure} <strong>Nothing was recorded</strong> — the disagreement is still only
           on this screen.
         </p>
       )}
@@ -365,12 +371,7 @@ function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: 
           {outcome.words.map((word) => (
             <li key={word.word} className={`editor-add-outcome editor-add-${word.outcome}`}>
               <strong>{word.word}</strong> —{" "}
-              <WordOutcomeLine
-                word={word}
-                target={outcome.target}
-                seed={outcome.seed ?? null}
-                disagreer={disagreer}
-              />
+              <WordOutcomeLine word={word} aim={outcome} disagreer={disagreer} />
             </li>
           ))}
         </ul>
@@ -391,22 +392,22 @@ function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: 
  */
 function WordOutcomeLine({
   word,
-  target,
-  seed,
+  aim,
   disagreer,
 }: {
   word: WordOutcome;
-  target: RhymeKey;
   /**
-   * The Seed Word the batch was aimed at, from the outcome itself rather than
-   * from the day on screen — the two part company the moment an editor checks a
-   * neighbouring day with a Submit's readout still standing. Null when the aim
-   * named a Rhyme Key outright and there is no Puzzle behind it, which the CLI
-   * allows and this screen does not.
+   * What the batch was aimed at — the Rhyme Key and, when a scheduled day
+   * supplied it, the Seed Word — taken from the outcome itself rather than from
+   * the day on screen. The two part company the moment an editor checks a
+   * neighbouring day with a Submit's readout still standing, and a Candidate
+   * naming the wrong Puzzle would look exactly as correct as one naming the
+   * right one.
    */
-  seed: string | null;
+  aim: AddTarget;
   disagreer: Disagreer;
 }) {
+  const { target } = aim;
   switch (word.outcome) {
     case "refused-name":
       return (
@@ -421,9 +422,7 @@ function WordOutcomeLine({
         </>
       );
     case "reads-on-another-key":
-      return (
-        <ReadsElsewhere word={word} target={target} seed={seed} disagreer={disagreer} />
-      );
+      return <ReadsElsewhere word={word} aim={aim} disagreer={disagreer} />;
     case "written":
       return (
         <>
@@ -445,99 +444,6 @@ function WordOutcomeLine({
       throw new Error(`unreachable word outcome: ${JSON.stringify(exhaustive)}`);
     }
   }
-}
-
-/**
- * A word the index already holds — on a Rhyme Key that is not this day's.
- *
- * ## Why it names the keys
- *
- * "It already has a reading that does not rhyme" leaves the editor watching a
- * word they were sure about do nothing. The engine *has* a pronunciation, and
- * that pronunciation is the whole of the disagreement, so the line says where
- * the index holds the word: each reading with the key it yields. A word can be
- * held more than once, and a reading with no stressed vowel yields no key at
- * all — said in words rather than shown as a blank, because a blank beside a
- * key reads as a rendering fault.
- *
- * ## Why there is a button, and why it records rather than fixes
- *
- * The editor is reading a third-party rhyme list in the next window and believes
- * the word rhymes anyway. That belief is worth exactly as much at 11pm as it is
- * in a judging pass, and nothing else on this screen can hold it: an add wrote
- * nothing, a Tier verdict is about a word that is already in the Puzzle, and a
- * demotion takes wordhood away rather than granting a reading. So the click
- * records a **Candidate** — the report, never the fix (CONTEXT.md) — into the
- * queue that already exists for exactly this claim.
- *
- * No pronunciation is offered, proposed or accepted anywhere here, and the
- * button's words are chosen so it cannot be read as offering one. Contradicting
- * a source that spoke is a different act from filling a gap where the sources
- * are silent, with different stakes and its own evidence requirements; it stays
- * a hand edit of `data/supplement.dict`, made against the queue rather than from
- * this screen.
- *
- * ## Why it says "this pass" rather than "recorded"
- *
- * The queue cannot be read from here — it is write-only by design — so what the
- * screen actually knows is that *this tab* posted it. Saying so is the honest
- * version of the same reassurance, and it is why a reload puts the button back:
- * the record is in the queue, and the screen has simply stopped knowing it.
- */
-function ReadsElsewhere({
-  word,
-  target,
-  seed,
-  disagreer,
-}: {
-  word: ReadsOnAnotherKeyOutcome;
-  target: RhymeKey;
-  seed: string | null;
-  disagreer: Disagreer;
-}) {
-  const recorded = disagreer.recorded.has(word.word);
-  const recording = disagreer.recording === word.word;
-
-  return (
-    <>
-      already reads, and not on <code>{target}</code> — so this is a correction rather than an add,
-      and nothing was written. Correcting a reading an upstream source gave is not something this
-      tool does. The index holds it as{" "}
-      <span className="editor-muted">
-        {word.readings.map((reading, at) => (
-          <span key={reading.phonemes.join(" ")}>
-            {at > 0 && "  ·  "}
-            {reading.phonemes.join(" ")} on{" "}
-            {reading.key === null ? (
-              <em>no key — the reading has no stressed vowel</em>
-            ) : (
-              <code>{reading.key}</code>
-            )}
-          </span>
-        ))}
-      </span>
-      .{" "}
-      {recorded ? (
-        <span className="editor-disagree-recorded">
-          Recorded this pass — the word, {seed} and <code>{target}</code> are in the
-          supplement-candidate queue for a judging pass to rule on.
-        </span>
-      ) : (
-        seed !== null && (
-          <button
-            type="button"
-            className="editor-disagree"
-            disabled={recording}
-            onClick={() => {
-              void disagreer.record(disagreementReport(word.word, word.readings, seed, target));
-            }}
-          >
-            {recording ? "Recording…" : `It does rhyme with ${seed} — record that`}
-          </button>
-        )
-      )}
-    </>
-  );
 }
 
 /**

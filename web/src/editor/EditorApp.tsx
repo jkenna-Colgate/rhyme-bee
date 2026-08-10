@@ -36,7 +36,8 @@
  * off the index it has just rebuilt, and the readout is handed to the hook that
  * owns the day rather than kept a second time by the one that submitted.
  *
- * The status is the fourth hook and belongs to none of the three above it. It
+ * The status hook is about none of the three above — not the day, not the words
+ * on it, not the queue beside them. It
  * is about the repository rather than a day — whether the built Rhyme Index is
  * stale, and whether the files the pass writes are committed (#162) — so it is
  * fetched once, refreshed when a write lands or the window is focused, and
@@ -44,8 +45,8 @@
  * as the add queue for the one rule that reads it: Submit is enabled by a stale
  * index as well as by a queued add.
  *
- * The disagreement recorder is the fifth, and the only one whose writes are
- * absent from that status — deliberately. `WRITTEN_GROUPS` names the files the
+ * The disagreement recorder is the one hook whose writes are absent from that
+ * status — deliberately. `WRITTEN_GROUPS` names the files the
  * pass is *accountable for committing*, and the supplement-candidate queue is
  * not one of them: it is gitignored with the rest of `data/`, it is judged
  * offline and pulled down rather than committed, and its deployed half writes to
