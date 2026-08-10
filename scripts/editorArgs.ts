@@ -2,18 +2,28 @@
  * Pure parser for the Editor's Pass commands — the one piece of the pass worth
  * testing, so it lives apart from the imperative shell that prints and writes.
  *
- *   npm run editor:read                          # tomorrow's Daily Puzzle
- *   npm run editor:read -- --date=2026-08-20     # a named day
- *   npm run editor:read -- --seed=placeholder    # audition an unscheduled Seed
- *   npm run editor:add -- --words=placeholder,toothache
- *   npm run editor:add -- --words=earache --rhymeKey="EY K"
+ *   npm run editor:read                                     # tomorrow's Daily Puzzle
+ *   npx tsx scripts/editor.ts read --date 2026-08-20        # a named day
+ *   npx tsx scripts/editor.ts read --seed thunder           # audition an unscheduled Seed
+ *   npx tsx scripts/editor.ts add --words "placeholder,toothache"
+ *   npx tsx scripts/editor.ts add --words earache --rhymeKey "EY K"
  *
- * Flags take either spelling, `--date 2026-08-20` or `--date=2026-08-20`. The
- * equals form exists for Windows PowerShell, which strips the bare `--`
- * separator *and* the token after it before npm forwards anything, so the space
- * form loses its flag on the way through. A bare positional token is accepted
- * too — an ISO date reads that day, anything else auditions that Seed Word —
- * which is the short thing to type when invoking `tsx` directly.
+ * Flags take either spelling, `--date 2026-08-20` or `--date=2026-08-20`; both
+ * are parsed identically here. Neither spelling rescues a `npm run … --` on
+ * Windows PowerShell, where the separator is eaten before npm sees it — see
+ * `editor.ts` for the invocations that survive.
+ *
+ * A bare positional token is accepted too — an ISO date reads that day,
+ * anything else auditions that Seed Word, and on `add` it is a word — which is
+ * the short thing to type when invoking `tsx` directly.
+ *
+ * That positional path is also why a mangled PowerShell invocation can look
+ * like it worked, and is the reason to care about the paragraph above.
+ * `npm run editor:read -- --date 2026-08-20` loses the separator and the flag
+ * name both, and arrives here as the lone positional `2026-08-20`: the right
+ * day, by luck. The same mangling of `--words=earache --rhymeKey="EY K"`
+ * arrives as `earache`, `EY`, `K` — three positionals, which on `add` are three
+ * words aimed at tomorrow's Rhyme Key rather than the one that was named.
  *
  * Throws on any invalid input; the script turns the throw into a clean exit.
  */

@@ -7,10 +7,12 @@
  *   --day 6      --seed books      # space-separated
  *   --day=6      --seed=books      # equals form
  *
- * The equals form exists for Windows PowerShell, which strips the bare `--`
- * separator *and* the token after it before npm forwards anything, so
- * `npm run play -- --day 6` reaches the script as just `["6"]`. `--day=6`
- * survives because there is no separated token to swallow.
+ * Both are parsed identically here, and neither rescues a `npm run play --` on
+ * Windows PowerShell, where the separator is eaten before npm sees it — see
+ * `play.ts` for the invocations that survive. The reason a mangled one can still
+ * appear to work is that `npm run play -- --day 6` loses the separator and the
+ * flag name both and arrives here as just `["6"]`, which the day parser accepts
+ * as a bare positional: the right Puzzle, by luck rather than by the flag.
  *
  * Throws on any invalid input; `play.ts` turns the throw into a clean exit.
  */

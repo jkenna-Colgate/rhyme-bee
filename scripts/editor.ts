@@ -2,15 +2,21 @@
  * The Editor's Pass: read a Daily Puzzle the night before it goes live, and add
  * the words that read turns up as missing.
  *
- *   npm run editor:read                          # tomorrow
- *   npm run editor:read -- --date=2026-08-20     # a named day
- *   npm run editor:read -- --seed=placeholder    # audition an unscheduled Seed
- *   npm run editor:add -- --words=placeholder,toothache
- *   npm run editor:add -- --words=earache --rhymeKey="EY K"
+ *   npm run editor:read                                     # tomorrow
+ *   npx tsx scripts/editor.ts read --date 2026-08-20        # a named day
+ *   npx tsx scripts/editor.ts read --seed thunder           # audition an unscheduled Seed
+ *   npx tsx scripts/editor.ts add --words "placeholder,toothache"
+ *   npx tsx scripts/editor.ts add --words earache --rhymeKey "EY K"
  *
- * On Windows PowerShell the bare `--` separator (and the token after it) is
- * stripped before npm forwards anything, so use the equals form above, or
- * invoke tsx directly: `npx tsx scripts/editor.ts read --date 2026-08-20`.
+ * **Do not reach these through `npm run` on Windows PowerShell.** PowerShell
+ * eats the bare `--` separator itself, so it never reaches npm; npm then reads
+ * the flags that follow as its own configuration and forwards them nowhere. The
+ * equals form is not the fix — it fails the same way. What survives depends on
+ * the flag name and is not worth learning: `--date=…` vanishes outright, while
+ * `--day=6` leaks a bare `6` through. Either quote the separator
+ * (`npm run editor:read '--' '--date=2026-08-20'`), or invoke tsx as above,
+ * which has no separator to lose. See `editorArgs.ts` for why the mangled form
+ * can still appear to work.
  *
  * The entry point and nothing else: parse the arguments, load the schedule,
  * dispatch. The pass is two activities that share almost nothing, so each has

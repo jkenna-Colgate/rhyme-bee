@@ -28,10 +28,27 @@ npm run deploy        # build the index and the shell, and ship both — docs/de
 `play` and `histogram` draw Seed Words from a playable size band, set by the
 `BAND_MIN` / `BAND_MAX` env vars (default `20` / `120`).
 
-`play` takes flags: `-- --day 1..7` (1 easiest … 7 hardest) or `-- --seed <word>`.
-On **Windows PowerShell** the bare `--` separator swallows the flag after it, so
-use the equals form — `npm run play -- --day=6`, `npm run play -- --seed=books` —
-or invoke tsx directly: `npx tsx scripts/play.ts --day 6`.
+`play` takes flags: `--day 1..7` (1 easiest … 7 hardest) or `--seed <word>`.
+
+On **Windows PowerShell**, do not pass them through `npm run`. PowerShell eats
+the bare `--` separator before npm sees it, npm reads the flags that follow as
+its own configuration, and they reach the script either mangled or not at all —
+silently, with no error. The equals form is not a fix; it fails the same way.
+Invoke tsx directly, or quote the separator:
+
+```
+npx tsx scripts/play.ts --day 6        # nothing to lose
+npm run play '--' '--day=6'            # quoting survives PowerShell
+```
+
+This applies to every flag-taking script here — `play`, `editor:read`,
+`editor:add`, `supplement:candidates`. In Git Bash the bare `--` survives and
+the ordinary form works.
+
+PowerShell has a second, separate trap for the scripts taking comma-separated
+lists (`editor:add --words`, `supplement:candidates --words`): it reads `a,b` as
+an array literal and passes it as the single argument `a b`. **Quote the list** —
+`--words "ule,rule"` — in either flag spelling.
 
 ## The rules, in short
 

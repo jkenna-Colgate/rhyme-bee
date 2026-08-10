@@ -16,7 +16,7 @@ describe("parsePlayArgs", () => {
     });
   });
 
-  describe("equals form (survives PowerShell's -- handling)", () => {
+  describe("equals form (parsed identically to the space form)", () => {
     it("reads --seed=<word>", () => {
       expect(parsePlayArgs(["--seed=books"])).toEqual({ seed: "books" });
     });

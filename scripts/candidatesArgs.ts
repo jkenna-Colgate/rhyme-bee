@@ -6,11 +6,14 @@
  *   --words ule,rule,fluke --target "UW L"      # space-separated
  *   --words=ule,rule,fluke --target="UW L"      # equals form
  *
- * The equals form exists for the same reason `playArgs.ts` carries it:
- * Windows PowerShell strips the bare `--` separator *and* the token after it
- * before npm forwards anything, so `npm run supplement:candidates -- --words
- * a,b` reaches the script as just `["a,b"]`. `--words=a,b` survives because
- * there is no separated token to swallow.
+ * Both are parsed identically here, and neither rescues a
+ * `npm run supplement:candidates --` on Windows PowerShell, where the separator
+ * is eaten before npm sees it and the flags that follow are read as npm's own
+ * configuration. This script fares worse than `play` there: both flags vanish
+ * outright rather than leaking a stray value, so the run silently falls back to
+ * queue mode. Quote the separator, or invoke tsx directly:
+ *
+ *   npx tsx scripts/supplement-candidates.ts --words "ule,rule" --target "UW L"
  *
  * Two modes, mutually exclusive:
  *
