@@ -29,63 +29,18 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
-import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import type { IncomingMessage, ServerResponse } from "node:http";
 import type { IndexStaleness } from "../../scripts/indexArtifact.ts";
 import { editorStatusSpec } from "../editorStatusPlugin.ts";
 import { editorMiddleware } from "../editorRoute.ts";
+import { callRoute as call } from "./routeCall.ts";
 import { porcelainCodes, writtenStatus } from "../editorStatusReport.ts";
 import { WRITTEN_FILES, type EditorStatus } from "../src/editor/status.ts";
 import { uncommittedPorcelain } from "../workingTree.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
-interface Answered {
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-  nexted: boolean;
-}
-
-/** Call the route the way connect does, mounted prefix already stripped. */
-async function call(
-  handler: ReturnType<typeof editorMiddleware>,
-  options: { method?: string; body?: string; headers?: Record<string, string> } = {},
-): Promise<Answered> {
-  const body = options.body ?? "";
-  const req = Readable.from(body.length > 0 ? [Buffer.from(body)] : []) as IncomingMessage;
-  req.method = options.method ?? "GET";
-  req.url = "/";
-  req.headers = options.headers ?? {};
-
-  const answered: Answered = { status: 0, headers: {}, body: "", nexted: false };
-  let finish: () => void;
-  const done = new Promise<void>((settle) => (finish = settle));
-  const res = {
-    set statusCode(value: number) {
-      answered.status = value;
-    },
-    get statusCode() {
-      return answered.status;
-    },
-    setHeader(name: string, value: string) {
-      answered.headers[name] = value;
-    },
-    end(payload?: string) {
-      answered.body = payload ?? "";
-      finish();
-    },
-  } as unknown as ServerResponse;
-
-  handler(req, res, () => {
-    answered.nexted = true;
-    finish();
-  });
-  await done;
-  return answered;
-}
 
 /**
  * The endpoint with both reads replaced by recorders, so no artifact is stat-ed

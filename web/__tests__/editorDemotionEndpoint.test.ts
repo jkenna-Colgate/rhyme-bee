@@ -17,63 +17,13 @@
  * the shape these follow.
  */
 
-import { Readable } from "node:stream";
 import { describe, expect, it } from "vitest";
-import type { IncomingMessage, ServerResponse } from "node:http";
 import { serialiseDemotion, type Demotion } from "../../src/demotions.ts";
 import { MAX_DEMOTION_BODY_BYTES, demotionWriteRequest } from "../editorDemotionRequest.ts";
 import { editorDemotionSpec } from "../editorDemotionPlugin.ts";
 import { editorMiddleware } from "../editorRoute.ts";
+import { callRoute as call } from "./routeCall.ts";
 
-interface Answered {
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-  nexted: boolean;
-}
-
-/** Call the route the way connect does, mounted prefix already stripped. */
-async function call(
-  handler: ReturnType<typeof editorMiddleware>,
-  options: {
-    method?: string;
-    url?: string;
-    body?: string;
-    headers?: Record<string, string>;
-  } = {},
-): Promise<Answered> {
-  const body = options.body ?? "";
-  const req = Readable.from(body.length > 0 ? [Buffer.from(body)] : []) as IncomingMessage;
-  req.method = options.method ?? "GET";
-  req.url = options.url ?? "/";
-  req.headers = options.headers ?? {};
-
-  const answered: Answered = { status: 0, headers: {}, body: "", nexted: false };
-  let finish: () => void;
-  const done = new Promise<void>((resolve) => (finish = resolve));
-  const res = {
-    set statusCode(value: number) {
-      answered.status = value;
-    },
-    get statusCode() {
-      return answered.status;
-    },
-    setHeader(name: string, value: string) {
-      answered.headers[name] = value;
-    },
-    end(payload?: string) {
-      answered.body = payload ?? "";
-      finish();
-    },
-  } as unknown as ServerResponse;
-
-  handler(req, res, () => {
-    answered.nexted = true;
-    finish();
-  });
-  await done;
-  return answered;
-}
 
 /** The endpoint with the file replaced by a string, so nothing touches `data/`. */
 function endpoint(options: { file?: string; append?: (demotion: Demotion) => void } = {}) {

@@ -21,10 +21,8 @@
 
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import type { IncomingMessage, ServerResponse } from "node:http";
 import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
 import { add, type AddOutcome, type AddTarget } from "../../scripts/editorAdd.ts";
@@ -33,57 +31,10 @@ import type { AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "../editorAddRequest.ts";
 import { editorAddSpec } from "../editorAddPlugin.ts";
 import { editorMiddleware } from "../editorRoute.ts";
+import { callRoute as call, type Answered } from "./routeCall.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
-interface Answered {
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-  nexted: boolean;
-}
-
-/** Call the handler the way connect does, mounted prefix already stripped. */
-async function call(
-  handler: ReturnType<typeof editorMiddleware>,
-  options: {
-    method?: string;
-    body?: string;
-    headers?: Record<string, string>;
-  } = {},
-): Promise<Answered> {
-  const body = options.body ?? "";
-  const req = Readable.from(body.length > 0 ? [Buffer.from(body)] : []) as IncomingMessage;
-  req.method = options.method ?? "POST";
-  req.url = "/";
-  req.headers = options.headers ?? {};
-
-  const answered: Answered = { status: 0, headers: {}, body: "", nexted: false };
-  let finish: () => void;
-  const done = new Promise<void>((resolve) => (finish = resolve));
-  const res = {
-    set statusCode(value: number) {
-      answered.status = value;
-    },
-    get statusCode() {
-      return answered.status;
-    },
-    setHeader(name: string, value: string) {
-      answered.headers[name] = value;
-    },
-    end(payload?: string) {
-      answered.body = payload ?? "";
-      finish();
-    },
-  } as unknown as ServerResponse;
-
-  handler(req, res, () => {
-    answered.nexted = true;
-    finish();
-  });
-  await done;
-  return answered;
-}
 
 /**
  * One scheduled day, with `bust`'s **real** Rhyme Key on it. Real because the

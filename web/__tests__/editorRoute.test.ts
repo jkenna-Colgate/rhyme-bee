@@ -20,69 +20,13 @@
  * calling transport untested, and that the convention lost.
  */
 
-import { Readable } from "node:stream";
 import { describe, expect, it } from "vitest";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { editorMiddleware, editorRoute, type EditorRouteSpec } from "../editorRoute.ts";
 import { relayCause } from "../editorTransport.ts";
+import { callRoute as call } from "./routeCall.ts";
 
-interface Answered {
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-  nexted: boolean;
-}
-
-/** Call the middleware the way connect does, mounted prefix already stripped. */
-async function call(
-  middleware: ReturnType<typeof editorMiddleware>,
-  options: {
-    method?: string;
-    url?: string;
-    body?: string;
-    headers?: Record<string, string>;
-  } = {},
-): Promise<Answered> {
-  const body = options.body ?? "";
-  const req = Readable.from(body.length > 0 ? [Buffer.from(body)] : []) as IncomingMessage;
-  req.method = options.method ?? "GET";
-  req.url = options.url ?? "/";
-  req.headers = options.headers ?? {};
-
-  const answered: Answered = { status: 0, headers: {}, body: "", nexted: false };
-  let ended = false;
-  let finish: () => void;
-  const done = new Promise<void>((settle) => (finish = settle));
-  const res = {
-    set statusCode(value: number) {
-      answered.status = value;
-    },
-    get statusCode() {
-      return answered.status;
-    },
-    setHeader(name: string, value: string) {
-      answered.headers[name] = value;
-    },
-    // Modelled because the skeleton's last-resort catch asks: a handler that
-    // answered and *then* threw must not have a second reply written over it.
-    get writableEnded() {
-      return ended;
-    },
-    end(payload?: string) {
-      answered.body = payload ?? "";
-      ended = true;
-      finish();
-    },
-  } as unknown as ServerResponse;
-
-  middleware(req, res, () => {
-    answered.nexted = true;
-    finish();
-  });
-  await done;
-  return answered;
-}
 
 /**
  * A route that records what reached it, so "the handler was never entered" is
