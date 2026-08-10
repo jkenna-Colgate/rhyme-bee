@@ -25,6 +25,7 @@ import { describe, expect, it } from "vitest";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { editorMiddleware, editorRoute, type EditorRouteSpec } from "../editorRoute.ts";
+import { relayCause } from "../editorTransport.ts";
 
 interface Answered {
   status: number;
@@ -267,6 +268,53 @@ describe("a route that does not answer for itself", () => {
 
     expect(answered.status).toBe(200);
     expect(JSON.parse(answered.body)).toEqual({ outcome: "day" });
+  });
+});
+
+describe("relaying a cause", () => {
+  /** A response that only records, since `relayCause` is called outside a route. */
+  function recorder() {
+    const wrote: { status: number; body: string } = { status: 0, body: "" };
+    const res = {
+      set statusCode(value: number) {
+        wrote.status = value;
+      },
+      setHeader() {},
+      end(payload?: string) {
+        wrote.body = payload ?? "";
+      },
+    } as unknown as ServerResponse;
+    return { res, wrote };
+  }
+
+  it("answers 500 with the prefix and the cause, and nothing between them", async () => {
+    const { res, wrote } = recorder();
+    relayCause(res, "Could not read 2026-08-03", new Error("No built Rhyme Index in /repo."));
+
+    expect(wrote.status).toBe(500);
+    expect(JSON.parse(wrote.body)).toEqual({
+      error: "Could not read 2026-08-03: No built Rhyme Index in /repo.",
+    });
+  });
+
+  it("relays a cause that is not an Error at all", async () => {
+    const { res, wrote } = recorder();
+    relayCause(res, "Could not record that demotion", "the file went away");
+
+    expect(JSON.parse(wrote.body).error).toBe(
+      "Could not record that demotion: the file went away",
+    );
+  });
+
+  it("adds no remedy of its own, which is the whole reason it exists", async () => {
+    // The causes already name their file and their remedy. A second sentence
+    // guessing at one reads as two diagnoses of a single problem.
+    const { res, wrote } = recorder();
+    relayCause(res, "Could not add those words", new Error("data/supplement.txt is read-only."));
+
+    expect(JSON.parse(wrote.body).error).toBe(
+      "Could not add those words: data/supplement.txt is read-only.",
+    );
   });
 });
 

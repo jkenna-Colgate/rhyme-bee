@@ -72,8 +72,7 @@ import type { DemotionState, DemotionWriteResult } from "./src/editor/demote.ts"
 import { appendDemotion, readDemotionText } from "./demotionFile.ts";
 import { MAX_DEMOTION_BODY_BYTES, demotionWriteRequest } from "./editorDemotionRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
-import { sendJson } from "./editorTransport.ts";
-import { message } from "../scripts/editorShell.ts";
+import { relayCause, sendJson } from "./editorTransport.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -137,14 +136,9 @@ export function editorDemotionHandler(deps: EditorDemotionDeps) {
       sendJson(res, 200, result);
     } catch (error) {
       // What throws past here is an unreadable demotion list or a file that
-      // would not take the append. Both already name their file, so the cause
-      // is relayed whole and nothing is added to it — a second sentence
-      // guessing at the remedy reads as two diagnoses of one problem. Relaying
-      // is safe in a way it would not be on a deployed route: the reader is
-      // the maintainer, and the paths are their own.
-      sendJson(res, 500, {
-        error: `Could not record that demotion: ${message(error)}`,
-      });
+      // would not take the append, and both already name their file.
+      // `relayCause` argues why the cause travels whole and nothing is added.
+      relayCause(res, "Could not record that demotion", error);
     }
   };
 }

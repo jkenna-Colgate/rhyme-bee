@@ -43,7 +43,6 @@ import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
 import { overriddenValue, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
-import { message } from "../scripts/editorShell.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
 import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
@@ -51,7 +50,7 @@ import { editorDayRequest } from "./editorDayRequest.ts";
 import { reachOf, tierPickerState } from "./editorTierPayload.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "./editorTierRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
-import { sendJson } from "./editorTransport.ts";
+import { relayCause, sendJson } from "./editorTransport.ts";
 import { appendTierOverride, readTierOverrideText } from "./tierOverrideFile.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -130,14 +129,9 @@ export function editorTierHandler(deps: EditorTierDeps) {
       sendJson(res, 200, record(deps, judgement.word, judgement.verdict, asked.date));
     } catch (error) {
       // What throws past here is a missing artifact, an unreadable schedule or
-      // a file that would not take the append. All three already name their
-      // file, so the cause is relayed whole and nothing is added to it — a
-      // second sentence guessing at the remedy reads as two diagnoses of one
-      // problem. Relaying is safe in a way it would not be on a deployed
-      // route: the reader is the maintainer, and the paths are their own.
-      sendJson(res, 500, {
-        error: `Could not record that judgement: ${message(error)}`,
-      });
+      // a file that would not take the append, and all three already name their
+      // file. `relayCause` argues why the cause travels whole.
+      relayCause(res, "Could not record that judgement", error);
     }
   };
 }

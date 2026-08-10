@@ -63,7 +63,7 @@
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
+import { readCappedBody, relayCause, sendJson } from "./editorTransport.ts";
 
 /**
  * The middleware shape connect hands a request. `next` is named in the
@@ -153,15 +153,9 @@ export function editorMiddleware(spec: EditorRouteSpec): EditorMiddleware {
         // sentence: an unhandled rejection inside the `void (async …)()` above
         // leaves the socket open with nothing on it, and the editor's screen
         // hangs rather than saying anything. Answering *something* is the
-        // guarantee this module exists to make. The cause is relayed on the
-        // same reasoning as `relayCause` — the reader is the maintainer.
-        if (!res.writableEnded) {
-          sendJson(res, 500, {
-            error: `That request could not be answered: ${
-              error instanceof Error ? error.message : String(error)
-            }`,
-          });
-        }
+        // guarantee this module exists to make. The cause is relayed on
+        // `relayCause`'s own reasoning — the reader is the maintainer.
+        if (!res.writableEnded) relayCause(res, "That request could not be answered", error);
       }
     })();
   };

@@ -80,7 +80,6 @@ import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { parseSchedule, type Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { add, targetIn, type AddOutcome, type AddTarget } from "../scripts/editorAdd.ts";
-import { message } from "../scripts/editorShell.ts";
 import { indexStaleness, type IndexStaleness } from "../scripts/indexArtifact.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { rebuildIndex } from "./indexRebuild.ts";
@@ -88,7 +87,7 @@ import { EDITOR_ADD_PATH } from "./src/endpoints.ts";
 import type { AddSubmitResult, RebuildResult } from "./src/editor/add.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "./editorAddRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
-import { sendJson } from "./editorTransport.ts";
+import { relayCause, sendJson } from "./editorTransport.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -188,7 +187,8 @@ export function editorAddHandler(deps: EditorAddDeps) {
       try {
         aim = targetIn(deps.schedule(), asked.date);
       } catch (error) {
-        return sendJson(res, 500, { error: `Could not read the schedule: ${message(error)}` });
+        // The second of the four scopes, and the first of the two that relay.
+        return relayCause(res, "Could not read the schedule", error);
       }
       if (aim === null) {
         // Not a malformed request and not the file's fault: the run simply
@@ -205,13 +205,11 @@ export function editorAddHandler(deps: EditorAddDeps) {
         outcome = await deps.runAdds(asked.words, aim);
       } catch (error) {
         // What throws past `add` is a pinned source that would not read or a
-        // supplement that would not take the append. Both name their own
-        // file, so the cause is relayed whole and nothing is added to it — a
-        // second sentence guessing at the remedy reads as two diagnoses of
-        // one problem. Relaying is safe in a way it would not be on a
-        // deployed route: the reader is the maintainer, and the paths are
-        // their own.
-        return sendJson(res, 500, { error: `Could not add those words: ${message(error)}` });
+        // supplement that would not take the append, and both name their own
+        // file. `relayCause` argues why the cause travels whole — and the
+        // staleness scope above deliberately does not use it, because its
+        // causes are absolute paths under `dist-data/`.
+        return relayCause(res, "Could not add those words", error);
       }
     }
 

@@ -34,12 +34,11 @@ import type { Plugin } from "vite";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
-import { message } from "../scripts/editorShell.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { EDITOR_DAY_PATH } from "./src/endpoints.ts";
 import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "./editorDayRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
-import { sendJson } from "./editorTransport.ts";
+import { relayCause, sendJson } from "./editorTransport.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -77,15 +76,9 @@ export function editorDayHandler(deps: EditorDayDeps) {
       sendJson(res, 200, readScheduledDay(deps.openIndex, deps.schedule(), asked.date));
     } catch (error) {
       // What throws past `readScheduledDay` is a missing or unreadable
-      // artifact, never anything about the day, and both of those errors
-      // already name their file and their remedy. So the cause is relayed
-      // whole and nothing is added to it: a second sentence guessing at the
-      // remedy reads as two different diagnoses of one problem. Relaying is
-      // safe here in a way it would not be on a deployed route — the reader
-      // is the maintainer, and the paths are their own.
-      sendJson(res, 500, {
-        error: `Could not read ${asked.date}: ${message(error)}`,
-      });
+      // artifact, never anything about the day. `relayCause` argues why the
+      // cause travels whole and nothing is added to it.
+      relayCause(res, `Could not read ${asked.date}`, error);
     }
   };
 }
