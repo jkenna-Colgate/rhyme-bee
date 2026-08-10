@@ -58,7 +58,7 @@
  * cannot make the sentence unreachable and the screen says it plainly instead.
  */
 
-import type { AddTarget, ReadsOnAnotherKeyOutcome } from "../../../scripts/editorAdd.ts";
+import type { AddTarget, ReadsOnAnotherKeyOutcome } from "./addOutcome.ts";
 import { disagreementKey, disagreementReport } from "./disagreement.ts";
 import type { Disagreer } from "./useDisagreement.ts";
 

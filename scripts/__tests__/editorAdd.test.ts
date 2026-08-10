@@ -15,7 +15,8 @@ import { describe, expect, it, vi } from "vitest";
 import { Derivation, IndexDataSource } from "../../src/derivation.ts";
 import type { Pronunciation, RhymeKey } from "../../src/phonology.ts";
 import type { EvidenceContext } from "../../src/supplementEvidence.ts";
-import { printAddOutcome, resolveAddOutcome, type AddTarget } from "../editorAdd.ts";
+import type { AddTarget } from "../../web/src/editor/addOutcome.ts";
+import { printAddOutcome, resolveAddOutcome } from "../editorAdd.ts";
 
 function context(overrides: {
   pronunciations?: [string, Pronunciation[]][];

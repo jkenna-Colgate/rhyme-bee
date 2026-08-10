@@ -26,7 +26,7 @@
  */
 
 import { useState } from "react";
-import type { AddTarget, DeferredOutcome, WordOutcome } from "../../../scripts/editorAdd.ts";
+import type { AddTarget, DeferredOutcome, WordOutcome } from "./addOutcome.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
 import { MAX_QUEUED_WORDS, aimHeldFor, type AddSubmitResult } from "./add.ts";
 import { failureFor } from "./disagreement.ts";

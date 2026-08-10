@@ -42,8 +42,8 @@
  */
 
 import { normaliseWord } from "../../../src/cmudict.ts";
-import type { AddOutcome } from "../../../scripts/editorAdd.ts";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
+import type { AddOutcome } from "./addOutcome.ts";
 
 /**
  * How many words one Submit will carry.
