@@ -293,9 +293,9 @@ Two verdicts that set did not reach:
 
 - **Already reads on the key** — `already reads on IY T ER — it is in the game
   already, nothing to add.`
-- **Reads, but does not rhyme** — reported as a **correction, not an add**, and
-  deliberately left for you to make by hand. Overriding an upstream
-  pronunciation stays a considered edit to `data/supplement.dict`.
+- **Reads, but does not rhyme** — reported as a **pronunciation correction, not
+  an add**, and deliberately left for you to make by hand. Overriding an
+  upstream pronunciation stays a considered edit to `data/supplement.dict`.
 
 ### When no split works: the agent
 

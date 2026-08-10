@@ -41,14 +41,16 @@ export interface WordEvidence {
   rhymesDirectly: boolean;
   /**
    * Inflectional relatives CMUdict holds — the derivation case. Only searched
-   * when `direct` is empty: a word with its own reading is a correction, never
-   * a derivation, so relatives are not offered as a distraction from it.
+   * when `direct` is empty: a word with its own reading is a pronunciation
+   * correction, never a derivation, so relatives are not offered as a
+   * distraction from it.
    */
   relatives: RelativeEvidence[];
   /**
    * A reading composed from a compound split, when one reaches the target.
    * Null when no split does, and — like `relatives` — never searched for a word
-   * that already has a direct reading, which is a correction rather than an add.
+   * that already has a direct reading, which is a pronunciation correction
+   * rather than an add.
    */
   composed: ComposedReading | null;
 }
