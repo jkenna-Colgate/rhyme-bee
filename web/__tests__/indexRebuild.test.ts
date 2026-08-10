@@ -157,7 +157,10 @@ describe("makeRebuild", () => {
     // would not be.
     child.emit("close", 0);
 
-    expect(await running).toBe(timedOut);
+    // Nothing useful can be asserted about awaiting `running` a second time —
+    // a promise hands back the value it settled with whether or not `done()`
+    // guards. That the timeout won the race is `timedOut.ok`, and that the late
+    // `close` did not run the settle path again is the single `forget`.
     expect(timedOut.ok).toBe(false);
     expect(forgets()).toBe(1);
   });

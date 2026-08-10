@@ -61,10 +61,11 @@ export interface IndexCache {
   /**
    * Drop the loaded copy, so the next caller reads the artifact off disk again.
    *
-   * This exists for exactly one caller — `rebuildIndex` (`web/indexRebuild.ts`),
-   * which is what Submit runs — and it is the difference between that feature
-   * working and appearing to. The copy below is held for the dev server's whole
-   * lifetime, so a rebuild that left it standing would hand the re-read the
+   * This exists for exactly one caller of the dev server's own cache —
+   * `rebuildIndex` (`web/indexRebuild.ts`), which is what Submit runs — and it
+   * is the difference between that feature working and appearing to. That cache
+   * is held for the server's whole lifetime, so a rebuild that left it standing
+   * would hand the re-read the
    * *superseded* index: every figure on the day would come from the artifact as
    * it was before the adds, look entirely plausible, and be wrong. Worse, the
    * artifact is content-addressed (`scripts/indexArtifact.ts`), so the file the
