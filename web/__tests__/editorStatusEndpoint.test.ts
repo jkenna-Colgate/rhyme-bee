@@ -30,7 +30,7 @@ import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { IndexStaleness } from "../../scripts/indexArtifact.ts";
 import { editorStatusSpec } from "../editorStatusPlugin.ts";
 import { editorMiddleware } from "../editorRoute.ts";
@@ -186,9 +186,16 @@ describe("what the endpoint will not do or say", () => {
    * for this route, whose causes are uniquely bad carriers.
    */
   it("says nothing about the machine when the staleness read throws", async () => {
+    // Spied rather than left to print: the route sends the cause to the dev
+    // server's console, which is the remedy its sentence names, and a suite
+    // that is quiet on success should stay quiet while asserting that.
+    const logged = vi.spyOn(console, "error").mockImplementation(() => {});
+    const cause = new Error(
+      `ENOENT: no such file or directory, open '${repoRoot}/dist-data/x.json'`,
+    );
     const { handler } = endpoint({
       staleness: () => {
-        throw new Error(`ENOENT: no such file or directory, open '${repoRoot}/dist-data/x.json'`);
+        throw cause;
       },
     });
     const answered = await call(handler);
@@ -198,6 +205,10 @@ describe("what the endpoint will not do or say", () => {
     expect(error).toMatch(/status could not be read/i);
     expect(error).not.toContain(repoRoot);
     expect(error).not.toMatch(/ENOENT/);
+    // Withheld from the response, not discarded — the remedy promises a console
+    // line, so there is one.
+    expect(logged).toHaveBeenCalledWith(expect.any(String), cause);
+    logged.mockRestore();
   });
 
   /**

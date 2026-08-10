@@ -43,9 +43,27 @@
  * So `handle` receives the already-read, already-capped body and does the rest
  * itself: it reads `req.method` where it dispatches on the verb (demotion,
  * tier), reads `req.url` where it parses a query (day, tier), and keeps its own
- * `try` scopes exactly where they already are. {@link relayCause} in
+ * `try` scopes exactly where they already are. `relayCause` in
  * `web/editorTransport.ts` shares the *sentence* those catches write without
  * sharing their scope.
+ *
+ * The `try` in {@link editorMiddleware} is **not** that catch, and the thing
+ * that keeps it from becoming one is that it relays nothing. It is a
+ * socket-level last resort: a rejection inside the `void (async …)()` below
+ * would otherwise leave the socket open with nothing on it, and an editor's
+ * screen that hangs is worse than a wrong sentence. So it answers one fixed
+ * sentence and sends the cause to the dev server's console.
+ *
+ * It must be the one catch here that says nothing about what failed, because it
+ * is the one catch that does not know *which route* it is catching for — and so
+ * cannot know what that route considers safe to say. `editorStatusPlugin.ts`
+ * withholds its causes deliberately: git's failures quote absolute paths and
+ * PATH lookups, and `indexStaleness` deals in absolute paths by design. Two of
+ * `editorAddPlugin.ts`'s four scopes withhold theirs, which quote `dist-data/`.
+ * A backstop that relayed would relay exactly those, from underneath the routes
+ * that decided not to — status's uncaught `porcelain` read reaches this catch
+ * and nothing else. Sending the cause to the console rather than the response
+ * is what status already does with the causes it will not put in a reply.
  *
  * **The cap.** It is a spec field passed in, never a constant declared here.
  * `web/editorTransport.ts` records the argument at length: each route's ceiling
@@ -63,7 +81,7 @@
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
-import { readCappedBody, relayCause, sendJson } from "./editorTransport.ts";
+import { readCappedBody, sendJson } from "./editorTransport.ts";
 
 /**
  * The middleware shape connect hands a request. `next` is named in the
@@ -137,11 +155,15 @@ export function editorMiddleware(spec: EditorRouteSpec): EditorMiddleware {
     }
 
     void (async () => {
-      // `null` is a refusal already sent — the 413 — and the caller returns.
-      const body = await readCappedBody(req, res, spec.cap);
-      if (body === null) return;
-
+      // The read is inside the `try` because the guarantee above is that an
+      // editor route *always* answers, and a read that threw from outside it
+      // would be a request with nothing on the socket. `null` is a refusal
+      // already sent — the 413 — and returning from here ends the wrapper
+      // without reaching the handler, exactly as it did outside.
       try {
+        const body = await readCappedBody(req, res, spec.cap);
+        if (body === null) return;
+
         await spec.handle(req, res, body);
       } catch (error) {
         // Not the route's error reporting: every route catches what its own
@@ -153,9 +175,26 @@ export function editorMiddleware(spec: EditorRouteSpec): EditorMiddleware {
         // sentence: an unhandled rejection inside the `void (async …)()` above
         // leaves the socket open with nothing on it, and the editor's screen
         // hangs rather than saying anything. Answering *something* is the
-        // guarantee this module exists to make. The cause is relayed on
-        // `relayCause`'s own reasoning — the reader is the maintainer.
-        if (!res.writableEnded) relayCause(res, "That request could not be answered", error);
+        // guarantee this module exists to make.
+        //
+        // **And the cause is not relayed.** This is the one catch that does not
+        // know which route it is catching for, so it cannot know what that
+        // route considers safe to say — status's uncaught `porcelain` read
+        // arrives here quoting absolute paths and PATH lookups that status
+        // exists to withhold. The console is where those go instead, and it is
+        // where a bug in a route is worth reading in full anyway.
+        //
+        // The line is written whether or not a reply already went out. A route
+        // that answered and *then* threw must not have a second reply written
+        // over it, so `writableEnded` below sends nothing — and that is the one
+        // case where the console is the only trace of the bug there is.
+        console.error(`[rhyme-bee] ${spec.path} threw past its own catches:`, error);
+        if (!res.writableEnded) {
+          sendJson(res, 500, {
+            error:
+              "That request could not be answered. The dev server's console has the reason.",
+          });
+        }
       }
     })();
   };

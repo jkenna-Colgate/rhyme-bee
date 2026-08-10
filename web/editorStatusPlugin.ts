@@ -1,7 +1,9 @@
 /**
  * The dev-only endpoint the Editor's Pass reads its own state through (#162). A
- * Vite plugin that, during `npm run dev` only (`apply: "serve"`, so
- * `configureServer` never runs in a production build), answers `GET` on
+ * Vite plugin that `web/editorRoute.ts` builds from the spec below, and that is
+ * dev-only because that module gives every route it builds the `apply: "serve"`
+ * which keeps `configureServer` from running in a production build. It answers
+ * `GET` on
  * `/api/editor/status` with two facts: whether the built Rhyme Index is stale,
  * and whether each file the tool writes carries uncommitted changes.
  *
@@ -109,7 +111,12 @@ export function editorStatusHandler(deps: EditorStatusDeps) {
     let index: EditorStatus["index"];
     try {
       index = indexStatus(deps.staleness(), repoRoot);
-    } catch {
+    } catch (error) {
+      // The remedy below promises the console has the reason, so the reason is
+      // put there. Withholding a cause from the response is not the same act as
+      // discarding it, and the difference is whether the maintainer the remedy
+      // addresses can act on it.
+      console.error("[rhyme-bee] the editor status could not read the index:", error);
       return sendJson(res, 500, {
         error:
           "The status could not be read. The dev server's console has the reason; " +

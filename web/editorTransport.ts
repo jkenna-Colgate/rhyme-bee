@@ -52,6 +52,12 @@ export function sendJson(res: ServerResponse, status: number, payload: unknown):
  * and PATH lookups, and add's staleness read quotes `dist-data/` — so they keep
  * their own `sendJson` and their own sentence. That distinction is real, and a
  * helper that made it awkward to keep would be worse than the duplication.
+ *
+ * `web/editorRoute.ts`'s last-resort catch does not call this either, and for a
+ * reason none of those three have: it is the one catch that does not know which
+ * route it is catching for, so it cannot know whether that route would have
+ * relayed. It would have relayed status's withheld causes out from underneath
+ * it.
  */
 export function relayCause(res: ServerResponse, prefix: string, error: unknown): void {
   sendJson(res, 500, { error: `${prefix}: ${message(error)}` });

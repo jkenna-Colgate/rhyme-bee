@@ -20,7 +20,7 @@
  * calling transport untested, and that the convention lost.
  */
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { editorMiddleware, editorRoute, type EditorRouteSpec } from "../editorRoute.ts";
@@ -173,7 +173,17 @@ describe("the body cap", () => {
 });
 
 describe("a route that does not answer for itself", () => {
+  /** The backstop writes its cause here, so every test below reads it. */
+  function console_() {
+    return vi.spyOn(console, "error").mockImplementation(() => {});
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("answers a handler that throws synchronously rather than leaving the socket open", async () => {
+    console_();
     const { middleware } = route({
       handle: () => {
         throw new Error("the day would not read");
@@ -183,12 +193,13 @@ describe("a route that does not answer for itself", () => {
 
     expect(answered.status).toBe(500);
     expect(JSON.parse(answered.body).error).toBe(
-      "That request could not be answered: the day would not read",
+      "That request could not be answered. The dev server's console has the reason.",
     );
     expect(answered.nexted).toBe(false);
   });
 
   it("answers a handler whose promise rejects", async () => {
+    console_();
     const { middleware } = route({
       handle: () => Promise.reject(new Error("the append would not land")),
     });
@@ -196,22 +207,48 @@ describe("a route that does not answer for itself", () => {
 
     expect(answered.status).toBe(500);
     expect(JSON.parse(answered.body).error).toBe(
-      "That request could not be answered: the append would not land",
+      "That request could not be answered. The dev server's console has the reason.",
     );
   });
 
+  it("says nothing about the environment, which is what status withholds", async () => {
+    // The backstop is the one catch that does not know which route it caught
+    // for. Status's uncaught `porcelain` read arrives here, and its causes
+    // quote absolute paths and PATH lookups — the exact thing that route's 500
+    // exists to keep out of a response. A backstop that relayed would relay it
+    // from underneath the route that decided not to.
+    const logged = console_();
+    const cause = new Error(
+      "spawn git ENOENT: no 'git' on PATH, running in /home/maintainer/rhyme-bee",
+    );
+    const { middleware } = route({ handle: () => Promise.reject(cause) });
+    const answered = await call(middleware);
+
+    expect(answered.status).toBe(500);
+    expect(answered.body).not.toContain("PATH");
+    expect(answered.body).not.toContain("/home/maintainer");
+    expect(answered.body).not.toContain("git");
+    // Withheld from the reply, not thrown away: the maintainer reads it whole.
+    expect(logged).toHaveBeenCalledWith(expect.stringContaining("/api/editor/example"), cause);
+  });
+
   it("leaves a reply that was already sent alone when the handler then throws", async () => {
+    const logged = console_();
+    const cause = new Error("something after the reply");
     const { middleware } = route({
       handle: (_req, res) => {
         res.statusCode = 200;
         res.end(JSON.stringify({ outcome: "day" }));
-        throw new Error("something after the reply");
+        throw cause;
       },
     });
     const answered = await call(middleware);
 
     expect(answered.status).toBe(200);
     expect(JSON.parse(answered.body)).toEqual({ outcome: "day" });
+    // Nothing can be said on a socket that is already closed, so the console is
+    // the only trace this bug leaves — and it is not swallowed.
+    expect(logged).toHaveBeenCalledWith(expect.any(String), cause);
   });
 });
 
