@@ -1,7 +1,9 @@
 /**
  * The dev-only endpoint the Editor's Pass reads a day through. A Vite plugin
- * that, during `npm run dev` only (`apply: "serve"`, so `configureServer` never
- * runs in a production build), answers `GET /api/editor/day`: it resolves the
+ * that exists during `npm run dev` only — the `apply: "serve"` behind that is
+ * declared once for all five editor routes in `web/editorRoute.ts`, which builds
+ * this one from the spec below, so `configureServer` never runs in a production
+ * build — answering `GET /api/editor/day`: it resolves the
  * date, builds the day against the built Rhyme Index and returns the readout as
  * JSON. It writes nothing, anywhere — repinning a day the index cannot pin is
  * out of scope, and the diagnosis is all this offers.
@@ -21,9 +23,10 @@
  * Dev-only matters more here than for `supplementPlugin`: this endpoint reads
  * `data/` and the later slices of the pass will write it, so a route that
  * survived into production would be a path from the public internet into the
- * repository. This plugin is one half of that guarantee; `vite.config.ts` naming
- * the build's input is the other, and keeps the editor's HTML entry out of a
- * build.
+ * repository. The skeleton this plugin is built on holds one half of that
+ * guarantee, and holds it for every editor route at once; `vite.config.ts`
+ * naming the build's input is the other, and keeps the editor's HTML entry out
+ * of a build.
  */
 
 import type { IncomingMessage, ServerResponse } from "node:http";

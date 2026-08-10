@@ -1,15 +1,18 @@
 /**
  * A fake socket, for driving a connect middleware without a dev server.
  *
- * Six suites hand-built this — the five editor endpoints and
+ * Six suites hand-built this before #170 — the five editor endpoints and
  * `supplementEndpoint.test.ts` — and the six copies were the same forty-eight
  * lines: a `Readable.from` request with a method, a url and headers pinned on
  * it, a `ServerResponse` literal cast through `unknown` because a real one
  * wants a socket, an `Answered` record the assertions read, and a `next` that
  * sets a flag rather than doing anything, so that "this route never falls
- * through" is a thing a test can *see*.
+ * through" is a thing a test can *see*. `editorRoute.test.ts` would have been
+ * the seventh, which is what settled it: a copy written *knowing* it was the
+ * seventh is not a coincidence six suites each reasonably arrived at.
  *
- * It is one adapter now. Not for the ~288 lines: for the same reason
+ * It is one adapter now, and the seventh copy was never written. Not for the
+ * ~288 lines the six came to: for the same reason
  * `web/editorRoute.ts` is one skeleton. A hand-built fake is a claim about what
  * the real socket does, and six copies of a claim are six chances for one of
  * them to be quietly wrong — a `setHeader` that records nothing, an `end` that

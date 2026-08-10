@@ -1,9 +1,10 @@
 /**
  * The dev-only endpoint the Editor's Pass **submits its add queue** through: the
  * other half of the pass, in the same sitting that found the gap (ADR-0016). A
- * Vite plugin that, during `npm run dev` only (`apply: "serve"`, so
- * `configureServer` never runs in a production build), answers `POST` on
- * `/api/editor/add`.
+ * Vite plugin, built from the spec at the foot of this file by
+ * `web/editorRoute.ts` — which is where the `apply: "serve"` that keeps
+ * `configureServer` out of a production build is now declared — answering
+ * `POST` on `/api/editor/add`.
  *
  * ## One request, three acts, in this order
  *
@@ -64,9 +65,10 @@
  *
  * It is the heaviest of the four editor routes to leave reachable: it **writes**
  * to `data/`, **spawns a process** and **rewrites `dist-data/`**. Three things
- * make a production copy impossible rather than unlikely: `apply: "serve"` here,
- * `vite.config.ts` naming the build's inputs so `editor.html` is never in a
- * bundle, and no Worker route answering this path. It does not weaken ADR-0013
+ * make a production copy impossible rather than unlikely: the `apply: "serve"`
+ * that `web/editorRoute.ts` declares for every route built on it, this one
+ * included; `vite.config.ts` naming the build's inputs so `editor.html` is never
+ * in a bundle; and no Worker route answering this path. It does not weaken ADR-0013
  * either: there is no player, no Session and no Submission being adjudicated —
  * a maintainer is editing their own repository over localhost.
  */

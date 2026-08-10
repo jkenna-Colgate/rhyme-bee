@@ -1,8 +1,9 @@
 /**
  * The dev-only endpoint the Editor's Pass **demotes** a word through: the second
  * correction the pass produces, beside the Tier picker's (ADR-0016). A Vite
- * plugin that, during `npm run dev` only (`apply: "serve"`, so `configureServer`
- * never runs in a production build), answers two verbs on
+ * plugin that runs during `npm run dev` only — `web/editorRoute.ts` builds it
+ * from the spec below and declares the `apply: "serve"` that stops
+ * `configureServer` ever running in a production build — answering two verbs on
  * `/api/editor/demotion`:
  *
  * - `GET` returns every entry standing in `data/demotions.txt`.
@@ -55,8 +56,10 @@
  *
  * It **writes** to `data/`. A route that survived into production would be a
  * path from the public internet into the repository. Three things make that
- * impossible rather than unlikely: `apply: "serve"` here, `vite.config.ts`
- * naming the build's inputs so `editor.html` is never in a bundle, and no Worker
+ * impossible rather than unlikely: `apply: "serve"`, which the spec below no
+ * longer states for itself — `web/editorRoute.ts` states it once for all five
+ * editor routes; `vite.config.ts` naming the build's inputs so `editor.html` is
+ * never in a bundle; and no Worker
  * route answering this path. It does not weaken ADR-0013 either: there is no
  * player, no Session and no Submission being adjudicated — a maintainer is
  * editing their own repository over localhost.

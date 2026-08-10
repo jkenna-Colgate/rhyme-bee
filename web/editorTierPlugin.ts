@@ -1,8 +1,9 @@
 /**
  * The dev-only endpoint the Editor's Pass sets a word's **Tier** through — the
- * act the whole web mode exists for (ADR-0016). A Vite plugin that, during
- * `npm run dev` only (`apply: "serve"`, so `configureServer` never runs in a
- * production build), answers two verbs on `/api/editor/tier`:
+ * act the whole web mode exists for (ADR-0016). A Vite plugin that
+ * `web/editorRoute.ts` builds from the spec below and marks `apply: "serve"`, so
+ * it exists during `npm run dev` only and `configureServer` never runs in a
+ * production build. It answers two verbs on `/api/editor/tier`:
  *
  * - `GET` returns what the picker needs and the day readout does not carry: the
  *   standing verdicts in `data/tier-overrides.csv`, and the lemma walk and
@@ -26,8 +27,10 @@
  * `editorDayPlugin` reads `data/`; this one **writes** it. A route that survived
  * into production would be a path from the public internet into the repository
  * with a file that can never be regenerated at the end of it. Three things make
- * that impossible rather than unlikely: `apply: "serve"` here, `vite.config.ts`
- * naming the build's inputs so `editor.html` is never in a bundle, and no Worker
+ * that impossible rather than unlikely: `apply: "serve"`, now declared for this
+ * route by `web/editorRoute.ts` rather than by the plugin at the foot of this
+ * file; `vite.config.ts`
+ * naming the build's inputs so `editor.html` is never in a bundle; and no Worker
  * route answering this path. It does not weaken ADR-0013 either: there is no
  * player, no Session and no Submission being adjudicated — a maintainer is
  * editing their own repository over localhost.
