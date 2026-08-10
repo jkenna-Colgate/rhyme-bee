@@ -3,9 +3,13 @@
  * demotion *means* is `src/demotions.ts`, what it does to the day on screen is
  * `web/__tests__/demote.test.ts`, and what happens to the file underneath it is
  * `web/__tests__/demotionFile.test.ts`; what is tested here is the transport
- * around them — that only the two verbs it answers are answered, that a body is
- * capped rather than buffered, that every refusal writes nothing, and that an
- * accepted demotion reaches the file with the reason the editor chose.
+ * around them — that every refusal writes nothing, and that an accepted
+ * demotion reaches the file with the reason the editor chose.
+ *
+ * The socket ceremony this route shares with the other four — the verb check,
+ * the body cap, and that no path falls through — is `web/editorRoute.ts`'s and
+ * is tested in `editorRoute.test.ts`. What stays here is this route's own 405
+ * *sentence*, and every claim about what a refusal does to `data/demotions.txt`.
  *
  * `AGENTS.md` records that the Worker routes were tested despite a convention
  * calling transport untested, and that the convention lost;
@@ -18,7 +22,8 @@ import { describe, expect, it } from "vitest";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { serialiseDemotion, type Demotion } from "../../src/demotions.ts";
 import { MAX_DEMOTION_BODY_BYTES, demotionWriteRequest } from "../editorDemotionRequest.ts";
-import { editorDemotionHandler } from "../editorDemotionPlugin.ts";
+import { editorDemotionSpec } from "../editorDemotionPlugin.ts";
+import { editorMiddleware } from "../editorRoute.ts";
 
 interface Answered {
   status: number;
@@ -27,9 +32,9 @@ interface Answered {
   nexted: boolean;
 }
 
-/** Call the handler the way connect does, mounted prefix already stripped. */
+/** Call the route the way connect does, mounted prefix already stripped. */
 async function call(
-  handler: ReturnType<typeof editorDemotionHandler>,
+  handler: ReturnType<typeof editorMiddleware>,
   options: {
     method?: string;
     url?: string;
@@ -74,15 +79,17 @@ async function call(
 function endpoint(options: { file?: string; append?: (demotion: Demotion) => void } = {}) {
   const written: Demotion[] = [];
   let text = options.file ?? "";
-  const handler = editorDemotionHandler({
-    demotions: () => text,
-    append:
-      options.append ??
-      ((demotion) => {
-        written.push(demotion);
-        text += serialiseDemotion(demotion);
-      }),
-  });
+  const handler = editorMiddleware(
+    editorDemotionSpec({
+      demotions: () => text,
+      append:
+        options.append ??
+        ((demotion) => {
+          written.push(demotion);
+          text += serialiseDemotion(demotion);
+        }),
+    }),
+  );
   return { handler, written };
 }
 
@@ -157,7 +164,9 @@ describe("writing a demotion", () => {
 });
 
 describe("what the endpoint refuses, and writes nothing for", () => {
-  it("answers anything but GET or POST with a method refusal", async () => {
+  // The mechanism is `web/editorRoute.ts`'s and is tested there. The sentence
+  // is this route's own, and naming both verbs is how it says there is no third.
+  it("answers anything but GET or POST with this route's own refusal", async () => {
     const { handler, written } = endpoint();
     for (const method of ["PUT", "DELETE", "PATCH"]) {
       const answered = await call(handler, {
@@ -167,6 +176,9 @@ describe("what the endpoint refuses, and writes nothing for", () => {
 
       expect(answered.status).toBe(405);
       expect(answered.headers["Allow"]).toBe("GET, POST");
+      expect(JSON.parse(answered.body)).toEqual({
+        error: "Read the demotion list with GET, record a demotion with POST.",
+      });
       expect(answered.nexted).toBe(false);
     }
     expect(written).toEqual([]);
@@ -185,34 +197,11 @@ describe("what the endpoint refuses, and writes nothing for", () => {
     expect(written).toEqual([]);
   });
 
-  it("refuses a body over the cap", async () => {
+  it("writes nothing for a body the cap refused", async () => {
     const { handler, written } = endpoint();
     const answered = await call(handler, {
       method: "POST",
       body: "x".repeat(MAX_DEMOTION_BODY_BYTES + 1),
-    });
-
-    expect(answered.status).toBe(413);
-    expect(written).toEqual([]);
-  });
-
-  it("refuses an oversize body that declared itself small", async () => {
-    const { handler, written } = endpoint();
-    const answered = await call(handler, {
-      method: "POST",
-      body: "x".repeat(MAX_DEMOTION_BODY_BYTES + 1),
-      headers: { "content-length": "42" },
-    });
-
-    expect(answered.status).toBe(413);
-    expect(written).toEqual([]);
-  });
-
-  it("refuses a declared size over the cap before a byte of it arrives", async () => {
-    const { handler, written } = endpoint();
-    const answered = await call(handler, {
-      method: "POST",
-      headers: { "content-length": String(MAX_DEMOTION_BODY_BYTES + 1) },
     });
 
     expect(answered.status).toBe(413);

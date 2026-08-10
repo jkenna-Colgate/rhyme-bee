@@ -71,7 +71,8 @@ import { EDITOR_DEMOTION_PATH } from "./src/endpoints.ts";
 import type { DemotionState, DemotionWriteResult } from "./src/editor/demote.ts";
 import { appendDemotion, readDemotionText } from "./demotionFile.ts";
 import { MAX_DEMOTION_BODY_BYTES, demotionWriteRequest } from "./editorDemotionRequest.ts";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
+import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { sendJson } from "./editorTransport.ts";
 import { message } from "../scripts/editorShell.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -98,87 +99,74 @@ function stateOf(deps: EditorDemotionDeps): DemotionState {
 }
 
 /**
- * The endpoint, apart from the dev server it is mounted on.
- *
- * Every refusal is a status and a sentence, and none of them is `next()`: this
- * path is the editor's alone, and falling through would hand a bad request the
- * static shell's HTML with a 200 on it — the one shape of failure worth ruling
- * out on a route whose success case writes to `data/`.
+ * The route's own work, over a body the shared skeleton has already read and
+ * capped. It dispatches on the verb itself, because which of the two verbs was
+ * used is what the work *is* here rather than something the skeleton could
+ * decide for it: the skeleton's part is only that a third verb never arrives.
  *
  * The order of the checks on a write is the order in which each one can rule the
- * write out: the verb, then the size, then the demotion, then whether the file
- * already holds the word. Nothing touches the file until all four have passed,
- * which is what "every refusal writes nothing" means and what the suite asserts
- * of each of them in turn.
+ * write out: the verb, then the size — both `web/editorRoute.ts`'s — then the
+ * demotion, then whether the file already holds the word. Nothing touches the
+ * file until all four have passed, which is what "every refusal writes nothing"
+ * means and what the suite asserts of each of them in turn.
  */
 export function editorDemotionHandler(deps: EditorDemotionDeps) {
-  // `next` is connect's and is named here only to be visibly never called.
-  return (req: IncomingMessage, res: ServerResponse, _next?: () => void): void => {
-    const method = req.method ?? "GET";
-    if (method !== "GET" && method !== "POST") {
-      res.setHeader("Allow", "GET, POST");
-      sendJson(res, 405, {
-        error: "Read the demotion list with GET, record a demotion with POST.",
-      });
-      return;
-    }
+  return (req: IncomingMessage, res: ServerResponse, body: string): void => {
+    try {
+      if ((req.method ?? "GET") === "GET") return sendJson(res, 200, stateOf(deps));
 
-    void (async () => {
-      const body = await readCappedBody(req, res, MAX_DEMOTION_BODY_BYTES);
-      if (body === null) return;
+      const asked = demotionWriteRequest(body);
+      if (!asked.ok) return sendJson(res, 400, { error: asked.error });
 
-      try {
-        if (method === "GET") return sendJson(res, 200, stateOf(deps));
-
-        const asked = demotionWriteRequest(body);
-        if (!asked.ok) return sendJson(res, 400, { error: asked.error });
-
-        const standing = stateOf(deps).standing.find((entry) => entry.word === asked.word);
-        if (standing !== undefined) {
-          // Not an error the editor made — the word may have been demoted on an
-          // earlier visit — so it says what is already true rather than scolding.
-          // 409 because the request is fine and the file's state is what refuses
-          // it, which is also what a retry will keep doing.
-          return sendJson(res, 409, {
-            error:
-              `${asked.word} is already demoted, as ${standing.reason}. ` +
-              "Reversing a demotion is a hand edit of data/demotions.txt.",
-          });
-        }
-
-        const appended: Demotion = { word: asked.word, reason: asked.reason };
-        deps.append(appended);
-        const result: DemotionWriteResult = { state: stateOf(deps), appended };
-        sendJson(res, 200, result);
-      } catch (error) {
-        // What throws past here is an unreadable demotion list or a file that
-        // would not take the append. Both already name their file, so the cause
-        // is relayed whole and nothing is added to it — a second sentence
-        // guessing at the remedy reads as two diagnoses of one problem. Relaying
-        // is safe in a way it would not be on a deployed route: the reader is
-        // the maintainer, and the paths are their own.
-        sendJson(res, 500, {
-          error: `Could not record that demotion: ${message(error)}`,
+      const standing = stateOf(deps).standing.find((entry) => entry.word === asked.word);
+      if (standing !== undefined) {
+        // Not an error the editor made — the word may have been demoted on an
+        // earlier visit — so it says what is already true rather than scolding.
+        // 409 because the request is fine and the file's state is what refuses
+        // it, which is also what a retry will keep doing.
+        return sendJson(res, 409, {
+          error:
+            `${asked.word} is already demoted, as ${standing.reason}. ` +
+            "Reversing a demotion is a hand edit of data/demotions.txt.",
         });
       }
-    })();
+
+      const appended: Demotion = { word: asked.word, reason: asked.reason };
+      deps.append(appended);
+      const result: DemotionWriteResult = { state: stateOf(deps), appended };
+      sendJson(res, 200, result);
+    } catch (error) {
+      // What throws past here is an unreadable demotion list or a file that
+      // would not take the append. Both already name their file, so the cause
+      // is relayed whole and nothing is added to it — a second sentence
+      // guessing at the remedy reads as two diagnoses of one problem. Relaying
+      // is safe in a way it would not be on a deployed route: the reader is
+      // the maintainer, and the paths are their own.
+      sendJson(res, 500, {
+        error: `Could not record that demotion: ${message(error)}`,
+      });
+    }
+  };
+}
+
+/** The route, as everything the shared skeleton needs to mount and guard it. */
+export function editorDemotionSpec(deps: EditorDemotionDeps): EditorRouteSpec {
+  return {
+    path: EDITOR_DEMOTION_PATH,
+    verbs: ["GET", "POST"],
+    refusal: "Read the demotion list with GET, record a demotion with POST.",
+    cap: MAX_DEMOTION_BODY_BYTES,
+    handle: editorDemotionHandler(deps),
   };
 }
 
 const demotionPath = resolve(repoRoot, "data/demotions.txt");
 
 export function editorDemotionPlugin(): Plugin {
-  return {
-    name: "rhyme-bee-editor-demotion",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use(
-        EDITOR_DEMOTION_PATH,
-        editorDemotionHandler({
-          demotions: () => readDemotionText(demotionPath),
-          append: (demotion) => appendDemotion(demotionPath, demotion),
-        }),
-      );
-    },
-  };
+  return editorRoute(
+    editorDemotionSpec({
+      demotions: () => readDemotionText(demotionPath),
+      append: (demotion) => appendDemotion(demotionPath, demotion),
+    }),
+  );
 }

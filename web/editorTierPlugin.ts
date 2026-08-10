@@ -50,7 +50,8 @@ import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
 import { editorDayRequest } from "./editorDayRequest.ts";
 import { reachOf, tierPickerState } from "./editorTierPayload.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "./editorTierRequest.ts";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
+import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { sendJson } from "./editorTransport.ts";
 import { appendTierOverride, readTierOverrideText } from "./tierOverrideFile.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -104,54 +105,51 @@ function stateFor(deps: EditorTierDeps, date: string): TierPickerState {
 }
 
 /**
- * The endpoint, apart from the dev server it is mounted on.
- *
- * Every refusal is a status and a sentence, and none of them is `next()`: this
- * path is the editor's alone, and falling through would hand a bad request the
- * static shell's HTML with a 200 on it — the one shape of failure worth ruling
- * out on a route whose success case writes to `data/`.
+ * The route's own work, over a body the shared skeleton has already read and
+ * capped. It reads both `req.url` and `req.method` for itself: the date is
+ * parsed on **both** verbs, deliberately outside the `try` below, and the verb
+ * then decides whether the day is being read or judged.
  *
  * The order of the checks on a write is the order in which each one can rule the
- * write out: the verb, then the size, then the day, then the judgement. Nothing
- * touches the file until all four have passed, which is what "every refusal
- * writes nothing" means and what the suite asserts of each of them in turn.
+ * write out: the verb, then the size — both `web/editorRoute.ts`'s — then the
+ * day, then the judgement. Nothing touches the file until all four have passed,
+ * which is what "every refusal writes nothing" means and what the suite asserts
+ * of each of them in turn.
  */
 export function editorTierHandler(deps: EditorTierDeps) {
-  // `next` is connect's and is named here only to be visibly never called.
-  return (req: IncomingMessage, res: ServerResponse, _next?: () => void): void => {
-    const method = req.method ?? "GET";
-    if (method !== "GET" && method !== "POST") {
-      res.setHeader("Allow", "GET, POST");
-      sendJson(res, 405, { error: "Read the picker with GET, record a judgement with POST." });
-      return;
+  return (req: IncomingMessage, res: ServerResponse, body: string): void => {
+    const asked = editorDayRequest(req.url ?? "/", deps.today());
+    if (!asked.ok) return sendJson(res, 400, { error: asked.error });
+
+    try {
+      if ((req.method ?? "GET") === "GET") return sendJson(res, 200, stateFor(deps, asked.date));
+
+      const judgement = tierWriteRequest(body);
+      if (!judgement.ok) return sendJson(res, 400, { error: judgement.error });
+
+      sendJson(res, 200, record(deps, judgement.word, judgement.verdict, asked.date));
+    } catch (error) {
+      // What throws past here is a missing artifact, an unreadable schedule or
+      // a file that would not take the append. All three already name their
+      // file, so the cause is relayed whole and nothing is added to it — a
+      // second sentence guessing at the remedy reads as two diagnoses of one
+      // problem. Relaying is safe in a way it would not be on a deployed
+      // route: the reader is the maintainer, and the paths are their own.
+      sendJson(res, 500, {
+        error: `Could not record that judgement: ${message(error)}`,
+      });
     }
+  };
+}
 
-    void (async () => {
-      const body = await readCappedBody(req, res, MAX_TIER_BODY_BYTES);
-      if (body === null) return;
-
-      const asked = editorDayRequest(req.url ?? "/", deps.today());
-      if (!asked.ok) return sendJson(res, 400, { error: asked.error });
-
-      try {
-        if (method === "GET") return sendJson(res, 200, stateFor(deps, asked.date));
-
-        const judgement = tierWriteRequest(body);
-        if (!judgement.ok) return sendJson(res, 400, { error: judgement.error });
-
-        sendJson(res, 200, record(deps, judgement.word, judgement.verdict, asked.date));
-      } catch (error) {
-        // What throws past here is a missing artifact, an unreadable schedule or
-        // a file that would not take the append. All three already name their
-        // file, so the cause is relayed whole and nothing is added to it — a
-        // second sentence guessing at the remedy reads as two diagnoses of one
-        // problem. Relaying is safe in a way it would not be on a deployed
-        // route: the reader is the maintainer, and the paths are their own.
-        sendJson(res, 500, {
-          error: `Could not record that judgement: ${message(error)}`,
-        });
-      }
-    })();
+/** The route, as everything the shared skeleton needs to mount and guard it. */
+export function editorTierSpec(deps: EditorTierDeps): EditorRouteSpec {
+  return {
+    path: EDITOR_TIER_PATH,
+    verbs: ["GET", "POST"],
+    refusal: "Read the picker with GET, record a judgement with POST.",
+    cap: MAX_TIER_BODY_BYTES,
+    handle: editorTierHandler(deps),
   };
 }
 
@@ -224,23 +222,16 @@ function measuredPrevalence(): ReadonlyMap<string, number> {
 }
 
 export function editorTierPlugin(): Plugin {
-  return {
-    name: "rhyme-bee-editor-tier",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use(
-        EDITOR_TIER_PATH,
-        editorTierHandler({
-          schedule: readSchedule,
-          openIndex: builtIndex,
-          today: () => localCalendarDate(),
-          measured: measuredPrevalence,
-          overrides: () => readTierOverrideText(overridePath),
-          append: (row) => appendTierOverride(overridePath, row),
-          now: () => new Date().toISOString(),
-          knownnessThreshold: builtKnownnessThreshold,
-        }),
-      );
-    },
-  };
+  return editorRoute(
+    editorTierSpec({
+      schedule: readSchedule,
+      openIndex: builtIndex,
+      today: () => localCalendarDate(),
+      measured: measuredPrevalence,
+      overrides: () => readTierOverrideText(overridePath),
+      append: (row) => appendTierOverride(overridePath, row),
+      now: () => new Date().toISOString(),
+      knownnessThreshold: builtKnownnessThreshold,
+    }),
+  );
 }

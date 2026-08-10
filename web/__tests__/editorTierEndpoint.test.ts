@@ -2,10 +2,15 @@
  * The dev-only endpoint the Editor's Pass sets a word's Tier through. What a
  * verdict *means* is `src/tierOverride.ts` and what a re-tiered day looks like is
  * `web/__tests__/retier.test.ts`; what is tested here is the transport around
- * them — that only the two verbs it answers are answered, that a body is capped
- * rather than buffered, that every refusal writes nothing, and that a judgement
- * that is accepted reaches the file with the prevalence measured at that moment
- * beside it.
+ * them — that every refusal writes nothing, and that a judgement that is
+ * accepted reaches the file with the prevalence measured at that moment beside
+ * it.
+ *
+ * The socket ceremony this route shares with the other four — the verb check,
+ * the body cap, and that no path falls through — is `web/editorRoute.ts`'s and
+ * is tested in `editorRoute.test.ts`. What stays here is this route's own 405
+ * *sentence*, and every claim about what a refusal does to
+ * `data/tier-overrides.csv`.
  *
  * `AGENTS.md` records that the Worker routes were tested despite a convention
  * calling transport untested, and that the convention lost;
@@ -20,7 +25,8 @@ import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
 import type { TierOverrideRow } from "../../src/tierOverride.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "../editorTierRequest.ts";
-import { editorTierHandler } from "../editorTierPlugin.ts";
+import { editorTierSpec } from "../editorTierPlugin.ts";
+import { editorMiddleware } from "../editorRoute.ts";
 
 const SCHEDULE: Schedule = {
   startDate: "2026-08-03",
@@ -73,9 +79,9 @@ interface Answered {
   nexted: boolean;
 }
 
-/** Call the handler the way connect does, mounted prefix already stripped. */
+/** Call the route the way connect does, mounted prefix already stripped. */
 async function call(
-  handler: ReturnType<typeof editorTierHandler>,
+  handler: ReturnType<typeof editorMiddleware>,
   options: {
     method?: string;
     url?: string;
@@ -117,23 +123,25 @@ async function call(
 }
 
 /** The endpoint with the file replaced by an array, so nothing touches `data/`. */
-function endpoint(overrides: Partial<Parameters<typeof editorTierHandler>[0]> = {}) {
+function endpoint(overrides: Partial<Parameters<typeof editorTierSpec>[0]> = {}) {
   const written: TierOverrideRow[] = [];
   let text = "";
-  const handler = editorTierHandler({
-    schedule: () => SCHEDULE,
-    openIndex: () => stubIndex(),
-    today: () => "2026-08-02",
-    measured: () => new Map([["sedate", 0.2], ["eight", 0.9]]),
-    overrides: () => text,
-    append: (row) => {
-      written.push(row);
-      text += `${row.word},${row.verdict},${row.measured ?? ""},${row.decided},${row.note}\n`;
-    },
-    now: () => "2026-08-08T12:00:00.000Z",
-    knownnessThreshold: () => 0,
-    ...overrides,
-  });
+  const handler = editorMiddleware(
+    editorTierSpec({
+      schedule: () => SCHEDULE,
+      openIndex: () => stubIndex(),
+      today: () => "2026-08-02",
+      measured: () => new Map([["sedate", 0.2], ["eight", 0.9]]),
+      overrides: () => text,
+      append: (row) => {
+        written.push(row);
+        text += `${row.word},${row.verdict},${row.measured ?? ""},${row.decided},${row.note}\n`;
+      },
+      now: () => "2026-08-08T12:00:00.000Z",
+      knownnessThreshold: () => 0,
+      ...overrides,
+    }),
+  );
   return { handler, written };
 }
 
@@ -281,46 +289,28 @@ describe("writing a judgement", () => {
 });
 
 describe("what the endpoint refuses, and writes nothing for", () => {
-  it("answers anything but GET or POST with a method refusal", async () => {
+  // The mechanism is `web/editorRoute.ts`'s and is tested there. The sentence
+  // is this route's own, and naming both verbs is how it says there is no third.
+  it("answers anything but GET or POST with this route's own refusal", async () => {
     const { handler, written } = endpoint();
     for (const method of ["PUT", "DELETE", "PATCH"]) {
       const answered = await call(handler, { ...post({ word: "eight", verdict: "bonus" }), method });
 
       expect(answered.status).toBe(405);
       expect(answered.headers["Allow"]).toBe("GET, POST");
+      expect(JSON.parse(answered.body)).toEqual({
+        error: "Read the picker with GET, record a judgement with POST.",
+      });
       expect(answered.nexted).toBe(false);
     }
     expect(written).toEqual([]);
   });
 
-  it("refuses a body over the cap", async () => {
+  it("writes nothing for a body the cap refused", async () => {
     const { handler, written } = endpoint();
     const answered = await call(handler, {
       method: "POST",
       body: "x".repeat(MAX_TIER_BODY_BYTES + 1),
-    });
-
-    expect(answered.status).toBe(413);
-    expect(written).toEqual([]);
-  });
-
-  it("refuses an oversize body that declared itself small", async () => {
-    const { handler, written } = endpoint();
-    const answered = await call(handler, {
-      method: "POST",
-      body: "x".repeat(MAX_TIER_BODY_BYTES + 1),
-      headers: { "content-length": "42" },
-    });
-
-    expect(answered.status).toBe(413);
-    expect(written).toEqual([]);
-  });
-
-  it("refuses a declared size over the cap before a byte of it arrives", async () => {
-    const { handler, written } = endpoint();
-    const answered = await call(handler, {
-      method: "POST",
-      headers: { "content-length": String(MAX_TIER_BODY_BYTES + 1) },
     });
 
     expect(answered.status).toBe(413);
