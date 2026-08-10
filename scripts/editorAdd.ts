@@ -32,9 +32,10 @@
  * shells out to an agent (#171).
  *
  * The judgement (`resolveAddOutcome`, `gatherEvidence`, `composeReading`,
- * `verifyReading`) is tested; `add` itself is not, following the rest of the
- * pass's shell — it is a context read, a call and two file writes. The agent
- * invocation is untested by the same precedent; the reading of what comes back
+ * `verifyReading`) is tested, and so are `add`'s two writes, over a temp dir
+ * with the agent stubbed — which is what `AddDeps` is for. What stays untested
+ * is the agent *invocation*: nothing covers the real `claude -p` spawn or its
+ * argv, and nothing here can without running it. The reading of what comes back
  * is a gate on the core rather than a neighbour of it, so it lives in
  * `editorReading.ts` and is tested there.
  */
