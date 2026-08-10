@@ -42,8 +42,7 @@
  */
 
 import { existsSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { indexStaleness, type IndexStaleness } from "../scripts/indexArtifact.ts";
@@ -52,9 +51,8 @@ import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { sendJson } from "./editorTransport.ts";
 import { EDITOR_STATUS_PATH } from "./src/endpoints.ts";
 import { WRITTEN_FILES, type EditorStatus } from "./src/editor/status.ts";
+import { repoRoot } from "./repoRoot.ts";
 import { uncommittedPorcelain } from "./workingTree.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
  * What the endpoint will read of a request body before refusing it.

@@ -32,13 +32,11 @@
  */
 
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
 import { indexArtifactPath } from "../scripts/indexArtifact.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+import { repoRoot } from "./repoRoot.ts";
 
 interface Built {
   index: RhymeIndex;

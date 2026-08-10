@@ -71,13 +71,10 @@
  * a maintainer is editing their own repository over localhost.
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
-import { parseSchedule, type Schedule } from "../src/schedule.ts";
+import type { Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { add, targetIn, type AddOutcome, type AddTarget } from "../scripts/editorAdd.ts";
 import { indexStaleness, type IndexStaleness } from "../scripts/indexArtifact.ts";
@@ -87,9 +84,9 @@ import { EDITOR_ADD_PATH } from "./src/endpoints.ts";
 import type { AddSubmitResult, RebuildResult } from "./src/editor/add.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "./editorAddRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { readSchedule } from "./editorSchedule.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+import { repoRoot } from "./repoRoot.ts";
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
@@ -252,21 +249,6 @@ function readDay(deps: EditorAddDeps, date: string): AddSubmitResult["readout"] 
   } catch {
     return null;
   }
-}
-
-
-/**
- * The reviewed schedule artifact, read per request rather than held — the same
- * call `editorDayPlugin.ts` makes, and for the same reasons: it is a small
- * hand-edited file, and `loadSchedule`'s `process.exit(1)` is the right answer
- * for a command and the wrong one for a dev server the player's shell is also
- * being served from.
- */
-function readSchedule(): Schedule {
-  const path = resolve(repoRoot, "data/schedule.json");
-  const parsed = parseSchedule(JSON.parse(readFileSync(path, "utf8")));
-  if (parsed === null) throw new Error(`${path} is not a readable schedule artifact.`);
-  return parsed;
 }
 
 export function editorAddPlugin(): Plugin {

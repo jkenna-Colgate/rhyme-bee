@@ -34,26 +34,25 @@
  */
 
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
-import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
+import { localCalendarDate, type Schedule } from "../src/schedule.ts";
 import { overriddenValue, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
 import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
 import { editorDayRequest } from "./editorDayRequest.ts";
+import { readSchedule } from "./editorSchedule.ts";
 import { reachOf, tierPickerState } from "./editorTierPayload.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "./editorTierRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
+import { repoRoot } from "./repoRoot.ts";
 import { appendTierOverride, readTierOverrideText } from "./tierOverrideFile.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
@@ -185,21 +184,6 @@ function record(
     overriddenValue(standing.get(candidate)?.verdict, measured.get(candidate));
 
   return { state, appended, reach: reachOf(word, deps.openIndex(), valueOf) };
-}
-
-/**
- * The reviewed schedule artifact, read per request rather than held — a small
- * hand-edited file, and an editor who has just corrected a day should see the
- * correction on reload rather than after restarting the dev server. Read here
- * rather than through `scripts/editorShell.ts`'s `loadSchedule`, which answers
- * an unreadable artifact with `process.exit(1)`: right for a command, and wrong
- * for a dev server that is also serving the player's shell.
- */
-function readSchedule(): Schedule {
-  const path = resolve(repoRoot, "data/schedule.json");
-  const parsed = parseSchedule(JSON.parse(readFileSync(path, "utf8")));
-  if (parsed === null) throw new Error(`${path} is not a readable schedule artifact.`);
-  return parsed;
 }
 
 const overridePath = resolve(repoRoot, "data/tier-overrides.csv");

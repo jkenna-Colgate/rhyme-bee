@@ -26,21 +26,17 @@
  * build.
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
-import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
+import { localCalendarDate, type Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { EDITOR_DAY_PATH } from "./src/endpoints.ts";
 import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "./editorDayRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { readSchedule } from "./editorSchedule.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
@@ -92,24 +88,6 @@ export function editorDaySpec(deps: EditorDayDeps): EditorRouteSpec {
     cap: MAX_REQUEST_BODY_BYTES,
     handle: editorDayHandler(deps),
   };
-}
-
-/**
- * The reviewed schedule artifact, read per request rather than held. It is a
- * small hand-edited file, and an editor who has just corrected a day should see
- * the correction on reload rather than after restarting the dev server.
- *
- * Read here rather than through `scripts/editorShell.ts`'s `loadSchedule`,
- * which answers an unreadable artifact with `process.exit(1)`. That is the right
- * answer for a command and the wrong one for a dev server: it would take the
- * whole server down, and the player's shell with it, over a file the player's
- * shell had not asked for.
- */
-function readSchedule(): Schedule {
-  const path = resolve(repoRoot, "data/schedule.json");
-  const parsed = parseSchedule(JSON.parse(readFileSync(path, "utf8")));
-  if (parsed === null) throw new Error(`${path} is not a readable schedule artifact.`);
-  return parsed;
 }
 
 export function editorDayPlugin(): Plugin {

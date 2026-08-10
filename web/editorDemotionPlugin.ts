@@ -62,8 +62,7 @@
  * editing their own repository over localhost.
  */
 
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { parseDemotions, type Demotion } from "../src/demotions.ts";
@@ -73,8 +72,7 @@ import { appendDemotion, readDemotionText } from "./demotionFile.ts";
 import { MAX_DEMOTION_BODY_BYTES, demotionWriteRequest } from "./editorDemotionRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+import { repoRoot } from "./repoRoot.ts";
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
