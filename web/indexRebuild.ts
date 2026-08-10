@@ -37,8 +37,8 @@
  * shim — the same accommodation `authorWithAgent` (`scripts/editorAdd.ts`)
  * makes, for the same reason, and it carries the same consequence: the child
  * this module holds is the shell, not the build, so an abandoned rebuild is
- * ended with that module's `killTree` rather than a bare `kill` that would
- * leave the build running under a shell nobody is holding any more. There is
+ * ended with `killTree` (`web/killTree.ts`) rather than a bare `kill` that
+ * would leave the build running under a shell nobody is holding any more. There is
  * nothing caller-supplied in the argv, so the shell has nothing to interpolate.
  *
  * ## Why the cache is forgotten here
@@ -71,13 +71,13 @@
  */
 
 import { spawn, type ChildProcess } from "node:child_process";
-import { killTree } from "../scripts/editorAdd.ts";
 import {
   builtIndex,
   builtKnownnessThreshold,
   forgetBuiltIndex,
   type IndexCache,
 } from "./builtIndex.ts";
+import { killTree } from "./killTree.ts";
 import type { RebuildResult } from "./src/editor/add.ts";
 
 export interface RebuildDeps {
