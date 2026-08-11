@@ -113,6 +113,30 @@ export const EDITOR_DEMOTION_PATH = "/api/editor/demotion";
 export const EDITOR_ADD_PATH = "/api/editor/add";
 
 /**
+ * Where the Editor's Pass reads the **Candidate Queue**: `GET` alone, naming
+ * nothing. Every outstanding Candidate grouped by Rhyme Key, each group carrying
+ * the scheduled day the schedule holds for that key, and each Candidate carrying
+ * a state already derived (#176, #177).
+ *
+ * No date, like the demotion path and unlike the two day-scoped ones. A
+ * Candidate is aimed at a Rhyme Key rather than at a date — 17 of the 33
+ * standing Candidates belong to no scheduled day at all — so the whole queue is
+ * one answer and the day panel is a filter over it in the browser
+ * (`web/src/editor/dayCandidates.ts`), not a second request with a date on it.
+ *
+ * It **writes nothing**, which makes it the second read-only editor path after
+ * the status one. Resolution is derived from the pinned sources on every read,
+ * so a Candidate fixed by a change made anywhere else in the build clears itself
+ * without a file recording that it did.
+ *
+ * Dev only, and structurally so — `editorCandidatesPlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface answers this path
+ * (ADR-0016, ADR-0017).
+ */
+export const EDITOR_CANDIDATES_PATH = "/api/editor/candidates";
+
+/**
  * Where the Editor's Pass reads its own state: `GET` alone, naming nothing.
  * Whether the built Rhyme Index is stale, and whether each file the tool writes
  * carries uncommitted changes (#162).

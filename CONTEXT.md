@@ -93,8 +93,16 @@ A player's report that a Submission the game rejected should have counted as an 
 _Avoid_: Flag (the maintainer-facing schedule review flags the days worth reading first, and that is the word's only other use), challenge, dispute, complaint
 
 **Candidate**:
-The record an Appeal becomes: the Submission, the reason the engine gave for rejecting it, and the context a judge needs to rule on it later. Judging is a separate offline pass over the queue, and may end in a correction to the pronunciation the engine reads — so a Candidate is the report, never the fix.
+The record an Appeal becomes: the Submission, the reason the engine gave for rejecting it, and the context a judge needs to rule on it later. Judging is a separate pass over the Candidate Queue, and may end in a correction to the pronunciation the engine reads — so a Candidate is the report, never the fix.
 _Avoid_: Suggestion, correction, fix (those name what judging may produce, not what the player sent)
+
+**Candidate Queue**:
+Every outstanding Candidate, grouped by Rhyme Key. The term covers Candidates from all three capture paths — a player's Appeal in the deployed game, a player's Appeal in dev, and the Editor's Pass disagreement — and, as a second section, the readings the add path asked an agent for and did not get. Judging it is the Editor's Pass's work rather than a pass of its own ([ADR-0017](./docs/adr/0017-candidates-are-judged-in-the-editors-pass.md)), and a Candidate whose word rhymes on its Rhyme Key against the current Rhyme Index is resolved by that fact alone, without anyone ruling on it.
+_Avoid_: "the add queue", which is the existing browser-side list of words an editor has typed and not yet submitted, and is a different thing on the same screen
+
+**Decline**:
+The editor's ruling that a Candidate should not become an Answer, together with the choice of what the player is told instead. It is distinct from the engine's **rejection** of a Submission: the engine rejects mid-play from index state, and an editor declines afterwards by changing that state. A Decline is recorded against the word and the Rhyme Key together, so declining a word for one target does not hide it when it is Appealed against another.
+_Avoid_: Reject (the engine's act), dismiss, close
 
 **Editor's Pass**:
 The puzzles editor's read of a Daily Puzzle before its date arrives, and the corrections that read produces. It is a *read*, not a play: the editor scans the day's Answers and Bonus Words as text — against a third-party rhyme list in another window — and never opens a Session. The term covers both halves of the loop, because they are one activity rather than two: the pass surfaces a Puzzle that has drifted out of the band it was dealt from or is missing an obvious rhyme, and the words it adds are added in the same sitting, by name alone.

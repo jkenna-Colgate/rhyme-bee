@@ -31,7 +31,9 @@ import type {
 import { DEMOTION_REASONS, type Demotion, type DemotionReason } from "../../../src/demotions.ts";
 import type { DriftReason } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
+import type { CandidateQueueReadout } from "../../../scripts/editorCandidates.ts";
 import { AddQueueView } from "./AddQueueView.tsx";
+import { DayCandidatesView } from "./CandidateQueueView.tsx";
 import { correctedDay } from "./correctedDay.ts";
 import { showsDemotionReassurance } from "./demote.ts";
 import type { RetieredWord } from "./retier.ts";
@@ -48,6 +50,7 @@ export function DayReadoutView({
   adder,
   disagreer,
   status,
+  candidates,
 }: {
   readout: DayReadout;
   picker: TierPicker;
@@ -55,6 +58,15 @@ export function DayReadoutView({
   adder: Adder;
   /** Read by nothing here — forwarded to `AddQueueView`, like `adder` itself. */
   disagreer: Disagreer;
+  /**
+   * The whole Candidate Queue, forwarded to the scheduled-day case, which is the
+   * only one with a Rhyme Key to select on. It arrives whole rather than
+   * pre-filtered because the filter is `candidatesForDay`'s and the key it
+   * selects on is the *readout's* own — the same rule `correctedDay` follows for
+   * the picker state, and for the same reason: a caller filtering on the date it
+   * typed rather than the day that came back can hand one day another's work.
+   */
+  candidates: CandidateQueueReadout | null;
   /**
    * The repository's state, carried through to `AddQueueView`, which is the
    * actual reader: Submit's enabling rule is half the queue and half the index
@@ -89,6 +101,7 @@ export function DayReadoutView({
           adder={adder}
           disagreer={disagreer}
           status={status}
+          candidates={candidates}
         />
       );
   }
@@ -168,6 +181,7 @@ function ScheduledDay({
   adder,
   disagreer,
   status,
+  candidates,
 }: {
   readout: ScheduledDayReadout;
   picker: TierPicker;
@@ -178,6 +192,8 @@ function ScheduledDay({
   /** Read by nothing here either — forwarded to `AddQueueView` below, for the
    * reason given on `DayReadoutView`'s own `status` prop. */
   status: EditorStatus | null;
+  /** The whole queue, narrowed to this day's Rhyme Key by `DayCandidatesView`. */
+  candidates: CandidateQueueReadout | null;
 }) {
   const { drift } = readout;
   // Which word's menu is showing. One at a time: the menu is a choice about one
@@ -323,6 +339,13 @@ function ScheduledDay({
         disagreer={disagreer}
         status={status}
       />
+
+      {/* Beside the add queue, because they are the same act read from two
+          directions: the queue is words the editor noticed missing, and this is
+          the words players already told us were. Selected by the day's *own*
+          Rhyme Key, and drawn only when that key holds Candidates — which is
+          five days in 260. */}
+      <DayCandidatesView queue={candidates} rhymeKey={readout.rhymeKey} />
 
       <p className="editor-lists-note">
         Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}

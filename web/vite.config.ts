@@ -10,6 +10,7 @@ import {
 import { deployHeadersPlugin } from "./deployHeadersPlugin.ts";
 import { indexAssetPlugin } from "./indexAssetPlugin.ts";
 import { editorAddPlugin } from "./editorAddPlugin.ts";
+import { editorCandidatesPlugin } from "./editorCandidatesPlugin.ts";
 import { editorDayPlugin } from "./editorDayPlugin.ts";
 import { editorDemotionPlugin } from "./editorDemotionPlugin.ts";
 import { editorStatusPlugin } from "./editorStatusPlugin.ts";
@@ -56,20 +57,23 @@ export default defineConfig(({ command }) => {
 
   return {
     root: rootDir,
-    // `feedbackPlugin`, `supplementPlugin` and the five `editor*` plugins are
+    // `feedbackPlugin`, `supplementPlugin` and the six `editor*` plugins are
     // dev-only (`apply: "serve"`); `deployHeadersPlugin` and `indexAssetPlugin`
     // are build-only. Three of the editor plugins write to `data/` — and
     // `editorAddPlugin` also rebuilds `dist-data/` — which is why the build's
-    // inputs are named below rather than defaulted. `editorStatusPlugin` is the
-    // one that writes nothing at all: it reads the artifact's staleness and
-    // asks git about the written files, and #162 gives the tool no commit and
-    // no deploy to go with the answer.
+    // inputs are named below rather than defaulted. `editorStatusPlugin` and
+    // `editorCandidatesPlugin` are the two that write nothing at all: the first
+    // reads the artifact's staleness and asks git about the written files, and
+    // #162 gives the tool no commit and no deploy to go with the answer; the
+    // second reads the Candidate Queue, whose every state is derived rather
+    // than stored (#177).
     plugins: [
       react(),
       deployHeadersPlugin(),
       indexAssetPlugin(distDataDir),
       editorDayPlugin(),
       editorStatusPlugin(),
+      editorCandidatesPlugin(),
       editorTierPlugin(),
       editorDemotionPlugin(),
       editorAddPlugin(),

@@ -60,11 +60,13 @@
 
 import { useEffect, useState } from "react";
 import { useAdder } from "./useAdder.ts";
+import { useCandidateQueue } from "./useCandidateQueue.ts";
 import { useDayReadout } from "./useDayReadout.ts";
 import { useDemoter } from "./useDemoter.ts";
 import { useDisagreement } from "./useDisagreement.ts";
 import { useEditorStatus } from "./useEditorStatus.ts";
 import { useTierPicker } from "./useTierPicker.ts";
+import { CandidateQueueView } from "./CandidateQueueView.tsx";
 import { DayReadoutView } from "./DayReadoutView.tsx";
 import { StatusView } from "./StatusView.tsx";
 
@@ -78,6 +80,10 @@ export function EditorApp() {
   const adder = useAdder(show, day);
   const disagreer = useDisagreement();
   const { status, error: statusError, refresh } = useEditorStatus();
+  // Not day-scoped, like the demoter and unlike the picker: the queue is grouped
+  // by Rhyme Key and most of it belongs to no scheduled day at all, so there is
+  // no date to fetch it for. The day panel selects out of this one readout.
+  const candidates = useCandidateQueue();
 
   // The status is refreshed by **observing** that a write happened, rather than
   // by three callbacks threaded through three hooks. Each of these three values
@@ -94,6 +100,16 @@ export function EditorApp() {
     if (picker.recorded === null && demoter.recorded === null && adder.result === null) return;
     refresh();
   }, [picker.recorded, demoter.recorded, adder.result, refresh]);
+
+  // The queue is refreshed on the same observation, and for a reason of its own:
+  // this slice writes nothing, but every state on the queue is *derived* from
+  // `data/` on each read, so an add, a demotion or a Tier verdict can retire a
+  // Candidate. A queue held from mount would go on presenting work already done.
+  const refreshQueue = candidates.refresh;
+  useEffect(() => {
+    if (picker.recorded === null && demoter.recorded === null && adder.result === null) return;
+    refreshQueue();
+  }, [picker.recorded, demoter.recorded, adder.result, refreshQueue]);
   // The control shows the date the editor last entered in full, and otherwise
   // the day on screen — which is how the endpoint's choice of tomorrow becomes
   // visible without the browser having decided it.
@@ -133,6 +149,16 @@ export function EditorApp() {
           jump would say it had gone stale when nothing about it had moved. */}
       <StatusView status={status} error={statusError} />
 
+      {/* Beside the status and outside the day's block, for the same reason: a
+          Candidate is aimed at a Rhyme Key rather than at a date, and most of
+          the queue belongs to no scheduled day at all. Dimming it on a jump
+          would say it had gone stale when nothing about it had moved. */}
+      <CandidateQueueView
+        queue={candidates.queue}
+        error={candidates.error}
+        loading={candidates.loading}
+      />
+
       {/* The previous day stays on screen while the next one is fetched, dimmed
           rather than replaced: a blank screen between two days makes a jump feel
           like a failure, and a day's readout arrives in milliseconds. */}
@@ -145,6 +171,7 @@ export function EditorApp() {
             adder={adder}
             disagreer={disagreer}
             status={status}
+            candidates={candidates.queue}
           />
         </div>
       )}

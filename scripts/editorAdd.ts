@@ -197,7 +197,7 @@ export async function add(
   aim: AddTarget,
   deps: AddDeps = {},
 ): Promise<AddOutcome> {
-  const outcome = await resolveAddOutcome(words, aim, evidenceContext(), deps.author);
+  const outcome = await resolveAddOutcome(words, aim, pinnedEvidenceContext(), deps.author);
   appendToSupplement(writtenReadings(outcome), deps.supplementPath ?? resolve(root, "data", SUPPLEMENT));
   appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? resolve(root, "data", DEFERRED_QUEUE));
   return outcome;
@@ -245,8 +245,16 @@ interface DeferredReading {
  * a *later* one — in exchange for a compound whose part was itself missing
  * until tonight, which no pass has yet turned up. Worth revisiting from a real
  * night's findings rather than from this comment.
+ *
+ * Exported for the Candidate Queue's readout endpoint
+ * (`web/editorCandidatesPlugin.ts`), which needs the *same* stack for the same
+ * reason: a Candidate's target Rhyme Key comes off the schedule or off a Seed
+ * the built index pinned, and judging it under a context assembled any other way
+ * would report a disagreement about the accent as a disagreement about the
+ * rhyme — which is precisely the five cot–caught Candidates all over again. The
+ * two paths call one function rather than reading the same four files twice.
  */
-function evidenceContext(): EvidenceContext {
+export function pinnedEvidenceContext(): EvidenceContext {
   const read = (name: string) => readFileSync(resolve(root, "data", name), "utf8");
   const pronunciations = parseCmudict(read("cmudict.dict"));
   const words = parseWordList(read("words.txt"));

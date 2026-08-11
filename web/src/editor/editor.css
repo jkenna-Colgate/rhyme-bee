@@ -757,3 +757,134 @@ code {
   font-size: 0.8rem;
   color: #2f5d3a;
 }
+
+/* --- The Candidate Queue (#177) ---------------------------------------------
+   A panel of its own beside the status, because what it reports is not about
+   the day on screen: a Candidate is aimed at a Rhyme Key, and most of the queue
+   belongs to no scheduled day at all. Every state drawn here was derived in
+   Node; nothing in the browser decides one. */
+.editor-queue {
+  margin: 0 0 1.1rem;
+  padding: 0.75rem 0.95rem 0.85rem;
+  background: #f7f4ee;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.editor-queue h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.editor-queue-lede {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+}
+
+/* A queue with nothing on it at all is the one state worth an alarm: an empty
+   list and an unpulled one look identical, and only one of them is good news. */
+.editor-queue-stale {
+  color: #8a5a00;
+}
+
+.editor-queue-failed {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: #8e2a1f;
+}
+
+.editor-queue-group {
+  margin: 0.7rem 0 0;
+  padding: 0.55rem 0.7rem 0.6rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 5px;
+}
+
+.editor-queue-group h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.editor-queue-day {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-queue-undated {
+  color: #857e70;
+}
+
+.editor-queue-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editor-queue-note {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+/* The day's own Candidates, inside the scheduled-day case. Boxed like the add
+   queue it sits beside, because the two are the same act read from two
+   directions. */
+.editor-queue-day-panel {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 1rem 1rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-queue-day-panel h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.editor-candidate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid #f0ece2;
+  font-size: 0.8rem;
+}
+
+.editor-candidate-word {
+  font-weight: 600;
+}
+
+.editor-candidate-state {
+  color: #6b6558;
+}
+
+.editor-candidate-evidence code {
+  margin-right: 0.5rem;
+  font-size: 0.72rem;
+  color: #857e70;
+}
+
+/* Green for the two states that want nothing; amber for the three that do. The
+   name card is the loudest of those three, because it is the one whose fix
+   takes a word off every day rather than adding one to a family. */
+.editor-candidate-settled .editor-candidate-state {
+  color: #2f6b3a;
+}
+
+.editor-candidate-correction .editor-candidate-state,
+.editor-candidate-add .editor-candidate-state,
+.editor-candidate-derivation .editor-candidate-state {
+  color: #8a5a00;
+}
+
+.editor-candidate-name .editor-candidate-state {
+  color: #8e2a1f;
+}
