@@ -9,9 +9,9 @@
  * A test that re-derived it the way the code does would agree with any bug.
  */
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { R2Credentials } from "../appealPull.ts";
-import { parseListing, signGet, uriEncode } from "../r2Bucket.ts";
+import { listObjects, parseListing, signGet, uriEncode } from "../r2Bucket.ts";
 
 const credentials: R2Credentials = {
   accountId: "abc123",
@@ -150,5 +150,47 @@ describe("reading a listing", () => {
   it("decodes the entities S3 escapes a key with", () => {
     const xml = page(entry("flags/a&amp;b.json"), "<IsTruncated>false</IsTruncated>");
     expect(parseListing(xml).keys).toEqual(["flags/a&b.json"]);
+  });
+});
+
+/**
+ * The one place the network is stubbed. A SigV4 signature names a host, so a
+ * redirect can only ever lead somewhere the credentials were not signed for —
+ * following one would be the request leaving the destination this module fixes
+ * by construction, carrying an `Authorization` header with it.
+ */
+describe("fetching, which follows nothing", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  const calls: RequestInit[] = [];
+  const replying = (response: Response) => {
+    calls.length = 0;
+    vi.stubGlobal("fetch", async (_url: string, init: RequestInit) => {
+      calls.push(init);
+      return response;
+    });
+  };
+
+  it("asks fetch not to follow redirects in the first place", async () => {
+    replying(
+      new Response(page(entry("flags/a.json"), "<IsTruncated>false</IsTruncated>"), { status: 200 }),
+    );
+    await listObjects(credentials, "flags/");
+    expect(calls[0]?.redirect).toBe("manual");
+  });
+
+  it("refuses a redirect instead of chasing it, and names where it pointed", async () => {
+    replying(
+      new Response(null, { status: 302, headers: { location: "https://elsewhere.test/flags" } }),
+    );
+    await expect(listObjects(credentials, "flags/")).rejects.toThrow(
+      /redirected .*302 to https:\/\/elsewhere\.test\/flags/,
+    );
+    expect(calls).toHaveLength(1);
+  });
+
+  it("still reports an ordinary refusal by its S3 error code", async () => {
+    replying(new Response("<Error><Code>AccessDenied</Code></Error>", { status: 403 }));
+    await expect(listObjects(credentials, "flags/")).rejects.toThrow(/403.*AccessDenied/s);
   });
 });
