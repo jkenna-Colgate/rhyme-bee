@@ -210,8 +210,9 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
     try {
       // Built as an `AddSubmitRequest` rather than as a literal, so the body
       // this posts is checked against the shape the endpoint's parser returns
-      // rather than agreeing with it by hand. The queue is held readonly and
-      // copied out here; the copy is what gets serialised either way.
+      // rather than agreeing with it by hand. Copied out because the queue is
+      // held readonly and the declared field is not — the copy is inert, since
+      // the next line serialises it and the endpoint parses its own.
       const payload: AddSubmitRequest = { date, words: [...batch] };
       const response = await fetch(EDITOR_ADD_PATH, {
         method: "POST",
