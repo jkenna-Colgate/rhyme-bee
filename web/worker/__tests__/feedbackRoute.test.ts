@@ -58,13 +58,13 @@ const CONTEXT = {
   foundAnswers: 7,
   totalAnswers: 30,
   foundBonus: 2,
-  url: "https://bramble-bee.jackkenna8.workers.dev/",
+  url: "https://bramble-bee.kenna-dev.workers.dev/",
   timestamp: "2026-08-05T10:00:00.000Z",
 };
 
 function post(body: unknown, headers: Record<string, string> = {}): Request {
   const payload = typeof body === "string" ? body : JSON.stringify(body);
-  return new Request("https://bramble-bee.jackkenna8.workers.dev/api/feedback", {
+  return new Request("https://bramble-bee.kenna-dev.workers.dev/api/feedback", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...headers },
     body: payload,

@@ -1,8 +1,9 @@
 /**
  * The dev-only endpoint the Editor's Pass sets a word's **Tier** through — the
- * act the whole web mode exists for (ADR-0016). A Vite plugin that, during
- * `npm run dev` only (`apply: "serve"`, so `configureServer` never runs in a
- * production build), answers two verbs on `/api/editor/tier`:
+ * act the whole web mode exists for (ADR-0016). A Vite plugin that
+ * `web/editorRoute.ts` builds from the spec below and marks `apply: "serve"`, so
+ * it exists during `npm run dev` only and `configureServer` never runs in a
+ * production build. It answers two verbs on `/api/editor/tier`:
  *
  * - `GET` returns what the picker needs and the day readout does not carry: the
  *   standing verdicts in `data/tier-overrides.csv`, and the lemma walk and
@@ -26,34 +27,35 @@
  * `editorDayPlugin` reads `data/`; this one **writes** it. A route that survived
  * into production would be a path from the public internet into the repository
  * with a file that can never be regenerated at the end of it. Three things make
- * that impossible rather than unlikely: `apply: "serve"` here, `vite.config.ts`
- * naming the build's inputs so `editor.html` is never in a bundle, and no Worker
+ * that impossible rather than unlikely: `apply: "serve"`, now declared for this
+ * route by `web/editorRoute.ts` rather than by the plugin at the foot of this
+ * file; `vite.config.ts`
+ * naming the build's inputs so `editor.html` is never in a bundle; and no Worker
  * route answering this path. It does not weaken ADR-0013 either: there is no
  * player, no Session and no Submission being adjudicated — a maintainer is
  * editing their own repository over localhost.
  */
 
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
-import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
+import { localCalendarDate, type Schedule } from "../src/schedule.ts";
 import { overriddenValue, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
-import { message } from "../scripts/editorShell.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
 import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
 import { editorDayRequest } from "./editorDayRequest.ts";
+import { readSchedule } from "./editorSchedule.ts";
 import { reachOf, tierPickerState } from "./editorTierPayload.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "./editorTierRequest.ts";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
+import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { relayCause, sendJson } from "./editorTransport.ts";
+import { repoRoot } from "./repoRoot.ts";
 import { appendTierOverride, readTierOverrideText } from "./tierOverrideFile.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
@@ -104,54 +106,46 @@ function stateFor(deps: EditorTierDeps, date: string): TierPickerState {
 }
 
 /**
- * The endpoint, apart from the dev server it is mounted on.
- *
- * Every refusal is a status and a sentence, and none of them is `next()`: this
- * path is the editor's alone, and falling through would hand a bad request the
- * static shell's HTML with a 200 on it — the one shape of failure worth ruling
- * out on a route whose success case writes to `data/`.
+ * The route's own work, over a body the shared skeleton has already read and
+ * capped. It reads both `req.url` and `req.method` for itself: the date is
+ * parsed on **both** verbs, deliberately outside the `try` below, and the verb
+ * then decides whether the day is being read or judged.
  *
  * The order of the checks on a write is the order in which each one can rule the
- * write out: the verb, then the size, then the day, then the judgement. Nothing
- * touches the file until all four have passed, which is what "every refusal
- * writes nothing" means and what the suite asserts of each of them in turn.
+ * write out: the verb, then the size — both `web/editorRoute.ts`'s — then the
+ * day, then the judgement. Nothing touches the file until all four have passed,
+ * which is what "every refusal writes nothing" means and what the suite asserts
+ * of each of them in turn.
  */
 export function editorTierHandler(deps: EditorTierDeps) {
-  // `next` is connect's and is named here only to be visibly never called.
-  return (req: IncomingMessage, res: ServerResponse, _next?: () => void): void => {
-    const method = req.method ?? "GET";
-    if (method !== "GET" && method !== "POST") {
-      res.setHeader("Allow", "GET, POST");
-      sendJson(res, 405, { error: "Read the picker with GET, record a judgement with POST." });
-      return;
+  return (req: IncomingMessage, res: ServerResponse, body: string): void => {
+    const asked = editorDayRequest(req.url ?? "/", deps.today());
+    if (!asked.ok) return sendJson(res, 400, { error: asked.error });
+
+    try {
+      if ((req.method ?? "GET") === "GET") return sendJson(res, 200, stateFor(deps, asked.date));
+
+      const judgement = tierWriteRequest(body);
+      if (!judgement.ok) return sendJson(res, 400, { error: judgement.error });
+
+      sendJson(res, 200, record(deps, judgement.word, judgement.verdict, asked.date));
+    } catch (error) {
+      // What throws past here is a missing artifact, an unreadable schedule or
+      // a file that would not take the append, and all three already name their
+      // file. `relayCause` argues why the cause travels whole.
+      relayCause(res, "Could not record that judgement", error);
     }
+  };
+}
 
-    void (async () => {
-      const body = await readCappedBody(req, res, MAX_TIER_BODY_BYTES);
-      if (body === null) return;
-
-      const asked = editorDayRequest(req.url ?? "/", deps.today());
-      if (!asked.ok) return sendJson(res, 400, { error: asked.error });
-
-      try {
-        if (method === "GET") return sendJson(res, 200, stateFor(deps, asked.date));
-
-        const judgement = tierWriteRequest(body);
-        if (!judgement.ok) return sendJson(res, 400, { error: judgement.error });
-
-        sendJson(res, 200, record(deps, judgement.word, judgement.verdict, asked.date));
-      } catch (error) {
-        // What throws past here is a missing artifact, an unreadable schedule or
-        // a file that would not take the append. All three already name their
-        // file, so the cause is relayed whole and nothing is added to it — a
-        // second sentence guessing at the remedy reads as two diagnoses of one
-        // problem. Relaying is safe in a way it would not be on a deployed
-        // route: the reader is the maintainer, and the paths are their own.
-        sendJson(res, 500, {
-          error: `Could not record that judgement: ${message(error)}`,
-        });
-      }
-    })();
+/** The route, as everything the shared skeleton needs to mount and guard it. */
+export function editorTierSpec(deps: EditorTierDeps): EditorRouteSpec {
+  return {
+    path: EDITOR_TIER_PATH,
+    verbs: ["GET", "POST"],
+    refusal: "Read the picker with GET, record a judgement with POST.",
+    cap: MAX_TIER_BODY_BYTES,
+    handle: editorTierHandler(deps),
   };
 }
 
@@ -195,21 +189,6 @@ function record(
   return { state, appended, reach: reachOf(word, deps.openIndex(), valueOf) };
 }
 
-/**
- * The reviewed schedule artifact, read per request rather than held — a small
- * hand-edited file, and an editor who has just corrected a day should see the
- * correction on reload rather than after restarting the dev server. Read here
- * rather than through `scripts/editorShell.ts`'s `loadSchedule`, which answers
- * an unreadable artifact with `process.exit(1)`: right for a command, and wrong
- * for a dev server that is also serving the player's shell.
- */
-function readSchedule(): Schedule {
-  const path = resolve(repoRoot, "data/schedule.json");
-  const parsed = parseSchedule(JSON.parse(readFileSync(path, "utf8")));
-  if (parsed === null) throw new Error(`${path} is not a readable schedule artifact.`);
-  return parsed;
-}
-
 const overridePath = resolve(repoRoot, "data/tier-overrides.csv");
 
 /**
@@ -224,23 +203,16 @@ function measuredPrevalence(): ReadonlyMap<string, number> {
 }
 
 export function editorTierPlugin(): Plugin {
-  return {
-    name: "rhyme-bee-editor-tier",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use(
-        EDITOR_TIER_PATH,
-        editorTierHandler({
-          schedule: readSchedule,
-          openIndex: builtIndex,
-          today: () => localCalendarDate(),
-          measured: measuredPrevalence,
-          overrides: () => readTierOverrideText(overridePath),
-          append: (row) => appendTierOverride(overridePath, row),
-          now: () => new Date().toISOString(),
-          knownnessThreshold: builtKnownnessThreshold,
-        }),
-      );
-    },
-  };
+  return editorRoute(
+    editorTierSpec({
+      schedule: readSchedule,
+      openIndex: builtIndex,
+      today: () => localCalendarDate(),
+      measured: measuredPrevalence,
+      overrides: () => readTierOverrideText(overridePath),
+      append: (row) => appendTierOverride(overridePath, row),
+      now: () => new Date().toISOString(),
+      knownnessThreshold: builtKnownnessThreshold,
+    }),
+  );
 }

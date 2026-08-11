@@ -33,7 +33,8 @@
  */
 
 import { localCalendarDate } from "../src/schedule.ts";
-import { add, printAddOutcome, targetFor, type AddTarget } from "./editorAdd.ts";
+import type { AddTarget } from "../web/src/editor/addOutcome.ts";
+import { add, printAddOutcome, targetFor } from "./editorAdd.ts";
 import { parseEditorArgs, tomorrow, type EditorArgs } from "./editorArgs.ts";
 import { audition, readDay } from "./editorRead.ts";
 import { fail, loadSchedule, message } from "./editorShell.ts";

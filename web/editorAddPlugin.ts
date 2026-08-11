@@ -1,9 +1,10 @@
 /**
  * The dev-only endpoint the Editor's Pass **submits its add queue** through: the
  * other half of the pass, in the same sitting that found the gap (ADR-0016). A
- * Vite plugin that, during `npm run dev` only (`apply: "serve"`, so
- * `configureServer` never runs in a production build), answers `POST` on
- * `/api/editor/add`.
+ * Vite plugin, built from the spec at the foot of this file by
+ * `web/editorRoute.ts` — which is where the `apply: "serve"` that keeps
+ * `configureServer` out of a production build is now declared — answering
+ * `POST` on `/api/editor/add`.
  *
  * ## One request, three acts, in this order
  *
@@ -64,32 +65,31 @@
  *
  * It is the heaviest of the four editor routes to leave reachable: it **writes**
  * to `data/`, **spawns a process** and **rewrites `dist-data/`**. Three things
- * make a production copy impossible rather than unlikely: `apply: "serve"` here,
- * `vite.config.ts` naming the build's inputs so `editor.html` is never in a
- * bundle, and no Worker route answering this path. It does not weaken ADR-0013
+ * make a production copy impossible rather than unlikely: the `apply: "serve"`
+ * that `web/editorRoute.ts` declares for every route built on it, this one
+ * included; `vite.config.ts` naming the build's inputs so `editor.html` is never
+ * in a bundle; and no Worker route answering this path. It does not weaken ADR-0013
  * either: there is no player, no Session and no Submission being adjudicated —
  * a maintainer is editing their own repository over localhost.
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
-import { parseSchedule, type Schedule } from "../src/schedule.ts";
+import type { Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
-import { add, targetIn, type AddOutcome, type AddTarget } from "../scripts/editorAdd.ts";
-import { message } from "../scripts/editorShell.ts";
+import { add, targetIn } from "../scripts/editorAdd.ts";
 import { indexStaleness, type IndexStaleness } from "../scripts/indexArtifact.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { rebuildIndex } from "./indexRebuild.ts";
 import { EDITOR_ADD_PATH } from "./src/endpoints.ts";
 import type { AddSubmitResult, RebuildResult } from "./src/editor/add.ts";
+import type { AddOutcome, AddTarget } from "./src/editor/addOutcome.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "./editorAddRequest.ts";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { readSchedule } from "./editorSchedule.ts";
+import { relayCause, sendJson } from "./editorTransport.ts";
+import { repoRoot } from "./repoRoot.ts";
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
@@ -123,107 +123,117 @@ export interface EditorAddDeps {
 }
 
 /**
- * The endpoint, apart from the dev server it is mounted on.
- *
- * Every refusal is a status and a sentence, and none of them is `next()`: this
- * path is the editor's alone, and falling through would hand a bad request the
- * static shell's HTML with a 200 on it — the one shape of failure worth ruling
- * out on a route whose success case writes to `data/` and rebuilds the index.
+ * The route's own work, over a body the shared skeleton has already read and
+ * capped.
  *
  * The order of the checks is the order in which each can rule the Submit out:
- * the verb, then the size, then the batch, then — for a batch with words in it
- * — whether the run covers the day they are aimed at, and for an empty one
- * whether anything is pending at all. Nothing is written until all of them have
- * passed, and a rebuild that fails is reported *with* the outcome rather than in
- * place of it — the readings are on disk by then, and an editor told only "the
- * build failed" would retype a batch that had already landed.
+ * the verb, then the size — both `web/editorRoute.ts`'s — then the batch, then
+ * — for a batch with words in it — whether the run covers the day they are
+ * aimed at, and for an empty one whether anything is pending at all. Nothing is
+ * written until all of them have passed, and a rebuild that fails is reported
+ * *with* the outcome rather than in place of it — the readings are on disk by
+ * then, and an editor told only "the build failed" would retype a batch that
+ * had already landed.
+ *
+ * ## Four `try` scopes, four sentences, and why none of them is shared
+ *
+ * This is the route the shared skeleton was kept narrow for. A skeleton owning
+ * one `try` around the whole of the work could not have expressed what is
+ * below, and flattening it would have cost the editor four distinct diagnoses:
+ *
+ * - the **staleness read** on the empty batch, which relays **no** cause,
+ *   because its causes are absolute paths under `dist-data/`;
+ * - the **schedule read**, which relays its cause;
+ * - the **add itself**, which relays its cause;
+ * - the **re-read** in `readDay`, which answers `null` rather than any status
+ *   at all, because a day that will not read is not a failed Submit.
+ *
+ * Each is scoped to exactly the call it is about, and the code between them —
+ * the `aim === null` 400, the `!stale` 400, the rebuild — is deliberately
+ * outside every one of them.
  */
 export function editorAddHandler(deps: EditorAddDeps) {
-  // `next` is connect's and is named here only to be visibly never called.
-  return (req: IncomingMessage, res: ServerResponse, _next?: () => void): void => {
-    if (req.method !== "POST") {
-      res.setHeader("Allow", "POST");
-      sendJson(res, 405, {
-        error: "Submit queued adds with POST. The queue itself lives in the browser.",
-      });
-      return;
-    }
+  return async (_req: IncomingMessage, res: ServerResponse, body: string): Promise<void> => {
+    const asked = addWriteRequest(body);
+    if (!asked.ok) return sendJson(res, 400, { error: asked.error });
 
-    void (async () => {
-      const body = await readCappedBody(req, res, MAX_ADD_BODY_BYTES);
-      if (body === null) return;
-
-      const asked = addWriteRequest(body);
-      if (!asked.ok) return sendJson(res, 400, { error: asked.error });
-
-      let outcome: AddOutcome | null = null;
-      if (asked.words.length === 0) {
-        // The empty Submit (#162). Nothing is aimed anywhere, no schedule is
-        // consulted and `runAdds` is never reached — the only question is
-        // whether the rebuild below has anything to fold in.
-        let stale: boolean;
-        try {
-          stale = deps.staleness().stale;
-        } catch {
-          // The staleness read is the only thing standing between an empty
-          // Submit and a rebuild for nothing, and a read that threw has not
-          // answered. Refusing is the cheap error: the editor queues a word or
-          // runs the build themselves. No cause is relayed, because the causes
-          // here are absolute paths under `dist-data/`.
-          return sendJson(res, 500, {
-            error: "Could not tell whether the Rhyme Index is stale, so nothing was rebuilt.",
-          });
-        }
-        if (!stale) {
-          return sendJson(res, 400, {
-            error:
-              "Nothing is pending: no words are queued and the Rhyme Index already holds " +
-              "everything written to data/. Submit rebuilds the index, which is not worth paying for nothing.",
-          });
-        }
-      } else {
-        let aim: AddTarget | null;
-        try {
-          aim = targetIn(deps.schedule(), asked.date);
-        } catch (error) {
-          return sendJson(res, 500, { error: `Could not read the schedule: ${message(error)}` });
-        }
-        if (aim === null) {
-          // Not a malformed request and not the file's fault: the run simply
-          // does not cover that day, so there is no Rhyme Key for the words to
-          // be aimed at and nothing to write. The browser cannot reach this
-          // from a day it is looking at, which is exactly why it is worth
-          // answering plainly.
-          return sendJson(res, 400, {
-            error: `No Daily Puzzle is scheduled for ${asked.date}, so there is no Rhyme Key to aim these words at.`,
-          });
-        }
-
-        try {
-          outcome = await deps.runAdds(asked.words, aim);
-        } catch (error) {
-          // What throws past `add` is a pinned source that would not read or a
-          // supplement that would not take the append. Both name their own
-          // file, so the cause is relayed whole and nothing is added to it — a
-          // second sentence guessing at the remedy reads as two diagnoses of
-          // one problem. Relaying is safe in a way it would not be on a
-          // deployed route: the reader is the maintainer, and the paths are
-          // their own.
-          return sendJson(res, 500, { error: `Could not add those words: ${message(error)}` });
-        }
+    let outcome: AddOutcome | null = null;
+    if (asked.words.length === 0) {
+      // The empty Submit (#162). Nothing is aimed anywhere, no schedule is
+      // consulted and `runAdds` is never reached — the only question is
+      // whether the rebuild below has anything to fold in.
+      let stale: boolean;
+      try {
+        stale = deps.staleness().stale;
+      } catch {
+        // The staleness read is the only thing standing between an empty
+        // Submit and a rebuild for nothing, and a read that threw has not
+        // answered. Refusing is the cheap error: the editor queues a word or
+        // runs the build themselves. No cause is relayed, because the causes
+        // here are absolute paths under `dist-data/`.
+        return sendJson(res, 500, {
+          error: "Could not tell whether the Rhyme Index is stale, so nothing was rebuilt.",
+        });
+      }
+      if (!stale) {
+        return sendJson(res, 400, {
+          error:
+            "Nothing is pending: no words are queued and the Rhyme Index already holds " +
+            "everything written to data/. Submit rebuilds the index, which is not worth paying for nothing.",
+        });
+      }
+    } else {
+      let aim: AddTarget | null;
+      try {
+        aim = targetIn(deps.schedule(), asked.date);
+      } catch (error) {
+        // The second of the four scopes, and the first of the two that relay.
+        return relayCause(res, "Could not read the schedule", error);
+      }
+      if (aim === null) {
+        // Not a malformed request and not the file's fault: the run simply
+        // does not cover that day, so there is no Rhyme Key for the words to
+        // be aimed at and nothing to write. The browser cannot reach this
+        // from a day it is looking at, which is exactly why it is worth
+        // answering plainly.
+        return sendJson(res, 400, {
+          error: `No Daily Puzzle is scheduled for ${asked.date}, so there is no Rhyme Key to aim these words at.`,
+        });
       }
 
-      const rebuilt = await deps.rebuild();
-      const result: AddSubmitResult = {
-        outcome,
-        rebuilt,
-        // A day is re-read only from an index that was actually rebuilt. See
-        // `AddSubmitResult` for why a stale re-read is refused rather than
-        // shown with a caveat on it.
-        readout: rebuilt.ok ? readDay(deps, asked.date) : null,
-      };
-      sendJson(res, 200, result);
-    })();
+      try {
+        outcome = await deps.runAdds(asked.words, aim);
+      } catch (error) {
+        // What throws past `add` is a pinned source that would not read or a
+        // supplement that would not take the append, and both name their own
+        // file. `relayCause` argues why the cause travels whole — and the
+        // staleness scope above deliberately does not use it, because its
+        // causes are absolute paths under `dist-data/`.
+        return relayCause(res, "Could not add those words", error);
+      }
+    }
+
+    const rebuilt = await deps.rebuild();
+    const result: AddSubmitResult = {
+      outcome,
+      rebuilt,
+      // A day is re-read only from an index that was actually rebuilt. See
+      // `AddSubmitResult` for why a stale re-read is refused rather than
+      // shown with a caveat on it.
+      readout: rebuilt.ok ? readDay(deps, asked.date) : null,
+    };
+    sendJson(res, 200, result);
+  };
+}
+
+/** The route, as everything the shared skeleton needs to mount and guard it. */
+export function editorAddSpec(deps: EditorAddDeps): EditorRouteSpec {
+  return {
+    path: EDITOR_ADD_PATH,
+    verbs: ["POST"],
+    refusal: "Submit queued adds with POST. The queue itself lives in the browser.",
+    cap: MAX_ADD_BODY_BYTES,
+    handle: editorAddHandler(deps),
   };
 }
 
@@ -244,36 +254,14 @@ function readDay(deps: EditorAddDeps, date: string): AddSubmitResult["readout"] 
   }
 }
 
-
-/**
- * The reviewed schedule artifact, read per request rather than held — the same
- * call `editorDayPlugin.ts` makes, and for the same reasons: it is a small
- * hand-edited file, and `loadSchedule`'s `process.exit(1)` is the right answer
- * for a command and the wrong one for a dev server the player's shell is also
- * being served from.
- */
-function readSchedule(): Schedule {
-  const path = resolve(repoRoot, "data/schedule.json");
-  const parsed = parseSchedule(JSON.parse(readFileSync(path, "utf8")));
-  if (parsed === null) throw new Error(`${path} is not a readable schedule artifact.`);
-  return parsed;
-}
-
 export function editorAddPlugin(): Plugin {
-  return {
-    name: "rhyme-bee-editor-add",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use(
-        EDITOR_ADD_PATH,
-        editorAddHandler({
-          schedule: readSchedule,
-          runAdds: add,
-          rebuild: () => rebuildIndex(repoRoot),
-          openIndex: builtIndex,
-          staleness: () => indexStaleness(repoRoot),
-        }),
-      );
-    },
-  };
+  return editorRoute(
+    editorAddSpec({
+      schedule: readSchedule,
+      runAdds: add,
+      rebuild: () => rebuildIndex(repoRoot),
+      openIndex: builtIndex,
+      staleness: () => indexStaleness(repoRoot),
+    }),
+  );
 }

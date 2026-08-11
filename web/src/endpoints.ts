@@ -48,9 +48,9 @@ export const FEEDBACK_PATH = "/api/feedback";
 /**
  * Where the Editor's Pass reads one scheduled day from: `GET`, with the day
  * named as `?date=YYYY-MM-DD` and tomorrow when it is not. Dev only, and
- * structurally so — `editorDayPlugin` is `apply: "serve"`, so `configureServer`
- * never runs in a production build and no deployed surface answers this path
- * (ADR-0016).
+ * structurally so — `editorDayPlugin` is built by `web/editorRoute.ts`, which
+ * declares `apply: "serve"`, so `configureServer` never runs in a production
+ * build and no deployed surface answers this path (ADR-0016).
  *
  * The editor's shell calls it instead of loading the Rhyme Index: a day's
  * readout is a few KB against the artifact's fifteen megabytes, and every figure
@@ -63,8 +63,9 @@ export const EDITOR_DAY_PATH = "/api/editor/day";
  * day, `POST` to append one judgement to `data/tier-overrides.csv`. The day is
  * named the same way as on `EDITOR_DAY_PATH`, and by the same module.
  *
- * Dev only, and structurally so — `editorTierPlugin` is `apply: "serve"`, so
- * `configureServer` never runs in a production build and no deployed surface
+ * Dev only, and structurally so — `editorTierPlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface
  * answers this path (ADR-0016). That guarantee is load-bearing here in a way it
  * is not for the read beside it: this is the one path in the repository that
  * **writes** to `data/`, and the file it writes can never be regenerated
@@ -81,8 +82,9 @@ export const EDITOR_TIER_PATH = "/api/editor/tier";
  * than about a day, and the same word demoted from Monday's screen is gone from
  * every day that ever held it.
  *
- * Dev only, and structurally so — `editorDemotionPlugin` is `apply: "serve"`,
- * so `configureServer` never runs in a production build and no deployed surface
+ * Dev only, and structurally so — `editorDemotionPlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface
  * answers this path (ADR-0016). Like the Tier path, this one **writes** to
  * `data/`; unlike it, what it writes is committed and a mistake is reversible by
  * hand, which is exactly how a demotion is reversed.
@@ -102,8 +104,9 @@ export const EDITOR_DEMOTION_PATH = "/api/editor/demotion";
  * the artifact that rebuild produced. Splitting them would leave an order for
  * the editor to remember and a half-done pass to remember it in.
  *
- * Dev only, and structurally so — `editorAddPlugin` is `apply: "serve"`, so
- * `configureServer` never runs in a production build and no deployed surface
+ * Dev only, and structurally so — `editorAddPlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface
  * answers this path (ADR-0016). It is the heaviest of the four to leave
  * reachable: it writes to `data/`, spawns a process and rewrites `dist-data/`.
  */
@@ -124,8 +127,9 @@ export const EDITOR_ADD_PATH = "/api/editor/add";
  * deliberately absent from this tool. See `web/workingTree.ts` for why reading
  * git is not one of the operations #162 bans.
  *
- * Dev only, and structurally so — `editorStatusPlugin` is `apply: "serve"`, so
- * `configureServer` never runs in a production build and no deployed surface
- * answers this path (ADR-0016).
+ * Dev only, and structurally so — `editorStatusPlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface answers this path
+ * (ADR-0016).
  */
 export const EDITOR_STATUS_PATH = "/api/editor/status";

@@ -28,7 +28,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const url = (path: string) => `https://bramble-bee.jackkenna8.workers.dev${path}`;
+const url = (path: string) => `https://bramble-bee.kenna-dev.workers.dev${path}`;
 
 describe("the deployed Worker", () => {
   it("hands the game itself to the assets, untouched", async () => {

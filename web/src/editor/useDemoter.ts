@@ -21,6 +21,10 @@
  * The Tier picker refetches on a day change because the lemma walk and the
  * measured values in its state *are* the day's; there is nothing here that is.
  *
+ * The *banner* is a different matter and does take the day, which is why the
+ * hook is given one at all: `recorded` and `alreadyDemoted` report a write the
+ * editor just made, and a write made on one day is not news on another.
+ *
  * ## Why a failed write is loud
  *
  * A demotion that did not reach the file is a demotion that did not happen, and
@@ -53,13 +57,13 @@ export interface Demoter {
   error: string | null;
   /** True when `error` is the 409 the file sends for a word it already names. */
   alreadyDemoted: boolean;
-  /** The last demotion recorded, kept on screen until the next one. */
+  /** The last demotion recorded, kept on screen until the next one or a day change. */
   recorded: Demotion | null;
   /** Demote a word. Resolves once the file has it and the state is refreshed. */
   demote: (word: string, reason: DemotionReason) => Promise<void>;
 }
 
-export function useDemoter(): Demoter {
+export function useDemoter(date: string | null): Demoter {
   const [state, setState] = useState<DemotionState | null>(null);
   const [writing, setWriting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +93,17 @@ export function useDemoter(): Demoter {
       current = false;
     };
   }, []);
+
+  // Kept apart from the fetch above, and keyed on the day rather than folded
+  // into it: the standing list is day-independent and must not be re-read every
+  // time the editor moves, but the banner it is reported alongside says a word
+  // was *just* demoted, and carrying that sentence to another day would attribute
+  // the write to the day now showing. `useTierPicker` clears `recorded` the same
+  // way, for the same reason.
+  useEffect(() => {
+    setAlreadyDemoted(false);
+    setRecorded(null);
+  }, [date]);
 
   const demote = useCallback(async (word: string, chosen: DemotionReason) => {
     setWriting(word);

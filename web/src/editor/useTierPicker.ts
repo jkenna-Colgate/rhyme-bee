@@ -39,9 +39,12 @@ export interface TierPicker {
   writing: string | null;
   /** A request that produced no state, or a write the file refused. */
   error: string | null;
-  /** The last judgement recorded, kept on screen until the next one. */
+  /** The last judgement recorded, kept on screen until the next one or a day change. */
   recorded: TierWriteResult | null;
-  /** Record a verdict. Resolves once the file has it and the state is refreshed. */
+  /**
+   * Record a verdict against the day on screen. Resolves once the file has it
+   * and the state is refreshed.
+   */
   judge: (word: string, verdict: TierVerdict) => Promise<void>;
 }
 
@@ -82,10 +85,28 @@ export function useTierPicker(date: string | null): TierPicker {
 
   const judge = useCallback(
     async (word: string, verdict: TierVerdict) => {
+      // The day posted is the one the words on screen belong to, which is this
+      // argument: `EditorApp` passes the readout's own date, and `DayReadoutView`
+      // builds both lists from that same readout — so the words being judged and
+      // this `date` move together, always. `state.date` does **not**: it lags
+      // until the read lands, and while it lags `correctedDay` renders the
+      // readout's words unjudged rather than holding them back, so a verdict
+      // clicked in that window would be posted against the day the editor has
+      // already left.
+      //
+      // What goes with the fallback this line used to carry is the day it fell
+      // back to. An empty date is not refused by `editorDayRequest`: it reads as
+      // none named and resolves to the day after today, so the readback came home
+      // with another day's standing verdicts and reach over the words just
+      // judged. (The row written was always right — `TierOverrideRow` has no date
+      // field, because a Tier verdict is a property of the word.) A null date is
+      // instead the case where there is no readout at all, and with no readout
+      // there are no words and no button to have called this.
+      if (date === null) return;
       setWriting(word);
       setError(null);
       try {
-        const response = await fetch(`${EDITOR_TIER_PATH}?date=${date ?? ""}`, {
+        const response = await fetch(`${EDITOR_TIER_PATH}?date=${date}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ word, verdict }),

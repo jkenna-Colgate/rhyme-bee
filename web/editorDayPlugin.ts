@@ -1,7 +1,9 @@
 /**
  * The dev-only endpoint the Editor's Pass reads a day through. A Vite plugin
- * that, during `npm run dev` only (`apply: "serve"`, so `configureServer` never
- * runs in a production build), answers `GET /api/editor/day`: it resolves the
+ * that exists during `npm run dev` only — the `apply: "serve"` behind that is
+ * declared once for all five editor routes in `web/editorRoute.ts`, which builds
+ * this one from the spec below, so `configureServer` never runs in a production
+ * build — answering `GET /api/editor/day`: it resolves the
  * date, builds the day against the built Rhyme Index and returns the readout as
  * JSON. It writes nothing, anywhere — repinning a day the index cannot pin is
  * out of scope, and the diagnosis is all this offers.
@@ -21,26 +23,23 @@
  * Dev-only matters more here than for `supplementPlugin`: this endpoint reads
  * `data/` and the later slices of the pass will write it, so a route that
  * survived into production would be a path from the public internet into the
- * repository. This plugin is one half of that guarantee; `vite.config.ts` naming
- * the build's input is the other, and keeps the editor's HTML entry out of a
- * build.
+ * repository. The skeleton this plugin is built on holds one half of that
+ * guarantee, and holds it for every editor route at once; `vite.config.ts`
+ * naming the build's input is the other, and keeps the editor's HTML entry out
+ * of a build.
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
-import { localCalendarDate, parseSchedule, type Schedule } from "../src/schedule.ts";
+import { localCalendarDate, type Schedule } from "../src/schedule.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
-import { message } from "../scripts/editorShell.ts";
 import { builtIndex } from "./builtIndex.ts";
 import { EDITOR_DAY_PATH } from "./src/endpoints.ts";
 import { MAX_REQUEST_BODY_BYTES, editorDayRequest } from "./editorDayRequest.ts";
-import { readCappedBody, sendJson } from "./editorTransport.ts";
-
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
+import { readSchedule } from "./editorSchedule.ts";
+import { relayCause, sendJson } from "./editorTransport.ts";
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
@@ -57,82 +56,49 @@ export interface EditorDayDeps {
 }
 
 /**
- * The endpoint, apart from the dev server it is mounted on.
+ * The route's own work, over a body the skeleton has already read and capped —
+ * and which this route has no use for, a `GET` carrying none.
  *
- * Every refusal is a status and a sentence, and none of them is `next()`: this
- * path is the editor's alone, and falling through would hand a bad request the
- * static shell's HTML with a 200 on it — a failure that reads as a success is
- * the one shape of failure worth ruling out here. The three cases of the readout
- * are *not* refusals: a date outside the run and a Seed the index cannot pin are
- * both things the editor needs rendered, so both are 200s carrying the case.
+ * The refusals the shared skeleton makes (the verb, the size) and the reason
+ * none of them is `next()` are `web/editorRoute.ts`'s. What is this route's own
+ * is the date: an unparseable one is a 400 and reads no day. The three cases of
+ * the readout are *not* refusals — a date outside the run and a Seed the index
+ * cannot pin are both things the editor needs rendered, so both are 200s
+ * carrying the case.
  */
 export function editorDayHandler(deps: EditorDayDeps) {
-  // `next` is connect's and is named here only to be visibly never called.
-  return (req: IncomingMessage, res: ServerResponse, _next?: () => void): void => {
-    if (req.method !== "GET") {
-      res.setHeader("Allow", "GET");
-      sendJson(res, 405, { error: "Read a day with GET." });
-      return;
+  return (req: IncomingMessage, res: ServerResponse): void => {
+    const asked = editorDayRequest(req.url ?? "/", deps.today());
+    if (!asked.ok) return sendJson(res, 400, { error: asked.error });
+
+    try {
+      sendJson(res, 200, readScheduledDay(deps.openIndex, deps.schedule(), asked.date));
+    } catch (error) {
+      // What throws past `readScheduledDay` is a missing or unreadable
+      // artifact, never anything about the day. `relayCause` argues why the
+      // cause travels whole and nothing is added to it.
+      relayCause(res, `Could not read ${asked.date}`, error);
     }
-
-    void (async () => {
-      // This route has no body to use — a `GET` carries none — so the read is
-      // only ever here to enforce the cap; the string it resolves to is not
-      // read. See `web/editorTransport.ts` for why the read happens anyway.
-      if ((await readCappedBody(req, res, MAX_REQUEST_BODY_BYTES)) === null) return;
-
-      const asked = editorDayRequest(req.url ?? "/", deps.today());
-      if (!asked.ok) return sendJson(res, 400, { error: asked.error });
-
-      try {
-        sendJson(res, 200, readScheduledDay(deps.openIndex, deps.schedule(), asked.date));
-      } catch (error) {
-        // What throws past `readScheduledDay` is a missing or unreadable
-        // artifact, never anything about the day, and both of those errors
-        // already name their file and their remedy. So the cause is relayed
-        // whole and nothing is added to it: a second sentence guessing at the
-        // remedy reads as two different diagnoses of one problem. Relaying is
-        // safe here in a way it would not be on a deployed route — the reader
-        // is the maintainer, and the paths are their own.
-        sendJson(res, 500, {
-          error: `Could not read ${asked.date}: ${message(error)}`,
-        });
-      }
-    })();
   };
 }
 
-/**
- * The reviewed schedule artifact, read per request rather than held. It is a
- * small hand-edited file, and an editor who has just corrected a day should see
- * the correction on reload rather than after restarting the dev server.
- *
- * Read here rather than through `scripts/editorShell.ts`'s `loadSchedule`,
- * which answers an unreadable artifact with `process.exit(1)`. That is the right
- * answer for a command and the wrong one for a dev server: it would take the
- * whole server down, and the player's shell with it, over a file the player's
- * shell had not asked for.
- */
-function readSchedule(): Schedule {
-  const path = resolve(repoRoot, "data/schedule.json");
-  const parsed = parseSchedule(JSON.parse(readFileSync(path, "utf8")));
-  if (parsed === null) throw new Error(`${path} is not a readable schedule artifact.`);
-  return parsed;
+/** The route, as everything the shared skeleton needs to mount and guard it. */
+export function editorDaySpec(deps: EditorDayDeps): EditorRouteSpec {
+  return {
+    path: EDITOR_DAY_PATH,
+    verbs: ["GET"],
+    refusal: "Read a day with GET.",
+    cap: MAX_REQUEST_BODY_BYTES,
+    handle: editorDayHandler(deps),
+  };
 }
 
 export function editorDayPlugin(): Plugin {
-  return {
-    name: "rhyme-bee-editor-day",
-    apply: "serve",
-    configureServer(server) {
-      server.middlewares.use(
-        EDITOR_DAY_PATH,
-        editorDayHandler({
-          schedule: readSchedule,
-          openIndex: builtIndex,
-          today: () => localCalendarDate(),
-        }),
-      );
-    },
-  };
+  return editorRoute(
+    editorDaySpec({
+      schedule: readSchedule,
+      openIndex: builtIndex,
+      today: () => localCalendarDate(),
+    }),
+  );
 }

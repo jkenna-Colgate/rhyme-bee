@@ -293,9 +293,9 @@ Two verdicts that set did not reach:
 
 - **Already reads on the key** — `already reads on IY T ER — it is in the game
   already, nothing to add.`
-- **Reads, but does not rhyme** — reported as a **correction, not an add**, and
-  deliberately left for you to make by hand. Overriding an upstream
-  pronunciation stays a considered edit to `data/supplement.dict`.
+- **Reads, but does not rhyme** — reported as a **pronunciation correction, not
+  an add**, and deliberately left for you to make by hand. Overriding an
+  upstream pronunciation stays a considered edit to `data/supplement.dict`.
 
 ### When no split works: the agent
 
@@ -468,7 +468,7 @@ See [docs/deploy.md](./deploy.md) for the full picture, including
 
 ## 8. See it land in the live game
 
-Open <https://bramble-bee.jackkenna8.workers.dev> on the date you added against
+Open <https://bramble-bee.kenna-dev.workers.dev> on the date you added against
 — or any date whose Puzzle the word rhymes in; a supplement entry is not scoped
 to one day.
 

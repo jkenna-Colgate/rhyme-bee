@@ -20,11 +20,47 @@
  */
 
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { message } from "../scripts/editorShell.ts";
 
 export function sendJson(res: ServerResponse, status: number, payload: unknown): void {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json");
   res.end(JSON.stringify(payload));
+}
+
+/**
+ * Answer 500 with `prefix`, then the cause whole.
+ *
+ * **The cause is relayed and nothing is added to it.** What throws past an
+ * editor route is a missing artifact, an unreadable schedule, or a file that
+ * would not take an append — and every one of those errors already names its
+ * file and its remedy. A second sentence guessing at the remedy reads as two
+ * different diagnoses of one problem, so the route's `prefix` says only what it
+ * was doing at the time and the error says the rest.
+ *
+ * **Relaying is safe here in a way it would not be on a deployed route**: the
+ * reader is the maintainer, and the paths are their own. That is the whole
+ * argument, and this is the one place it is written down — it was reproduced
+ * near-verbatim in four files before, which is four chances for one of them to
+ * drift into a claim the others do not make.
+ *
+ * It lives here rather than in `web/editorRoute.ts` because it is transport
+ * rather than ceremony, and because the routes that call it call it from *their
+ * own* catches, in the scopes they chose. Sharing the sentence is not sharing
+ * the scope: `editorStatusPlugin.ts` and two of `editorAddPlugin.ts`'s four
+ * scopes deliberately relay **no** cause — status's causes quote absolute paths
+ * and PATH lookups, and add's staleness read quotes `dist-data/` — so they keep
+ * their own `sendJson` and their own sentence. That distinction is real, and a
+ * helper that made it awkward to keep would be worse than the duplication.
+ *
+ * `web/editorRoute.ts`'s last-resort catch does not call this either, and for a
+ * reason none of those three have: it is the one catch that does not know which
+ * route it is catching for, so it cannot know whether that route would have
+ * relayed. It would have relayed status's withheld causes out from underneath
+ * it.
+ */
+export function relayCause(res: ServerResponse, prefix: string, error: unknown): void {
+  sendJson(res, 500, { error: `${prefix}: ${message(error)}` });
 }
 
 /**

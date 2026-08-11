@@ -3,10 +3,15 @@
  * add *means* is `scripts/editorAdd.ts` and is tested in
  * `scripts/__tests__/editorAdd.test.ts`; what the queue does before Submit is
  * `web/__tests__/addQueue.test.ts`. What is tested here is the transport around
- * them — that only the one verb it answers is answered, that a body is capped
- * rather than buffered, that every refusal writes nothing and rebuilds nothing,
- * and that an accepted Submit performs its three acts **in the one order that
- * makes them true**: write, rebuild, then re-read.
+ * them — that every refusal writes nothing and rebuilds nothing, that each of
+ * this route's four error scopes keeps its own sentence, and that an accepted
+ * Submit performs its three acts **in the one order that makes them true**:
+ * write, rebuild, then re-read.
+ *
+ * The socket ceremony this route shares with the other four — the verb check,
+ * the body cap, and that no path falls through — is `web/editorRoute.ts`'s and
+ * is tested in `editorRoute.test.ts`. What stays here is this route's own 405
+ * *sentence*, and every claim about what a refusal does to `data/`.
  *
  * `AGENTS.md` records that the Worker routes were tested despite a convention
  * calling transport untested, and that the convention lost;
@@ -16,68 +21,21 @@
 
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import type { IncomingMessage, ServerResponse } from "node:http";
 import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
-import { add, type AddOutcome, type AddTarget } from "../../scripts/editorAdd.ts";
+import { add } from "../../scripts/editorAdd.ts";
 import type { IndexStaleness } from "../../scripts/indexArtifact.ts";
-import type { AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
+import type { AddSubmitRequest, AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
+import type { AddOutcome, AddTarget } from "../src/editor/addOutcome.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "../editorAddRequest.ts";
-import { editorAddHandler } from "../editorAddPlugin.ts";
+import { editorAddSpec } from "../editorAddPlugin.ts";
+import { editorMiddleware } from "../editorRoute.ts";
+import { callRoute as call, type Answered } from "./routeCall.ts";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
-interface Answered {
-  status: number;
-  headers: Record<string, string>;
-  body: string;
-  nexted: boolean;
-}
-
-/** Call the handler the way connect does, mounted prefix already stripped. */
-async function call(
-  handler: ReturnType<typeof editorAddHandler>,
-  options: {
-    method?: string;
-    body?: string;
-    headers?: Record<string, string>;
-  } = {},
-): Promise<Answered> {
-  const body = options.body ?? "";
-  const req = Readable.from(body.length > 0 ? [Buffer.from(body)] : []) as IncomingMessage;
-  req.method = options.method ?? "POST";
-  req.url = "/";
-  req.headers = options.headers ?? {};
-
-  const answered: Answered = { status: 0, headers: {}, body: "", nexted: false };
-  let finish: () => void;
-  const done = new Promise<void>((resolve) => (finish = resolve));
-  const res = {
-    set statusCode(value: number) {
-      answered.status = value;
-    },
-    get statusCode() {
-      return answered.status;
-    },
-    setHeader(name: string, value: string) {
-      answered.headers[name] = value;
-    },
-    end(payload?: string) {
-      answered.body = payload ?? "";
-      finish();
-    },
-  } as unknown as ServerResponse;
-
-  handler(req, res, () => {
-    answered.nexted = true;
-    finish();
-  });
-  await done;
-  return answered;
-}
 
 /**
  * One scheduled day, with `bust`'s **real** Rhyme Key on it. Real because the
@@ -147,47 +105,49 @@ function endpoint(
 ) {
   const acts: string[] = [];
   const added: { words: string[]; aim: AddTarget }[] = [];
-  const handler = editorAddHandler({
-    schedule: options.schedule ?? (() => SCHEDULE),
-    runAdds:
-      options.runAdds ??
-      ((words, aim) => {
-        acts.push("add");
-        added.push({ words, aim });
-        return Promise.resolve(outcomeFor(words, aim));
-      }),
-    rebuild:
-      options.rebuild ??
-      (() => {
-        acts.push("rebuild");
-        return Promise.resolve({ ok: true });
-      }),
-    openIndex:
-      options.openIndex ??
-      (() => {
-        acts.push("open-index");
-        // Which Answers the index holds depends on whether the rebuild has run,
-        // which is how "re-read from the *fresh* artifact" is asserted below
-        // rather than assumed: an index opened before the rebuild reads the day
-        // as it was, and would show it here.
-        return stubIndex(acts.includes("rebuild") ? ["bust", "adjust"] : ["bust"]);
-      }),
-    // A current index by default, which is the state in which #161's refusal of
-    // an empty batch still stands. The tests that widen it (#162) hand in a
-    // stale one, and the act is recorded so "the staleness read happened, and
-    // happened before anything else" is assertable rather than assumed.
-    staleness:
-      options.staleness ??
-      (() => {
-        acts.push("staleness");
-        return { stale: false, reason: null };
-      }),
-  });
+  const handler = editorMiddleware(
+    editorAddSpec({
+      schedule: options.schedule ?? (() => SCHEDULE),
+      runAdds:
+        options.runAdds ??
+        ((words, aim) => {
+          acts.push("add");
+          added.push({ words, aim });
+          return Promise.resolve(outcomeFor(words, aim));
+        }),
+      rebuild:
+        options.rebuild ??
+        (() => {
+          acts.push("rebuild");
+          return Promise.resolve({ ok: true });
+        }),
+      openIndex:
+        options.openIndex ??
+        (() => {
+          acts.push("open-index");
+          // Which Answers the index holds depends on whether the rebuild has run,
+          // which is how "re-read from the *fresh* artifact" is asserted below
+          // rather than assumed: an index opened before the rebuild reads the day
+          // as it was, and would show it here.
+          return stubIndex(acts.includes("rebuild") ? ["bust", "adjust"] : ["bust"]);
+        }),
+      // A current index by default, which is the state in which #161's refusal of
+      // an empty batch still stands. The tests that widen it (#162) hand in a
+      // stale one, and the act is recorded so "the staleness read happened, and
+      // happened before anything else" is assertable rather than assumed.
+      staleness:
+        options.staleness ??
+        (() => {
+          acts.push("staleness");
+          return { stale: false, reason: null };
+        }),
+    }),
+  );
   return { handler, acts, added };
 }
 
 const submit = (payload: unknown) => ({ method: "POST", body: JSON.stringify(payload) });
-const batch = { date: "2026-08-10", words: ["candleholder"] };
+const batch: AddSubmitRequest = { date: "2026-08-10", words: ["candleholder"] };
 
 describe("submitting a queue", () => {
   it("aims the words at the day's own Rhyme Key, taken from the schedule", async () => {
@@ -238,7 +198,7 @@ describe("submitting a queue", () => {
    * shows up as the *old* Answer list rather than as an error.
    *
    * In the dev server the same guarantee is `forgetBuiltIndex`, which
-   * `rebuildIndex` calls on success — see `web/builtIndex.ts`.
+   * `rebuildIndex` calls on every outcome — see `web/indexRebuild.ts`.
    */
   it("re-reads the day from the index as it stands after the rebuild", async () => {
     const { handler } = endpoint();
@@ -485,19 +445,25 @@ describe("what Submit does not write", () => {
 });
 
 describe("what the endpoint refuses, and writes nothing for", () => {
-  it("answers anything but POST with a method refusal", async () => {
+  // The mechanism is `web/editorRoute.ts`'s and is tested there. The sentence
+  // is this route's own, and is the only one of the five that explains where
+  // the queue lives — which is the answer to "so where do I GET it".
+  it("answers anything but POST with this route's own refusal", async () => {
     const { handler, acts } = endpoint();
     for (const method of ["GET", "PUT", "DELETE", "PATCH"]) {
       const answered = await call(handler, { ...submit(batch), method });
 
       expect(answered.status).toBe(405);
       expect(answered.headers["Allow"]).toBe("POST");
+      expect(JSON.parse(answered.body)).toEqual({
+        error: "Submit queued adds with POST. The queue itself lives in the browser.",
+      });
       expect(answered.nexted).toBe(false);
     }
     expect(acts).toEqual([]);
   });
 
-  it("refuses a body over the cap", async () => {
+  it("writes nothing and rebuilds nothing for a body the cap refused", async () => {
     const { handler, acts } = endpoint();
     const answered = await call(handler, {
       method: "POST",
@@ -508,27 +474,51 @@ describe("what the endpoint refuses, and writes nothing for", () => {
     expect(acts).toEqual([]);
   });
 
-  it("refuses an oversize body that declared itself small", async () => {
-    const { handler, acts } = endpoint();
-    const answered = await call(handler, {
-      method: "POST",
-      body: "x".repeat(MAX_ADD_BODY_BYTES + 1),
-      headers: { "content-length": "42" },
-    });
+  /**
+   * This route has **four** error scopes where its neighbours have one, and
+   * the four sentences are the reason the shared skeleton (#170) owns no catch
+   * of its own: a single implied `try` around the work could only ever have
+   * produced one of them. Each is asserted in its own case above and below;
+   * what is asserted here is that they are still *four different sentences*,
+   * which is the property a later tidy-up would quietly cost.
+   */
+  it("keeps a different sentence for each of its four error scopes", async () => {
+    const thrower = (message: string) => () => {
+      throw new Error(message);
+    };
+    const errorOf = async (answered: Answered) =>
+      (JSON.parse(answered.body) as { error: string }).error;
 
-    expect(answered.status).toBe(413);
-    expect(acts).toEqual([]);
-  });
+    const staleness = await errorOf(
+      await call(endpoint({ staleness: thrower("stat failed") }).handler, {
+        ...submit({ date: "2026-08-10", words: [] }),
+      }),
+    );
+    const schedule = await errorOf(
+      await call(endpoint({ schedule: thrower("unreadable") }).handler, submit(batch)),
+    );
+    const adding = await errorOf(
+      await call(
+        endpoint({ runAdds: () => Promise.reject(new Error("no supplement")) }).handler,
+        submit(batch),
+      ),
+    );
 
-  it("refuses a declared size over the cap before a byte of it arrives", async () => {
-    const { handler, acts } = endpoint();
-    const answered = await call(handler, {
-      method: "POST",
-      headers: { "content-length": String(MAX_ADD_BODY_BYTES + 1) },
-    });
+    expect(staleness).toBe(
+      "Could not tell whether the Rhyme Index is stale, so nothing was rebuilt.",
+    );
+    expect(schedule).toBe("Could not read the schedule: unreadable");
+    expect(adding).toBe("Could not add those words: no supplement");
+    expect(new Set([staleness, schedule, adding]).size).toBe(3);
 
-    expect(answered.status).toBe(413);
-    expect(acts).toEqual([]);
+    // The fourth scope answers no sentence at all: a day that will not re-read
+    // is not a failed Submit, so the readout is `null` and the 200 stands.
+    const reread = await call(
+      endpoint({ openIndex: thrower("the artifact went away") }).handler,
+      submit(batch),
+    );
+    expect(reread.status).toBe(200);
+    expect((JSON.parse(reread.body) as AddSubmitResult).readout).toBeNull();
   });
 
   it("refuses a body that is not a batch of adds, and names what was wrong", async () => {

@@ -54,7 +54,7 @@
  */
 
 import { spawn } from "node:child_process";
-import { killTree } from "../scripts/editorAdd.ts";
+import { killTree } from "./killTree.ts";
 
 /**
  * How long git gets before the question is abandoned.

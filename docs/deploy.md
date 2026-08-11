@@ -8,7 +8,7 @@ browser, so the deploy is a file upload with a routing table attached — see
 | Thing | Value |
 |---|---|
 | Worker | `bramble-bee` |
-| Public URL | `https://bramble-bee.jackkenna8.workers.dev` |
+| Public URL | `https://bramble-bee.kenna-dev.workers.dev` |
 | R2 binding → bucket | `APPEAL_QUEUE` → `rhyme-bee-flags` |
 | Worker secret | `GITHUB_ISSUE_TOKEN` |
 | Config | `web/wrangler.jsonc`, committed |

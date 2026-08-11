@@ -58,7 +58,7 @@
  * cannot make the sentence unreachable and the screen says it plainly instead.
  */
 
-import type { AddTarget, ReadsOnAnotherKeyOutcome } from "../../../scripts/editorAdd.ts";
+import type { AddTarget, ReadsOnAnotherKeyOutcome } from "./addOutcome.ts";
 import { disagreementKey, disagreementReport } from "./disagreement.ts";
 import type { Disagreer } from "./useDisagreement.ts";
 
@@ -87,9 +87,9 @@ export function ReadsElsewhere({
 
   return (
     <>
-      already reads, and not on <code>{target}</code> — so this is a correction rather than an add,
-      and nothing was written. Correcting a reading an upstream source gave is not something this
-      tool does. The index holds it as{" "}
+      already reads, and not on <code>{target}</code> — so this is a pronunciation correction rather
+      than an add, and nothing was written. Correcting a reading an upstream source gave is not
+      something this tool does. The index holds it as{" "}
       <span className="editor-muted">
         {word.readings.map((reading, at) => (
           <span key={reading.phonemes.join(" ")}>

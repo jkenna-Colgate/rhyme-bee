@@ -26,15 +26,21 @@
  * (ADR-0016), and a value that only *describes* a write some other layer must
  * remember to perform is a bug waiting for a caller that forgets.
  *
+ * The outcome types this returns are declared in `web/src/editor/addOutcome.ts`
+ * and imported back, the direction every other editor route already uses: the
+ * browser renders them and cannot import this module, which opens files and
+ * shells out to an agent (#171).
+ *
  * The judgement (`resolveAddOutcome`, `gatherEvidence`, `composeReading`,
- * `verifyReading`) is tested; `add` itself is not, following the rest of the
- * pass's shell — it is a context read, a call and two file writes. The agent
- * invocation is untested by the same precedent; the reading of what comes back
+ * `verifyReading`) is tested, and so are `add`'s two writes, over a temp dir
+ * with the agent stubbed — which is what `AddDeps` is for. What stays untested
+ * is the agent *invocation*: nothing covers the real `claude -p` spawn or its
+ * argv, and nothing here can without running it. The reading of what comes back
  * is a gate on the core rather than a neighbour of it, so it lives in
  * `editorReading.ts` and is tested there.
  */
 
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseCmudict } from "../src/cmudict.ts";
@@ -46,189 +52,23 @@ import {
   evidenceContextFrom,
   gatherEvidence,
   verifyReading,
-  type ComposedReading,
   type EvidenceContext,
-  type ReadingEvidence,
   type WordReading,
 } from "../src/supplementEvidence.ts";
+import { killTree } from "../web/killTree.ts";
+import type {
+  AddOutcome,
+  AddTarget,
+  DeferredOutcome,
+  ScheduledAddTarget,
+  WordOutcome,
+  WrittenOutcome,
+} from "../web/src/editor/addOutcome.ts";
 import { parseReading } from "./editorReading.ts";
 import { fail, root } from "./editorShell.ts";
 
-/**
- * What an add is aimed at: one Rhyme Key, and where that key came from. The two
- * travel together because the provenance is printed beside the key — a night's
- * add is auditable from its own output only if the readout says whether the
- * editor typed the key or the schedule supplied it.
- */
-export interface AddTarget {
-  target: RhymeKey;
-  provenance: string;
-  /**
-   * The Seed Word the key belongs to, when the aim came from a scheduled day.
-   * Absent when the editor named a Rhyme Key outright on the command line —
-   * there is no Puzzle behind that aim and therefore no Seed.
-   *
-   * It exists because a `reads-on-another-key` outcome can be recorded as a
-   * Candidate, and a Candidate names the Seed Word the disagreement is about
-   * (#163). Read out of `provenance` it would be a sentence being parsed for a
-   * value it was written to *read* well, and taken from the day on screen it
-   * would be the wrong Seed the moment the editor looked at a neighbouring day
-   * with a batch's outcome still showing — a Candidate that looks right and
-   * names a Puzzle the word was never held against. So the outcome carries the
-   * Seed it was actually aimed at.
-   */
-  seed?: string;
-}
-
-/**
- * An aim taken from a scheduled day, where the Seed Word is not in question.
- *
- * `AddTarget.seed` is optional because one aim genuinely has no Seed — the
- * command line's `--rhymeKey`, which names a Rhyme Key outright with no Puzzle
- * behind it. That optionality is correct for the union of the two aims and
- * wrong for either one taken alone: every aim `targetIn` builds comes off a
- * scheduled day and therefore *always* carries a Seed, and typing it as though
- * it might not made a real gap on the screen. The browser's record-a-
- * disagreement button needs the Seed Word, so it rendered `seed !== null &&
- * (…)` and a null Seed made the button silently vanish — the editor watching a
- * word do nothing, which is the exact failure the gesture exists to prevent.
- *
- * Narrowing here rather than making `seed` required on `AddTarget` because the
- * `--rhymeKey` aim is not a degenerate scheduled one, it is a second kind of
- * aim, and a required field would have to be filled with a lie. It does not
- * reach all the way to the browser either: `AddOutcome.seed` stays optional
- * because the outcome is the union again, and a wire type cannot carry a
- * guarantee about which caller built it. What this buys is that the one server
- * path a browser can reach (`web/editorAddPlugin.ts`, which aims only through
- * `targetIn`) provably has a Seed — so the null case on screen is a sentence
- * about the CLI's aim rather than a hole the web mode can fall into.
- */
-export interface ScheduledAddTarget extends AddTarget {
-  seed: string;
-}
-
-/**
- * A word that needed nothing: a Proper Noun, refused outright. The space of
- * names is unbounded and has no defensible edge, however well the name
- * rhymes. It is its own case rather than a `deferred` reason — deferring
- * says "later", and a name is never coming back.
- */
-export interface RefusedNameOutcome {
-  outcome: "refused-name";
-  word: string;
-}
-
-/**
- * A word CMUdict already reads on the target Rhyme Key: the reading an add would
- * have written is there, so there is nothing to add. It does **not** follow that
- * the word is in the Puzzle. Reading on the key is one of three properties, and
- * an add supplies only this one — a demoted word has no wordhood and appears in
- * neither list however well it reads, and a word that does have wordhood holds a
- * Tier that decides whether it is an Answer or a Bonus Word. Saying "it is in
- * the Puzzle already" would state a conclusion this outcome cannot reach, and
- * the sentence `web/src/editor/AddQueueView.tsx` renders is written to the same
- * limit.
- *
- * Distinguished from `ReadsOnAnotherKeyOutcome` because the two look alike (both
- * are "no write happened") but mean opposite things to the editor reading the
- * outcome: this one is confirmation, that one is a problem.
- *
- * Carries `readings` for the same reason `ReadsOnAnotherKeyOutcome` does: a
- * word can hold more than one CMUdict entry, and confirming *which* reading
- * is the one on the target key is still worth showing, not only the fact of
- * agreement.
- */
-export interface AlreadyReadsOutcome {
-  outcome: "already-reads";
-  word: string;
-  readings: ReadingEvidence[];
-}
-
-/**
- * A word CMUdict already reads, but not on the target key — a correction
- * rather than an add, and left alone here exactly as it always has been
- * (overriding an upstream pronunciation stays a deliberate hand-edit in
- * `data/supplement.dict`, never something this program does on its own
- * judgement).
- *
- * Carries every direct reading CMUdict holds for the word, keys included —
- * where the index holds it *now* — because a maintainer reading this outcome
- * cannot act on "it disagrees" without also being told what it currently
- * says. The browser names every one of them beside its key, and records the
- * *first* as the engine's respelling when the editor says the word rhymes
- * anyway — `web/src/editor/disagreement.ts` argues why that is the reading the
- * engine itself would have shown (#163). Nothing on either path proposes a
- * correction; recording the disagreement is the whole of what is offered.
- */
-export interface ReadsOnAnotherKeyOutcome {
-  outcome: "reads-on-another-key";
-  word: string;
-  readings: ReadingEvidence[];
-}
-
-/**
- * A word given a reading and written to `data/supplement.dict`: either
- * composed from a compound split (`composed` carries the parts, for a reader
- * who wants to check the derivation) or authored by the agent once no split
- * reached the target (`composed` is null). Either way the reading passed the
- * same `verifyReading` before arriving here (ADR-0014) — this case does not
- * distinguish the two paths by trustworthiness, only by provenance.
- */
-export interface WrittenOutcome {
-  outcome: "written";
-  word: string;
-  phonemes: Pronunciation;
-  composed: ComposedReading | null;
-}
-
-/**
- * A word neither composed nor authored: no compound split reached the target,
- * and the agent either did not answer (`agent-unavailable`) or proposed a
- * reading that failed the same verification a human proposal would fail
- * (`agent-reading-failed-verification`, and `proposed` carries what it said so
- * the miss is inspectable). Appended to the deferred queue rather than
- * discarded, so the composition's real miss rate is countable and a night's
- * words are not silently retried next time.
- */
-export interface DeferredOutcome {
-  outcome: "deferred";
-  word: string;
-  reason: "agent-unavailable" | "agent-reading-failed-verification";
-  proposed: Pronunciation | null;
-}
-
-export type WordOutcome =
-  | RefusedNameOutcome
-  | AlreadyReadsOutcome
-  | ReadsOnAnotherKeyOutcome
-  | WrittenOutcome
-  | DeferredOutcome;
-
-/**
- * The whole of one `add` invocation, as a value: the aim it ran against — the
- * Rhyme Key, where that key came from, and the Seed Word behind it when there
- * was one — and every supplied word's outcome in the order it was given.
- * `printAddOutcome`
- * below is the one renderer over it; a later slice's React view is the other
- * (#150).
- *
- * Flat rather than pre-partitioned into written/deferred lists — `words` is
- * the one list, each entry self-describing via `outcome`, so a reader who
- * wants the partition filters it (as `printAddOutcome`, `writtenReadings` and
- * `deferredReadings` below all do) and a reader who wants the original order
- * an editor typed the words in still has it. Two lists would have to agree on
- * an order convention neither the CLI nor a browser table actually needs.
- */
-export interface AddOutcome {
-  target: RhymeKey;
-  provenance: string;
-  /** The aim's Seed Word, carried through unchanged — see `AddTarget.seed`. */
-  seed?: string;
-  words: WordOutcome[];
-}
-
 /** How an add asks an agent to author a reading — real in `add`, stubbed in tests. */
-type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | null>;
+export type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | null>;
 
 /**
  * The editor names words the pass turned up as missing, and nothing else — no
@@ -252,10 +92,12 @@ type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | n
  * shelled out to here, the same move `readScheduledDay` makes for its index:
  * it is what makes this function callable over a fixture with a stubbed
  * agent, with no pinned source on disk and no subprocess in flight, which is
- * the whole of what makes it testable. `add` below supplies the real ones.
+ * the whole of what makes it testable. `add` below supplies the real context
+ * and hands on whatever author its own caller named, which is nothing on both
+ * live paths — so `authorWithAgent` is what they get.
  */
 export async function resolveAddOutcome(
-  words: string[],
+  words: readonly string[],
   aim: AddTarget,
   ctx: EvidenceContext,
   authorReading: AgentAuthor = authorWithAgent,
@@ -305,6 +147,34 @@ export async function resolveAddOutcome(
 }
 
 /**
+ * What `add` will take from a caller instead of reaching for itself. Every
+ * field is optional and every default is the real thing, so the two live
+ * surfaces — `web/editorAddPlugin.ts` and the CLI — pass nothing and get the
+ * real agent and the real `data/` files, exactly as before.
+ *
+ * The seam is here rather than one level down at `resolveAddOutcome` because
+ * that is where it was unreachable: `AgentAuthor` was injectable at the
+ * judgement, but no live path calls the judgement — both go through `add`,
+ * which always supplied the real `claude -p` spawn. A seam only the tests can
+ * see is a seam only the tests can see.
+ *
+ * The two paths are what make the seam worth having. With the author stubbed
+ * and the paths left real, `add` is testable right up to the point it writes,
+ * and then writes to the repository's own `data/`. Injecting them is what lets
+ * a temp dir stand in — the technique `web/__tests__/tierOverrideFile.test.ts`
+ * already uses — so the two appends can be asserted end to end rather than
+ * inferred from the returned value.
+ */
+export interface AddDeps {
+  /** How a word no split resolves gets a reading. `authorWithAgent`, live. */
+  author?: AgentAuthor;
+  /** Where accepted readings land. `data/supplement.dict`, live. */
+  supplementPath?: string;
+  /** Where misses land. `data/deferred-readings.jsonl`, live. */
+  deferredPath?: string;
+}
+
+/**
  * The real entry point: builds the real pinned-source context, judges the
  * words against it, writes what `resolveAddOutcome` decided reached a reading
  * to `data/supplement.dict` and what it deferred to the deferred queue, and
@@ -318,11 +188,18 @@ export async function resolveAddOutcome(
  * (ADR-0016). A value that only *describes* a write some other layer must
  * remember to perform is a bug waiting for a caller that forgets — every
  * consumer of `AddOutcome` gets a value the write has already happened for.
+ *
+ * `deps` defaults to nothing at all, so a caller that wants the real add keeps
+ * writing `add(words, aim)`. See `AddDeps` for why the three are injectable.
  */
-export async function add(words: string[], aim: AddTarget): Promise<AddOutcome> {
-  const outcome = await resolveAddOutcome(words, aim, evidenceContext());
-  appendToSupplement(writtenReadings(outcome));
-  appendToDeferredQueue(deferredReadings(outcome));
+export async function add(
+  words: readonly string[],
+  aim: AddTarget,
+  deps: AddDeps = {},
+): Promise<AddOutcome> {
+  const outcome = await resolveAddOutcome(words, aim, evidenceContext(), deps.author);
+  appendToSupplement(writtenReadings(outcome), deps.supplementPath ?? resolve(root, "data", SUPPLEMENT));
+  appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? resolve(root, "data", DEFERRED_QUEUE));
   return outcome;
 }
 
@@ -437,37 +314,6 @@ function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation 
  */
 const AGENT_TIMEOUT_MS = 60_000;
 
-/**
- * End the abandoned CLI, so it does not outlive the command that asked it a
- * question. `shell: true` is what lets `claude` be found on Windows, where it
- * is a `.cmd` shim — but it also means the child this program holds is the
- * shell, and killing that alone would orphan the CLI under it. `taskkill /t`
- * takes the tree. Elsewhere the shell execs the command in place, so the signal
- * reaches the CLI directly.
- *
- * Exported for two callers outside this module, and not for the same reason.
- * `web/indexRebuild.ts` spawns `npm run build:index` with the same `shell:
- * true` for the same Windows reason, and so inherits the same orphan this
- * function exists to close — a second copy there would be the mitigation
- * drifting away from the accommodation that forces it. `web/workingTree.ts`
- * spawns `git` directly, with no shell in the way and so no orphan to close;
- * it reuses this anyway, because `taskkill /pid … /f /t` is the only place in
- * this codebase that knows how to end a child reliably on Windows, and writing
- * a second copy for a one-process case would still be a second thing to keep
- * correct, not a smaller one. This is no longer the one place that knows what
- * killing a *shelled* child costs — `web/indexRebuild.ts` argues that for its
- * own case, and `web/workingTree.ts` has no shell to argue it about — but it
- * stays the one place the kill itself is implemented.
- */
-export function killTree(child: ChildProcess): void {
-  if (child.pid === undefined) return;
-  if (process.platform === "win32") {
-    spawn("taskkill", ["/pid", String(child.pid), "/f", "/t"]).on("error", () => {});
-  } else {
-    child.kill();
-  }
-}
-
 const SUPPLEMENT = "supplement.dict";
 const DEFERRED_QUEUE = "deferred-readings.jsonl";
 
@@ -480,9 +326,8 @@ const EDITOR_SECTION =
   "# --- Adds by the Editor's Pass: composed from a compound split and verified\n" +
   "# against the day's Rhyme Key before being written here (ADR-0014). ---";
 
-function appendToSupplement(readings: WordReading[]): void {
+function appendToSupplement(readings: WordReading[], path: string): void {
   if (readings.length === 0) return;
-  const path = resolve(root, "data", SUPPLEMENT);
   const existing = readFileSync(path, "utf8");
   const section = existing.includes(EDITOR_SECTION) ? "" : `\n${EDITOR_SECTION}\n`;
   const lines = readings.map((r) => `${r.word} ${r.phonemes.join(" ")}`).join("\n");
@@ -497,11 +342,11 @@ function appendToSupplement(readings: WordReading[]): void {
  * would forfeit that, and a second composition rule is meant to be decided from
  * this file's contents rather than from the next frustrating word.
  */
-function appendToDeferredQueue(deferred: DeferredReading[]): void {
+function appendToDeferredQueue(deferred: DeferredReading[], path: string): void {
   if (deferred.length === 0) return;
   const timestamp = new Date().toISOString();
   const lines = deferred.map((d) => JSON.stringify({ ...d, timestamp })).join("\n");
-  appendFileSync(resolve(root, "data", DEFERRED_QUEUE), `${lines}\n`);
+  appendFileSync(path, `${lines}\n`);
 }
 
 /**

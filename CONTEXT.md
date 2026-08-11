@@ -99,3 +99,7 @@ _Avoid_: Suggestion, correction, fix (those name what judging may produce, not w
 **Editor's Pass**:
 The puzzles editor's read of a Daily Puzzle before its date arrives, and the corrections that read produces. It is a *read*, not a play: the editor scans the day's Answers and Bonus Words as text — against a third-party rhyme list in another window — and never opens a Session. The term covers both halves of the loop, because they are one activity rather than two: the pass surfaces a Puzzle that has drifted out of the band it was dealt from or is missing an obvious rhyme, and the words it adds are added in the same sitting, by name alone.
 _Avoid_: play-ahead, preflight, daily review
+
+**Corrected Day**:
+A Daily Puzzle as the next rebuild will produce it — every standing Tier verdict and demotion applied to the readout, with the figures re-measured. The Editor's Pass writes corrections to file but does not rebuild the index, so the screen shows arithmetic the browser did, standing in for the artifact that has not caught up. A Corrected Day whose figures differ from the built readout's has *moved*, which withdraws the band verdicts decided against the old figures.
+_Avoid_: Shown day (that is the intermediate value in `demote.ts`), preview, pending day; **pronunciation correction** is a different thing and is always qualified.

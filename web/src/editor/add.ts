@@ -42,8 +42,8 @@
  */
 
 import { normaliseWord } from "../../../src/cmudict.ts";
-import type { AddOutcome } from "../../../scripts/editorAdd.ts";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
+import type { AddOutcome } from "./addOutcome.ts";
 
 /**
  * How many words one Submit will carry.
@@ -159,7 +159,16 @@ export function aimHeldFor(queuedFor: string | null, date: string): string | nul
   );
 }
 
-/** What one Submit asks for: a day, and the words queued against it. */
+/**
+ * What one Submit asks for: a day, and the words queued against it.
+ *
+ * Declared here for the reason `AddSubmitResult` is, with the ends swapped:
+ * on the request direction the browser writes the shape and the endpoint reads
+ * it, so the module that cannot be imported is the reader.
+ *
+ * A day is named and a Rhyme Key is not — the endpoint resolves the key from
+ * `data/schedule.json` itself (`web/editorAddRequest.ts` says why).
+ */
 export interface AddSubmitRequest {
   date: string;
   words: string[];

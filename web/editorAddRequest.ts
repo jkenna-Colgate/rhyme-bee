@@ -19,7 +19,7 @@
  */
 
 import { normaliseWord } from "../src/cmudict.ts";
-import { MAX_QUEUED_WORDS } from "./src/editor/add.ts";
+import { MAX_QUEUED_WORDS, type AddSubmitRequest } from "./src/editor/add.ts";
 
 /** ISO `YYYY-MM-DD`, the spelling the schedule artifact uses. */
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -43,9 +43,15 @@ const WORD = /^[a-z]+$/;
  */
 export const MAX_ADD_BODY_BYTES = 45 * MAX_QUEUED_WORDS + 128;
 
-export type AddWriteRequest =
-  | { ok: true; date: string; words: string[] }
-  | { ok: false; error: string };
+/**
+ * What a body turned out to be: the Submit it asks for, or the sentence saying
+ * why it is not one.
+ *
+ * The accepted arm is `AddSubmitRequest` itself rather than a hand-written
+ * `{ date, words }` beside it, so the shape this parser hands the endpoint is
+ * checked against the one the browser builds instead of matching it by eye.
+ */
+export type AddWriteRequest = ({ ok: true } & AddSubmitRequest) | { ok: false; error: string };
 
 /**
  * The batch a request body carries.
