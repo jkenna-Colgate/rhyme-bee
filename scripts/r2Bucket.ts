@@ -168,12 +168,27 @@ function errorCode(body: string): string {
   return /<Code>([\s\S]*?)<\/Code>/.exec(body)?.[1] ?? "no error code";
 }
 
+/**
+ * `redirect: "manual"` because this client has exactly one correct destination
+ * and follows nothing to a second one. A SigV4 signature covers the host, so a
+ * redirect could not be followed usefully anyway — the re-sent request would
+ * arrive signed for somewhere it isn't — and following one would carry a
+ * credentialed `Authorization` header to a host the signing never named. A 3xx
+ * here is a misconfiguration to report, not a hop to take.
+ */
 async function get(request: SignedRequest, what: string): Promise<Response> {
   let response: Response;
   try {
-    response = await fetch(request.url, { headers: request.headers });
+    response = await fetch(request.url, { headers: request.headers, redirect: "manual" });
   } catch (cause) {
     throw new Error(`Could not reach R2 to ${what}. Is this machine online?`, { cause });
+  }
+  if (response.status >= 300 && response.status < 400) {
+    throw new Error(
+      `R2 redirected the request to ${what} (${response.status} to ` +
+        `${response.headers.get("location") ?? "an unnamed location"}), which this pull does ` +
+        "not follow. Check R2_ACCOUNT_ID and R2_BUCKET name the bucket you mean.",
+    );
   }
   if (!response.ok) {
     throw new Error(

@@ -200,4 +200,45 @@ describe("reading the local credentials", () => {
       readCredentials({ R2_ACCOUNT_ID: "abc", R2_ACCESS_KEY_ID: "  ", R2_SECRET_ACCESS_KEY: "g" }),
     ).toThrow(/R2_ACCESS_KEY_ID/);
   });
+
+  // The account id and the bucket are the two settings `signGet` interpolates
+  // into the URL — the first into the host, the second into the path. Nobody
+  // hostile supplies either, but a value carrying punctuation would address a
+  // host the signing never named, so the shape is checked here at the boundary
+  // rather than trusted downstream.
+  it.each([
+    ["a host of its own", "evil.test/"],
+    ["userinfo, stealing the host after the @", "abc@evil.test"],
+    ["a port", "abc:8080"],
+    ["a scheme", "https://evil.test"],
+  ])("refuses an account id carrying %s", (_what, accountId) => {
+    expect(() =>
+      readCredentials({
+        R2_ACCOUNT_ID: accountId,
+        R2_ACCESS_KEY_ID: "def",
+        R2_SECRET_ACCESS_KEY: "ghi",
+      }),
+    ).toThrow(/R2_ACCOUNT_ID/);
+  });
+
+  it("refuses a bucket that would climb out of its own path", () => {
+    expect(() =>
+      readCredentials({
+        R2_ACCOUNT_ID: "abc",
+        R2_ACCESS_KEY_ID: "def",
+        R2_SECRET_ACCESS_KEY: "ghi",
+        R2_BUCKET: "../../somewhere-else",
+      }),
+    ).toThrow(/R2_BUCKET/);
+  });
+
+  it("accepts the hyphenated bucket name the pull actually uses", () => {
+    const credentials = readCredentials({
+      R2_ACCOUNT_ID: "abc",
+      R2_ACCESS_KEY_ID: "def",
+      R2_SECRET_ACCESS_KEY: "ghi",
+      R2_BUCKET: "rhyme-bee-flags",
+    });
+    expect(credentials.bucket).toBe("rhyme-bee-flags");
+  });
 });

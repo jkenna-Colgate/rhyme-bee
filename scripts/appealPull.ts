@@ -53,6 +53,21 @@ export interface R2Credentials {
 const REQUIRED = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"] as const;
 
 /**
+ * What may appear in the two settings that are interpolated into the request
+ * URL. `signGet` builds its host out of the account id and its path out of the
+ * bucket, so a `/`, `@` or `:` in either would quietly point a signed,
+ * credentialed request at some other host. Neither value is attacker-supplied —
+ * both come from the maintainer's own environment — so this is not a hole being
+ * closed; it makes "the destination is fixed" something the code checks rather
+ * than something it assumes, and turns a typo into a named error instead of an
+ * opaque `SignatureDoesNotMatch`.
+ *
+ * Deliberately not pinned to Cloudflare's 32-hex account id: what matters is
+ * that the value cannot restructure a URL, not that it matches today's format.
+ */
+const URL_SAFE = /^[A-Za-z0-9-]+$/;
+
+/**
  * Read `KEY=value` settings out of a local credentials file. Blank lines, `#`
  * comments and any line without an `=` are skipped, so a file that is half prose
  * note and half settings still reads — a missing setting is reported by
@@ -110,11 +125,28 @@ export function readCredentials(settings: Record<string, string | undefined>): R
     );
   }
 
+  const accountId = value("R2_ACCOUNT_ID");
+  const bucket = value("R2_BUCKET") || APPEAL_BUCKET;
+
+  for (const [name, setting] of [
+    ["R2_ACCOUNT_ID", accountId],
+    ["R2_BUCKET", bucket],
+  ] as const) {
+    if (!URL_SAFE.test(setting)) {
+      throw new Error(
+        `${name} is ${JSON.stringify(setting)}, which is not letters, digits and hyphens.\n` +
+          "That value goes into the URL the pull signs and requests, so a stray\n" +
+          "punctuation mark in it would address a different host entirely. Check it\n" +
+          "against the token's page in the Cloudflare dashboard.",
+      );
+    }
+  }
+
   return {
-    accountId: value("R2_ACCOUNT_ID"),
+    accountId,
     accessKeyId: value("R2_ACCESS_KEY_ID"),
     secretAccessKey: value("R2_SECRET_ACCESS_KEY"),
-    bucket: value("R2_BUCKET") || APPEAL_BUCKET,
+    bucket,
   };
 }
 
