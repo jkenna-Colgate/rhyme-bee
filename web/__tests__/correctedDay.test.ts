@@ -258,7 +258,7 @@ describe("the two corrections composed", () => {
     const readout = readoutFor(built);
     const bonus = readout.bonusWords[0]!.word;
 
-    const corrected = correctedDay(readout, null, { standing: [{ word: bonus, reason: "not-a-word" }] });
+    const corrected = correctedDay(readout, null, { standing: [{ word: bonus, reason: "not-a-known-word" }] });
 
     expect(words(corrected.bonusWords)).not.toContain(bonus);
     expect(corrected.facts).toEqual(readout.facts);
