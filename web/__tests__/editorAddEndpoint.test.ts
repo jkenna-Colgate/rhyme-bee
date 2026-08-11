@@ -27,7 +27,7 @@ import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
 import { add } from "../../scripts/editorAdd.ts";
 import type { IndexStaleness } from "../../scripts/indexArtifact.ts";
-import type { AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
+import type { AddSubmitRequest, AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
 import type { AddOutcome, AddTarget } from "../src/editor/addOutcome.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "../editorAddRequest.ts";
 import { editorAddSpec } from "../editorAddPlugin.ts";
@@ -147,7 +147,7 @@ function endpoint(
 }
 
 const submit = (payload: unknown) => ({ method: "POST", body: JSON.stringify(payload) });
-const batch = { date: "2026-08-10", words: ["candleholder"] };
+const batch: AddSubmitRequest = { date: "2026-08-10", words: ["candleholder"] };
 
 describe("submitting a queue", () => {
   it("aims the words at the day's own Rhyme Key, taken from the schedule", async () => {

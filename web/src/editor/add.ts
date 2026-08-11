@@ -159,7 +159,22 @@ export function aimHeldFor(queuedFor: string | null, date: string): string | nul
   );
 }
 
-/** What one Submit asks for: a day, and the words queued against it. */
+/**
+ * What one Submit asks for: a day, and the words queued against it.
+ *
+ * The request direction of the decision `AddSubmitResult` and its three
+ * siblings make, declared in the same place for the same reason — only with the
+ * ends swapped. Here it is the browser that builds the shape and the endpoint
+ * that takes it apart, so the module which cannot be imported is on the reading
+ * side rather than the writing one; the pair that drifts is the same pair, and a
+ * field added to the hook that posts a body and not to the parser that reads it
+ * still typechecks.
+ *
+ * A day is named and a Rhyme Key is not. An add is aimed at exactly one key and
+ * the editor never types one, so the endpoint resolves it from
+ * `data/schedule.json` itself — which is what stops a screen that has drifted
+ * from the schedule aiming a night's words at the wrong family.
+ */
 export interface AddSubmitRequest {
   date: string;
   words: string[];

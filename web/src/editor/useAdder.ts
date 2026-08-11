@@ -53,7 +53,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
 import { EDITOR_ADD_PATH } from "../endpoints.ts";
-import { aimHeldFor, queueAdd, unqueueAdd, type AddSubmitResult } from "./add.ts";
+import {
+  aimHeldFor,
+  queueAdd,
+  unqueueAdd,
+  type AddSubmitRequest,
+  type AddSubmitResult,
+} from "./add.ts";
 import { readEndpointResponse } from "./fetchError.ts";
 
 export interface Adder {
@@ -202,10 +208,15 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
     setError(null);
     setSubmitError(null);
     try {
+      // Built as an `AddSubmitRequest` rather than as a literal, so the body
+      // this posts is checked against the shape the endpoint's parser returns
+      // rather than agreeing with it by hand. The queue is held readonly and
+      // copied out here; the copy is what gets serialised either way.
+      const payload: AddSubmitRequest = { date, words: [...batch] };
       const response = await fetch(EDITOR_ADD_PATH, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, words: batch }),
+        body: JSON.stringify(payload),
       });
       const outcome = await readEndpointResponse<AddSubmitResult>(response, "add");
       if (!outcome.ok) {
