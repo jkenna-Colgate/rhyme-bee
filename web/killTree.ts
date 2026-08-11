@@ -3,9 +3,16 @@
  * Windows.
  *
  * It lived in `scripts/editorAdd.ts`, beside the agent shell-out that first
- * needed it, and both of its runtime callers are here in `web/` — a process
- * utility is not part of what adding a word means, and reaching into a
- * `scripts/` module to find one said otherwise (#171).
+ * needed it, and moved because two of its three callers are here in `web/` and
+ * had to reach into a word-adding module to find a process utility — which said
+ * a process utility is part of what adding a word means. It is not (#171).
+ *
+ * The remaining caller is `scripts/editorAdd.ts` itself, so that module now
+ * imports this one and the dependency points the other way. That is the arrow
+ * this repository is already settling into: `web/src/editor/addOutcome.ts` sends
+ * the add's wire shapes the same direction, for the same reason. What is left in
+ * `scripts/editorAdd.ts` is one act — compose, author, verify, write — and the
+ * pieces it borrows to do it belong to whoever else borrows them too.
  */
 
 import { spawn, type ChildProcess } from "node:child_process";

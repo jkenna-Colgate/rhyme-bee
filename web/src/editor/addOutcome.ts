@@ -182,8 +182,9 @@ export type WordOutcome =
  *
  * Flat rather than pre-partitioned into written/deferred lists — `words` is
  * the one list, each entry self-describing via `outcome`, so a reader who
- * wants the partition filters it (as `printAddOutcome`, `writtenReadings` and
- * `deferredReadings` all do) and a reader who wants the original order an
+ * wants the partition filters it (as `printAddOutcome` and the two reading
+ * collectors beside it in `scripts/editorAdd.ts` all do) and a reader who
+ * wants the original order an
  * editor typed the words in still has it. Two lists would have to agree on
  * an order convention neither the CLI nor a browser table actually needs.
  */
