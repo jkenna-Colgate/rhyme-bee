@@ -32,7 +32,7 @@ them.
 `vitest.config.ts` exists for one exclusion: `.claude/worktrees/`, where agent
 checkouts keep their own copy of every test file. Without it a bare `npm test`
 walks into them and reports several times the real suite — and passes, which is
-the dangerous direction to be wrong in. The real suite is 69 files.
+the dangerous direction to be wrong in. The real suite is 72 files.
 
 ## Context hygiene
 

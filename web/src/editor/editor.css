@@ -888,3 +888,110 @@ code {
 .editor-candidate-name .editor-candidate-state {
   color: #8e2a1f;
 }
+
+/* The acts a card offers (#178). Given the whole row rather than sitting inline
+   with the evidence, because the card is read top to bottom — word, state,
+   evidence, and then what to do about it — and a button wrapped in beside a
+   Rhyme Key reads as part of the evidence. */
+.editor-candidate-acts {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.editor-candidate-add,
+.editor-candidate-decline {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-candidate-add {
+  color: #2f5d7a;
+}
+
+.editor-candidate-decline {
+  color: #7a5a2e;
+}
+
+.editor-candidate-add:hover:not(:disabled),
+.editor-candidate-decline:hover:not(:disabled) {
+  background: #f6ecdd;
+  border-color: #bfa982;
+}
+
+.editor-candidate-add:disabled,
+.editor-candidate-decline:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* The Decline's second click. Every ruling carries the sentence saying what it
+   will do *beside its own button*, because two of the three take a word's
+   wordhood on every day and the reach of a per-Candidate act has to be read
+   before it is taken rather than after (#178). */
+.editor-candidate-rulings {
+  flex-basis: 100%;
+  padding: 0.45rem 0.5rem;
+  background: #fbf6ef;
+  border: 1px solid #e3ded2;
+  border-radius: 4px;
+}
+
+.editor-candidate-rulings-lede {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-candidate-ruling {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0 0 0.3rem;
+}
+
+.editor-candidate-ruling button {
+  flex: none;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Warmer for the two that reach the demotion list, plain for the one that
+   changes nothing anywhere — the difference in reach, said in the colour. */
+.editor-candidate-ruling-demotion button {
+  color: #8e2a1f;
+  border-color: #d9b6ae;
+}
+
+.editor-candidate-ruling-decline button {
+  color: #5a5348;
+}
+
+.editor-candidate-consequence {
+  font-size: 0.72rem;
+  color: #857e70;
+}
+
+.editor-candidate-ruling-cancel {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #6b6558;
+  text-decoration: underline;
+  cursor: pointer;
+}

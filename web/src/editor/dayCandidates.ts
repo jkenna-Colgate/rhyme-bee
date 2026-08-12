@@ -110,3 +110,29 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
  * there is anything to derive from.
  */
 export type CandidateCard = "settled" | "name" | "correction" | "add" | "derivation";
+
+/**
+ * Whether the one-gesture add is offered for this Candidate.
+ *
+ * `addable` and nothing else. It is the state that means the engine has no
+ * reading it will accept for the word, which is exactly what an add supplies —
+ * a reading aimed at the Rhyme Key, plus the wordhood the supplement grants
+ * (ADR-0009). It covers both `addable` cards: the plain one, and the derivation
+ * one, whose relatives are evidence for the same act rather than a different
+ * act.
+ *
+ * `needs-correction` is deliberately excluded and is not an oversight: the
+ * engine already holds a reading there, and writing a second one over it is a
+ * correction, which is slice 3's (#180). An add offered on that card would
+ * silently replace a pronunciation nobody had approved replacing.
+ */
+export function offersAdd(candidate: ReadCandidate): boolean {
+  return candidate.state === "addable";
+}
+
+// There is deliberately no `offersDecline` beside `offersAdd`. The Decline is
+// offered to exactly the Candidates that still want a ruling, which is
+// `isOutstanding` — the same test this file already counts `outstanding` with,
+// and the same one the panel and the whole-queue list read. A predicate here
+// would only forward to it under a second name, and the reasoning it would
+// carry belongs where the gesture is drawn (`CandidateQueueView.tsx`).

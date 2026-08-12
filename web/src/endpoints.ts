@@ -137,6 +137,35 @@ export const EDITOR_ADD_PATH = "/api/editor/add";
 export const EDITOR_CANDIDATES_PATH = "/api/editor/candidates";
 
 /**
+ * Where the Editor's Pass **declines a Candidate**: `POST` alone, appending one
+ * ruling to `data/declines.txt`.
+ *
+ * No `GET`. Which Candidates stand declined is derived server-side on every read
+ * of the queue (`EDITOR_CANDIDATES_PATH`), which is where the screen already
+ * learns it; a second verb serving the same fact would be a second answer to one
+ * question (#176).
+ *
+ * A ruling names a word **and a Rhyme Key**, which is the one thing that
+ * distinguishes it from the demotion path beside it. A demotion is a fact about
+ * a word; a Decline is a ruling on a word *aimed at a target*, so declining
+ * `docked` against `AA K T` leaves it visible when a player who hears it
+ * differently Appeals it against `AA K` (#176).
+ *
+ * It records only **one** of the three Declines an editor can make: the case
+ * where the engine's rejection is already correct and the Candidate should stop
+ * appearing. A Proper Noun and junk with wordhood are demotions, and the gesture
+ * reaches `EDITOR_DEMOTION_PATH` with the word prefilled rather than writing a
+ * second copy of that fact — one demotion path in the tool, not two.
+ *
+ * Dev only, and structurally so — `editorDeclinePlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface answers this path
+ * (ADR-0016, ADR-0017). Like the demotion path it **writes** to `data/`, and
+ * what it writes is committed and reversed by hand.
+ */
+export const EDITOR_DECLINE_PATH = "/api/editor/decline";
+
+/**
  * Where the Editor's Pass reads its own state: `GET` alone, naming nothing.
  * Whether the built Rhyme Index is stale, and whether each file the tool writes
  * carries uncommitted changes (#162).

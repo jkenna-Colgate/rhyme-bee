@@ -12,25 +12,34 @@
  * queue is a `string[]`, it is lost if the tab closes, and losing it costs
  * exactly the retyping — which is the trade the ticket asks for by name.
  *
- * ## Why the queue holds no Rhyme Key, but does hold a day
+ * ## The two ways a queue names what it is aimed at
  *
- * An add is aimed at the **day's** Rhyme Key, and the editor never types one.
- * The queue therefore carries no key: the day is named at Submit by date, and
- * the endpoint resolves the key out of `data/schedule.json` itself. A key
- * carried in the browser would let a screen that had drifted from the schedule
- * aim an add with a figure of its own, which is the hole the ticket closed.
+ * An add lands on one Rhyme Key, and there are exactly two things that can say
+ * which — a **day**, whose key the endpoint resolves out of `data/schedule.json`
+ * itself, or a **Candidate**, which already carries the key it was Appealed
+ * against. `AddAim` is that pair, and it is one field rather than two so that a
+ * queue cannot be aimed at both or at neither.
  *
- * It does carry the **date it was typed against**, and that is not the same
- * field. Without it, the aim was taken from whichever day happened to be on
- * screen at the click — so a queue typed against Monday, left standing while the
- * editor checked Tuesday, submitted its words at *Tuesday's* Rhyme Key with
- * nothing having said so. `queuedFor` is what makes that mismatch a thing
- * `aimHeldFor` can refuse rather than a thing the editor discovers in
- * `data/supplement.dict` afterwards.
+ * The day aim is the editor's own: they type a word the day is missing and never
+ * type a key. Carrying the day's *key* in the browser was rejected and stays
+ * rejected — it would let a screen that had drifted from the schedule aim an add
+ * with a figure of its own, which is the hole #161 closed. So the day travels as
+ * a date and the endpoint resolves the key.
  *
- * A date is safe to carry where a key is not, because it is not an answer to
- * anything: the endpoint still resolves the key from the schedule, and the date
- * is only ever compared with the day on screen. The queue never *aims* itself.
+ * The Candidate aim is a **key named outright**, and it is safe for the opposite
+ * reason: the key is not being derived from anything the screen might have wrong
+ * about the schedule. It *is* the Candidate — the key the player's Appeal was
+ * recorded against — and it is the only aim most of the queue can have, since
+ * most Candidates belong to no scheduled day at all (#176, #178). A one-gesture
+ * add reachable only from a day would be a gesture the largest group of the
+ * queue could never use.
+ *
+ * Either way the aim is carried, and that is not a nicety. Without it the aim
+ * was taken from whichever day happened to be on screen at the click — so a
+ * queue typed against Monday, left standing while the editor checked Tuesday,
+ * submitted its words at *Tuesday's* Rhyme Key with nothing having said so.
+ * `aim` is what makes that mismatch a thing `aimClash` can refuse rather than a
+ * thing the editor discovers in `data/supplement.dict` afterwards.
  *
  * ## Why these are not Submissions, and not Candidates
  *
@@ -43,7 +52,29 @@
 
 import { normaliseWord } from "../../../src/cmudict.ts";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
+import type { RhymeKey } from "../../../src/phonology.ts";
 import type { AddOutcome } from "./addOutcome.ts";
+
+/**
+ * What a queue is aimed at: a scheduled day, or a Rhyme Key named outright.
+ *
+ * A closed union rather than two nullable fields, so "a queue aimed at both" and
+ * "a queue aimed at neither with words in it" are states that cannot be written
+ * down. The two arms are the two things that can supply a key — see the module
+ * comment — and they are not two kinds of add: `aimClash` treats them
+ * identically, the endpoint judges every word the same way whichever arm sent
+ * it, and the only difference downstream is which of the two the target came
+ * from.
+ */
+export type AddAim =
+  | { kind: "day"; date: string }
+  | { kind: "key"; rhymeKey: RhymeKey };
+
+/** Whether two aims name the same target, which is what lets one queue hold both words. */
+function sameAim(a: AddAim, b: AddAim): boolean {
+  if (a.kind === "day") return b.kind === "day" && a.date === b.date;
+  return b.kind === "key" && a.rhymeKey === b.rhymeKey;
+}
 
 /**
  * How many words one Submit will carry.
@@ -112,22 +143,18 @@ export function unqueueAdd(queue: readonly string[], word: string): string[] {
 }
 
 /**
- * Whether a queue typed against `queuedFor` may act on the day now on screen —
+ * Whether a word aimed at `wanted` may join a queue already aimed at `held` —
  * `null` when it may, and the sentence to show when it may not.
  *
- * ## Why a queue is bound to a day at all
+ * ## Why a queue is bound to one aim at all
  *
- * The Rhyme Key an add is aimed at is the day's, resolved server-side from the
- * date Submit sends. So a queue that outlives the day it was typed against is a
- * queue that will silently aim at whatever day is on screen when the button is
- * pressed: type `readjust` while Monday's `AH S T` is open, glance at Tuesday,
- * hit Submit, and the word is written against Tuesday's family instead. Nothing
- * on screen contradicts it, and the wrong reading is in
- * `data/supplement.dict` by the time anyone could. The whole point of taking the
- * key from the day was that nobody should be able to aim an add at the wrong
- * family; taking it from *the click* rather than from the queue put that back.
+ * One Submit carries one target. So a queue that mixed aims would land some of
+ * its words on a family nobody chose for them: type `readjust` while Monday's
+ * `AH S T` is open, glance at Tuesday, type another word, and one of the two is
+ * written against a Rhyme Key nothing on screen named. The wrong reading is in
+ * `data/supplement.dict` by the time anyone could contradict it.
  *
- * ## Why the queue is not simply cleared on a day change
+ * ## Why the queue is not simply cleared when the aim would change
  *
  * Because that throws away typing the editor did, and the reason the queue
  * survives a day change is a real one: a pass on Monday routinely involves
@@ -138,40 +165,97 @@ export function unqueueAdd(queue: readonly string[], word: string): string[] {
  *
  * ## What this does instead
  *
- * The queue stays, whole, and stops being *submittable* anywhere but its own
- * day. The editor is told which day it belongs to; going back there restores
- * Submit, and the words can still be removed one by one from anywhere. Two
- * further options were rejected: submitting to the queue's own date regardless
- * of what is displayed would write to a day the editor is not looking at and
- * then replace the screen with it, and a confirm dialog would make the correct
+ * The queue stays, whole, and refuses the word. The editor is told what it is
+ * aimed at and what to do about it, and the words can still be removed one by
+ * one from anywhere. A confirm dialog was rejected: it would make the correct
  * answer the one behind an extra click.
- *
- * The same check gates queueing, not only Submit. A word typed on Tuesday that
- * joined Monday's queue would be aimed at Monday — the identical mistake with
- * the days swapped, and it would be *created* by the very design meant to stop
- * it.
  */
-export function aimHeldFor(queuedFor: string | null, date: string): string | null {
-  if (queuedFor === null || queuedFor === date) return null;
+export function aimClash(held: AddAim | null, wanted: AddAim): string | null {
+  if (held === null || sameAim(held, wanted)) return null;
+  if (held.kind === "day") {
+    return (
+      `These words were typed against ${held.date}, and an add is aimed at the day's own Rhyme Key. ` +
+      `Go back to ${held.date} to submit them, or take them out of the queue to start one for this day.`
+    );
+  }
   return (
-    `These words were typed against ${queuedFor}, and an add is aimed at the day's own Rhyme Key. ` +
-    `Go back to ${queuedFor} to submit them, or take them out of the queue to start one for this day.`
+    `These words were raised from the Candidate Queue and are aimed at ${held.rhymeKey}. ` +
+    "Submit them, or take them out of the queue, before starting one for this day."
   );
 }
 
 /**
- * What one Submit asks for: a day, and the words queued against it.
+ * Whether a queue may be *submitted* while `date` is on screen — `null` when it
+ * may, and the sentence to show when it may not.
+ *
+ * A narrower question than `aimClash`, and deliberately not the same one. What
+ * stops a day-aimed queue being submitted from another day is not that the aim
+ * would be wrong — the aim travels with the queue and the endpoint honours it —
+ * but that Submit answers with the day it wrote to and the screen would be
+ * replaced by a day the editor was not looking at. That was one of the options
+ * this rule rejected, and it is still rejected.
+ *
+ * A **key-aimed** queue is held by nothing, which is the whole point of naming
+ * the key outright: most Candidates belong to no scheduled day, so a gate that
+ * asked which day they were on could only ever answer "not this one" and the
+ * largest group of the queue would be queueable and never submittable. Nothing
+ * is re-read for such a Submit either, so there is no screen to replace.
+ */
+export function aimHeldFor(held: AddAim | null, date: string): string | null {
+  if (held === null || held.kind === "key") return null;
+  return aimClash(held, { kind: "day", date });
+}
+
+/**
+ * What one Submit asks for: what the batch is aimed at, and the words in it.
  *
  * Declared here for the reason `AddSubmitResult` is, with the ends swapped:
  * on the request direction the browser writes the shape and the endpoint reads
  * it, so the module that cannot be imported is the reader.
- *
- * A day is named and a Rhyme Key is not — the endpoint resolves the key from
- * `data/schedule.json` itself (`web/editorAddRequest.ts` says why).
  */
 export interface AddSubmitRequest {
-  date: string;
+  /**
+   * The day on screen. It does two things, and they are separable: it is what
+   * the batch is aimed at when `rhymeKey` is absent — the endpoint resolves the
+   * key from `data/schedule.json` itself (`web/editorAddRequest.ts` says why) —
+   * and it is the day the answer re-reads either way, since the rebuild a
+   * Submit runs folds in everything on disk and the figures on screen move with
+   * it.
+   *
+   * `null` only for a batch aimed at a Rhyme Key that was raised before any day
+   * had loaded: there is then nothing to re-read and nothing to resolve, which
+   * is why `rhymeKey` is the field the request cannot do without.
+   */
+  date: string | null;
+  /**
+   * The Rhyme Key a Candidate supplied, aimed at directly (#178).
+   *
+   * One more way to name the target and not a second add: the words, the
+   * judgements, the writes and the rebuild are identical whichever field
+   * carried the aim. It exists because a Candidate already *has* a key — the
+   * one its Appeal was recorded against — and most of the queue belongs to no
+   * scheduled day, so resolving a key from a date would leave the largest group
+   * of Candidates with no add at all.
+   *
+   * Absent for the ordinary editor add, which has no Candidate behind it and
+   * takes its aim from the day.
+   */
+  rhymeKey?: RhymeKey;
   words: string[];
+  /**
+   * Which of `words` were raised from the Candidate Queue rather than typed by
+   * the editor (#178) — always a subset, and empty for a batch the editor
+   * composed themselves.
+   *
+   * A second list rather than a shape change to `words`, because it is a fact
+   * about *where a word came from* and not about the word: the queue is a
+   * `string[]`, `queueAdd` refuses a duplicate by name, and the endpoint judges
+   * every word identically whatever list it is also on. All the field decides is
+   * whether the reading that lands in `data/supplement.dict` carries a comment
+   * saying a player asked for it — which is the one place that provenance can be
+   * kept, since the supplement is what outlives the pass.
+   */
+  appealed: string[];
 }
 
 /**
@@ -189,13 +273,17 @@ export type RebuildResult = { ok: true } | { ok: false; error: string };
  * the index was rebuilt, and the day re-read from the artifact that rebuild
  * produced.
  *
- * `readout` is **null exactly when the rebuild failed**, and that is not an
+ * `readout` is **null when the rebuild failed**, and that is not an
  * omission. The index on disk is then the one from before the adds, and a day
  * re-read from it would put figures on screen that look like the result of the
  * pass and are not. `DayReadoutView` already takes that position for a day the
  * editor has moved — it withdraws the band verdicts rather than guessing at
  * them — and this is the same call one layer out: a stale re-read displayed as
  * a fresh one is the failure this whole route exists to avoid.
+ *
+ * It is null for one further reason: a batch aimed at a Rhyme Key that named no
+ * date has no day to re-read. The screen keeps whatever it had, which is right
+ * — nothing about it was being looked at when the words were raised.
  *
  * Declared here rather than beside the endpoint that builds it, for the reason
  * `DemotionWriteResult` is: the browser cannot import that module — it opens

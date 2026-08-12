@@ -312,6 +312,89 @@ describe("add, over a temp dir with a stubbed agent", () => {
     expect(existsSync(deferredPath)).toBe(false);
   });
 
+  /**
+   * The provenance an add raised from the Candidate Queue carries into the file
+   * that outlives the pass (#178). The section header already says a reading was
+   * verified against the day's Rhyme Key; what it cannot say, and what this
+   * adds, is that a *player* is the reason the word was looked at.
+   *
+   * A whole-line comment above the entry rather than a gloss after it, because
+   * `applySupplement` strips only lines that start with `#` — a trailing comment
+   * would be read as phonemes and the entry would be nonsense.
+   */
+  it("records that a player Appealed a word, above the reading it wrote", async () => {
+    await add(["gleeb"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+      appealed: ["gleeb"],
+    });
+
+    const written = lines(supplementPath);
+    expect(written.at(-1)).toBe("gleeb G L EY1 T");
+    expect(written.at(-2)).toBe(
+      "# gleeb: a player Appealed this word — raised from the Candidate Queue (test).",
+    );
+  });
+
+  it("leaves a word the editor typed with no comment of its own", async () => {
+    await add(["gleeb"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+    });
+
+    expect(readFileSync(supplementPath, "utf8")).not.toContain("Appealed");
+  });
+
+  /**
+   * A batch can hold both, and the note belongs to the word rather than to the
+   * batch: an editor reading the supplement later must be able to tell which of
+   * two adjacent readings a player asked for.
+   */
+  it("notes only the words a player asked for in a mixed batch", async () => {
+    await add(["gleeb", "zorp"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"], zorp: ["Z", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+      appealed: ["zorp"],
+    });
+
+    expect(lines(supplementPath).slice(-3)).toEqual([
+      "gleeb G L EY1 T",
+      "# zorp: a player Appealed this word — raised from the Candidate Queue (test).",
+      "zorp Z EY1 T",
+    ]);
+  });
+
+  /**
+   * The note is attached by normalised spelling, which is what `gatherEvidence`
+   * reports on the outcome and what the endpoint's parser has already applied —
+   * so a caller holding the word in another spelling still gets the right line
+   * annotated rather than none.
+   */
+  it("matches an Appealed word by the spelling the outcome reports", async () => {
+    await add(["gleeb"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+      appealed: ["  Gleeb "],
+    });
+
+    expect(lines(supplementPath).at(-2)).toContain("a player Appealed this word");
+  });
+
+  it("writes no comment for an Appealed word that never reached a reading", async () => {
+    await add(["zorp"], AIM, {
+      author: authoring({}),
+      supplementPath,
+      deferredPath,
+      appealed: ["zorp"],
+    });
+
+    expect(readFileSync(supplementPath, "utf8")).toBe("");
+  });
+
   it("appends a deferred word to the deferred queue, with the key it must reach", async () => {
     const outcome = await add(["zorp"], AIM, {
       author: authoring({}),

@@ -39,7 +39,6 @@
  * that is stale because nobody has pulled *looks* stale rather than empty.
  */
 
-import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
@@ -49,9 +48,11 @@ import { parseCandidates, type SupplementCandidate } from "../src/supplementCand
 import type { EvidenceContext } from "../src/supplementEvidence.ts";
 import { readCandidateQueue } from "../scripts/editorCandidates.ts";
 import { pinnedEvidenceContext } from "../scripts/editorAdd.ts";
+import { DECLINES_PATH, readDeclineText } from "./declinesFile.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { readSchedule } from "./editorSchedule.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
+import { readOptional } from "./readOptional.ts";
 import { repoRoot } from "./repoRoot.ts";
 import { EDITOR_CANDIDATES_PATH } from "./src/endpoints.ts";
 
@@ -67,9 +68,13 @@ import { EDITOR_CANDIDATES_PATH } from "./src/endpoints.ts";
  */
 const MAX_QUEUE_BODY_BYTES = 512;
 
-/** The append-only capture queue, and the standing rulings over it. */
+/**
+ * The append-only capture queue. The standing rulings over it are read through
+ * `web/declinesFile.ts`, which owns their path as well as their IO: two plugins
+ * read that file — this one and the route that appends to it — and two spellings
+ * of one location is a ruling written where nobody looks.
+ */
 const QUEUE_PATH = resolve(repoRoot, "data/supplement-candidates.jsonl");
-const DECLINES_PATH = resolve(repoRoot, "data/declines.txt");
 
 /**
  * What the handler needs from the world, so the transport can be driven in a
@@ -130,17 +135,12 @@ export function editorCandidatesSpec(deps: EditorCandidatesDeps): EditorRouteSpe
   };
 }
 
-/** A file's text, or `""` when there is none — the build's own `readOptional` rule. */
-function readOptional(path: string): string {
-  return existsSync(path) ? readFileSync(path, "utf8") : "";
-}
-
 export function editorCandidatesPlugin(): Plugin {
   return editorRoute(
     editorCandidatesSpec({
       queue: () => parseCandidates(readOptional(QUEUE_PATH)),
       schedule: readSchedule,
-      declines: () => parseDeclines(readOptional(DECLINES_PATH)),
+      declines: () => parseDeclines(readDeclineText(DECLINES_PATH)),
       context: pinnedEvidenceContext,
     }),
   );

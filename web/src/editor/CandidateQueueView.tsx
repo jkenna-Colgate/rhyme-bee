@@ -11,16 +11,55 @@
  * add-versus-correct determination ever appears in this file, the shape has gone
  * wrong.
  *
- * **Nothing here is a gesture.** Slice 1 is a read: no button writes, and no
- * click changes a file. The cards name the act each Candidate is waiting for so
- * that the editor can see the shape of the evening's work, and slices 2 to 4 are
- * what attach the acts to them.
+ * **The gestures are handed in, never built here.** Slice 2 attaches two acts to
+ * the cards — the one-gesture add and the three-way Decline (#178) — and both
+ * arrive as callbacks, so this file still decides nothing: which act a Candidate
+ * offers is `offersAdd` and `isOutstanding`'s, what each Decline writes and what
+ * it costs is `decline.ts`'s, and where the write goes is the hook's.
+ *
+ * Both are **optional** and both are offered on both surfaces. The add is aimed
+ * at a Rhyme Key, and a Candidate carries its own — the key its Appeal was
+ * recorded against — so the whole-queue list needs no day to raise one from, and
+ * the group with no scheduled day behind it (most of the queue) is addable like
+ * any other. What differs between the two surfaces is only which aim the screen
+ * hands the add: the day panel keeps the day-derived one it already had, and the
+ * list above aims at the Candidate's key. See `EditorApp`.
  */
 
-import type { ReadCandidate } from "../../../scripts/editorCandidates.ts";
+import { useState } from "react";
+import { isOutstanding, type ReadCandidate } from "../../../scripts/editorCandidates.ts";
 import type { CandidateQueueReadout, CandidateGroup } from "../../../scripts/editorCandidates.ts";
 import type { Pronunciation } from "../../../src/phonology.ts";
-import { candidatesForDay, cardFor } from "./dayCandidates.ts";
+import {
+  DECLINE_CHOICES,
+  DECLINE_CONSEQUENCE,
+  DECLINE_LABEL,
+  declineWrites,
+  type DeclineChoice,
+} from "./decline.ts";
+import { candidatesForDay, cardFor, offersAdd } from "./dayCandidates.ts";
+
+/**
+ * The acts a card can offer, as the screen hands them down.
+ *
+ * One object rather than two props threaded through four components, and every
+ * field optional so that a surface which cannot offer an act simply does not
+ * pass it — which is how the whole-queue list has no add without a second
+ * component knowing why.
+ */
+export interface CandidateActs {
+  /**
+   * Queue this Candidate's word as an add, prefilled. The whole Candidate
+   * rather than its word, because what the add is aimed at is the Candidate's
+   * own Rhyme Key on the list above and the day's on the panel below, and only
+   * the screen assembling the act knows which of the two it is offering.
+   */
+  onAdd?: (candidate: ReadCandidate) => void;
+  /** Rule on the Candidate. The choice decides which of the two files is written. */
+  onDecline?: (candidate: ReadCandidate, choice: DeclineChoice) => void;
+  /** The word a write is in flight for, so its card can say so. */
+  writing?: string | null;
+}
 
 /**
  * The whole queue, at the top of the pass beside the status panel.
@@ -32,10 +71,13 @@ export function CandidateQueueView({
   queue,
   error,
   loading,
+  acts,
 }: {
   queue: CandidateQueueReadout | null;
   error: string | null;
   loading: boolean;
+  /** The full set: an add up here is aimed at the Candidate's own Rhyme Key. */
+  acts: CandidateActs;
 }) {
   return (
     <section className="editor-queue">
@@ -55,7 +97,7 @@ export function CandidateQueueView({
           </p>
 
           {queue.groups.map((group) => (
-            <QueueGroup key={group.rhymeKey} group={group} />
+            <QueueGroup key={group.rhymeKey} group={group} acts={acts} />
           ))}
         </>
       )}
@@ -88,7 +130,7 @@ function Newest({ newest }: { newest: string | null }) {
 }
 
 /** One Rhyme Key's Candidates, and the day the schedule holds for that key. */
-function QueueGroup({ group }: { group: CandidateGroup }) {
+function QueueGroup({ group, acts }: { group: CandidateGroup; acts: CandidateActs }) {
   return (
     <article className="editor-queue-group">
       <h3>
@@ -118,7 +160,7 @@ function QueueGroup({ group }: { group: CandidateGroup }) {
       <ul className="editor-queue-list">
         {group.candidates.map((candidate) => (
           <li key={`${candidate.word}-${candidate.candidate.timestamp}`}>
-            <CandidateCardView candidate={candidate} />
+            <CandidateCardView candidate={candidate} acts={acts} />
           </li>
         ))}
       </ul>
@@ -137,9 +179,12 @@ function QueueGroup({ group }: { group: CandidateGroup }) {
 export function DayCandidatesView({
   queue,
   rhymeKey,
+  acts,
 }: {
   queue: CandidateQueueReadout | null;
   rhymeKey: string;
+  /** The full set here: this panel knows a day, so the add has somewhere to aim. */
+  acts: CandidateActs;
 }) {
   const day = candidatesForDay(queue, rhymeKey);
   if (day.all.length === 0) return null;
@@ -167,7 +212,7 @@ export function DayCandidatesView({
       <ul className="editor-queue-list">
         {day.all.map((candidate) => (
           <li key={`${candidate.word}-${candidate.candidate.timestamp}`}>
-            <CandidateCardView candidate={candidate} />
+            <CandidateCardView candidate={candidate} acts={acts} />
           </li>
         ))}
       </ul>
@@ -175,13 +220,127 @@ export function DayCandidatesView({
   );
 }
 
-/** What the editor is told about one Candidate: its state, and its own evidence. */
-function CandidateCardView({ candidate }: { candidate: ReadCandidate }) {
+/**
+ * What the editor is told about one Candidate — its state and its own evidence —
+ * and what they can do about it.
+ *
+ * The acts sit below the evidence rather than beside the word, because the
+ * evidence is what the ruling is made *from*: a card is read top to bottom and
+ * the buttons are the end of that sentence.
+ */
+function CandidateCardView({
+  candidate,
+  acts,
+}: {
+  candidate: ReadCandidate;
+  acts: CandidateActs;
+}) {
   return (
     <div className={`editor-candidate editor-candidate-${cardFor(candidate)}`}>
       <span className="editor-candidate-word">{candidate.word}</span>
       <span className="editor-candidate-state">{STATE_SENTENCE[candidate.state]}</span>
       <CandidateEvidence candidate={candidate} />
+      <CandidateActsView candidate={candidate} acts={acts} />
+    </div>
+  );
+}
+
+/**
+ * The two acts, and the second click the Decline takes.
+ *
+ * **The add is one click.** The word is on the screen already, so the gesture is
+ * the whole of it: no field, no confirmation, nothing retyped. It queues rather
+ * than writes, which is not a hedge — it is the existing add path, whose queue
+ * costs nothing until Submit and lets a word be taken back out before it costs
+ * anything (#161). A Candidate-raised add joins the same batch as the words the
+ * editor typed and is submitted, judged, verified and written with them.
+ *
+ * **The Decline is two**, and the second click is the point of the first. The
+ * three rulings do different things — two of them take a word's wordhood on
+ * every day — so the menu exists to put each one's consequence in front of the
+ * editor *before* it is taken rather than in the banner afterwards. It is the
+ * shape `DemoteMenu` uses in `DayReadoutView.tsx`, for the same reason.
+ *
+ * It is offered to every Candidate that is still `isOutstanding`, and all three
+ * rulings are reachable from every one of those states on purpose: `is-a-name`
+ * is the obvious Proper Noun, but a name the names data does not hold reads
+ * `addable` and is exactly the case the demotion list exists for, and any state
+ * can turn out to be junk or to have been rejected for the right reason all
+ * along. Which of the three the editor picks is a judgement about the word, and
+ * the queue has no basis for making it for them. A settled Candidate — resolved,
+ * or already declined — is offered nothing: there is no un-decline anywhere in
+ * the tool, and a Candidate the engine now accepts is not being rejected, so
+ * there is no rejection left to agree with.
+ */
+function CandidateActsView({
+  candidate,
+  acts,
+}: {
+  candidate: ReadCandidate;
+  acts: CandidateActs;
+}) {
+  const [ruling, setRuling] = useState(false);
+  const add = acts.onAdd;
+  const decline = acts.onDecline;
+  const canAdd = add !== undefined && offersAdd(candidate);
+  const canDecline = decline !== undefined && isOutstanding(candidate);
+  if (!canAdd && !canDecline) return null;
+
+  const busy = acts.writing === candidate.word;
+
+  return (
+    <div className="editor-candidate-acts">
+      {canAdd && (
+        <button
+          type="button"
+          className="editor-candidate-add"
+          disabled={busy}
+          onClick={() => add!(candidate)}
+        >
+          Queue {candidate.word} as an add
+        </button>
+      )}
+
+      {canDecline && !ruling && (
+        <button
+          type="button"
+          className="editor-candidate-decline"
+          disabled={busy}
+          onClick={() => setRuling(true)}
+        >
+          {busy ? "Declining…" : "Decline…"}
+        </button>
+      )}
+
+      {canDecline && ruling && (
+        <div
+          className="editor-candidate-rulings"
+          role="group"
+          aria-label={`Decline ${candidate.word}`}
+        >
+          <p className="editor-candidate-rulings-lede">
+            Declining <strong>{candidate.word}</strong> against <code>{candidate.candidate.seedRhymeKey}</code>:
+          </p>
+          {DECLINE_CHOICES.map((choice) => (
+            <p key={choice} className={`editor-candidate-ruling editor-candidate-ruling-${declineWrites(choice)}`}>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setRuling(false);
+                  decline!(candidate, choice);
+                }}
+              >
+                {DECLINE_LABEL[choice]}
+              </button>{" "}
+              <span className="editor-candidate-consequence">{DECLINE_CONSEQUENCE[choice]}</span>
+            </p>
+          ))}
+          <button type="button" className="editor-candidate-ruling-cancel" onClick={() => setRuling(false)}>
+            Leave it on the queue
+          </button>
+        </div>
+      )}
     </div>
   );
 }

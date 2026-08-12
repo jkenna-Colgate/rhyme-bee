@@ -97,22 +97,22 @@ function stubIndex(answers: string[]): RhymeIndex {
 function endpoint(
   options: {
     schedule?: () => Schedule;
-    runAdds?: (words: string[], aim: AddTarget) => Promise<AddOutcome>;
+    runAdds?: (words: string[], aim: AddTarget, appealed: string[]) => Promise<AddOutcome>;
     rebuild?: () => Promise<RebuildResult>;
     openIndex?: () => RhymeIndex;
     staleness?: () => IndexStaleness;
   } = {},
 ) {
   const acts: string[] = [];
-  const added: { words: string[]; aim: AddTarget }[] = [];
+  const added: { words: string[]; aim: AddTarget; appealed: string[] }[] = [];
   const handler = editorMiddleware(
     editorAddSpec({
       schedule: options.schedule ?? (() => SCHEDULE),
       runAdds:
         options.runAdds ??
-        ((words, aim) => {
+        ((words, aim, appealed) => {
           acts.push("add");
-          added.push({ words, aim });
+          added.push({ words, aim, appealed });
           return Promise.resolve(outcomeFor(words, aim));
         }),
       rebuild:
@@ -147,7 +147,7 @@ function endpoint(
 }
 
 const submit = (payload: unknown) => ({ method: "POST", body: JSON.stringify(payload) });
-const batch: AddSubmitRequest = { date: "2026-08-10", words: ["candleholder"] };
+const batch: AddSubmitRequest = { date: "2026-08-10", words: ["candleholder"], appealed: [] };
 
 describe("submitting a queue", () => {
   it("aims the words at the day's own Rhyme Key, taken from the schedule", async () => {
@@ -163,8 +163,123 @@ describe("submitting a queue", () => {
       {
         words: ["candleholder"],
         aim: { target: "AH S T", provenance: "2026-08-10, the bust Puzzle", seed: "bust" },
+        appealed: [],
       },
     ]);
+  });
+
+  /**
+   * The provenance an add raised from the Candidate Queue carries (#178). The
+   * endpoint's whole part in it is carrying the subset through to `add`, which
+   * is what writes the comment; what it must *not* do is let it change anything
+   * about the batch, so the words and the aim below are the ordinary ones.
+   */
+  it("carries the words a player Appealed through to the add, unchanged", async () => {
+    const { handler, added } = endpoint();
+    const answered = await call(
+      handler,
+      submit({ date: "2026-08-10", words: ["candleholder"], appealed: ["candleholder"] }),
+    );
+
+    expect(answered.status).toBe(200);
+    expect(added[0]!.words).toEqual(["candleholder"]);
+    expect(added[0]!.appealed).toEqual(["candleholder"]);
+  });
+
+  /**
+   * #178's first acceptance criterion, for the group it is hardest to meet on.
+   * `AA K T` is not on `SCHEDULE` and no date could reach it — which is the
+   * ordinary case rather than a corner: most Candidates belong to no scheduled
+   * day at all (#176), so an add that could only take its aim from a date would
+   * never be offered to the largest group on the queue. A Candidate carries the
+   * key its Appeal was recorded against, and this is that key arriving as the
+   * aim.
+   */
+  it("aims a batch at a Rhyme Key no scheduled day holds, when a Candidate names one", async () => {
+    const { handler, added } = endpoint();
+    const answered = await call(
+      handler,
+      submit({
+        date: "2026-08-10",
+        rhymeKey: "AA K T",
+        words: ["frocked"],
+        appealed: ["frocked"],
+      }),
+    );
+
+    expect(answered.status).toBe(200);
+    expect(added).toEqual([
+      {
+        words: ["frocked"],
+        // No Seed, exactly as the CLI's `--rhymeKey` carries none: there is no
+        // Puzzle behind an aim named outright.
+        aim: { target: "AA K T", provenance: "AA K T, from the Candidate Queue" },
+        appealed: ["frocked"],
+      },
+    ]);
+  });
+
+  /**
+   * The schedule is not read at all on that path, which is what makes it one
+   * more way to name the target rather than a second resolution of it. A
+   * schedule that throws would take the date-derived aim down; it cannot touch
+   * this one.
+   */
+  it("reads no schedule for a batch that names its own Rhyme Key", async () => {
+    const { handler, added } = endpoint({
+      schedule: () => {
+        throw new Error("data/schedule.json is not a readable schedule artifact.");
+      },
+    });
+    const answered = await call(
+      handler,
+      submit({ date: "2026-08-10", rhymeKey: "AA K T", words: ["frocked"] }),
+    );
+
+    expect(answered.status).toBe(200);
+    expect(added[0]!.aim.target).toBe("AA K T");
+  });
+
+  /**
+   * The day on screen is what the answer re-reads, and it is separable from the
+   * aim: the rebuild folds in everything on disk, so the figures on the day the
+   * editor is looking at move whether or not the batch was aimed at it. With no
+   * day named there is nothing to re-read, and the screen keeps what it had.
+   */
+  it("re-reads no day for a key-aimed batch that names no date", async () => {
+    const { handler, acts } = endpoint();
+    const answered = await call(
+      handler,
+      submit({ date: null, rhymeKey: "AA K T", words: ["frocked"] }),
+    );
+
+    expect(answered.status).toBe(200);
+    expect((JSON.parse(answered.body) as AddSubmitResult).readout).toBeNull();
+    expect(acts).toEqual(["add", "rebuild"]);
+  });
+
+  it("treats a Submit that names no Candidates as the ordinary editor's batch", async () => {
+    const { handler, added } = endpoint();
+    await call(handler, submit({ date: "2026-08-10", words: ["candleholder"] }));
+
+    expect(added[0]!.appealed).toEqual([]);
+  });
+
+  /**
+   * A caller that has lost track of its own queue. Refused rather than dropped:
+   * the quiet failure is a reading written into the supplement with no note on
+   * it and nothing to say the note was meant to be there.
+   */
+  it("refuses a Candidate named that is not in the batch, and writes nothing", async () => {
+    const { handler, acts } = endpoint();
+    const answered = await call(
+      handler,
+      submit({ date: "2026-08-10", words: ["candleholder"], appealed: ["frocked"] }),
+    );
+
+    expect(answered.status).toBe(400);
+    expect(JSON.parse(answered.body).error).toContain("not in the batch");
+    expect(acts).toEqual([]);
   });
 
   /**
@@ -371,7 +486,7 @@ describe("submitting with nothing queued", () => {
     const before = snapshot();
     // `runAdds` is the real `add`, so a handler that decided to call it with an
     // empty batch would be running the writing code rather than a recorder.
-    const { handler, acts } = endpoint({ staleness: () => stale, runAdds: add });
+    const { handler, acts } = endpoint({ staleness: () => stale, runAdds: (words, aim, appealed) => add(words, aim, { appealed }) });
     const answered = await call(handler, submit({ date: "2026-08-10", words: [] }));
 
     expect(answered.status).toBe(200);
@@ -431,7 +546,7 @@ describe("what Submit does not write", () => {
     const before = snapshot(watched);
     // `rebuild` and `openIndex` stay recorders: a real rebuild is a subprocess
     // and a real index is fifteen megabytes, and neither is what this asserts.
-    const { handler } = endpoint({ runAdds: add });
+    const { handler } = endpoint({ runAdds: (words, aim, appealed) => add(words, aim, { appealed }) });
     const answered = await call(handler, submit({ date: "2026-08-10", words: ["adjust"] }));
 
     expect(answered.status).toBe(200);
@@ -532,6 +647,11 @@ describe("what the endpoint refuses, and writes nothing for", () => {
       [JSON.stringify({ date: "2026-08-10", words: ["bust", 7] }), /words/i],
       [JSON.stringify({ date: "2026-08-10", words: ["counter-thrust"] }), /not a word/i],
       [JSON.stringify({ date: "2026-08-10", words: ["bust", "BUST"] }), /same word twice/i],
+      // A key named outright still has to be a key, and a batch that names
+      // neither a day nor a key is aimed at nothing.
+      [JSON.stringify({ date: "2026-08-10", rhymeKey: "aa k t", words: ["bust"] }), /Rhyme Key/],
+      [JSON.stringify({ date: "2026-08-10", rhymeKey: 42, words: ["bust"] }), /Rhyme Key/],
+      [JSON.stringify({ date: null, words: ["bust"] }), /names a day or a Rhyme Key/],
     ];
     for (const [body, expected] of bodies) {
       const answered = await call(handler, { method: "POST", body });
@@ -630,7 +750,53 @@ describe("what counts as a Submit", () => {
       ok: true,
       date: "2026-08-10",
       words: ["bust"],
+      // A body naming no Candidates is the batch the editor typed themselves,
+      // which is the ordinary case and the only one that existed before #178.
+      appealed: [],
     });
+  });
+
+  it("takes the Candidates a batch was raised from, normalised the same way", () => {
+    expect(
+      addWriteRequest(
+        JSON.stringify({ date: "2026-08-10", words: [" Bust ", "adjust"], appealed: ["BUST"] }),
+      ),
+    ).toEqual({
+      ok: true,
+      date: "2026-08-10",
+      words: ["bust", "adjust"],
+      appealed: ["bust"],
+    });
+  });
+
+  it("takes a Rhyme Key named outright, trimmed, as the aim a Candidate supplied", () => {
+    expect(
+      addWriteRequest(JSON.stringify({ date: null, rhymeKey: " AA K T ", words: ["frocked"] })),
+    ).toEqual({
+      ok: true,
+      date: null,
+      rhymeKey: "AA K T",
+      words: ["frocked"],
+      appealed: [],
+    });
+  });
+
+  it("refuses a Candidate list that is not a list of words", () => {
+    const asked = addWriteRequest(
+      JSON.stringify({ date: "2026-08-10", words: ["bust"], appealed: "bust" }),
+    );
+
+    expect(asked.ok).toBe(false);
+    expect(asked.ok === false && asked.error).toContain("a list of words, or not at all");
+  });
+
+  it("refuses the same Candidate named twice", () => {
+    const asked = addWriteRequest(
+      JSON.stringify({ date: "2026-08-10", words: ["bust"], appealed: ["bust", "bust"] }),
+    );
+
+    expect(asked.ok).toBe(false);
+    expect(asked.ok === false && asked.error).toContain("the same Candidate twice");
   });
 
   /**
@@ -649,6 +815,7 @@ describe("what counts as a Submit", () => {
       ok: true,
       date: "2026-08-10",
       words: [],
+      appealed: [],
     });
   });
 

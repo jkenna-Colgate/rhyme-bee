@@ -43,7 +43,7 @@
 import { spawn } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { parseCmudict } from "../src/cmudict.ts";
+import { normaliseWord, parseCmudict } from "../src/cmudict.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import { parseWordList } from "../src/pipeline.ts";
 import type { Schedule } from "../src/schedule.ts";
@@ -172,6 +172,26 @@ export interface AddDeps {
   supplementPath?: string;
   /** Where misses land. `data/deferred-readings.jsonl`, live. */
   deferredPath?: string;
+  /**
+   * Which words in this batch a **player** asked for: the ones raised from the
+   * Candidate Queue rather than typed by the editor (#178). Each one's reading
+   * carries that into `data/supplement.dict` as a comment above it, so a future
+   * reader of the supplement knows the word is there because somebody Appealed
+   * it — which is a different fact from an editor spotting a gap, and the only
+   * place it can be recorded is the file the reading lands in.
+   *
+   * It is here, among the things `add` takes from a caller instead of reaching
+   * for itself, because that is exactly what it is: where a word came from is
+   * knowledge the surface that collected it has and this function cannot
+   * recover. The default is the real thing for the CLI, which has no queue to
+   * raise a word from — nobody Appealed anything, and no comment is written.
+   *
+   * It changes **no judgement**. `resolveAddOutcome` never sees it: a word a
+   * player asked for is composed, authored and verified exactly as any other
+   * word is (ADR-0014), and provenance that moved the bar would be a second
+   * standard for readings.
+   */
+  appealed?: readonly string[];
 }
 
 /**
@@ -198,15 +218,61 @@ export async function add(
   deps: AddDeps = {},
 ): Promise<AddOutcome> {
   const outcome = await resolveAddOutcome(words, aim, pinnedEvidenceContext(), deps.author);
-  appendToSupplement(writtenReadings(outcome), deps.supplementPath ?? resolve(root, "data", SUPPLEMENT));
+  appendToSupplement(
+    writtenReadings(outcome, deps.appealed ?? []),
+    deps.supplementPath ?? resolve(root, "data", SUPPLEMENT),
+  );
   appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? resolve(root, "data", DEFERRED_QUEUE));
   return outcome;
 }
 
-function writtenReadings(outcome: AddOutcome): WordReading[] {
+/**
+ * One accepted reading, and the comment that goes above it — `null` for the
+ * ordinary add, which carries none.
+ *
+ * `WordReading` is the shape `verifyReading` and the supplement's own parser
+ * deal in, and it is deliberately not widened with a note: a comment is a fact
+ * about *why this line was written*, which no reader of a reading has any use
+ * for. So the note travels beside the reading, as far as the append and no
+ * further.
+ */
+interface SupplementEntry {
+  reading: WordReading;
+  note: string | null;
+}
+
+/**
+ * The readings to write, each with its provenance comment when a player asked
+ * for it.
+ *
+ * The words are matched by normalised spelling, which is the spelling
+ * `gatherEvidence` reports back on the outcome and the one the endpoint's parser
+ * has already applied — so a word raised from a Candidate is recognised as the
+ * same word here rather than by the string the caller happened to hold.
+ */
+function writtenReadings(outcome: AddOutcome, appealed: readonly string[]): SupplementEntry[] {
+  const asked = new Set(appealed.map(normaliseWord));
   return outcome.words
     .filter((w): w is WrittenOutcome => w.outcome === "written")
-    .map((w) => ({ word: w.word, phonemes: w.phonemes }));
+    .map((w) => ({
+      reading: { word: w.word, phonemes: w.phonemes },
+      note: asked.has(w.word) ? provenanceNote(w.word, outcome.provenance) : null,
+    }));
+}
+
+/**
+ * What a reading raised from a Candidate says about itself, as a whole-line
+ * comment above the entry.
+ *
+ * A whole line rather than a trailing gloss, because the supplement's parser
+ * only strips lines that *start* with `#` — `parseCmudict` would read a trailing
+ * comment's words as phonemes and the entry would be nonsense (`src/supplement.ts`).
+ * The section header this sits under already says the reading was verified
+ * against the day's Rhyme Key; what it cannot say, and what this adds, is that a
+ * player is the reason the word was looked at.
+ */
+function provenanceNote(word: string, provenance: string): string {
+  return `# ${word}: a player Appealed this word — raised from the Candidate Queue (${provenance}).`;
 }
 
 function deferredReadings(outcome: AddOutcome): DeferredReading[] {
@@ -327,18 +393,28 @@ const DEFERRED_QUEUE = "deferred-readings.jsonl";
 
 /**
  * The section the pass appends to, written once. There is no per-entry comment
- * — the reason for an add is constant, and a line restating it every time
- * carries no information (ADR-0014).
+ * for a word the *editor* named — the reason for that add is constant, and a
+ * line restating it every time carries no information (ADR-0014).
+ *
+ * A word raised from the Candidate Queue is the exception, and it is an
+ * exception on exactly that test: "a player asked for this" is not constant
+ * across the section, so a line saying it carries information no other line
+ * does (#178).
  */
 const EDITOR_SECTION =
   "# --- Adds by the Editor's Pass: composed from a compound split and verified\n" +
   "# against the day's Rhyme Key before being written here (ADR-0014). ---";
 
-function appendToSupplement(readings: WordReading[], path: string): void {
-  if (readings.length === 0) return;
+function appendToSupplement(entries: SupplementEntry[], path: string): void {
+  if (entries.length === 0) return;
   const existing = readFileSync(path, "utf8");
   const section = existing.includes(EDITOR_SECTION) ? "" : `\n${EDITOR_SECTION}\n`;
-  const lines = readings.map((r) => `${r.word} ${r.phonemes.join(" ")}`).join("\n");
+  const lines = entries
+    .map(({ reading, note }) => {
+      const entry = `${reading.word} ${reading.phonemes.join(" ")}`;
+      return note === null ? entry : `${note}\n${entry}`;
+    })
+    .join("\n");
   appendFileSync(path, `${section}${lines}\n`);
 }
 

@@ -131,12 +131,7 @@ describe("reading the status", () => {
     const { handler } = endpoint({ porcelain: () => Promise.resolve(null) });
     const status = JSON.parse((await call(handler)).body) as EditorStatus;
 
-    expect(status.written.map((file) => file.state)).toEqual([
-      "unknown",
-      "unknown",
-      "unknown",
-      "unknown",
-    ]);
+    expect(status.written.map((file) => file.state)).toEqual(WRITTEN_FILES.map(() => "unknown"));
   });
 });
 

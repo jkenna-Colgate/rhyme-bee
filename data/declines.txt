@@ -1,0 +1,26 @@
+# Committed Declines — the editor's standing rulings over the Candidate Queue.
+#
+# `<word> <rhyme key>`, `#` comments, read by the Editor's Pass alone. Written
+# by the Decline gesture (#178) and by nothing else; `npm run build:index` never
+# opens this file, because a Decline changes NO verdict. Its whole job is that a
+# Candidate the editor has considered and rejected stops appearing on the queue.
+#
+# The key is the pair. A Candidate is a word aimed at a Rhyme Key, so a ruling
+# is too: `docked` declined against `AA K T` stays visible if a player who hears
+# it differently Appeals it against `AA K`. The Rhyme Key runs to the end of the
+# line rather than being a second whitespace-separated column, because a key
+# CONTAINS spaces.
+#
+# This file records exactly ONE of the three Declines an editor can make — the
+# case where the engine's rejection is already correct. The other two are
+# demotions and belong in data/demotions.txt:
+#
+#   - the word is a Proper Noun            -> demotions.txt, `proper-noun`
+#   - the word is junk with wordhood       -> demotions.txt, `not-a-known-word`
+#   - the reason the engine gave is right  -> here
+#
+# A demotion changes adjudication and a Decline changes nothing, which is why
+# they are two files and two modules free to vary apart. Note WHY beside a
+# ruling: the line itself records only that one was made.
+#
+# There is no un-decline in the tool. Reversing one is deleting its line.

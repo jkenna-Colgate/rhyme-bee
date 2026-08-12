@@ -33,7 +33,7 @@ import type { DriftReason } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
 import type { CandidateQueueReadout } from "../../../scripts/editorCandidates.ts";
 import { AddQueueView } from "./AddQueueView.tsx";
-import { DayCandidatesView } from "./CandidateQueueView.tsx";
+import { DayCandidatesView, type CandidateActs } from "./CandidateQueueView.tsx";
 import { correctedDay } from "./correctedDay.ts";
 import { showsDemotionReassurance } from "./demote.ts";
 import type { RetieredWord } from "./retier.ts";
@@ -51,6 +51,7 @@ export function DayReadoutView({
   disagreer,
   status,
   candidates,
+  candidateActs,
 }: {
   readout: DayReadout;
   picker: TierPicker;
@@ -58,6 +59,14 @@ export function DayReadoutView({
   adder: Adder;
   /** Read by nothing here — forwarded to `AddQueueView`, like `adder` itself. */
   disagreer: Disagreer;
+  /**
+   * The add and the Decline, forwarded to the day panel with `candidates`. They
+   * are built in `EditorApp`, where all three hooks the two acts reach live, for
+   * the reason every other gesture on this screen is: a component that assembled
+   * a write out of hooks it was handed would be a second place the write could
+   * be assembled differently.
+   */
+  candidateActs: CandidateActs;
   /**
    * The whole Candidate Queue, forwarded to the scheduled-day case, which is the
    * only one with a Rhyme Key to select on. It arrives whole rather than
@@ -102,6 +111,7 @@ export function DayReadoutView({
           disagreer={disagreer}
           status={status}
           candidates={candidates}
+          candidateActs={candidateActs}
         />
       );
   }
@@ -182,6 +192,7 @@ function ScheduledDay({
   disagreer,
   status,
   candidates,
+  candidateActs,
 }: {
   readout: ScheduledDayReadout;
   picker: TierPicker;
@@ -194,6 +205,8 @@ function ScheduledDay({
   status: EditorStatus | null;
   /** The whole queue, narrowed to this day's Rhyme Key by `DayCandidatesView`. */
   candidates: CandidateQueueReadout | null;
+  /** The acts the panel's cards offer — forwarded, unread here. */
+  candidateActs: CandidateActs;
 }) {
   const { drift } = readout;
   // Which word's menu is showing. One at a time: the menu is a choice about one
@@ -345,7 +358,7 @@ function ScheduledDay({
           the words players already told us were. Selected by the day's *own*
           Rhyme Key, and drawn only when that key holds Candidates — which is
           five days in 260. */}
-      <DayCandidatesView queue={candidates} rhymeKey={readout.rhymeKey} />
+      <DayCandidatesView queue={candidates} rhymeKey={readout.rhymeKey} acts={candidateActs} />
 
       <p className="editor-lists-note">
         Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}

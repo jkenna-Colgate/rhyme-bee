@@ -9,7 +9,13 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { MAX_QUEUED_WORDS, aimHeldFor, queueAdd, unqueueAdd } from "../src/editor/add.ts";
+import {
+  MAX_QUEUED_WORDS,
+  aimClash,
+  aimHeldFor,
+  queueAdd,
+  unqueueAdd,
+} from "../src/editor/add.ts";
 
 /** Queue a run of words, asserting each one lands. */
 function queueAll(words: string[]): string[] {
@@ -85,35 +91,91 @@ describe("taking a word back out", () => {
 });
 
 /**
- * The queue is bound to the day it was typed against, and this is the assertion
- * that the binding is what stops a batch landing on another day's Rhyme Key.
+ * A queue is bound to one aim, and this is the assertion that the binding is
+ * what stops a batch landing on a Rhyme Key nothing on screen named.
  *
- * The aim is resolved server-side from the date Submit sends, so nothing in the
- * request itself can tell Monday's words apart from Tuesday's — the browser is
- * the only layer that knows which day they were typed on, and `aimHeldFor` is
- * where it says so. `useAdder` gates queueing *and* Submit on it, and
- * `AddQueueView` disables both controls; all three read this one function.
+ * There are two aims — a day, whose key the endpoint resolves from the date, and
+ * a Rhyme Key a Candidate supplied outright (#178) — and `aimClash` is the one
+ * rule that says which words may join which queue. `useAdder` gates queueing on
+ * it and `AddQueueView` shuts the entry on it; both read this one function.
  */
-describe("the day a queue is aimed at", () => {
+describe("what a queue is aimed at", () => {
+  const monday = { kind: "day", date: "2026-08-10" } as const;
+  const tuesday = { kind: "day", date: "2026-08-11" } as const;
+  const docked = { kind: "key", rhymeKey: "AA K T" } as const;
+
+  it("refuses a word typed against another day, and names the day to go back to", () => {
+    const clash = aimClash(monday, tuesday);
+    expect(clash).not.toBeNull();
+    expect(clash).toContain(monday.date);
+  });
+
+  it("takes a word typed against the day the queue is already aimed at", () => {
+    expect(aimClash(monday, monday)).toBeNull();
+  });
+
+  /**
+   * An empty queue is aimed at nothing, which is what lets an editor who has just
+   * submitted — or emptied the queue by hand — start a fresh one wherever they
+   * are, rather than being sent back to a day they have finished with.
+   */
+  it("takes anything when the queue is aimed at nothing", () => {
+    expect(aimClash(null, tuesday)).toBeNull();
+    expect(aimClash(null, docked)).toBeNull();
+  });
+
+  /**
+   * The two aims do not mix. A word typed on a day cannot join a batch raised
+   * from the Candidate Queue, and the sentence names the key it is aimed at
+   * rather than a date, because there may be no date — most Candidates belong to
+   * no scheduled day at all.
+   */
+  it("refuses a typed word against a queue raised from the Candidate Queue", () => {
+    const clash = aimClash(docked, monday);
+    expect(clash).not.toBeNull();
+    expect(clash).toContain(docked.rhymeKey);
+  });
+
+  it("takes a second Candidate on the same Rhyme Key", () => {
+    expect(aimClash(docked, { kind: "key", rhymeKey: "AA K T" })).toBeNull();
+    expect(aimClash(docked, { kind: "key", rhymeKey: "AA K" })).not.toBeNull();
+  });
+});
+
+/**
+ * Submit asks a narrower question than queueing does. What stops a day-aimed
+ * queue being submitted from another day is not that the aim would be wrong —
+ * the aim travels with the request — but that the answer re-reads the day it
+ * wrote to and would replace the screen with a day the editor was not looking
+ * at. A key-aimed queue re-reads nothing of the sort, so nothing holds it.
+ */
+describe("when a queue may be submitted", () => {
   const monday = "2026-08-10";
   const tuesday = "2026-08-11";
 
-  it("holds a queue typed against another day, and names the day to go back to", () => {
-    const held = aimHeldFor(monday, tuesday);
+  it("holds a day-aimed queue on any other day, and names the day to go back to", () => {
+    const held = aimHeldFor({ kind: "day", date: monday }, tuesday);
     expect(held).not.toBeNull();
     expect(held).toContain(monday);
   });
 
-  it("lets a queue act on the day it was typed against", () => {
-    expect(aimHeldFor(monday, monday)).toBeNull();
+  it("lets a day-aimed queue act on the day it was typed against", () => {
+    expect(aimHeldFor({ kind: "day", date: monday }, monday)).toBeNull();
+  });
+
+  it("holds nothing when the queue is aimed at nothing", () => {
+    expect(aimHeldFor(null, tuesday)).toBeNull();
   });
 
   /**
-   * An empty queue is bound to no day, which is what lets an editor who has just
-   * submitted — or emptied the queue by hand — start a fresh one wherever they
-   * are, rather than being sent back to a day they have finished with.
+   * The property that makes the one-gesture add reach the whole queue. Most
+   * Candidates belong to no scheduled day, so a Submit gate that asked which day
+   * they were on could only ever answer "not this one" — the words would be
+   * queueable and never submittable, which is the failure #178's first
+   * acceptance criterion is about.
    */
-  it("holds nothing when the queue is bound to no day", () => {
-    expect(aimHeldFor(null, tuesday)).toBeNull();
+  it("holds a queue raised from the Candidate Queue on no day at all", () => {
+    expect(aimHeldFor({ kind: "key", rhymeKey: "AA K T" }, monday)).toBeNull();
+    expect(aimHeldFor({ kind: "key", rhymeKey: "AA K T" }, tuesday)).toBeNull();
   });
 });

@@ -60,6 +60,23 @@ export interface Decline {
 const RHYME_KEY_SHAPE = /^[A-Z]+( [A-Z]+)*$/;
 
 /**
+ * True when `value` is spelled like a Rhyme Key.
+ *
+ * Exported so the parser below and the write route's validator
+ * (`web/editorDeclineRequest.ts`) check against one pattern rather than two
+ * copies of it — the shape `isDemotionReason` takes in `src/demotions.ts`, for
+ * the same reason: a key the route accepts and the parser then drops would be a
+ * ruling the editor watched land and that never came back.
+ *
+ * It is a check on the *spelling*, not on the key existing anywhere. Whether any
+ * Puzzle is dealt on it is a question about `data/schedule.json`, and a Decline
+ * is aimed at whatever key the Candidate named.
+ */
+export function isRhymeKeyShape(value: string): value is RhymeKey {
+  return RHYME_KEY_SHAPE.test(value);
+}
+
+/**
  * The lookup key for one ruling: the word and the Rhyme Key together, in one
  * string, so a `Set` answers "is this Candidate declined" in one question.
  *
@@ -103,7 +120,7 @@ export function parseDeclines(text: string): Decline[] {
     // The key is the rest of the line, collapsed: a Rhyme Key holds spaces, so
     // it cannot be a second whitespace-separated column.
     const rhymeKey = line.slice(cut + 1).trim().replace(/\s+/g, " ");
-    if (word === "" || !RHYME_KEY_SHAPE.test(rhymeKey)) continue;
+    if (word === "" || !isRhymeKeyShape(rhymeKey)) continue;
     out.push({ word, rhymeKey });
   }
   return out;

@@ -81,6 +81,18 @@ export interface EditorStatus {
  * pass half told, so they are one thing to commit and are shown as one heading
  * with both paths under it.
  *
+ * #178 adds the fourth: the standing Declines. What this list answers is
+ * **which files the pass must commit**, which is a different question from
+ * whether a write can make the built Rhyme Index stale — a Decline cannot, since
+ * the build never opens the file, and it belongs here all the same.
+ * `data/declines.txt` is hand-written, committed, and derived from nothing: it
+ * is the only record that a Candidate was considered and rejected, so a pass
+ * whose rulings are still uncommitted has lost them the moment the clone is
+ * gone. Its own heading rather than sharing the demotion list's, because the two
+ * are separate acts with opposite reach — a demotion changes adjudication
+ * everywhere and a Decline changes nothing at all — and one heading over both
+ * would say they are one thing to commit when either can be committed alone.
+ *
  * Declared as a shared constant rather than assembled at either end, so the
  * endpoint's answer and the screen's headings cannot disagree about which files
  * the tool is accountable for.
@@ -103,6 +115,11 @@ export const WRITTEN_GROUPS: readonly WrittenGroup[] = [
     title: "Demotions",
     blurb: "The words the pass took wordhood from — names, abbreviations, junk.",
     paths: ["data/demotions.txt"],
+  },
+  {
+    title: "Declines",
+    blurb: "The Candidates the pass considered and rejected. Nothing derives it.",
+    paths: ["data/declines.txt"],
   },
   {
     title: "Pronunciation supplement",

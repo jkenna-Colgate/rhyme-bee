@@ -13,6 +13,7 @@ import { describe, expect, it } from "vitest";
 import {
   declineKey,
   declinedPairs,
+  isRhymeKeyShape,
   parseDeclines,
   serialiseDecline,
   type Decline,
@@ -68,6 +69,35 @@ describe("the Declines format", () => {
 
   it("reads an absent file's empty text as no rulings", () => {
     expect(parseDeclines("")).toEqual([]);
+  });
+});
+
+/**
+ * The parser's own test for a Rhyme Key, exported so the write route
+ * (`web/editorDeclineRequest.ts`) refuses exactly what the parser would drop. A
+ * ruling the route accepted and the parser then dropped would be one the editor
+ * watched land and that never came back — silently, since a malformed line here
+ * is dropped rather than thrown over.
+ */
+describe("what is spelled like a Rhyme Key", () => {
+  it("takes space-separated ARPABET with the stress digits stripped", () => {
+    expect(isRhymeKeyShape("AA K T")).toBe(true);
+    expect(isRhymeKeyShape("EY")).toBe(true);
+  });
+
+  it("refuses what the parser would drop", () => {
+    expect(isRhymeKeyShape("aa k t")).toBe(false); // lower case
+    expect(isRhymeKeyShape("AA1 K T")).toBe(false); // stress digits still on
+    expect(isRhymeKeyShape("AA  K")).toBe(false); // not collapsed
+    expect(isRhymeKeyShape(" AA K")).toBe(false); // not trimmed
+    expect(isRhymeKeyShape("")).toBe(false);
+    expect(isRhymeKeyShape("42")).toBe(false);
+  });
+
+  it("agrees with the parser on every one of them", () => {
+    for (const key of ["AA K T", "EY", "aa k t", "AA1 K T", "42"]) {
+      expect(parseDeclines(`docked ${key}\n`).length).toBe(isRhymeKeyShape(key) ? 1 : 0);
+    }
   });
 });
 
