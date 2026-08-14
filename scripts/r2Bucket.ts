@@ -5,8 +5,8 @@
  *
  * Hand-rolled rather than pulled from an SDK. The whole surface is two GETs, the
  * signing is a documented recipe, and this repository's four dev dependencies are
- * not worth trading for it — the same reasoning that has `candidatesArgs.ts`
- * parsing its own flags.
+ * not worth trading for it — the same reasoning that has `playArgs.ts` and
+ * `editorArgs.ts` parsing their own flags.
  *
  * Wrangler is not an option even though it is already here: `wrangler r2 object`
  * can get, put and delete a *named* object but cannot list a bucket, and the pull

@@ -3,28 +3,28 @@
  *
  *   npm run appeals:pull
  *
- * The first step of the play-test refine loop: pull, judge into the pronunciation
- * supplement, rebuild the index, deploy. A player tapped "should count" on a
- * rejection they were sure about, the deployed endpoint wrote that report to R2
- * as one object (#119), and this brings the batch home.
+ * The first step of the play-test refine loop: pull, judge the Candidate Queue in
+ * the Editor's Pass, deploy. A player tapped "should count" on a rejection they
+ * were sure about, the deployed endpoint wrote that report to R2 as one object
+ * (#119), and this brings the batch home.
  *
- * It appends to the queue the judging flow already reads,
+ * It appends to the queue the Editor's Pass already reads,
  * `data/supplement-candidates.jsonl`, in the format that flow already produces —
  * each object body *is* a JSON Lines record, so the append is a concatenation and
- * nothing is transcribed or reassembled. `npm run supplement:candidates` is
- * unchanged and cannot tell a pulled record from one the dev button jotted.
+ * nothing is transcribed or reassembled. The Candidate Queue is unchanged and
+ * cannot tell a pulled record from one the dev button jotted.
  *
  * Run it as often as you like. A record's object key is derived from the record,
- * so the queue and its archive already say which objects have been pulled; a
- * second run lists the bucket, recognises everything in it, and appends nothing.
- * That also means it never fetches an object twice — the listing alone settles
- * it, so a repeat run costs one request.
+ * so the queue itself already says which objects have been pulled; a second run
+ * lists the bucket, recognises everything in it, and appends nothing. That also
+ * means it never fetches an object twice — the listing alone settles it, so a
+ * repeat run costs one request.
  *
  * This is a maintainer script. It runs here, never in the browser, and is no part
  * of the deployed bundle. It reads the bucket with the scoped read-only R2 API
  * token from #114 Step 8 (see `appealPull.ts` for why the account login will not
- * do), and it only ever reads: judged records are archived locally, and nothing
- * is deleted from the bucket.
+ * do), and it only ever reads: the local queue is append-only, and nothing is
+ * deleted from the bucket.
  */
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
@@ -43,7 +43,6 @@ import { getObject, listObjects } from "./r2Bucket.ts";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
 const queuePath = resolve(dataDir, "supplement-candidates.jsonl");
-const archivePath = resolve(dataDir, "supplement-candidates.archived.jsonl");
 const credentialsPath = resolve(root, "credentials.env");
 
 function readIfPresent(path: string): string {
@@ -71,10 +70,11 @@ async function main(): Promise<void> {
     return;
   }
 
-  // The queue and its archive between them hold every record ever pulled, and a
-  // key is derived from its record — so this is enough to skip fetching an
-  // object we already have, rather than fetching it and discarding it after.
-  const held = candidateKeysIn(readIfPresent(queuePath), readIfPresent(archivePath));
+  // The queue holds every record ever pulled — it is append-only and judging it
+  // in the Editor's Pass never empties it — and a key is derived from its
+  // record, so this one file is enough to skip fetching an object we already
+  // have, rather than fetching it and discarding it after.
+  const held = candidateKeysIn(readIfPresent(queuePath));
   const fresh = keys.filter((key) => !held.has(key));
 
   console.log(
@@ -114,7 +114,7 @@ async function main(): Promise<void> {
   for (const candidate of selection.added) {
     console.log(`  ${candidate.word}   (against seed "${candidate.seedWord}", ${candidate.reason})`);
   }
-  console.log("\nNext: `npm run supplement:candidates` to judge the queue.");
+  console.log("\nNext: start the dev server and judge these on the Editor's Pass's Candidate Queue.");
 }
 
 try {

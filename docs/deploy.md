@@ -102,19 +102,31 @@ still playing. Once a day, or whenever the Appeals look worth a look:
 
 ```
 npm run appeals:pull          # 1. bring down what players Appealed (#120)
-npm run supplement:candidates # 2. judge the batch into data/supplement.dict
+npm --prefix web run dev      # 2. judge the Candidate Queue in the Editor's Pass
 npm run deploy                # 3. rebuild the index and ship it
 ```
+
+All three run from the repo root. Step 2 starts `web/`'s dev server without
+moving you there, because step 3's `npm run deploy` is the root script that
+rebuilds the index — from inside `web/` the same words mean `wrangler deploy`,
+which uploads the last build and rebuilds nothing.
 
 1. **Pull.** Players tap "should have counted" on a rejection they were sure
    about; the endpoint writes each report to R2 as one object, and this appends
    the new ones to `data/supplement-candidates.jsonl`. It only reads, and it
    recognises what it has already pulled, so running it twice costs one request
-   and appends nothing.
-2. **Judge.** The candidate flow is unchanged and cannot tell a pulled record
-   from one the dev feedback button jotted. What survives judging becomes a line
-   in the committed pronunciation supplement, the permanent override layer
+   and appends nothing. It is the one step still on the CLI, deliberately: the
+   Editor's Pass has no credentials and makes no network call
+   ([ADR-0017](./adr/0017-candidates-are-judged-in-the-editors-pass.md)).
+2. **Judge.** The Candidate Queue in the Editor's Pass reads that file and
+   cannot tell a pulled record from one the dev feedback button jotted. A
+   Candidate whose word already rhymes is shown resolved without a ruling; the
+   rest are added, corrected or declined by the gestures the pass already has.
+   What an add or a correction writes is a line in the committed pronunciation
+   supplement, the permanent override layer
    ([ADR-0009](./adr/0009-pronunciation-supplement-is-the-permanent-override-layer.md)).
+   Nothing empties the queue: it stays as the record of what was Appealed and
+   when.
 3. **Deploy.** Step 3 is the ordinary command; it rebuilds the index from the
    supplement you just edited, so a new judge is a new artifact filename and
    every browser picks it up on the next load without a cache clear.

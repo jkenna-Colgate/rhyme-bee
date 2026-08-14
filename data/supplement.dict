@@ -87,8 +87,8 @@ winos W IY1 N OW0 Z
 # `vestibule`, `mule`, `yule`, `joule`, `tubule`, `nodule`, `ovule`, `boule`,
 # `saccule`, `minuscule`, `virgule`, and a handful more). The other 38 are
 # invisible to the game: wordhood is already granted (`words.txt` says yes for
-# every one, per `npm run supplement:candidates -- --words ... --target "UW
-# L"`), so the only defect is the missing reading. None is a name.
+# every one, per `npm run editor:add -- --words ... --rhymeKey "UW L"`), so the
+# only defect is the missing reading. None is a name.
 #
 # Every reading below either (a) is spliced onto a stem CMUdict already reads
 # (`duct`, `barb`, `gem`, `plume`, `sphere`, `mount`, `gallus`, `hierarchy`,

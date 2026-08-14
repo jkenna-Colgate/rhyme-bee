@@ -2,7 +2,8 @@
  * The pull's job is to land the bucket's Appealed words in the existing queue
  * without changing what that queue is. So the tests that matter are: the format
  * is the one `parseCandidates` already reads, and running twice appends nothing
- * the second time.
+ * the second time — including after a judging pass, now that the queue is the
+ * only history there is and the archive it used to be read with is gone (#182).
  *
  * The object bodies here are built with `serialiseCandidate` and keyed with
  * `candidateKey` — the same two functions the deployed endpoint writes with — so
@@ -83,24 +84,33 @@ describe("choosing what to pull", () => {
   });
 
   it("appends nothing on a second run over the same bucket", () => {
-    const objects = [objectFor(airburst), objectFor(overjoy)];
-    const first = selectNewCandidates(objects, new Set());
+    // The whole daily loop, starting from a queue file that does not exist yet:
+    // pull, judge, pull again. There is no judging step to write here because
+    // there is none in fact — judging writes to the pronunciation supplement and
+    // leaves this file byte-identical (#182) — so the second pull sees exactly
+    // what the first one wrote, and recognises all of it.
+    const bucket = [objectFor(airburst), objectFor(overjoy)];
+    const first = selectNewCandidates(bucket, candidateKeysIn(""));
 
-    const second = selectNewCandidates(objects, candidateKeysIn(first.append));
+    const second = selectNewCandidates(bucket, candidateKeysIn(first.append));
 
+    expect(first.added).toEqual([airburst, overjoy]);
     expect(second.added).toEqual([]);
     expect(second.append).toBe("");
   });
 
-  it("still skips a record the maintainer has judged and archived", () => {
-    // `--archive` empties the queue into the archive, so the queue alone would
-    // no longer remember the record and the pull would fetch it back.
-    const queue = "";
-    const archive = serialiseCandidate(airburst);
+  it("still skips a record the maintainer has already judged", () => {
+    // Judging happens on the Editor's Pass's Candidate Queue and writes nothing
+    // to this file: it is append-only, and a Candidate is resolved by the Rhyme
+    // Index rhyming its word rather than by being moved out (#182). So the queue
+    // after a judging pass is byte-identical to the queue before one, and the
+    // pull recognises the record with no archive to fall back on.
+    const queueBeforeJudging = serialiseCandidate(airburst);
+    const queueAfterJudging = queueBeforeJudging;
 
     const selection = selectNewCandidates(
       [objectFor(airburst), objectFor(overjoy)],
-      candidateKeysIn(queue, archive),
+      candidateKeysIn(queueAfterJudging),
     );
 
     expect(selection.added).toEqual([overjoy]);
@@ -150,12 +160,12 @@ describe("the keys a queue accounts for", () => {
     );
   });
 
-  it("reads the queue and the archive as one history", () => {
-    expect(candidateKeysIn(serialiseCandidate(airburst), serialiseCandidate(overjoy)).size).toBe(2);
+  it("reads the one queue as the whole history", () => {
+    expect(candidateKeysIn(serialiseCandidate(airburst) + serialiseCandidate(overjoy)).size).toBe(2);
   });
 
   it("is empty for a queue that does not exist yet", () => {
-    expect(candidateKeysIn("", "")).toEqual(new Set());
+    expect(candidateKeysIn("")).toEqual(new Set());
   });
 });
 

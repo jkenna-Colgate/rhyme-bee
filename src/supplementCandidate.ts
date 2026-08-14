@@ -3,7 +3,10 @@
  * Submission a player Appealed mid-play as *should have counted as an Answer*,
  * captured with the context a judge needs to act on it later. Capture only
  * records; the judging — is this a real word, an add or a stress correction,
- * what reading — happens on a later run against the queue.
+ * what reading — happens later, on the Editor's Pass's Candidate Queue
+ * (ADR-0017). The queue file is append-only: nothing is moved out of it when a
+ * Candidate is judged, and a Candidate whose word rhymes on its Rhyme Key
+ * against the current Rhyme Index is resolved by that fact alone.
  *
  * Nothing here adjudicates. The verdict was reached in the player's browser and
  * stays there (ADR-0013); a candidate is a report *about* a verdict already

@@ -90,6 +90,16 @@ describe("parseEditorArgs for the add command", () => {
     });
   });
 
+  it("trims whitespace and drops empty entries from the list", () => {
+    // The comma-list convention was pinned in two places until #182 retired the
+    // other one; this is the surviving parser that still has to honour it, and
+    // a shell that mangles a list into " a , b ,," must not produce a word "".
+    expect(parseEditorArgs(["add", "--words= placeholder , toothache ,,"])).toEqual({
+      command: "add",
+      words: ["placeholder", "toothache"],
+    });
+  });
+
   it("takes bare words when the shell lets them through", () => {
     expect(parseEditorArgs(["add", "placeholder", "toothache"])).toEqual({
       command: "add",
