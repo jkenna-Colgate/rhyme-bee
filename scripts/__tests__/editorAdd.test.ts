@@ -20,7 +20,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Derivation, IndexDataSource } from "../../src/derivation.ts";
 import type { Pronunciation, RhymeKey } from "../../src/phonology.ts";
-import type { EvidenceContext } from "../../src/supplementEvidence.ts";
+import type { EvidenceContext, WordEvidence } from "../../src/supplementEvidence.ts";
 import type { AddTarget } from "../../web/src/editor/addOutcome.ts";
 import { add, printAddOutcome, resolveAddOutcome, type AgentAuthor } from "../editorAdd.ts";
 
@@ -52,7 +52,7 @@ const ctx = context({
 });
 
 /** Never called for a word the pure judgement never reaches an agent for. */
-const unreachable = vi.fn(async (word: string): Promise<Pronunciation | null> => {
+const unreachable = vi.fn(async ({ word }: WordEvidence): Promise<Pronunciation | null> => {
   throw new Error(`agent should not have been asked about "${word}"`);
 });
 
@@ -119,14 +119,19 @@ describe("resolveAddOutcome", () => {
   });
 
   it("writes a reading the agent authored once no split reaches the target", async () => {
-    const author = vi.fn(async (word: string) =>
+    const author = vi.fn(async ({ word }: WordEvidence) =>
       word === "gleeb" ? (["G", "L", "EY1", "T"] as Pronunciation) : null,
     );
     const outcome = await resolveAddOutcome(["gleeb"], AIM, ctx, author);
     expect(outcome.words).toEqual([
       { outcome: "written", word: "gleeb", phonemes: ["G", "L", "EY1", "T"], composed: null },
     ]);
-    expect(author).toHaveBeenCalledWith("gleeb", TARGET);
+    // `isWord` and `direct` are here to pin that what reaches the seam is the
+    // record the caller gathered, not a word and a target packed into an object
+    // literal — which is the whole of what this parameter change buys.
+    expect(author).toHaveBeenCalledWith(
+      expect.objectContaining({ word: "gleeb", target: TARGET, isWord: false, direct: [] }),
+    );
   });
 
   it("defers a word the agent did not answer for", async () => {
@@ -151,7 +156,7 @@ describe("resolveAddOutcome", () => {
   });
 
   it("partitions a mixed list into every case, independently and in order", async () => {
-    const author = vi.fn(async (word: string) => {
+    const author = vi.fn(async ({ word }: WordEvidence) => {
       if (word === "gleeb") return ["G", "L", "EY1", "T"] as Pronunciation;
       if (word === "zorp") return null;
       throw new Error(`unexpected agent call for "${word}"`);
@@ -291,7 +296,7 @@ describe("add, over a temp dir with a stubbed agent", () => {
 
   /** Authors for the words named and refuses every other, so a miss is explicit. */
   function authoring(readings: Record<string, Pronunciation>): AgentAuthor {
-    return async (word) => readings[word] ?? null;
+    return async ({ word }) => readings[word] ?? null;
   }
 
   function lines(path: string): string[] {

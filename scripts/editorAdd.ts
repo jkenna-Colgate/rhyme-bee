@@ -53,6 +53,7 @@ import {
   gatherEvidence,
   verifyReading,
   type EvidenceContext,
+  type WordEvidence,
   type WordReading,
 } from "../src/supplementEvidence.ts";
 import { killTree } from "../web/killTree.ts";
@@ -67,8 +68,20 @@ import type {
 import { parseReading } from "./editorReading.ts";
 import { fail, root } from "./editorShell.ts";
 
-/** How an add asks an agent to author a reading — real in `add`, stubbed in tests. */
-export type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | null>;
+/**
+ * How an add asks an agent to author a reading — real in `add`, stubbed in
+ * tests.
+ *
+ * It takes the **evidence** rather than a word and a target, though it needs
+ * only those two to write today's prompt. The caller gathers the evidence
+ * immediately before calling, so passing the whole record costs nothing and
+ * carries strictly more: the direct readings, the inflectional relatives,
+ * wordhood and name status are all there for the case that wants them. Each
+ * further fact an adapter comes to need is then a fact it reads off an argument
+ * it already has, rather than another parameter on a seam every adapter and
+ * every stub would have to widen together.
+ */
+export type AgentAuthor = (evidence: WordEvidence) => Promise<Pronunciation | null>;
 
 /**
  * The editor names words the pass turned up as missing, and nothing else — no
@@ -131,7 +144,7 @@ export async function resolveAddOutcome(
       continue;
     }
 
-    const authored = await authorReading(word, target);
+    const authored = await authorReading(evidence);
     if (authored === null) {
       results.push({ outcome: "deferred", word, reason: "agent-unavailable", proposed: null });
     } else if (verifyReading(authored, target)) {
@@ -339,8 +352,12 @@ export function pinnedEvidenceContext(): EvidenceContext {
  * unparseable output and a process that simply hangs are all the same outcome
  * to the caller — the word is deferred and the night carries on. A tooling
  * problem costs a few words, not the evening.
+ *
+ * The prompt is written here, from the evidence, rather than handed in: what an
+ * agent has to be told is a fact about *this* adapter's agent and not about the
+ * add path, and a caller that composed it would have to know both.
  */
-function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation | null> {
+function authorWithAgent({ word, target }: WordEvidence): Promise<Pronunciation | null> {
   const prompt = [
     `Write the General American CMUdict/ARPAbet pronunciation of the English word "${word}".`,
     `It must rhyme on the Rhyme Key ${target} — that is, the phonemes from its last`,
