@@ -15,13 +15,23 @@ in step 7.
 | words it could not resolve | `data/deferred-readings.jsonl` | `git checkout -- data/` |
 | nothing at all | steps 1, 2, 8 | — |
 
-Only step 6 (the commit) and step 7 (the deploy) leave this machine.
+Only step 6 (the commit, push and merge) and step 7 (the deploy) leave this
+machine.
 
 ## Before you start
 
-- Be on an up-to-date `main` with `data/` clean — `git status --porcelain`
-  should show nothing under `data/`. You will be reverting into that state at
-  the end, so it wants to be the state you began from.
+- Start from an up-to-date `main` with `data/` clean, then branch:
+
+  ```
+  git checkout main
+  git pull
+  git status --porcelain data/          # must print nothing
+  git checkout -b fix/editors-pass-2026-08-14
+  ```
+
+  `data/` wants to be clean because you will be reverting into that state at the
+  end, so it should be the state you began from. The branch is what step 6
+  pushes; name it for the date of the pass, not the date of the Puzzle.
 - A built Rhyme Index must exist in `dist-data/`. Step 1 needs it to resolve the
   scheduled Seed Word; if it is missing you are told to run `npm run build:index`
   from the repo root.
@@ -424,25 +434,42 @@ tries a word that plainly rhymes should not be told no. But if a day drifts hard
 after an add, that is the moment to decide, not something to discover on the
 day.
 
-## 6. Commit
+## 6. Commit, push, merge
 
 ```
-git add data/supplement.dict data/deferred-readings.jsonl
+git add data/
 git commit -m "Add the words the 2026-08-08 Editor's Pass turned up"
+git push -u origin HEAD
+gh pr create --fill
+gh pr merge --merge --delete-branch
 ```
 
 The supplement is a hand-authored input. The Rhyme Index that ships is
 reproducible only from the pinned sources plus this file, so an uncommitted
 supplement is an index nobody can rebuild.
 
-`data/schedule.json` should be untouched here. If it has changed, something
-edited it that should not have.
+**Do not stop at the commit.** A committed, unpushed pass looks finished on the
+machine that ran it and does not exist anywhere else — the work survives exactly
+one disk. This step ends at a merged PR, not at a clean `git status`.
+
+`git add data/` rather than naming the two files, so a schedule repair is not
+left behind. `data/schedule.json` is normally untouched by a pass, and if it
+changed for a reason you cannot name, something edited it that should not have.
+The one routine exception is step 1 reporting a schedule/index disagreement:
+repairing that *is* an edit to `schedule.json`, and it belongs in this commit.
 
 ## 7. Deploy
 
 ```
+git checkout main
+git pull
 npm run deploy
 ```
+
+**Deploy from `main`, after the merge.** `npm run deploy` ships whatever is
+checked out locally, so deploying from the branch puts a judge live that `main`
+does not have — the deployed game and the reviewed history drift apart silently,
+and the next person to deploy from `main` reverts your pass without touching it.
 
 There is one deploy command and no fast-path flag. It decides for itself whether
 the Rhyme Index needs rebuilding and says which branch it took:
@@ -506,8 +533,11 @@ looks stale and your next `npm run deploy` will rebuild for four minutes even
 though nothing really changed. Harmless, and worth knowing so it is not a
 mystery.
 
-After the commit, `git revert` the commit and deploy again — or, if it is
-already live and wrong, `npm run --prefix web rollback`, which restores the
+After the commit but before the merge, the branch is the undo: abandon it and
+start again from `main`, since nothing outside it has changed.
+
+After the merge, `git revert` the commit on `main` and deploy again — or, if it
+is already live and wrong, `npm run --prefix web rollback`, which restores the
 judge that shipped with the previous version rather than just the code.
 
 Steps 1, 2 and 8 write nothing and need no undoing.
@@ -521,6 +551,8 @@ Worth reporting, in rough order of how much it matters:
 - A word `editor:add` accepted is still rejected in the live game after step 7.
 - A word that was rejected mid-Session is still rejected after a reload
   post-deploy — the heal is the load-bearing claim of the whole loop.
+- The pass ends committed but unpushed, or deployed but unmerged. Both leave the
+  live game and `main` saying different things, and neither announces itself.
 - `data/deferred-readings.jsonl` stays empty through a run that reported a
   deferral.
 - The agent call hangs past 60 seconds instead of deferring the word.
