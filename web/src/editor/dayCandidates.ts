@@ -27,6 +27,11 @@
  */
 
 import type { RhymeKey } from "../../../src/phonology.ts";
+import type {
+  ComposedReading,
+  ReadingEvidence,
+  RelativeEvidence,
+} from "../../../src/supplementEvidence.ts";
 import {
   isOutstanding,
   type CandidateQueueReadout,
@@ -110,6 +115,70 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
  * there is anything to derive from.
  */
 export type CandidateCard = "settled" | "name" | "correction" | "add" | "derivation";
+
+/**
+ * The evidence one card shows — the three kinds a Candidate can carry, with the
+ * ones its own case does not turn on emptied.
+ *
+ * Total rather than optional-per-card: every card gets all three fields and the
+ * ones it has no use for are empty, so a renderer maps over three lists instead
+ * of asking which of them exist.
+ */
+export interface CardEvidence {
+  /** The word's own readings, each with the Rhyme Key it computes to. */
+  readings: ReadingEvidence[];
+  /** Inflectional relatives a reading could be derived from. */
+  relatives: RelativeEvidence[];
+  /** A reading composed from a compound split, when one reaches the target. */
+  composed: ComposedReading | null;
+}
+
+const NOTHING: CardEvidence = { readings: [], relatives: [], composed: null };
+
+/**
+ * Which evidence a Candidate's card shows, as a pure selection.
+ *
+ * **A card shows the evidence its own case turns on and not the rest** (#176),
+ * which is what keeps the screen readable at the point of judgement. The two the
+ * ticket names:
+ *
+ * - a **correction** card shows the **direct readings** and no relatives. The
+ *   judgement is about the reading the engine holds — it is on the screen beside
+ *   the agent's proposal, and that pairing is the whole of what is being
+ *   approved. A relative would be evidence for deriving a reading the word
+ *   already has.
+ * - a **derivation** card shows the **relatives** and the composed reading, and
+ *   no direct reading. The judgement is whether the derivation is defensible,
+ *   and the word has no reading of its own to weigh it against.
+ *
+ * It is a function rather than a `switch` in the JSX for `cardFor`'s reason and
+ * one more: this is a rule the ticket states about the screen, and a rule that
+ * only exists inside a component is a rule no test can hold to account —
+ * `showsDemotionReassurance` in `demote.ts` and `DECLINE_CONSEQUENCE` are the
+ * same split for the same reason.
+ *
+ * The two cases cannot overlap in practice: `gatherEvidence` never searches for
+ * relatives for a word that already reads, so a correction's `relatives` is
+ * empty at the source. Emptying it here anyway is what makes the rule structural
+ * rather than a property of the evidence gatherer that a later change could take
+ * away silently.
+ */
+export function evidenceFor(candidate: ReadCandidate): CardEvidence {
+  switch (candidate.state) {
+    case "declined":
+    case "is-a-name":
+      // Neither ruling is made from a reading. A Decline is already made, and a
+      // name is never valid however well it rhymes.
+      return NOTHING;
+    case "resolved":
+    case "needs-correction":
+      return { readings: candidate.readings, relatives: [], composed: null };
+    case "addable":
+      return cardFor(candidate) === "derivation"
+        ? { readings: [], relatives: candidate.relatives, composed: candidate.composed }
+        : { readings: candidate.readings, relatives: [], composed: null };
+  }
+}
 
 /**
  * Whether the one-gesture add is offered for this Candidate.

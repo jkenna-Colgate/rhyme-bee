@@ -37,7 +37,9 @@ import {
   declineWrites,
   type DeclineChoice,
 } from "./decline.ts";
-import { candidatesForDay, cardFor, offersAdd } from "./dayCandidates.ts";
+import { candidatesForDay, cardFor, evidenceFor, offersAdd } from "./dayCandidates.ts";
+import { CorrectionPanel } from "./CorrectionView.tsx";
+import type { Corrector } from "./useCorrector.ts";
 
 /**
  * The acts a card can offer, as the screen hands them down.
@@ -59,6 +61,14 @@ export interface CandidateActs {
   onDecline?: (candidate: ReadCandidate, choice: DeclineChoice) => void;
   /** The word a write is in flight for, so its card can say so. */
   writing?: string | null;
+  /**
+   * The correction gesture, for the one card that offers it (#180). Optional
+   * like the other two, so a surface that cannot offer it simply does not pass
+   * one — and it is the whole hook rather than two callbacks because the
+   * proposal between the ask and the approval is state the card renders and
+   * nothing else holds.
+   */
+  corrector?: Corrector;
 }
 
 /**
@@ -240,6 +250,19 @@ function CandidateCardView({
       <span className="editor-candidate-word">{candidate.word}</span>
       <span className="editor-candidate-state">{STATE_SENTENCE[candidate.state]}</span>
       <CandidateEvidence candidate={candidate} />
+      {/* The correction, on the one card whose word the engine already reads
+          (#180). Dispatched on `cardFor` rather than on the state directly, so
+          the card a Candidate draws is decided in one place and this file goes
+          on deciding nothing. */}
+      {cardFor(candidate) === "correction" && acts.corrector !== undefined && (
+        <CorrectionPanel
+          word={candidate.word}
+          rhymeKey={candidate.candidate.seedRhymeKey}
+          current={evidenceFor(candidate).readings}
+          corrector={acts.corrector}
+          ask={`Ask an agent to correct ${candidate.word}`}
+        />
+      )}
       <CandidateActsView candidate={candidate} acts={acts} />
     </div>
   );
@@ -362,48 +385,44 @@ const STATE_SENTENCE: Record<ReadCandidate["state"], string> = {
 
 /**
  * Each card shows the evidence its own case turns on and not the rest, which is
- * what keeps the screen readable at the point of judgement. The cases cannot
- * overlap: `gatherEvidence` never offers relatives for a word that already
- * reads, so a correction has readings and a derivation has relatives.
+ * what keeps the screen readable at the point of judgement.
+ *
+ * **Which is which is `evidenceFor`'s** (`dayCandidates.ts`) and not this file's,
+ * for `cardFor`'s reason and one more: "a correction card shows direct readings
+ * and no relatives, a derivation card shows relatives and no direct reading" is
+ * a rule the ticket states about the screen, and a rule that lives only inside
+ * JSX is a rule no test can hold to account. This renders the three lists it is
+ * handed and asks nothing about the state.
  */
 function CandidateEvidence({ candidate }: { candidate: ReadCandidate }) {
-  switch (candidate.state) {
-    case "declined":
-    case "is-a-name":
-      return null;
-    case "resolved":
-    case "needs-correction":
-      return (
-        <span className="editor-candidate-evidence">
-          {candidate.readings.map((reading) => (
-            <code key={reading.phonemes.join(" ")}>
-              {say(reading.phonemes)} → {reading.key ?? "unstressed"}
-            </code>
-          ))}
-        </span>
-      );
-    case "addable":
-      return (
-        <span className="editor-candidate-evidence">
-          {candidate.composed !== null && (
-            <code>
-              {candidate.composed.head.word} + {candidate.composed.tail.word} →{" "}
-              {say(candidate.composed.phonemes)}
-            </code>
-          )}
-          {candidate.relatives.map((relative) => (
-            <code key={relative.word}>
-              {relative.word} {relative.readings.map((r) => r.key ?? "—").join(", ")}
-            </code>
-          ))}
-          {candidate.readings.map((reading) => (
-            <code key={reading.phonemes.join(" ")}>
-              {say(reading.phonemes)} → {reading.key ?? "unstressed"} (no wordhood)
-            </code>
-          ))}
-        </span>
-      );
-  }
+  const { readings, relatives, composed } = evidenceFor(candidate);
+  if (readings.length === 0 && relatives.length === 0 && composed === null) return null;
+
+  // Only an `addable` card ever shows a reading with no wordhood behind it: a
+  // word the pinned sources read on the target and the wordhood set does not
+  // hold, which the supplement is the only layer that can grant (ADR-0009).
+  const unknown = candidate.state === "addable";
+
+  return (
+    <span className="editor-candidate-evidence">
+      {composed !== null && (
+        <code>
+          {composed.head.word} + {composed.tail.word} → {say(composed.phonemes)}
+        </code>
+      )}
+      {relatives.map((relative) => (
+        <code key={relative.word}>
+          {relative.word} {relative.readings.map((r) => r.key ?? "—").join(", ")}
+        </code>
+      ))}
+      {readings.map((reading) => (
+        <code key={reading.phonemes.join(" ")}>
+          {say(reading.phonemes)} → {reading.key ?? "unstressed"}
+          {unknown ? " (no wordhood)" : ""}
+        </code>
+      ))}
+    </span>
+  );
 }
 
 function say(phonemes: Pronunciation): string {

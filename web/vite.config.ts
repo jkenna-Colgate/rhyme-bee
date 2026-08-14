@@ -11,6 +11,7 @@ import { deployHeadersPlugin } from "./deployHeadersPlugin.ts";
 import { indexAssetPlugin } from "./indexAssetPlugin.ts";
 import { editorAddPlugin } from "./editorAddPlugin.ts";
 import { editorCandidatesPlugin } from "./editorCandidatesPlugin.ts";
+import { editorCorrectionPlugin } from "./editorCorrectionPlugin.ts";
 import { editorDayPlugin } from "./editorDayPlugin.ts";
 import { editorDeclinePlugin } from "./editorDeclinePlugin.ts";
 import { editorDemotionPlugin } from "./editorDemotionPlugin.ts";
@@ -58,10 +59,11 @@ export default defineConfig(({ command }) => {
 
   return {
     root: rootDir,
-    // `feedbackPlugin`, `supplementPlugin` and the seven `editor*` plugins are
+    // `feedbackPlugin`, `supplementPlugin` and the eight `editor*` plugins are
     // dev-only (`apply: "serve"`); `deployHeadersPlugin` and `indexAssetPlugin`
-    // are build-only. Four of the editor plugins write to `data/` — and
-    // `editorAddPlugin` also rebuilds `dist-data/` — which is why the build's
+    // are build-only. Five of the editor plugins write to `data/` — and
+    // `editorAddPlugin` and `editorCorrectionPlugin` also rebuild `dist-data/`
+    // — which is why the build's
     // inputs are named below rather than defaulted. `editorStatusPlugin` and
     // `editorCandidatesPlugin` are the two that write nothing at all: the first
     // reads the artifact's staleness and asks git about the written files, and
@@ -78,6 +80,7 @@ export default defineConfig(({ command }) => {
       editorTierPlugin(),
       editorDemotionPlugin(),
       editorDeclinePlugin(),
+      editorCorrectionPlugin(),
       editorAddPlugin(),
       feedbackPlugin(),
       supplementPlugin(),

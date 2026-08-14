@@ -166,6 +166,36 @@ export const EDITOR_CANDIDATES_PATH = "/api/editor/candidates";
 export const EDITOR_DECLINE_PATH = "/api/editor/decline";
 
 /**
+ * Where the Editor's Pass **corrects a reading**: `POST` alone, in two asks on
+ * one path (#180).
+ *
+ * A body naming a word and a Rhyme Key asks an agent to propose a corrected
+ * reading and **writes nothing at all**. A body that also names the reading and
+ * whether it **replaces** the engine's or **joins** it as an alternate approves
+ * that proposal — and that request writes to `data/supplement.dict`, rebuilds
+ * the Rhyme Index and rechecks the days on the union of the word's Rhyme Keys
+ * before and after.
+ *
+ * Two asks on one path rather than two paths, because the approval is
+ * meaningless without the proposal and they are one act to the editor. What it
+ * buys is that "nothing is written before approval" is a property of the parsed
+ * body — a request with no reading on it — rather than of a router remembering
+ * which half it mounted where.
+ *
+ * No `GET`. A proposal is not a fact about the repository that can be read back:
+ * it is authored on request, costs a subprocess, and is deliberately kept
+ * nowhere between the two calls (`web/editorCorrectionPlugin.ts`).
+ *
+ * Dev only, and structurally so — `editorCorrectionPlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface answers this path
+ * (ADR-0016, ADR-0017). It is the joint heaviest of the editor routes with the
+ * add beside it: it writes to `data/`, spawns a process and rewrites
+ * `dist-data/`.
+ */
+export const EDITOR_CORRECTION_PATH = "/api/editor/correction";
+
+/**
  * Where the Editor's Pass reads its own state: `GET` alone, naming nothing.
  * Whether the built Rhyme Index is stale, and whether each file the tool writes
  * carries uncommitted changes (#162).

@@ -355,9 +355,18 @@ export function pinnedEvidenceContext(): EvidenceContext {
  *
  * The prompt is written here, from the evidence, rather than handed in: what an
  * agent has to be told is a fact about *this* adapter's agent and not about the
- * add path, and a caller that composed it would have to know both.
+ * add path, and a caller that composed it would have to know both. That is what
+ * #179 narrowed the seam for, and #180 is the case it was narrowed *against*: a
+ * correction reads `evidence.direct` off an argument this adapter already holds,
+ * with no third parameter and nothing for the two other adapters to widen.
+ *
+ * Exported because it is the live adapter for two callers now — `add` above and
+ * `proposeCorrection` (`scripts/editorCorrection.ts`) — and a second copy of the
+ * spawn, the timeout and the kill would be a second thing to get right about a
+ * subprocess nothing can test.
  */
-function authorWithAgent({ word, target }: WordEvidence): Promise<Pronunciation | null> {
+export function authorWithAgent(evidence: WordEvidence): Promise<Pronunciation | null> {
+  const { word, target } = evidence;
   const prompt = [
     `Write the General American CMUdict/ARPAbet pronunciation of the English word "${word}".`,
     `It must rhyme on the Rhyme Key ${target} — that is, the phonemes from its last`,
@@ -366,6 +375,12 @@ function authorWithAgent({ word, target }: WordEvidence): Promise<Pronunciation 
     "Use ARPAbet phonemes with stress digits on vowels (0 unstressed, 1 primary,",
     "2 secondary), separated by single spaces. A compound's final element usually",
     "takes secondary rather than primary stress.",
+    // Only when there is one. A word the pinned sources do not read at all is an
+    // add and this paragraph would be a lie; a word they *do* read is a
+    // correction, and the reading being corrected is the single most useful
+    // thing an author can be shown — it is usually right about the phonemes and
+    // wrong only about which vowel carries the stress (ADR-0009).
+    ...correctionContext(evidence),
     "",
     "Respond with ONLY the phonemes on one line. No word, no quotes, no explanation.",
   ].join("\n");
@@ -394,6 +409,28 @@ function authorWithAgent({ word, target }: WordEvidence): Promise<Pronunciation 
     child.on("close", (code) => settle(code === 0 ? parseReading(stdout) : null));
     child.stdin.end(prompt);
   });
+}
+
+/**
+ * The paragraph an agent is shown when it is being asked to **correct** a
+ * reading rather than to author one from nothing: the readings the engine holds
+ * today, each with the Rhyme Key it computes to.
+ *
+ * Empty for a word with no reading, which is the add path's every agent call and
+ * was the whole of this prompt before #180. Written as a list because a word can
+ * hold more than one reading and the one being corrected is not always the
+ * first — and because saying "the current reading is X" of a word with two would
+ * be false in a way that invites the agent to reproduce X.
+ */
+function correctionContext({ direct, target }: WordEvidence): string[] {
+  if (direct.length === 0) return [];
+  return [
+    "",
+    "The pinned sources already read this word, and the reading is wrong — it is",
+    `not on ${target}. What they currently say, with the Rhyme Key each computes to:`,
+    ...direct.map((r) => `  ${r.phonemes.join(" ")}  →  ${r.key ?? "no stressed vowel"}`),
+    "Correct it. Usually the phonemes are right and the stress is on the wrong vowel.",
+  ];
 }
 
 /**

@@ -350,6 +350,7 @@ function ScheduledDay({
         rhymeKey={readout.rhymeKey}
         adder={adder}
         disagreer={disagreer}
+        corrector={candidateActs.corrector}
         status={status}
       />
 

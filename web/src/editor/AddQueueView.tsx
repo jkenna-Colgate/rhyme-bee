@@ -36,6 +36,9 @@ import { ReadsElsewhere } from "./ReadsElsewhere.tsx";
 import { pendingWork, type EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 import type { Disagreer } from "./useDisagreement.ts";
+import type { Corrector } from "./useCorrector.ts";
+import { CorrectionPanel } from "./CorrectionView.tsx";
+import { honestReading } from "./correction.ts";
 
 /**
  * The worst case one word can cost, in milliseconds: the bound
@@ -52,6 +55,7 @@ export function AddQueueView({
   rhymeKey,
   adder,
   disagreer,
+  corrector,
   status,
 }: {
   date: string;
@@ -59,6 +63,14 @@ export function AddQueueView({
   adder: Adder;
   /** Recording a disagreement over a word the index holds on another key. */
   disagreer: Disagreer;
+  /**
+   * Approving a proposal the agent made and verification refused — the word's
+   * **honest reading** (#180). It reaches this file rather than only the
+   * Candidate Queue's because a failed-verification proposal is produced *here*,
+   * by a Submit, and it is the same branch of the same outcome union: one card,
+   * offered wherever the proposal turns up.
+   */
+  corrector?: Corrector;
   /** The repository's state, for the half of Submit's rule that is not the queue. */
   status: EditorStatus | null;
 }) {
@@ -189,7 +201,9 @@ export function AddQueueView({
 
       {adder.submitError !== null && <p className="editor-write-failed">{adder.submitError}</p>}
 
-      {adder.result !== null && <Submitted result={adder.result} disagreer={disagreer} />}
+      {adder.result !== null && (
+        <Submitted result={adder.result} disagreer={disagreer} corrector={corrector} />
+      )}
     </section>
   );
 }
@@ -296,7 +310,15 @@ function InFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
  * writes would leave the editor to work out which of the words they typed had
  * simply vanished.
  */
-function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: Disagreer }) {
+function Submitted({
+  result,
+  disagreer,
+  corrector,
+}: {
+  result: AddSubmitResult;
+  disagreer: Disagreer;
+  corrector?: Corrector;
+}) {
   const { outcome, rebuilt, readout } = result;
   const written = outcome?.words.filter((w) => w.outcome === "written").length ?? 0;
   const deferred = outcome?.words.filter((w) => w.outcome === "deferred").length ?? 0;
@@ -384,7 +406,12 @@ function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: 
           {outcome.words.map((word) => (
             <li key={word.word} className={`editor-add-outcome editor-add-${word.outcome}`}>
               <strong>{word.word}</strong> —{" "}
-              <WordOutcomeLine word={word} aim={outcome} disagreer={disagreer} />
+              <WordOutcomeLine
+                word={word}
+                aim={outcome}
+                disagreer={disagreer}
+                corrector={corrector}
+              />
             </li>
           ))}
         </ul>
@@ -407,6 +434,7 @@ function WordOutcomeLine({
   word,
   aim,
   disagreer,
+  corrector,
 }: {
   word: WordOutcome;
   /**
@@ -419,6 +447,7 @@ function WordOutcomeLine({
    */
   aim: AddTarget;
   disagreer: Disagreer;
+  corrector?: Corrector;
 }) {
   const { target } = aim;
   switch (word.outcome) {
@@ -451,7 +480,7 @@ function WordOutcomeLine({
         </>
       );
     case "deferred":
-      return <Deferral word={word} target={target} />;
+      return <Deferral word={word} target={target} corrector={corrector} />;
     default: {
       const exhaustive: never = word;
       throw new Error(`unreachable word outcome: ${JSON.stringify(exhaustive)}`);
@@ -469,7 +498,15 @@ function WordOutcomeLine({
  * composition genuinely cannot reach, and the proposal is shown so the miss is
  * inspectable rather than merely counted.
  */
-function Deferral({ word, target }: { word: DeferredOutcome; target: RhymeKey }) {
+function Deferral({
+  word,
+  target,
+  corrector,
+}: {
+  word: DeferredOutcome;
+  target: RhymeKey;
+  corrector?: Corrector;
+}) {
   if (word.reason === "agent-unavailable") {
     return (
       <>
@@ -483,6 +520,20 @@ function Deferral({ word, target }: { word: DeferredOutcome; target: RhymeKey })
       deferred: no compound split reached <code>{target}</code>, and the agent proposed{" "}
       <code>{word.proposed?.join(" ")}</code>, which does not. Recorded in{" "}
       <code>data/deferred-readings.jsonl</code> for a later pass.
+      {/* And offered, because a proposal that failed verification is not only a
+          miss: it may be the word's **honest reading**, and writing it is what
+          makes the player be told "doesn't rhyme" rather than "not a word we
+          know" (#176). The same card the Candidate Queue's correction draws,
+          with nothing to join to — the engine reads this word not at all. */}
+      {corrector !== undefined && word.proposed !== null && (
+        <CorrectionPanel
+          word={word.word}
+          rhymeKey={target}
+          current={[]}
+          corrector={corrector}
+          standing={honestReading(word.word, target, word.proposed)}
+        />
+      )}
     </>
   );
 }

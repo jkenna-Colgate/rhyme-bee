@@ -16,7 +16,7 @@ import type {
   ReadCandidate,
 } from "../../scripts/editorCandidates.ts";
 import type { SupplementCandidate } from "../../src/supplementCandidate.ts";
-import { candidatesForDay, cardFor } from "../src/editor/dayCandidates.ts";
+import { candidatesForDay, cardFor, evidenceFor } from "../src/editor/dayCandidates.ts";
 
 const DOCKED = "AA K T";
 const ATE = "EY T";
@@ -168,5 +168,87 @@ describe("the card a state selects", () => {
     };
 
     expect(cardFor(candidate)).toBe("derivation");
+  });
+});
+
+/**
+ * The rule #180 states about the screen, held to account away from the screen: a
+ * correction card shows direct readings and no relatives, and a derivation card
+ * shows relatives and no direct reading. It is `evidenceFor`'s and not
+ * `CandidateQueueView`'s precisely so this file can ask it.
+ *
+ * Both directions are asserted over a Candidate carrying **both** kinds of
+ * evidence, which is the only way the assertion is not vacuous: a real
+ * `needs-correction` Candidate has no relatives because `gatherEvidence` never
+ * searches for them, so a fixture that also had none would pass with the
+ * selection deleted. The rule under test is that the card drops what its own
+ * case does not turn on, whatever it was handed.
+ */
+describe("the evidence a card shows", () => {
+  const READING = { phonemes: ["CH", "AO1", "K", "L", "AH0", "T"], key: "AH T" };
+  const RELATIVE = {
+    word: "overjoyed",
+    readings: [{ phonemes: ["OW2", "V", "ER0", "JH", "OY1", "D"], key: "OY D" }],
+    rhymes: false,
+  };
+  const COMPOSED = {
+    phonemes: ["B", "AA1", "L", "W", "AA2", "K", "T"],
+    key: DOCKED,
+    head: { word: "ball", phonemes: ["B", "AA1", "L"] },
+    tail: { word: "walked", phonemes: ["W", "AA1", "K", "T"] },
+  };
+
+  it("shows a correction card the direct readings and no relatives", () => {
+    const base = read("chocolate", "docked", DOCKED, "needs-correction");
+    if (base.state !== "needs-correction") throw new Error("expected a correction");
+    const candidate: ReadCandidate = { ...base, readings: [READING] };
+
+    expect(cardFor(candidate)).toBe("correction");
+    expect(evidenceFor(candidate)).toEqual({
+      readings: [READING],
+      relatives: [],
+      composed: null,
+    });
+  });
+
+  it("shows a derivation card the relatives and no direct reading", () => {
+    const base = read("overjoy", "joy", "OY", "addable");
+    if (base.state !== "addable") throw new Error("expected an addable Candidate");
+    // Handed a direct reading it has no business showing, so that dropping it is
+    // something this test can see rather than something the fixture arranged.
+    const candidate: ReadCandidate = {
+      ...base,
+      readings: [READING],
+      relatives: [RELATIVE],
+      composed: COMPOSED,
+    };
+
+    expect(cardFor(candidate)).toBe("derivation");
+    expect(evidenceFor(candidate)).toEqual({
+      readings: [],
+      relatives: [RELATIVE],
+      composed: COMPOSED,
+    });
+  });
+
+  it("shows the plain add card its own reading, which is the no-wordhood case", () => {
+    const base = read("grates", "ate", ATE, "addable");
+    if (base.state !== "addable") throw new Error("expected an addable Candidate");
+    const candidate: ReadCandidate = { ...base, readings: [READING] };
+
+    expect(cardFor(candidate)).toBe("add");
+    expect(evidenceFor(candidate)).toEqual({ readings: [READING], relatives: [], composed: null });
+  });
+
+  it("shows a settled or name card nothing — neither ruling is made from a reading", () => {
+    const nothing = { readings: [], relatives: [], composed: null };
+    expect(evidenceFor(read("kate", "ate", ATE, "declined"))).toEqual(nothing);
+    expect(evidenceFor(read("kate", "ate", ATE, "is-a-name"))).toEqual(nothing);
+  });
+
+  it("shows a resolved Candidate the reading that resolved it", () => {
+    const candidate = read("talked", "docked", DOCKED, "resolved");
+    expect(evidenceFor(candidate).readings).toHaveLength(1);
+    expect(evidenceFor(candidate).relatives).toEqual([]);
   });
 });

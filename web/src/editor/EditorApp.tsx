@@ -62,6 +62,7 @@ import { useEffect, useState } from "react";
 import type { ReadCandidate } from "../../../scripts/editorCandidates.ts";
 import { useAdder } from "./useAdder.ts";
 import { useCandidateQueue } from "./useCandidateQueue.ts";
+import { useCorrector } from "./useCorrector.ts";
 import { useDayReadout } from "./useDayReadout.ts";
 import { useDecliner } from "./useDecliner.ts";
 import { useDemoter } from "./useDemoter.ts";
@@ -88,26 +89,32 @@ export function EditorApp() {
   // by Rhyme Key and most of it belongs to no scheduled day at all, so there is
   // no date to fetch it for. The day panel selects out of this one readout.
   const candidates = useCandidateQueue();
+  // Not day-scoped either, and for a stronger reason than the queue's: a
+  // correction changes the word on *every* day (#180), so scoping it to the one
+  // on screen would attach a fact about the whole run to a date it happens to
+  // have been made from.
+  const corrector = useCorrector();
 
   // The status and the queue are both refreshed by **observing** that a write
   // happened, rather than by callbacks threaded through four hooks. Each of
-  // these four values is set only on a write the file accepted —
+  // these five values is set only on a write the file accepted —
   // `picker.recorded` on a Tier verdict, `demoter.recorded` on a demotion,
-  // `adder.result` on a Submit, `decliner.recorded` on a Decline — and each is a
+  // `adder.result` on a Submit, `decliner.recorded` on a Decline,
+  // `corrector.result` on an approved correction — and each is a
   // fresh object every time, so two identical verdicts in a row are still two
   // refreshes. A callback per hook would be a second announcement of a fact each
-  // hook already publishes, and one more thing for a fifth write route to
+  // hook already publishes, and one more thing for a sixth write route to
   // remember to call.
   //
   // A *failed* write sets none of them, and correctly triggers nothing: what it
   // changed on disk is nothing.
   //
-  // One observation and not two, because the four writes that move the status
-  // are the same four that move the queue, and a second effect over the same
+  // One observation and not two, because the five writes that move the status
+  // are the same five that move the queue, and a second effect over the same
   // condition would be a second place to forget the fifth. What each refresh is
   // *for* differs, and both reasons are worth stating:
   //
-  // - **The status.** Every one of the four writes a file `WRITTEN_GROUPS` names
+  // - **The status.** Every one of the five writes a file `WRITTEN_GROUPS` names
   //   and the panel reports on. A Decline is the one whose case is narrower: it
   //   cannot make the built Rhyme Index stale, since the build never opens
   //   `data/declines.txt`, so the index line cannot have moved — but the file is
@@ -123,13 +130,22 @@ export function EditorApp() {
       picker.recorded === null &&
       demoter.recorded === null &&
       adder.result === null &&
-      decliner.recorded === null
+      decliner.recorded === null &&
+      corrector.result === null
     ) {
       return;
     }
     refresh();
     refreshQueue();
-  }, [picker.recorded, demoter.recorded, adder.result, decliner.recorded, refresh, refreshQueue]);
+  }, [
+    picker.recorded,
+    demoter.recorded,
+    adder.result,
+    decliner.recorded,
+    corrector.result,
+    refresh,
+    refreshQueue,
+  ]);
 
   // The two acts the Candidate cards offer, assembled here because here is where
   // both hooks they reach are held. Neither is a new write path: the add is the
@@ -164,6 +180,11 @@ export function EditorApp() {
       adder.queueWord(candidate.word, { kind: "key", rhymeKey: candidate.candidate.seedRhymeKey }, true),
     onDecline: declineCandidate,
     writing: decliner.writing ?? demoter.writing,
+    // The correction, on the one card that offers it. The whole hook rather than
+    // a callback, because the proposal between the ask and the approval is state
+    // the card renders and nothing on disk holds — asking writes nothing, which
+    // is the whole point of the two-step (ADR-0017).
+    corrector,
   };
 
   /**
