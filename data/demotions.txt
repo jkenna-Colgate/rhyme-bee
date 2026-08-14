@@ -64,3 +64,4 @@ lapides not-a-known-word     # Latin plural of `lapis`
 lbs not-a-known-word         # abbreviation of `pounds`
 oct not-a-known-word         # abbreviation of `October`
 preceeding not-a-known-word  # misspelling of `preceding`
+nepal proper-noun
