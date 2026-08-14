@@ -53,6 +53,9 @@ const QUEUE: CandidateQueueReadout = {
   total: 4,
   outstanding: 2,
   newest: "2026-08-07T18:30:00.000Z",
+  // The queue's second section (#181), which the day panel does not select
+  // from: a deferred reading is aimed at a Rhyme Key and belongs to no date.
+  deferred: { entries: [], outstanding: 0 },
   groups: [
     {
       rhymeKey: DOCKED,

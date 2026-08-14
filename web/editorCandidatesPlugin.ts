@@ -49,6 +49,7 @@ import type { EvidenceContext } from "../src/supplementEvidence.ts";
 import { readCandidateQueue } from "../scripts/editorCandidates.ts";
 import { pinnedEvidenceContext } from "../scripts/editorAdd.ts";
 import { DECLINES_PATH, readDeclineText } from "./declinesFile.ts";
+import { readDeferredReadings } from "./deferredFile.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { readSchedule } from "./editorSchedule.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
@@ -93,6 +94,18 @@ export interface EditorCandidatesDeps {
   schedule: () => Schedule;
   declines: () => Decline[];
   context: () => EvidenceContext;
+  /**
+   * Where the queue's **second section** is read from —
+   * `data/deferred-readings.jsonl` when unsaid (#181).
+   *
+   * A path rather than a fifth thunk, which is `AddDeps.deferredPath`'s shape
+   * and deliberately the same one: this file has a writer already, on the add
+   * path, and it takes a path there for exactly this reason — what a test wants
+   * to stand in for is *the file*, not the act of reading one. The four above
+   * are thunks because each is a different parse over a different source; the
+   * deferred readings are one file with one reader (`web/deferredFile.ts`).
+   */
+  deferredPath?: string;
 }
 
 /**
@@ -109,6 +122,12 @@ export interface EditorCandidatesDeps {
  * queue, which the readout renders as such. Nobody has Appealed, or nobody has
  * pulled — and the screen says which, because `newest` is null either way and
  * `data/` is where the maintainer looks next.
+ *
+ * The same holds of the deferred readings, and there it is the *live* state:
+ * `data/deferred-readings.jsonl` is zero bytes in the repository, so an empty
+ * second section is what this route answers with today and an empty section is
+ * what the screen draws. Neither a missing file nor an empty one reaches the
+ * `catch` (#181).
  */
 export function editorCandidatesHandler(deps: EditorCandidatesDeps) {
   return (_req: IncomingMessage, res: ServerResponse): void => {
@@ -116,7 +135,13 @@ export function editorCandidatesHandler(deps: EditorCandidatesDeps) {
       sendJson(
         res,
         200,
-        readCandidateQueue(deps.queue(), deps.schedule(), deps.declines(), deps.context()),
+        readCandidateQueue(
+          deps.queue(),
+          deps.schedule(),
+          deps.declines(),
+          deps.context(),
+          readDeferredReadings(deps.deferredPath),
+        ),
       );
     } catch (error) {
       relayCause(res, "Could not read the Candidate Queue", error);

@@ -47,6 +47,16 @@
  * (`web/src/editor/dayCandidates.ts`) rather than a second delivery. The day
  * readout's own payload does not grow: a fact about Candidates is not a fact
  * about the day.
+ *
+ * ## The second section rides on this readout rather than beside it
+ *
+ * The Candidate Queue is defined as the outstanding Candidates *and*, as a
+ * second section, the readings the add path asked an agent for and did not get
+ * (CONTEXT.md, #181). So the readout carries both, and the one endpoint that
+ * already answers with the whole queue answers with the whole queue. What that
+ * section *is* stays in `./editorDeferred.ts` — a different file, a different
+ * state union and a different act — and this module neither parses it nor
+ * derives it; it is passed through, the way the schedule's days are.
  */
 
 import { declineKey, declinedPairs, type Decline } from "../src/declines.ts";
@@ -60,6 +70,11 @@ import {
   type ReadingEvidence,
   type RelativeEvidence,
 } from "../src/supplementEvidence.ts";
+import {
+  readDeferredSection,
+  type DeferredRecord,
+  type DeferredSection,
+} from "./editorDeferred.ts";
 
 /** What every Candidate carries, whatever state it is in. */
 export interface CandidateIdentity {
@@ -182,6 +197,12 @@ export interface CandidateQueueReadout {
    * saying how old the newest thing it holds is.
    */
   newest: string | null;
+  /**
+   * The queue's second section: the readings the add path asked an agent for and
+   * did not get (#181). Empty when the deferred file is — which is its state in
+   * the repository today, and the good one.
+   */
+  deferred: DeferredSection;
 }
 
 /**
@@ -200,12 +221,20 @@ export interface CandidateQueueReadout {
  * Normalisation the index build applies (`evidenceContextFrom`), so a Rhyme Key
  * computed here and one taken from the built artifact are computed under one
  * phonology rather than two.
+ *
+ * `deferred` is the second section's parsed records, and it defaults to none:
+ * the section is read from a file of its own, so a caller asking about
+ * Candidates alone gets an empty section rather than having to supply one.
+ * Every state on it is `readDeferredSection`'s, derived against the same `ctx`
+ * — one context for both sections, so a word cannot be answered in one and
+ * outstanding in the other.
  */
 export function readCandidateQueue(
   candidates: readonly SupplementCandidate[],
   schedule: Schedule,
   declines: readonly Decline[],
   ctx: EvidenceContext,
+  deferred: readonly DeferredRecord[] = [],
 ): CandidateQueueReadout {
   const declined = declinedPairs(declines);
   const dayFor = daysByRhymeKey(schedule);
@@ -247,6 +276,7 @@ export function readCandidateQueue(
     total: candidates.length,
     outstanding: ordered.reduce((n, group) => n + group.outstanding, 0),
     newest,
+    deferred: readDeferredSection(deferred, ctx),
   };
 }
 

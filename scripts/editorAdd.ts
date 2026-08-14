@@ -56,6 +56,7 @@ import {
   type WordEvidence,
   type WordReading,
 } from "../src/supplementEvidence.ts";
+import { DEFERRED_READINGS_PATH } from "../web/deferredFile.ts";
 import { killTree } from "../web/killTree.ts";
 import type {
   AddOutcome,
@@ -65,6 +66,7 @@ import type {
   WordOutcome,
   WrittenOutcome,
 } from "../web/src/editor/addOutcome.ts";
+import type { DeferredReading } from "./editorDeferred.ts";
 import { parseReading } from "./editorReading.ts";
 import { fail, root } from "./editorShell.ts";
 
@@ -235,7 +237,7 @@ export async function add(
     writtenReadings(outcome, deps.appealed ?? []),
     deps.supplementPath ?? resolve(root, "data", SUPPLEMENT),
   );
-  appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? resolve(root, "data", DEFERRED_QUEUE));
+  appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? DEFERRED_READINGS_PATH);
   return outcome;
 }
 
@@ -288,17 +290,24 @@ function provenanceNote(word: string, provenance: string): string {
   return `# ${word}: a player Appealed this word — raised from the Candidate Queue (${provenance}).`;
 }
 
+/**
+ * The misses to record, each with whatever the agent did say.
+ *
+ * `proposed` travels to the file with the rest of the record and did not until
+ * #181: the outcome carried the refused reading, the appended line dropped it,
+ * and the editor reading the queue back was then offered a judgement about a
+ * reading nobody could see. It is null for `agent-unavailable`, where there was
+ * nothing to carry — which is `DeferredOutcome`'s own shape, unchanged.
+ */
 function deferredReadings(outcome: AddOutcome): DeferredReading[] {
   return outcome.words
     .filter((w): w is DeferredOutcome => w.outcome === "deferred")
-    .map((w) => ({ word: w.word, rhymeKey: outcome.target, reason: w.reason }));
-}
-
-/** One word the pass could not resolve, kept so the miss rate is countable. */
-interface DeferredReading {
-  word: string;
-  rhymeKey: RhymeKey;
-  reason: "agent-unavailable" | "agent-reading-failed-verification";
+    .map((w) => ({
+      word: w.word,
+      rhymeKey: outcome.target,
+      reason: w.reason,
+      proposed: w.proposed,
+    }));
 }
 
 /**
@@ -443,6 +452,12 @@ function correctionContext({ direct, target }: WordEvidence): string[] {
 const AGENT_TIMEOUT_MS = 60_000;
 
 const SUPPLEMENT = "supplement.dict";
+/**
+ * The deferred queue's name, for the sentence the terminal prints. Where the
+ * file *is* comes from `web/deferredFile.ts`, which is also where it is read
+ * back from (#181) — one spelling of a location with a writer here and a reader
+ * there.
+ */
 const DEFERRED_QUEUE = "deferred-readings.jsonl";
 
 /**
@@ -474,11 +489,17 @@ function appendToSupplement(entries: SupplementEntry[], path: string): void {
 
 /**
  * The deferred queue, in the shape `supplement-candidates.jsonl` established.
- * It is the work list for a later human or agent pass — each entry carries the
- * word and the Rhyme Key it must reach, which is all an author needs — and it
- * is what makes the composition's real miss rate countable. Discarding misses
- * would forfeit that, and a second composition rule is meant to be decided from
- * this file's contents rather than from the next frustrating word.
+ * It is the work list for a later pass — each entry carries the word, the Rhyme
+ * Key it must reach and whatever reading the agent did propose, which is all an
+ * author or an editor needs — and it is what makes the composition's real miss
+ * rate countable. Discarding misses would forfeit that, and a second composition
+ * rule is meant to be decided from this file's contents rather than from the
+ * next frustrating word.
+ *
+ * Since #181 the later pass is the Editor's Pass itself: the file is read back
+ * as the Candidate Queue's second section (`scripts/editorDeferred.ts`), where
+ * an unreachable agent is retried and a refused reading is judged. **Append-only
+ * either way** — nothing reads this file and then shortens it.
  */
 function appendToDeferredQueue(deferred: DeferredReading[], path: string): void {
   if (deferred.length === 0) return;

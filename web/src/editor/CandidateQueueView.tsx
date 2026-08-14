@@ -1,7 +1,9 @@
 /**
  * The Candidate Queue, rendered. Two surfaces over one readout: the whole queue
  * grouped by Rhyme Key, and the panel for the day the editor is already reading
- * (#177).
+ * (#177) — plus the queue's second section, the readings the add path asked an
+ * agent for and did not get (#181), which hangs under the whole-queue surface
+ * because it is aimed at Rhyme Keys and belongs to no date at all.
  *
  * **This file decides nothing.** Every state on the screen was derived in
  * `scripts/editorCandidates.ts` and arrived over the wire already resolved; the
@@ -29,6 +31,7 @@
 import { useState } from "react";
 import { isOutstanding, type ReadCandidate } from "../../../scripts/editorCandidates.ts";
 import type { CandidateQueueReadout, CandidateGroup } from "../../../scripts/editorCandidates.ts";
+import type { DeferredSection, ReadDeferral } from "../../../scripts/editorDeferred.ts";
 import type { Pronunciation } from "../../../src/phonology.ts";
 import {
   DECLINE_CHOICES,
@@ -38,6 +41,7 @@ import {
   type DeclineChoice,
 } from "./decline.ts";
 import { candidatesForDay, cardFor, evidenceFor, offersAdd } from "./dayCandidates.ts";
+import { deferredReadings, proposalFor } from "./deferredReadings.ts";
 import { CorrectionPanel } from "./CorrectionView.tsx";
 import type { Corrector } from "./useCorrector.ts";
 
@@ -69,6 +73,15 @@ export interface CandidateActs {
    * nothing else holds.
    */
   corrector?: Corrector;
+  /**
+   * Try the add again for a word the agent could not be reached for (#181).
+   *
+   * The whole deferral rather than its word, for `onAdd`'s reason: what the
+   * retry is aimed at is the Rhyme Key the *first* attempt was aimed at, which
+   * the record carries and no screen should be re-deriving from whichever day
+   * happens to be showing.
+   */
+  onRetry?: (deferral: ReadDeferral) => void;
 }
 
 /**
@@ -109,11 +122,152 @@ export function CandidateQueueView({
           {queue.groups.map((group) => (
             <QueueGroup key={group.rhymeKey} group={group} acts={acts} />
           ))}
+
+          {/* The second section, under the Candidates and inside the same
+              panel: it is part of the Candidate Queue rather than a screen of
+              its own (CONTEXT.md), and it is a shorter list about the tool's own
+              failures rather than about what players sent. */}
+          <DeferredReadingsView section={deferredReadings(queue)} acts={acts} />
         </>
       )}
     </section>
   );
 }
+
+/**
+ * The readings the add path asked an agent for and did not get (#181).
+ *
+ * **Drawn even when it is empty**, and that is the live case: the file is zero
+ * bytes today, so the heading and one muted sentence is what an editor sees. An
+ * empty section is the good news — every add the pass asked for got a reading —
+ * and a section that vanished when it was empty would be indistinguishable from
+ * one that had never been read back at all, which is the silence this whole
+ * slice exists to end.
+ *
+ * **This component decides nothing.** Which state a deferral is in was derived
+ * in Node, how many of them still want the editor is counted there too
+ * (`isDeferralOutstanding`), and what an approve card is drawn over is
+ * `proposalFor`'s — all of them where a test can reach them.
+ */
+function DeferredReadingsView({
+  section,
+  acts,
+}: {
+  section: DeferredSection;
+  acts: CandidateActs;
+}) {
+  return (
+    <section className="editor-deferred">
+      <h3>
+        Readings the agent did not supply{" "}
+        <span className="editor-muted">
+          {section.entries.length === 0
+            ? "— none"
+            : `— ${section.outstanding} outstanding of ${section.entries.length}`}
+        </span>
+      </h3>
+
+      {section.entries.length === 0 ? (
+        <p className="editor-muted">
+          Nothing deferred: every word the pass has asked an agent for came back with a reading it
+          could take.
+        </p>
+      ) : (
+        <ul className="editor-queue-list">
+          {section.entries.map((deferral) => (
+            <li key={`${deferral.word}-${deferral.rhymeKey}`}>
+              <DeferralCardView deferral={deferral} acts={acts} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/**
+ * One deferred word: what happened to it, and the two acts that answer the two
+ * things that can have happened.
+ *
+ * **The retry is the existing add path**, prefilled and aimed at the Rhyme Key
+ * the first attempt was aimed at. It queues rather than writes, exactly as the
+ * Candidate add does and for the same reason (#161): the point of the gesture is
+ * that a word whose only problem was a subprocess failing is not retyped.
+ *
+ * It is offered on `unreached` **and nowhere else**. An agent that has already
+ * answered must not be asked again (#180): the second answer would be a
+ * different reading, and the first is the one the editor is being asked to
+ * judge — so a retry button beside a standing proposal invites exactly the thing
+ * `honestReading` exists to prevent. A deferral with a proposal on it has one
+ * act, and it is the card.
+ *
+ * **The approve card is #180's**, handed the proposal the add path already made
+ * rather than asking for a new one — which is why no `ask` is passed. Asking
+ * again would spend another minute of agent time to get a *different* reading
+ * and throw away the one the editor is being invited to judge. The engine reads
+ * this word not at all, which is why `current` is empty and why `correctionModes`
+ * offers only `replace`: there is no second pronunciation to join to.
+ */
+function DeferralCardView({
+  deferral,
+  acts,
+}: {
+  deferral: ReadDeferral;
+  acts: CandidateActs;
+}) {
+  const proposal = proposalFor(deferral);
+  const retry = acts.onRetry;
+
+  return (
+    <div className={`editor-deferral editor-deferral-${deferral.state}`}>
+      <span className="editor-candidate-word">{deferral.word}</span>
+      <span className="editor-candidate-state">{DEFERRAL_SENTENCE[deferral.state]}</span>
+      <span className="editor-muted">
+        aimed at <code>{deferral.rhymeKey}</code>, deferred{" "}
+        {deferral.record.timestamp.slice(0, 10)}
+      </span>
+
+      {deferral.state === "answered" && (
+        <span className="editor-candidate-evidence">
+          {deferral.readings.map((reading) => (
+            <code key={reading.phonemes.join(" ")}>
+              {say(reading.phonemes)} → {reading.key ?? "unstressed"}
+            </code>
+          ))}
+        </span>
+      )}
+
+      {proposal !== null && acts.corrector !== undefined && (
+        <CorrectionPanel
+          word={deferral.word}
+          rhymeKey={deferral.rhymeKey}
+          current={[]}
+          corrector={acts.corrector}
+          standing={proposal}
+        />
+      )}
+
+      {retry !== undefined && deferral.state === "unreached" && (
+        <div className="editor-candidate-acts">
+          <button type="button" className="editor-deferral-retry" onClick={() => retry(deferral)}>
+            Queue {deferral.word} again
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * What each state means, in the editor's terms rather than the union's — a
+ * `Record` over the closed set, for `STATE_SENTENCE`'s reason: a fourth state
+ * cannot be added to the union without this table refusing to compile.
+ */
+const DEFERRAL_SENTENCE: Record<ReadDeferral["state"], string> = {
+  answered: "the engine reads this word now — nothing to do",
+  unreached: "the agent could not be reached — nothing was proposed",
+  proposed: "the agent's reading missed the Rhyme Key — judge it below",
+};
 
 /**
  * The queue's own newest timestamp, said in full.

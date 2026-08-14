@@ -185,6 +185,18 @@ export function EditorApp() {
     // the card renders and nothing on disk holds — asking writes nothing, which
     // is the whole point of the two-step (ADR-0017).
     corrector,
+    // The retry, on the queue's second section (#181). It is `queueWord` again —
+    // the same add path, aimed at the Rhyme Key the deferred attempt was aimed
+    // at — because "retry" means running the existing add for that word, never a
+    // write path of its own.
+    //
+    // Deliberately **not** flagged as raised from a Candidate, unlike the add
+    // above: a deferred reading is the editor's own add that a subprocess failed
+    // on, and nobody Appealed it. The provenance comment that flag writes into
+    // `data/supplement.dict` says a player asked for the word (#178), and it
+    // would be saying something untrue here.
+    onRetry: (deferral) =>
+      adder.queueWord(deferral.word, { kind: "key", rhymeKey: deferral.rhymeKey }),
   };
 
   /**

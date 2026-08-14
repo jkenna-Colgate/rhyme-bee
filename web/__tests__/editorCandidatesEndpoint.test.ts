@@ -16,7 +16,10 @@
  * shape `editorDayEndpoint.test.ts` took.
  */
 
-import { describe, expect, it } from "vitest";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { makeTestData } from "../../src/__fixtures__/index.ts";
 import type { Decline } from "../../src/declines.ts";
 import type { Schedule } from "../../src/schedule.ts";
@@ -71,6 +74,25 @@ function context(): EvidenceContext {
 }
 
 /**
+ * A temp file for the queue's second section, which is the one dependency this
+ * route takes as a **path** rather than as a thunk (#181) — so standing in for
+ * it is standing in for the file, exactly as it is on the add path that writes
+ * the real one. The route reads `data/deferred-readings.jsonl` when it is not
+ * given one, which no test here relies on.
+ */
+let dir: string;
+let deferredPath: string;
+
+beforeEach(() => {
+  dir = mkdtempSync(join(tmpdir(), "rhyme-bee-queue-"));
+  deferredPath = join(dir, "deferred-readings.jsonl");
+});
+
+afterEach(() => {
+  rmSync(dir, { recursive: true, force: true });
+});
+
+/**
  * The endpoint with everything it depends on stubbed and nothing loaded, driven
  * through the shared skeleton so that what is tested is the route as mounted —
  * its own 405 sentence included. `read` records which deps were reached, which
@@ -90,6 +112,9 @@ function endpoint(overrides: Partial<Parameters<typeof editorCandidatesSpec>[0]>
         read.push("context");
         return context();
       },
+      // The temp file by default, so no case here reaches the repository's own
+      // `data/` — including the ones that never mention the second section.
+      deferredPath,
       ...overrides,
     }),
   );
@@ -132,7 +157,43 @@ describe("the dev-only Candidate Queue endpoint", () => {
       total: 0,
       outstanding: 0,
       newest: null,
+      deferred: { entries: [], outstanding: 0 },
     });
+  });
+
+  // The queue's second section, read from a path this route is handed (#181).
+  it("answers with the deferred readings beside the Candidates", async () => {
+    writeFileSync(
+      deferredPath,
+      JSON.stringify({
+        word: "zorp",
+        rhymeKey: DOCKED,
+        reason: "agent-reading-failed-verification",
+        proposed: ["Z", "AO1", "R", "P"],
+        timestamp: "2026-08-12T21:00:00.000Z",
+      }) + "\n",
+    );
+    const { handler } = endpoint({ deferredPath });
+    const answered = await call(handler, { url: "/" });
+
+    expect(answered.status).toBe(200);
+    expect(JSON.parse(answered.body)).toMatchObject({
+      total: 2,
+      deferred: {
+        outstanding: 1,
+        entries: [{ word: "zorp", rhymeKey: DOCKED, state: "proposed", proposed: ["Z", "AO1", "R", "P"] }],
+      },
+    });
+  });
+
+  // The live case: the file is zero bytes in the repository, and a fresh clone
+  // has never written one at all. Neither is a failure.
+  it("answers a deferred file that was never written with an empty section", async () => {
+    const { handler } = endpoint({ deferredPath: join(dir, "never-written.jsonl") });
+    const answered = await call(handler, { url: "/" });
+
+    expect(answered.status).toBe(200);
+    expect(JSON.parse(answered.body).deferred).toEqual({ entries: [], outstanding: 0 });
   });
 
   it("carries a standing Decline through without deciding anything about it", async () => {

@@ -1167,3 +1167,50 @@ code {
 .editor-correction-moved {
   color: #3d6b4a;
 }
+
+/* The Candidate Queue's second section: the readings the add path asked an
+   agent for and did not get (#181). Set apart from the Rhyme Key groups above
+   it with a rule rather than a panel of its own, because it is part of the same
+   queue and is usually — correctly — empty. */
+.editor-deferred {
+  margin-top: 0.9rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #e3dbcb;
+}
+
+.editor-deferred h3 {
+  margin: 0 0 0.3rem;
+  font-size: 0.85rem;
+}
+
+.editor-deferral {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid #f0ece2;
+  font-size: 0.8rem;
+}
+
+/* The two that still want the editor say so; the answered one stays quiet. */
+.editor-deferral-unreached .editor-candidate-state,
+.editor-deferral-proposed .editor-candidate-state {
+  color: #7a5a2e;
+}
+
+.editor-deferral-retry {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  color: #2f5d7a;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-deferral-retry:hover:not(:disabled) {
+  background: #f6ecdd;
+  border-color: #bfa982;
+}

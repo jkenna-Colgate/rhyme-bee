@@ -23,6 +23,7 @@ import type { Pronunciation, RhymeKey } from "../../src/phonology.ts";
 import type { EvidenceContext, WordEvidence } from "../../src/supplementEvidence.ts";
 import type { AddTarget } from "../../web/src/editor/addOutcome.ts";
 import { add, printAddOutcome, resolveAddOutcome, type AgentAuthor } from "../editorAdd.ts";
+import { parseDeferredReadings } from "../editorDeferred.ts";
 
 function context(overrides: {
   pronunciations?: [string, Pronunciation[]][];
@@ -413,6 +414,33 @@ describe("add, over a temp dir with a stubbed agent", () => {
     const [entry] = lines(deferredPath).map((line) => JSON.parse(line));
     expect(entry).toMatchObject({ word: "zorp", rhymeKey: TARGET, reason: "agent-unavailable" });
     expect(typeof entry.timestamp).toBe("string");
+    expect(readFileSync(supplementPath, "utf8")).toBe("");
+  });
+
+  /**
+   * The reading is what the editor judges when the queue's second section is
+   * read back (#181), and until it was written here the record said only that
+   * *something* had been refused — a judgement offered over a reading nobody
+   * could see. Read back through the parser that reads the real file, so the
+   * write and the read are held to one shape rather than two.
+   */
+  it("records the reading a proposal was refused for, so it can be judged later", async () => {
+    const missed: Pronunciation = ["F", "L", "AA1", "B"];
+    await add(["zorp"], AIM, {
+      author: authoring({ zorp: missed }),
+      supplementPath,
+      deferredPath,
+    });
+
+    expect(parseDeferredReadings(readFileSync(deferredPath, "utf8"))).toEqual([
+      {
+        word: "zorp",
+        rhymeKey: TARGET,
+        reason: "agent-reading-failed-verification",
+        proposed: missed,
+        timestamp: expect.any(String),
+      },
+    ]);
     expect(readFileSync(supplementPath, "utf8")).toBe("");
   });
 

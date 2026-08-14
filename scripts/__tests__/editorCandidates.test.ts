@@ -436,6 +436,29 @@ describe("the readout as a whole", () => {
       total: 0,
       outstanding: 0,
       newest: null,
+      // The second section (#181) is read from a file of its own and defaults
+      // to none, so a caller asking about Candidates alone gets an empty one.
+      // What it holds when there *is* one is `editorDeferred.test.ts`'s.
+      deferred: { entries: [], outstanding: 0 },
     });
+  });
+
+  it("carries the deferred readings through as the queue's second section", () => {
+    const readout = readCandidateQueue([], SCHEDULE, [], contextFor(), [
+      {
+        word: "zorp",
+        rhymeKey: DOCKED,
+        reason: "agent-unavailable",
+        proposed: null,
+        timestamp: "2026-08-12T21:00:00.000Z",
+      },
+    ]);
+
+    expect(readout.deferred.entries.map((d) => [d.word, d.state])).toEqual([["zorp", "unreached"]]);
+    expect(readout.deferred.outstanding).toBe(1);
+    // A deferred reading is not a Candidate: it was never Appealed, and the
+    // queue's own counts do not move for one.
+    expect(readout.total).toBe(0);
+    expect(readout.outstanding).toBe(0);
   });
 });
