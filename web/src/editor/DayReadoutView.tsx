@@ -31,7 +31,9 @@ import type {
 import { DEMOTION_REASONS, type Demotion, type DemotionReason } from "../../../src/demotions.ts";
 import type { DriftReason } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
+import type { CandidateQueueReadout } from "../../../scripts/editorCandidates.ts";
 import { AddQueueView } from "./AddQueueView.tsx";
+import { DayCandidatesView, type CandidateActs } from "./CandidateQueueView.tsx";
 import { correctedDay } from "./correctedDay.ts";
 import { showsDemotionReassurance } from "./demote.ts";
 import type { RetieredWord } from "./retier.ts";
@@ -48,6 +50,8 @@ export function DayReadoutView({
   adder,
   disagreer,
   status,
+  candidates,
+  candidateActs,
 }: {
   readout: DayReadout;
   picker: TierPicker;
@@ -55,6 +59,23 @@ export function DayReadoutView({
   adder: Adder;
   /** Read by nothing here — forwarded to `AddQueueView`, like `adder` itself. */
   disagreer: Disagreer;
+  /**
+   * The add and the Decline, forwarded to the day panel with `candidates`. They
+   * are built in `EditorApp`, where all three hooks the two acts reach live, for
+   * the reason every other gesture on this screen is: a component that assembled
+   * a write out of hooks it was handed would be a second place the write could
+   * be assembled differently.
+   */
+  candidateActs: CandidateActs;
+  /**
+   * The whole Candidate Queue, forwarded to the scheduled-day case, which is the
+   * only one with a Rhyme Key to select on. It arrives whole rather than
+   * pre-filtered because the filter is `candidatesForDay`'s and the key it
+   * selects on is the *readout's* own — the same rule `correctedDay` follows for
+   * the picker state, and for the same reason: a caller filtering on the date it
+   * typed rather than the day that came back can hand one day another's work.
+   */
+  candidates: CandidateQueueReadout | null;
   /**
    * The repository's state, carried through to `AddQueueView`, which is the
    * actual reader: Submit's enabling rule is half the queue and half the index
@@ -89,6 +110,8 @@ export function DayReadoutView({
           adder={adder}
           disagreer={disagreer}
           status={status}
+          candidates={candidates}
+          candidateActs={candidateActs}
         />
       );
   }
@@ -168,6 +191,8 @@ function ScheduledDay({
   adder,
   disagreer,
   status,
+  candidates,
+  candidateActs,
 }: {
   readout: ScheduledDayReadout;
   picker: TierPicker;
@@ -178,6 +203,10 @@ function ScheduledDay({
   /** Read by nothing here either — forwarded to `AddQueueView` below, for the
    * reason given on `DayReadoutView`'s own `status` prop. */
   status: EditorStatus | null;
+  /** The whole queue, narrowed to this day's Rhyme Key by `DayCandidatesView`. */
+  candidates: CandidateQueueReadout | null;
+  /** The acts the panel's cards offer — forwarded, unread here. */
+  candidateActs: CandidateActs;
 }) {
   const { drift } = readout;
   // Which word's menu is showing. One at a time: the menu is a choice about one
@@ -321,8 +350,16 @@ function ScheduledDay({
         rhymeKey={readout.rhymeKey}
         adder={adder}
         disagreer={disagreer}
+        corrector={candidateActs.corrector}
         status={status}
       />
+
+      {/* Beside the add queue, because they are the same act read from two
+          directions: the queue is words the editor noticed missing, and this is
+          the words players already told us were. Selected by the day's *own*
+          Rhyme Key, and drawn only when that key holds Candidates — which is
+          five days in 260. */}
+      <DayCandidatesView queue={candidates} rhymeKey={readout.rhymeKey} acts={candidateActs} />
 
       <p className="editor-lists-note">
         Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}

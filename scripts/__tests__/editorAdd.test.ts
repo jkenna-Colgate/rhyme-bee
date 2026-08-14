@@ -20,9 +20,10 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Derivation, IndexDataSource } from "../../src/derivation.ts";
 import type { Pronunciation, RhymeKey } from "../../src/phonology.ts";
-import type { EvidenceContext } from "../../src/supplementEvidence.ts";
+import type { EvidenceContext, WordEvidence } from "../../src/supplementEvidence.ts";
 import type { AddTarget } from "../../web/src/editor/addOutcome.ts";
 import { add, printAddOutcome, resolveAddOutcome, type AgentAuthor } from "../editorAdd.ts";
+import { parseDeferredReadings } from "../editorDeferred.ts";
 
 function context(overrides: {
   pronunciations?: [string, Pronunciation[]][];
@@ -52,7 +53,7 @@ const ctx = context({
 });
 
 /** Never called for a word the pure judgement never reaches an agent for. */
-const unreachable = vi.fn(async (word: string): Promise<Pronunciation | null> => {
+const unreachable = vi.fn(async ({ word }: WordEvidence): Promise<Pronunciation | null> => {
   throw new Error(`agent should not have been asked about "${word}"`);
 });
 
@@ -119,14 +120,19 @@ describe("resolveAddOutcome", () => {
   });
 
   it("writes a reading the agent authored once no split reaches the target", async () => {
-    const author = vi.fn(async (word: string) =>
+    const author = vi.fn(async ({ word }: WordEvidence) =>
       word === "gleeb" ? (["G", "L", "EY1", "T"] as Pronunciation) : null,
     );
     const outcome = await resolveAddOutcome(["gleeb"], AIM, ctx, author);
     expect(outcome.words).toEqual([
       { outcome: "written", word: "gleeb", phonemes: ["G", "L", "EY1", "T"], composed: null },
     ]);
-    expect(author).toHaveBeenCalledWith("gleeb", TARGET);
+    // `isWord` and `direct` are here to pin that what reaches the seam is the
+    // record the caller gathered, not a word and a target packed into an object
+    // literal — which is the whole of what this parameter change buys.
+    expect(author).toHaveBeenCalledWith(
+      expect.objectContaining({ word: "gleeb", target: TARGET, isWord: false, direct: [] }),
+    );
   });
 
   it("defers a word the agent did not answer for", async () => {
@@ -151,7 +157,7 @@ describe("resolveAddOutcome", () => {
   });
 
   it("partitions a mixed list into every case, independently and in order", async () => {
-    const author = vi.fn(async (word: string) => {
+    const author = vi.fn(async ({ word }: WordEvidence) => {
       if (word === "gleeb") return ["G", "L", "EY1", "T"] as Pronunciation;
       if (word === "zorp") return null;
       throw new Error(`unexpected agent call for "${word}"`);
@@ -291,7 +297,7 @@ describe("add, over a temp dir with a stubbed agent", () => {
 
   /** Authors for the words named and refuses every other, so a miss is explicit. */
   function authoring(readings: Record<string, Pronunciation>): AgentAuthor {
-    return async (word) => readings[word] ?? null;
+    return async ({ word }) => readings[word] ?? null;
   }
 
   function lines(path: string): string[] {
@@ -312,6 +318,89 @@ describe("add, over a temp dir with a stubbed agent", () => {
     expect(existsSync(deferredPath)).toBe(false);
   });
 
+  /**
+   * The provenance an add raised from the Candidate Queue carries into the file
+   * that outlives the pass (#178). The section header already says a reading was
+   * verified against the day's Rhyme Key; what it cannot say, and what this
+   * adds, is that a *player* is the reason the word was looked at.
+   *
+   * A whole-line comment above the entry rather than a gloss after it, because
+   * `applySupplement` strips only lines that start with `#` — a trailing comment
+   * would be read as phonemes and the entry would be nonsense.
+   */
+  it("records that a player Appealed a word, above the reading it wrote", async () => {
+    await add(["gleeb"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+      appealed: ["gleeb"],
+    });
+
+    const written = lines(supplementPath);
+    expect(written.at(-1)).toBe("gleeb G L EY1 T");
+    expect(written.at(-2)).toBe(
+      "# gleeb: a player Appealed this word — raised from the Candidate Queue (test).",
+    );
+  });
+
+  it("leaves a word the editor typed with no comment of its own", async () => {
+    await add(["gleeb"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+    });
+
+    expect(readFileSync(supplementPath, "utf8")).not.toContain("Appealed");
+  });
+
+  /**
+   * A batch can hold both, and the note belongs to the word rather than to the
+   * batch: an editor reading the supplement later must be able to tell which of
+   * two adjacent readings a player asked for.
+   */
+  it("notes only the words a player asked for in a mixed batch", async () => {
+    await add(["gleeb", "zorp"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"], zorp: ["Z", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+      appealed: ["zorp"],
+    });
+
+    expect(lines(supplementPath).slice(-3)).toEqual([
+      "gleeb G L EY1 T",
+      "# zorp: a player Appealed this word — raised from the Candidate Queue (test).",
+      "zorp Z EY1 T",
+    ]);
+  });
+
+  /**
+   * The note is attached by normalised spelling, which is what `gatherEvidence`
+   * reports on the outcome and what the endpoint's parser has already applied —
+   * so a caller holding the word in another spelling still gets the right line
+   * annotated rather than none.
+   */
+  it("matches an Appealed word by the spelling the outcome reports", async () => {
+    await add(["gleeb"], AIM, {
+      author: authoring({ gleeb: ["G", "L", "EY1", "T"] }),
+      supplementPath,
+      deferredPath,
+      appealed: ["  Gleeb "],
+    });
+
+    expect(lines(supplementPath).at(-2)).toContain("a player Appealed this word");
+  });
+
+  it("writes no comment for an Appealed word that never reached a reading", async () => {
+    await add(["zorp"], AIM, {
+      author: authoring({}),
+      supplementPath,
+      deferredPath,
+      appealed: ["zorp"],
+    });
+
+    expect(readFileSync(supplementPath, "utf8")).toBe("");
+  });
+
   it("appends a deferred word to the deferred queue, with the key it must reach", async () => {
     const outcome = await add(["zorp"], AIM, {
       author: authoring({}),
@@ -325,6 +414,33 @@ describe("add, over a temp dir with a stubbed agent", () => {
     const [entry] = lines(deferredPath).map((line) => JSON.parse(line));
     expect(entry).toMatchObject({ word: "zorp", rhymeKey: TARGET, reason: "agent-unavailable" });
     expect(typeof entry.timestamp).toBe("string");
+    expect(readFileSync(supplementPath, "utf8")).toBe("");
+  });
+
+  /**
+   * The reading is what the editor judges when the queue's second section is
+   * read back (#181), and until it was written here the record said only that
+   * *something* had been refused — a judgement offered over a reading nobody
+   * could see. Read back through the parser that reads the real file, so the
+   * write and the read are held to one shape rather than two.
+   */
+  it("records the reading a proposal was refused for, so it can be judged later", async () => {
+    const missed: Pronunciation = ["F", "L", "AA1", "B"];
+    await add(["zorp"], AIM, {
+      author: authoring({ zorp: missed }),
+      supplementPath,
+      deferredPath,
+    });
+
+    expect(parseDeferredReadings(readFileSync(deferredPath, "utf8"))).toEqual([
+      {
+        word: "zorp",
+        rhymeKey: TARGET,
+        reason: "agent-reading-failed-verification",
+        proposed: missed,
+        timestamp: expect.any(String),
+      },
+    ]);
     expect(readFileSync(supplementPath, "utf8")).toBe("");
   });
 

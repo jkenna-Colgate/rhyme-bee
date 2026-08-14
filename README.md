@@ -42,13 +42,12 @@ npm run play '--' '--day=6'            # quoting survives PowerShell
 ```
 
 This applies to every flag-taking script here — `play`, `editor:read`,
-`editor:add`, `supplement:candidates`. In Git Bash the bare `--` survives and
-the ordinary form works.
+`editor:add`. In Git Bash the bare `--` survives and the ordinary form works.
 
 PowerShell has a second, separate trap for the scripts taking comma-separated
-lists (`editor:add --words`, `supplement:candidates --words`): it reads `a,b` as
-an array literal and passes it as the single argument `a b`. **Quote the list** —
-`--words "ule,rule"` — in either flag spelling.
+lists (`editor:add --words`): it reads `a,b` as an array literal and passes it
+as the single argument `a b`. **Quote the list** — `--words "ule,rule"` — in
+either flag spelling.
 
 ## The rules, in short
 

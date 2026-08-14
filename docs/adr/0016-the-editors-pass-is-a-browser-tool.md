@@ -51,3 +51,7 @@ The decisive reason is that **`add` must be server-side regardless**: it appends
 - **The overview should shout about unpinnable days before drift.** 0 of 260 scheduled days currently drift out of band; **9 cannot be pinned against the shipped index at all**. A day that cannot be built is a worse fact than a day whose figures moved, and the readout should rank them that way.
 
 - **`docs/editors-pass.md` is rewritten, not amended.** It is a command-by-command walkthrough whose every step changes, including the `--` warnings that become moot.
+
+## Superseded in part (2026-08-11)
+
+[ADR-0017](./0017-candidates-are-judged-in-the-editors-pass.md) supersedes one narrow point recorded alongside this pass — that a disagreement over a reading is settled **offline against the Candidate Queue** rather than from the browser. Judging Candidates becomes a surface inside the Editor's Pass. **Nothing this ADR decides is amended:** the browser still computes nothing, dev-only is still structural, and the queue's readout is served over a dev-only endpoint exactly as the day's is.

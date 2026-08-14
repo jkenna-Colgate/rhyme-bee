@@ -54,9 +54,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
 import { EDITOR_ADD_PATH } from "../endpoints.ts";
 import {
+  aimClash,
   aimHeldFor,
   queueAdd,
   unqueueAdd,
+  type AddAim,
   type AddSubmitRequest,
   type AddSubmitResult,
 } from "./add.ts";
@@ -66,10 +68,20 @@ export interface Adder {
   /** The words waiting, in the order they were typed. */
   queue: readonly string[];
   /**
-   * The date the standing queue was typed against, or `null` when it is empty.
-   * The screen compares it with the day on show; see `aimHeldFor`.
+   * Which of them came from the Candidate Queue rather than the editor's own
+   * typing (#178). Kept beside the queue rather than inside it because it is a
+   * fact about where a word came from and not about the word — every rule the
+   * queue has (`queueAdd`, `unqueueAdd`, `aimHeldFor`, the cap) is indifferent
+   * to it, and the one thing it decides is whether the reading written for it
+   * carries a comment saying a player asked.
    */
-  queuedFor: string | null;
+  appealed: readonly string[];
+  /**
+   * What the standing queue is aimed at — a day, or a Rhyme Key a Candidate
+   * supplied — or `null` when it is empty. The screen compares it with the day
+   * on show; see `aimClash` and `aimHeldFor`.
+   */
+  aim: AddAim | null;
   /** A word refused before it cost anything: a duplicate, a typo, a full queue. */
   error: string | null;
   /** True from the click until the whole act — adds, rebuild, re-read — is done. */
@@ -80,10 +92,23 @@ export interface Adder {
   result: AddSubmitResult | null;
   /** A Submit that produced no answer at all, or one the endpoint refused. */
   submitError: string | null;
-  /** Queue a word against the day on screen, which binds the queue to it. */
-  queueWord: (typed: string, date: string) => void;
+  /**
+   * Queue a word against an aim, which binds the queue to it.
+   *
+   * `fromCandidate` is how the Candidate Queue's one-gesture add reaches this
+   * hook: the same call the typed add makes, with the word prefilled, its
+   * provenance recorded and — from the whole-queue list, where there is no day —
+   * the Candidate's own Rhyme Key as the aim. Everything after it is identical,
+   * which is the point: an add raised from a Candidate must not be a second add
+   * path.
+   */
+  queueWord: (typed: string, aim: AddAim, fromCandidate?: boolean) => void;
   unqueueWord: (word: string) => void;
-  /** Run the queue against the day's Rhyme Key, rebuild, and re-read the day. */
+  /**
+   * Run the queue against its own aim, rebuild, and re-read the day on screen.
+   * The date is the day showing, not the aim: an empty Submit is aimed at
+   * nothing and a key-aimed one is aimed somewhere the screen is not.
+   */
   submit: (date: string) => Promise<void>;
 }
 
@@ -92,7 +117,8 @@ const TICK_MS = 500;
 
 export function useAdder(onDay: (readout: DayReadout) => void, date: string | null): Adder {
   const [queue, setQueue] = useState<readonly string[]>([]);
-  const [queuedFor, setQueuedFor] = useState<string | null>(null);
+  const [appealed, setAppealed] = useState<readonly string[]>([]);
+  const [aim, setAim] = useState<AddAim | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -114,18 +140,27 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   // update already pending the updater is deferred, and `submit` would then post
   // an empty batch and return having silently done nothing. A ref is the honest
   // read, so every write goes through `hold` and nothing sets `queue` directly.
-  const standing = useRef<{ queue: readonly string[]; queuedFor: string | null }>({
-    queue: [],
-    queuedFor: null,
-  });
-  const hold = useCallback((next: readonly string[], date: string | null): void => {
-    // A queue with nothing in it is bound to no day, which is what lets the
-    // editor start a fresh one wherever they are after submitting or clearing.
-    const boundTo = next.length === 0 ? null : date;
-    standing.current = { queue: next, queuedFor: boundTo };
-    setQueue(next);
-    setQueuedFor(boundTo);
-  }, []);
+  const standing = useRef<{
+    queue: readonly string[];
+    appealed: readonly string[];
+    aim: AddAim | null;
+  }>({ queue: [], appealed: [], aim: null });
+  const hold = useCallback(
+    (next: readonly string[], raised: readonly string[], at: AddAim | null): void => {
+      // A queue with nothing in it is aimed at nothing, which is what lets the
+      // editor start a fresh one wherever they are after submitting or clearing.
+      const boundTo = next.length === 0 ? null : at;
+      // Narrowed to the queue on every write rather than trusted to be kept in
+      // step: `unqueueAdd` is the queue's own rule for removal and this list
+      // must not be a second opinion about which words are still waiting.
+      const kept = raised.filter((word) => next.includes(word));
+      standing.current = { queue: next, appealed: kept, aim: boundTo };
+      setQueue(next);
+      setAppealed(kept);
+      setAim(boundTo);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!submitting) return;
@@ -140,9 +175,9 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   // moment the editor moves to another day, and is cleared rather than left to
   // sit under the wrong Daily Puzzle.
   //
-  // This `date` is a display key and nothing more. It does not replace the `date`
-  // that `queueWord` and `submit` are each given at the call: the queue's binding
-  // is `queuedFor`, checked by `aimHeldFor` below, and the `standing` ref this
+  // This `date` is a display key and nothing more. It does not replace the aim
+  // that `queueWord` is given at the call: the queue's binding is `aim`, checked
+  // by `aimClash` below, and the `standing` ref this
   // effect deliberately does not touch. Letting `AddQueueView` hold the day
   // alongside `result` and decide whether to render it was rejected — that puts a
   // correctness rule in a view no test can reach.
@@ -151,17 +186,25 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   }, [date]);
 
   const queueWord = useCallback(
-    (typed: string, date: string) => {
-      // Refused before the word is normalised or judged: a word typed on one day
-      // cannot join a queue aimed at another, or it would be written against a
-      // Rhyme Key the editor was not looking at when they typed it.
-      const held = aimHeldFor(standing.current.queuedFor, date);
-      if (held !== null) return setError(held);
+    (typed: string, at: AddAim, fromCandidate = false) => {
+      // Refused before the word is normalised or judged: a word aimed at one
+      // target cannot join a queue aimed at another, or one of the two would be
+      // written against a Rhyme Key nothing on screen named.
+      const clash = aimClash(standing.current.aim, at);
+      if (clash !== null) return setError(clash);
 
       const asked = queueAdd(standing.current.queue, typed);
       if (!asked.ok) return setError(asked.error);
       setError(null);
-      hold(asked.queue, date);
+      // The word as `queueAdd` normalised it, not as it arrived: the provenance
+      // has to be recorded under the spelling the batch and the endpoint will
+      // both use, or the note would be attached to a word that is not there.
+      const raised = asked.queue[asked.queue.length - 1]!;
+      hold(
+        asked.queue,
+        fromCandidate ? [...standing.current.appealed, raised] : standing.current.appealed,
+        at,
+      );
     },
     [hold],
   );
@@ -169,7 +212,11 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   const unqueueWord = useCallback(
     (word: string) => {
       setError(null);
-      hold(unqueueAdd(standing.current.queue, word), standing.current.queuedFor);
+      hold(
+        unqueueAdd(standing.current.queue, word),
+        standing.current.appealed,
+        standing.current.aim,
+      );
     },
     [hold],
   );
@@ -177,7 +224,7 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   const submit = useCallback(async (date: string) => {
     // The queue as it stands at the click, not as it stood when this callback
     // was built — the callback is deliberately stable across renders.
-    const { queue: batch, queuedFor: boundTo } = standing.current;
+    const { queue: batch, appealed: raised, aim: boundTo } = standing.current;
 
     // An empty queue is **posted**, not dropped here, which is #162's widening.
     // It used to return early, back when an empty Submit could only ever be a
@@ -213,7 +260,17 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
       // rather than agreeing with it by hand. Copied out because the queue is
       // held readonly and the declared field is not — the copy is inert, since
       // the next line serialises it and the endpoint parses its own.
-      const payload: AddSubmitRequest = { date, words: [...batch] };
+      //
+      // The date always travels and is always the day on screen: it is what the
+      // aim is resolved from for a day-aimed queue, and what the answer re-reads
+      // for every other kind. The key travels only when the queue has one, which
+      // is what makes it the aim rather than a second opinion about the day.
+      const payload: AddSubmitRequest = {
+        date,
+        words: [...batch],
+        appealed: [...raised],
+        ...(boundTo?.kind === "key" ? { rhymeKey: boundTo.rhymeKey } : {}),
+      };
       const response = await fetch(EDITOR_ADD_PATH, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -230,7 +287,7 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
       // refused or unreachable Submit leaves both exactly as they were, because
       // the words are then still missing from the game and retyping them is the
       // one cost this whole design exists to avoid.
-      hold([], null);
+      hold([], [], null);
       if (answered.readout !== null) day.current(answered.readout);
     } catch (cause) {
       // Deliberately not `endpointFailure`, whose sentence ends "Nothing was
@@ -251,7 +308,8 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
 
   return {
     queue,
-    queuedFor,
+    appealed,
+    aim,
     error,
     submitting,
     elapsedMs,

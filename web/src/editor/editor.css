@@ -757,3 +757,460 @@ code {
   font-size: 0.8rem;
   color: #2f5d3a;
 }
+
+/* --- The Candidate Queue (#177) ---------------------------------------------
+   A panel of its own beside the status, because what it reports is not about
+   the day on screen: a Candidate is aimed at a Rhyme Key, and most of the queue
+   belongs to no scheduled day at all. Every state drawn here was derived in
+   Node; nothing in the browser decides one. */
+.editor-queue {
+  margin: 0 0 1.1rem;
+  padding: 0.75rem 0.95rem 0.85rem;
+  background: #f7f4ee;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.editor-queue h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.editor-queue-lede {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+}
+
+/* A queue with nothing on it at all is the one state worth an alarm: an empty
+   list and an unpulled one look identical, and only one of them is good news. */
+.editor-queue-stale {
+  color: #8a5a00;
+}
+
+.editor-queue-failed {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: #8e2a1f;
+}
+
+.editor-queue-group {
+  margin: 0.7rem 0 0;
+  padding: 0.55rem 0.7rem 0.6rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 5px;
+}
+
+.editor-queue-group h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.editor-queue-day {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-queue-undated {
+  color: #857e70;
+}
+
+.editor-queue-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editor-queue-note {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+/* The day's own Candidates, inside the scheduled-day case. Boxed like the add
+   queue it sits beside, because the two are the same act read from two
+   directions. */
+.editor-queue-day-panel {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 1rem 1rem;
+  background: #fff;
+  border: 1px solid #e3ded2;
+  border-radius: 6px;
+}
+
+.editor-queue-day-panel h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.editor-candidate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid #f0ece2;
+  font-size: 0.8rem;
+}
+
+.editor-candidate-word {
+  font-weight: 600;
+}
+
+.editor-candidate-state {
+  color: #6b6558;
+}
+
+.editor-candidate-evidence code {
+  margin-right: 0.5rem;
+  font-size: 0.72rem;
+  color: #857e70;
+}
+
+/* Green for the two states that want nothing; amber for the three that do. The
+   name card is the loudest of those three, because it is the one whose fix
+   takes a word off every day rather than adding one to a family. */
+.editor-candidate-settled .editor-candidate-state {
+  color: #2f6b3a;
+}
+
+.editor-candidate-correction .editor-candidate-state,
+.editor-candidate-add .editor-candidate-state,
+.editor-candidate-derivation .editor-candidate-state {
+  color: #8a5a00;
+}
+
+.editor-candidate-name .editor-candidate-state {
+  color: #8e2a1f;
+}
+
+/* The acts a card offers (#178). Given the whole row rather than sitting inline
+   with the evidence, because the card is read top to bottom — word, state,
+   evidence, and then what to do about it — and a button wrapped in beside a
+   Rhyme Key reads as part of the evidence. */
+.editor-candidate-acts {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.editor-candidate-add,
+.editor-candidate-decline {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-candidate-add {
+  color: #2f5d7a;
+}
+
+.editor-candidate-decline {
+  color: #7a5a2e;
+}
+
+.editor-candidate-add:hover:not(:disabled),
+.editor-candidate-decline:hover:not(:disabled) {
+  background: #f6ecdd;
+  border-color: #bfa982;
+}
+
+.editor-candidate-add:disabled,
+.editor-candidate-decline:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* The Decline's second click. Every ruling carries the sentence saying what it
+   will do *beside its own button*, because two of the three take a word's
+   wordhood on every day and the reach of a per-Candidate act has to be read
+   before it is taken rather than after (#178). */
+.editor-candidate-rulings {
+  flex-basis: 100%;
+  padding: 0.45rem 0.5rem;
+  background: #fbf6ef;
+  border: 1px solid #e3ded2;
+  border-radius: 4px;
+}
+
+.editor-candidate-rulings-lede {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-candidate-ruling {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0 0 0.3rem;
+}
+
+.editor-candidate-ruling button {
+  flex: none;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Warmer for the two that reach the demotion list, plain for the one that
+   changes nothing anywhere — the difference in reach, said in the colour. */
+.editor-candidate-ruling-demotion button {
+  color: #8e2a1f;
+  border-color: #d9b6ae;
+}
+
+.editor-candidate-ruling-decline button {
+  color: #5a5348;
+}
+
+.editor-candidate-consequence {
+  font-size: 0.72rem;
+  color: #857e70;
+}
+
+.editor-candidate-ruling-cancel {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #6b6558;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* The approve card (#180): an agent's proposed reading beside the engine's own,
+   and the choice between replacing it and joining it. Given the whole row like
+   the Decline's second click, and for the same reason — what is being judged is
+   two readings held against each other, which does not fit beside a word. */
+.editor-correction {
+  flex-basis: 100%;
+}
+
+.editor-correction-ask {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  color: #2f5d7a;
+  cursor: pointer;
+}
+
+.editor-correction-ask:hover:not(:disabled) {
+  background: #f6ecdd;
+  border-color: #bfa982;
+}
+
+.editor-correction-ask:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.editor-correction-missed {
+  margin: 0.3rem 0 0;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-correction-proposal {
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.5rem;
+  background: #fbf6ef;
+  border: 1px solid #e3ded2;
+  border-radius: 4px;
+}
+
+/* The two readings aligned rather than in two paragraphs: the judgement is
+   about the *difference* between them, and a reader comparing two ARPAbet
+   strings needs them under one another. */
+.editor-correction-beside {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.15rem 0.6rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+}
+
+.editor-correction-beside dt {
+  color: #6b6558;
+}
+
+.editor-correction-beside dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: baseline;
+}
+
+.editor-correction-beside code {
+  font-size: 0.75rem;
+  color: #4a4437;
+}
+
+.editor-correction-respelling {
+  font-size: 0.75rem;
+  color: #2f5d7a;
+}
+
+.editor-correction-reaches,
+.editor-correction-misses {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+}
+
+.editor-correction-reaches {
+  color: #3d6b4a;
+}
+
+.editor-correction-misses {
+  color: #8e5a1f;
+}
+
+/* The one sentence on this card that is about the *reach* of the act rather
+   than about the reading: a correction changes the word on every day, which is
+   what makes it a different thing from an add. Set apart so it is not read as
+   another line of evidence. */
+.editor-correction-reach {
+  margin: 0 0 0.4rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid #d9b6ae;
+  font-size: 0.72rem;
+  color: #857e70;
+}
+
+.editor-correction-mode {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0 0 0.3rem;
+}
+
+.editor-correction-mode button {
+  flex: none;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Warmer for the one that takes a reading away, plain for the one that keeps
+   both — the difference in reach, said in the colour, as the Decline's rulings
+   say it. */
+.editor-correction-mode-replace button {
+  color: #8e2a1f;
+  border-color: #d9b6ae;
+}
+
+.editor-correction-mode-join button {
+  color: #3d6b4a;
+}
+
+.editor-correction-consequence {
+  font-size: 0.72rem;
+  color: #857e70;
+}
+
+.editor-correction-cancel {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #6b6558;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* What moved, after a correction landed. The days a change reached are the
+   half of this act an editor cannot see from the card they made it on. */
+.editor-correction-landed {
+  margin-top: 0.35rem;
+  padding: 0.45rem 0.5rem;
+  background: #f2f6f1;
+  border: 1px solid #cfdccd;
+  border-radius: 4px;
+  font-size: 0.78rem;
+}
+
+.editor-correction-landed p {
+  margin: 0 0 0.25rem;
+}
+
+.editor-correction-landed code {
+  font-size: 0.75rem;
+  margin-right: 0.3rem;
+}
+
+.editor-correction-moved {
+  color: #3d6b4a;
+}
+
+/* The Candidate Queue's second section: the readings the add path asked an
+   agent for and did not get (#181). Set apart from the Rhyme Key groups above
+   it with a rule rather than a panel of its own, because it is part of the same
+   queue and is usually — correctly — empty. */
+.editor-deferred {
+  margin-top: 0.9rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #e3dbcb;
+}
+
+.editor-deferred h3 {
+  margin: 0 0 0.3rem;
+  font-size: 0.85rem;
+}
+
+.editor-deferral {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid #f0ece2;
+  font-size: 0.8rem;
+}
+
+/* The two that still want the editor say so; the answered one stays quiet. */
+.editor-deferral-unreached .editor-candidate-state,
+.editor-deferral-proposed .editor-candidate-state {
+  color: #7a5a2e;
+}
+
+.editor-deferral-retry {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  color: #2f5d7a;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-deferral-retry:hover:not(:disabled) {
+  background: #f6ecdd;
+  border-color: #bfa982;
+}

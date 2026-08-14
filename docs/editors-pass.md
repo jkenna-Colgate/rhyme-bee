@@ -379,13 +379,24 @@ line carries no information.
 The deferred queue gains one JSON object per line:
 
 ```
-{"word":"hectoliter","rhymeKey":"OW L D ER","reason":"agent-reading-failed-verification","timestamp":"2026-08-07T20:05:18.132Z"}
+{"word":"hectoliter","rhymeKey":"OW L D ER","reason":"agent-reading-failed-verification","proposed":["HH","EH1","K","T","OW0","L","IY2","D","ER0"],"timestamp":"2026-08-07T20:05:18.132Z"}
 ```
+
+`proposed` is the reading the agent authored and verification refused, and it is
+`null` when the agent could not be reached at all — there was nothing to record.
 
 **This file starts empty.** It was created during development and until a real
 pass defers something it is zero bytes, so "does anything actually land here" is
 worth confirming rather than assuming. It is the work list for a later pass and
 it is what makes the composition's real miss rate countable.
+
+Since #181 the later pass is the browser tool: the file is read back as the
+**Candidate Queue's second section**, where a word the agent could not be
+reached for is queued for another add in one click and a refused reading is
+offered to the editor on the same approve card a pronunciation correction uses.
+It is still **append-only** — nothing shortens it — and a word the engine reads
+by the time you look simply says so, without anything being written to record
+that.
 
 One limit to know before you type a long `--words` list: every word is judged
 against a **snapshot** of the evidence taken before the first of them. A word

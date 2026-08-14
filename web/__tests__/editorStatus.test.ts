@@ -27,18 +27,31 @@ describe("the files the pass is accountable for", () => {
   /**
    * #162 names "the Retrieval override layer, the demotion list, and the
    * pronunciation supplement with its deferred queue" — three groups over four
-   * paths. Held here because the arithmetic is the part a reader is most likely
-   * to think is a slip, and because the ticket's "each of the three written
-   * files" is met by three headings rather than by three paths.
+   * paths — and #178 adds the standing Declines as a fourth group of one. Held
+   * here because the arithmetic is the part a reader is most likely to think is
+   * a slip, and because the ticket's "each of the written files" is met by
+   * headings rather than by paths.
    */
-  it("is three groups over four paths", () => {
-    expect(WRITTEN_GROUPS).toHaveLength(3);
+  it("is four groups over five paths", () => {
+    expect(WRITTEN_GROUPS).toHaveLength(4);
     expect(WRITTEN_FILES).toEqual([
       "data/tier-overrides.csv",
       "data/demotions.txt",
+      "data/declines.txt",
       "data/supplement.dict",
       "data/deferred-readings.jsonl",
     ]);
+  });
+
+  /**
+   * The one a Decline writes, and the one this list is most easily read as not
+   * needing: a Decline changes no verdict and cannot make the built Rhyme Index
+   * stale. What this list answers is which files the pass must *commit*, and
+   * `data/declines.txt` is hand-written, derived from nothing, and the only
+   * record that a Candidate was ever considered and rejected (#178).
+   */
+  it("names the standing Declines, which nothing can regenerate", () => {
+    expect(WRITTEN_FILES).toContain("data/declines.txt");
   });
 
   /**
@@ -185,7 +198,7 @@ describe("what each written file's state is", () => {
   it("answers unknown for every file when git could not be asked", () => {
     const statuses = writtenStatus(null, present);
 
-    expect(statuses.map((file) => file.state)).toEqual(["unknown", "unknown", "unknown", "unknown"]);
+    expect(statuses.map((file) => file.state)).toEqual(WRITTEN_FILES.map(() => "unknown"));
   });
 
   it("answers for every written path, in the order the screen groups them", () => {

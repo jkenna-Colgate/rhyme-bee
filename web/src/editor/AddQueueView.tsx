@@ -13,10 +13,12 @@
  * would be off the bottom of the screen at exactly the moment the editor spots
  * the gap and wants to type it.
  *
- * The key is shown but never typed. Every queued word is aimed at the day's own
+ * The key is shown but never typed. A word typed here is aimed at the day's own
  * Rhyme Key, resolved from `data/schedule.json` by the endpoint; showing it is
  * how the editor can *check* the aim, and there is deliberately no control that
- * changes it.
+ * changes it. A queue raised from the Candidate Queue is aimed at the key the
+ * Candidate carries instead (#178) — still not a key anyone typed, and the
+ * heading names whichever of the two the standing queue actually holds.
  *
  * The one gesture here that is not an add is `ReadsElsewhere`, which has its own
  * file: a word the index turns out to hold on another key, reported with the
@@ -28,12 +30,15 @@
 import { useState } from "react";
 import type { AddTarget, DeferredOutcome, WordOutcome } from "./addOutcome.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
-import { MAX_QUEUED_WORDS, aimHeldFor, type AddSubmitResult } from "./add.ts";
+import { MAX_QUEUED_WORDS, aimClash, aimHeldFor, type AddSubmitResult } from "./add.ts";
 import { failureFor } from "./disagreement.ts";
 import { ReadsElsewhere } from "./ReadsElsewhere.tsx";
 import { pendingWork, type EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 import type { Disagreer } from "./useDisagreement.ts";
+import type { Corrector } from "./useCorrector.ts";
+import { CorrectionPanel } from "./CorrectionView.tsx";
+import { honestReading } from "./correction.ts";
 
 /**
  * The worst case one word can cost, in milliseconds: the bound
@@ -50,6 +55,7 @@ export function AddQueueView({
   rhymeKey,
   adder,
   disagreer,
+  corrector,
   status,
 }: {
   date: string;
@@ -57,18 +63,31 @@ export function AddQueueView({
   adder: Adder;
   /** Recording a disagreement over a word the index holds on another key. */
   disagreer: Disagreer;
+  /**
+   * Approving a proposal the agent made and verification refused — the word's
+   * **honest reading** (#180). It reaches this file rather than only the
+   * Candidate Queue's because a failed-verification proposal is produced *here*,
+   * by a Submit, and it is the same branch of the same outcome union: one card,
+   * offered wherever the proposal turns up.
+   */
+  corrector?: Corrector;
   /** The repository's state, for the half of Submit's rule that is not the queue. */
   status: EditorStatus | null;
 }) {
   const [typed, setTyped] = useState("");
   const { queue, submitting } = adder;
-  // The queue belongs to the day it was typed against, and this is the day on
-  // screen. When they differ the queue is shown but cannot act — see
-  // `aimHeldFor` for why it is neither cleared nor quietly resubmitted here.
-  const held = aimHeldFor(adder.queuedFor, date);
+  // Two questions, and they part company on a queue raised from the Candidate
+  // Queue. `takes` is whether a word typed *here* could join the standing queue
+  // at all — false for a queue aimed at another day and for one aimed at a Rhyme
+  // Key — and it is what shuts the entry and says why. `held` is the narrower
+  // one: whether Submit would replace the screen with a day the editor is not
+  // looking at. A key-aimed queue is held by neither day, which is what makes it
+  // submittable from wherever the editor happens to be standing.
+  const takes = aimClash(adder.aim, { kind: "day", date });
+  const held = aimHeldFor(adder.aim, date);
 
   const queueTyped = () => {
-    adder.queueWord(typed, date);
+    adder.queueWord(typed, { kind: "day", date });
     // Cleared unconditionally, including on a refusal. The refusal names the
     // word it refused, so the field is not where the editor reads what went
     // wrong, and leaving a rejected word in it means the next word is typed
@@ -78,10 +97,14 @@ export function AddQueueView({
 
   return (
     <section className="editor-add">
+      {/* The key the heading names is the queue's own when it has one, and the
+          day's otherwise. They differ only for a queue raised from the Candidate
+          Queue, and that is exactly when a heading reading "aimed at" the day's
+          key would be saying something untrue about the words underneath it. */}
       <h3>
         Add missing words{" "}
         <span className="editor-muted">
-          aimed at <code>{rhymeKey}</code>
+          aimed at <code>{adder.aim?.kind === "key" ? adder.aim.rhymeKey : rhymeKey}</code>
         </span>
       </h3>
 
@@ -108,18 +131,18 @@ export function AddQueueView({
             value={typed}
             autoComplete="off"
             spellCheck={false}
-            // Shut while a queue bound to another day is standing, so the one
+            // Shut while a queue aimed elsewhere is standing, so the one
             // sentence explaining that is the only thing on screen saying it —
             // typing into a field that refuses every word with the same message
             // is the same message twice. `queueWord` refuses anyway.
-            disabled={submitting || held !== null}
+            disabled={submitting || takes !== null}
             onChange={(event) => setTyped(event.target.value)}
           />
         </label>
         <button
           type="submit"
           className="editor-add-queue"
-          disabled={submitting || typed === "" || held !== null}
+          disabled={submitting || typed === "" || takes !== null}
         >
           Queue
         </button>
@@ -129,14 +152,14 @@ export function AddQueueView({
           is about the last word typed, and the entry is shut while a queue is
           held — so anything still standing here is from the day the editor has
           just left, and reads as a second complaint about the day they are on. */}
-      {adder.error !== null && held === null && (
+      {adder.error !== null && takes === null && (
         <p className="editor-add-refused">{adder.error}</p>
       )}
 
-      {/* Above the queue, not below it: this sentence is the reason the words
-          under it cannot be submitted, and a reader who meets the list first
-          has already reached for the button. */}
-      {held !== null && <p className="editor-add-held">{held}</p>}
+      {/* Above the queue, not below it: this sentence is the reason no word
+          typed here can join the words under it, and a reader who meets the
+          list first has already reached for the field. */}
+      {takes !== null && <p className="editor-add-held">{takes}</p>}
 
       <Queued adder={adder} />
 
@@ -160,12 +183,14 @@ export function AddQueueView({
           // it. The endpoint asks `indexStaleness` itself rather than trusting
           // this: a rule only a button enforces is not a rule.
           //
-          // Disabled too on a queue typed against another day. That rule is
-          // not also enforced at the endpoint, because the endpoint cannot see
-          // it: the date it receives is the only aim it has, and a Submit from
-          // the wrong day is a perfectly well-formed request for the wrong
-          // Rhyme Key. `submit` checks it again instead, so it is not a rule
-          // only a button enforces.
+          // Disabled too on a queue typed against another day — `held`, not
+          // `takes`: a queue raised from the Candidate Queue carries its own
+          // Rhyme Key and is submittable from wherever the editor is standing,
+          // which is the whole point of naming the key outright. That rule is
+          // not enforced at the endpoint, because the endpoint cannot see it:
+          // a Submit from the wrong day is a perfectly well-formed request.
+          // `submit` checks it again instead, so it is not a rule only a button
+          // enforces.
           disabled={!pendingWork(queue.length, status) || submitting || held !== null}
           onClick={() => void adder.submit(date)}
         >
@@ -176,7 +201,9 @@ export function AddQueueView({
 
       {adder.submitError !== null && <p className="editor-write-failed">{adder.submitError}</p>}
 
-      {adder.result !== null && <Submitted result={adder.result} disagreer={disagreer} />}
+      {adder.result !== null && (
+        <Submitted result={adder.result} disagreer={disagreer} corrector={corrector} />
+      )}
     </section>
   );
 }
@@ -283,7 +310,15 @@ function InFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
  * writes would leave the editor to work out which of the words they typed had
  * simply vanished.
  */
-function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: Disagreer }) {
+function Submitted({
+  result,
+  disagreer,
+  corrector,
+}: {
+  result: AddSubmitResult;
+  disagreer: Disagreer;
+  corrector?: Corrector;
+}) {
   const { outcome, rebuilt, readout } = result;
   const written = outcome?.words.filter((w) => w.outcome === "written").length ?? 0;
   const deferred = outcome?.words.filter((w) => w.outcome === "deferred").length ?? 0;
@@ -371,7 +406,12 @@ function Submitted({ result, disagreer }: { result: AddSubmitResult; disagreer: 
           {outcome.words.map((word) => (
             <li key={word.word} className={`editor-add-outcome editor-add-${word.outcome}`}>
               <strong>{word.word}</strong> —{" "}
-              <WordOutcomeLine word={word} aim={outcome} disagreer={disagreer} />
+              <WordOutcomeLine
+                word={word}
+                aim={outcome}
+                disagreer={disagreer}
+                corrector={corrector}
+              />
             </li>
           ))}
         </ul>
@@ -394,6 +434,7 @@ function WordOutcomeLine({
   word,
   aim,
   disagreer,
+  corrector,
 }: {
   word: WordOutcome;
   /**
@@ -406,6 +447,7 @@ function WordOutcomeLine({
    */
   aim: AddTarget;
   disagreer: Disagreer;
+  corrector?: Corrector;
 }) {
   const { target } = aim;
   switch (word.outcome) {
@@ -438,7 +480,7 @@ function WordOutcomeLine({
         </>
       );
     case "deferred":
-      return <Deferral word={word} target={target} />;
+      return <Deferral word={word} target={target} corrector={corrector} />;
     default: {
       const exhaustive: never = word;
       throw new Error(`unreachable word outcome: ${JSON.stringify(exhaustive)}`);
@@ -456,7 +498,15 @@ function WordOutcomeLine({
  * composition genuinely cannot reach, and the proposal is shown so the miss is
  * inspectable rather than merely counted.
  */
-function Deferral({ word, target }: { word: DeferredOutcome; target: RhymeKey }) {
+function Deferral({
+  word,
+  target,
+  corrector,
+}: {
+  word: DeferredOutcome;
+  target: RhymeKey;
+  corrector?: Corrector;
+}) {
   if (word.reason === "agent-unavailable") {
     return (
       <>
@@ -470,6 +520,20 @@ function Deferral({ word, target }: { word: DeferredOutcome; target: RhymeKey })
       deferred: no compound split reached <code>{target}</code>, and the agent proposed{" "}
       <code>{word.proposed?.join(" ")}</code>, which does not. Recorded in{" "}
       <code>data/deferred-readings.jsonl</code> for a later pass.
+      {/* And offered, because a proposal that failed verification is not only a
+          miss: it may be the word's **honest reading**, and writing it is what
+          makes the player be told "doesn't rhyme" rather than "not a word we
+          know" (#176). The same card the Candidate Queue's correction draws,
+          with nothing to join to — the engine reads this word not at all. */}
+      {corrector !== undefined && word.proposed !== null && (
+        <CorrectionPanel
+          word={word.word}
+          rhymeKey={target}
+          current={[]}
+          corrector={corrector}
+          standing={honestReading(word.word, target, word.proposed)}
+        />
+      )}
     </>
   );
 }

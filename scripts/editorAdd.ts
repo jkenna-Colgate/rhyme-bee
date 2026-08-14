@@ -43,7 +43,7 @@
 import { spawn } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { parseCmudict } from "../src/cmudict.ts";
+import { normaliseWord, parseCmudict } from "../src/cmudict.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import { parseWordList } from "../src/pipeline.ts";
 import type { Schedule } from "../src/schedule.ts";
@@ -53,8 +53,10 @@ import {
   gatherEvidence,
   verifyReading,
   type EvidenceContext,
+  type WordEvidence,
   type WordReading,
 } from "../src/supplementEvidence.ts";
+import { DEFERRED_READINGS_PATH } from "../web/deferredFile.ts";
 import { killTree } from "../web/killTree.ts";
 import type {
   AddOutcome,
@@ -64,11 +66,24 @@ import type {
   WordOutcome,
   WrittenOutcome,
 } from "../web/src/editor/addOutcome.ts";
+import type { DeferredReading } from "./editorDeferred.ts";
 import { parseReading } from "./editorReading.ts";
 import { fail, root } from "./editorShell.ts";
 
-/** How an add asks an agent to author a reading — real in `add`, stubbed in tests. */
-export type AgentAuthor = (word: string, target: RhymeKey) => Promise<Pronunciation | null>;
+/**
+ * How an add asks an agent to author a reading — real in `add`, stubbed in
+ * tests.
+ *
+ * It takes the **evidence** rather than a word and a target, though it needs
+ * only those two to write today's prompt. The caller gathers the evidence
+ * immediately before calling, so passing the whole record costs nothing and
+ * carries strictly more: the direct readings, the inflectional relatives,
+ * wordhood and name status are all there for the case that wants them. Each
+ * further fact an adapter comes to need is then a fact it reads off an argument
+ * it already has, rather than another parameter on a seam every adapter and
+ * every stub would have to widen together.
+ */
+export type AgentAuthor = (evidence: WordEvidence) => Promise<Pronunciation | null>;
 
 /**
  * The editor names words the pass turned up as missing, and nothing else — no
@@ -131,7 +146,7 @@ export async function resolveAddOutcome(
       continue;
     }
 
-    const authored = await authorReading(word, target);
+    const authored = await authorReading(evidence);
     if (authored === null) {
       results.push({ outcome: "deferred", word, reason: "agent-unavailable", proposed: null });
     } else if (verifyReading(authored, target)) {
@@ -172,6 +187,26 @@ export interface AddDeps {
   supplementPath?: string;
   /** Where misses land. `data/deferred-readings.jsonl`, live. */
   deferredPath?: string;
+  /**
+   * Which words in this batch a **player** asked for: the ones raised from the
+   * Candidate Queue rather than typed by the editor (#178). Each one's reading
+   * carries that into `data/supplement.dict` as a comment above it, so a future
+   * reader of the supplement knows the word is there because somebody Appealed
+   * it — which is a different fact from an editor spotting a gap, and the only
+   * place it can be recorded is the file the reading lands in.
+   *
+   * It is here, among the things `add` takes from a caller instead of reaching
+   * for itself, because that is exactly what it is: where a word came from is
+   * knowledge the surface that collected it has and this function cannot
+   * recover. The default is the real thing for the CLI, which has no queue to
+   * raise a word from — nobody Appealed anything, and no comment is written.
+   *
+   * It changes **no judgement**. `resolveAddOutcome` never sees it: a word a
+   * player asked for is composed, authored and verified exactly as any other
+   * word is (ADR-0014), and provenance that moved the bar would be a second
+   * standard for readings.
+   */
+  appealed?: readonly string[];
 }
 
 /**
@@ -197,29 +232,82 @@ export async function add(
   aim: AddTarget,
   deps: AddDeps = {},
 ): Promise<AddOutcome> {
-  const outcome = await resolveAddOutcome(words, aim, evidenceContext(), deps.author);
-  appendToSupplement(writtenReadings(outcome), deps.supplementPath ?? resolve(root, "data", SUPPLEMENT));
-  appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? resolve(root, "data", DEFERRED_QUEUE));
+  const outcome = await resolveAddOutcome(words, aim, pinnedEvidenceContext(), deps.author);
+  appendToSupplement(
+    writtenReadings(outcome, deps.appealed ?? []),
+    deps.supplementPath ?? resolve(root, "data", SUPPLEMENT),
+  );
+  appendToDeferredQueue(deferredReadings(outcome), deps.deferredPath ?? DEFERRED_READINGS_PATH);
   return outcome;
 }
 
-function writtenReadings(outcome: AddOutcome): WordReading[] {
-  return outcome.words
-    .filter((w): w is WrittenOutcome => w.outcome === "written")
-    .map((w) => ({ word: w.word, phonemes: w.phonemes }));
+/**
+ * One accepted reading, and the comment that goes above it — `null` for the
+ * ordinary add, which carries none.
+ *
+ * `WordReading` is the shape `verifyReading` and the supplement's own parser
+ * deal in, and it is deliberately not widened with a note: a comment is a fact
+ * about *why this line was written*, which no reader of a reading has any use
+ * for. So the note travels beside the reading, as far as the append and no
+ * further.
+ */
+interface SupplementEntry {
+  reading: WordReading;
+  note: string | null;
 }
 
+/**
+ * The readings to write, each with its provenance comment when a player asked
+ * for it.
+ *
+ * The words are matched by normalised spelling, which is the spelling
+ * `gatherEvidence` reports back on the outcome and the one the endpoint's parser
+ * has already applied — so a word raised from a Candidate is recognised as the
+ * same word here rather than by the string the caller happened to hold.
+ */
+function writtenReadings(outcome: AddOutcome, appealed: readonly string[]): SupplementEntry[] {
+  const asked = new Set(appealed.map(normaliseWord));
+  return outcome.words
+    .filter((w): w is WrittenOutcome => w.outcome === "written")
+    .map((w) => ({
+      reading: { word: w.word, phonemes: w.phonemes },
+      note: asked.has(w.word) ? provenanceNote(w.word, outcome.provenance) : null,
+    }));
+}
+
+/**
+ * What a reading raised from a Candidate says about itself, as a whole-line
+ * comment above the entry.
+ *
+ * A whole line rather than a trailing gloss, because the supplement's parser
+ * only strips lines that *start* with `#` — `parseCmudict` would read a trailing
+ * comment's words as phonemes and the entry would be nonsense (`src/supplement.ts`).
+ * The section header this sits under already says the reading was verified
+ * against the day's Rhyme Key; what it cannot say, and what this adds, is that a
+ * player is the reason the word was looked at.
+ */
+function provenanceNote(word: string, provenance: string): string {
+  return `# ${word}: a player Appealed this word — raised from the Candidate Queue (${provenance}).`;
+}
+
+/**
+ * The misses to record, each with whatever the agent did say.
+ *
+ * `proposed` travels to the file with the rest of the record and did not until
+ * #181: the outcome carried the refused reading, the appended line dropped it,
+ * and the editor reading the queue back was then offered a judgement about a
+ * reading nobody could see. It is null for `agent-unavailable`, where there was
+ * nothing to carry — which is `DeferredOutcome`'s own shape, unchanged.
+ */
 function deferredReadings(outcome: AddOutcome): DeferredReading[] {
   return outcome.words
     .filter((w): w is DeferredOutcome => w.outcome === "deferred")
-    .map((w) => ({ word: w.word, rhymeKey: outcome.target, reason: w.reason }));
-}
-
-/** One word the pass could not resolve, kept so the miss rate is countable. */
-interface DeferredReading {
-  word: string;
-  rhymeKey: RhymeKey;
-  reason: "agent-unavailable" | "agent-reading-failed-verification";
+    .map((w) => ({
+      word: w.word,
+      rhymeKey: outcome.target,
+      reason: w.reason,
+      proposed: w.proposed,
+    }));
 }
 
 /**
@@ -245,8 +333,16 @@ interface DeferredReading {
  * a *later* one — in exchange for a compound whose part was itself missing
  * until tonight, which no pass has yet turned up. Worth revisiting from a real
  * night's findings rather than from this comment.
+ *
+ * Exported for the Candidate Queue's readout endpoint
+ * (`web/editorCandidatesPlugin.ts`), which needs the *same* stack for the same
+ * reason: a Candidate's target Rhyme Key comes off the schedule or off a Seed
+ * the built index pinned, and judging it under a context assembled any other way
+ * would report a disagreement about the accent as a disagreement about the
+ * rhyme — which is precisely the five cot–caught Candidates all over again. The
+ * two paths call one function rather than reading the same four files twice.
  */
-function evidenceContext(): EvidenceContext {
+export function pinnedEvidenceContext(): EvidenceContext {
   const read = (name: string) => readFileSync(resolve(root, "data", name), "utf8");
   const pronunciations = parseCmudict(read("cmudict.dict"));
   const words = parseWordList(read("words.txt"));
@@ -265,8 +361,21 @@ function evidenceContext(): EvidenceContext {
  * unparseable output and a process that simply hangs are all the same outcome
  * to the caller — the word is deferred and the night carries on. A tooling
  * problem costs a few words, not the evening.
+ *
+ * The prompt is written here, from the evidence, rather than handed in: what an
+ * agent has to be told is a fact about *this* adapter's agent and not about the
+ * add path, and a caller that composed it would have to know both. That is what
+ * #179 narrowed the seam for, and #180 is the case it was narrowed *against*: a
+ * correction reads `evidence.direct` off an argument this adapter already holds,
+ * with no third parameter and nothing for the two other adapters to widen.
+ *
+ * Exported because it is the live adapter for two callers now — `add` above and
+ * `proposeCorrection` (`scripts/editorCorrection.ts`) — and a second copy of the
+ * spawn, the timeout and the kill would be a second thing to get right about a
+ * subprocess nothing can test.
  */
-function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation | null> {
+export function authorWithAgent(evidence: WordEvidence): Promise<Pronunciation | null> {
+  const { word, target } = evidence;
   const prompt = [
     `Write the General American CMUdict/ARPAbet pronunciation of the English word "${word}".`,
     `It must rhyme on the Rhyme Key ${target} — that is, the phonemes from its last`,
@@ -275,6 +384,12 @@ function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation 
     "Use ARPAbet phonemes with stress digits on vowels (0 unstressed, 1 primary,",
     "2 secondary), separated by single spaces. A compound's final element usually",
     "takes secondary rather than primary stress.",
+    // Only when there is one. A word the pinned sources do not read at all is an
+    // add and this paragraph would be a lie; a word they *do* read is a
+    // correction, and the reading being corrected is the single most useful
+    // thing an author can be shown — it is usually right about the phonemes and
+    // wrong only about which vowel carries the stress (ADR-0009).
+    ...correctionContext(evidence),
     "",
     "Respond with ONLY the phonemes on one line. No word, no quotes, no explanation.",
   ].join("\n");
@@ -306,6 +421,28 @@ function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation 
 }
 
 /**
+ * The paragraph an agent is shown when it is being asked to **correct** a
+ * reading rather than to author one from nothing: the readings the engine holds
+ * today, each with the Rhyme Key it computes to.
+ *
+ * Empty for a word with no reading, which is the add path's every agent call and
+ * was the whole of this prompt before #180. Written as a list because a word can
+ * hold more than one reading and the one being corrected is not always the
+ * first — and because saying "the current reading is X" of a word with two would
+ * be false in a way that invites the agent to reproduce X.
+ */
+function correctionContext({ direct, target }: WordEvidence): string[] {
+  if (direct.length === 0) return [];
+  return [
+    "",
+    "The pinned sources already read this word, and the reading is wrong — it is",
+    `not on ${target}. What they currently say, with the Rhyme Key each computes to:`,
+    ...direct.map((r) => `  ${r.phonemes.join(" ")}  →  ${r.key ?? "no stressed vowel"}`),
+    "Correct it. Usually the phonemes are right and the stress is on the wrong vowel.",
+  ];
+}
+
+/**
  * How long the agent gets for one word. Headless `claude -p` answers a request
  * this small — one word, one line of ARPAbet — in seconds; a minute means it is
  * not going to, and no amount of further waiting changes that. Erring long
@@ -315,32 +452,54 @@ function authorWithAgent(word: string, target: RhymeKey): Promise<Pronunciation 
 const AGENT_TIMEOUT_MS = 60_000;
 
 const SUPPLEMENT = "supplement.dict";
+/**
+ * The deferred queue's name, for the sentence the terminal prints. Where the
+ * file *is* comes from `web/deferredFile.ts`, which is also where it is read
+ * back from (#181) — one spelling of a location with a writer here and a reader
+ * there.
+ */
 const DEFERRED_QUEUE = "deferred-readings.jsonl";
 
 /**
  * The section the pass appends to, written once. There is no per-entry comment
- * — the reason for an add is constant, and a line restating it every time
- * carries no information (ADR-0014).
+ * for a word the *editor* named — the reason for that add is constant, and a
+ * line restating it every time carries no information (ADR-0014).
+ *
+ * A word raised from the Candidate Queue is the exception, and it is an
+ * exception on exactly that test: "a player asked for this" is not constant
+ * across the section, so a line saying it carries information no other line
+ * does (#178).
  */
 const EDITOR_SECTION =
   "# --- Adds by the Editor's Pass: composed from a compound split and verified\n" +
   "# against the day's Rhyme Key before being written here (ADR-0014). ---";
 
-function appendToSupplement(readings: WordReading[], path: string): void {
-  if (readings.length === 0) return;
+function appendToSupplement(entries: SupplementEntry[], path: string): void {
+  if (entries.length === 0) return;
   const existing = readFileSync(path, "utf8");
   const section = existing.includes(EDITOR_SECTION) ? "" : `\n${EDITOR_SECTION}\n`;
-  const lines = readings.map((r) => `${r.word} ${r.phonemes.join(" ")}`).join("\n");
+  const lines = entries
+    .map(({ reading, note }) => {
+      const entry = `${reading.word} ${reading.phonemes.join(" ")}`;
+      return note === null ? entry : `${note}\n${entry}`;
+    })
+    .join("\n");
   appendFileSync(path, `${section}${lines}\n`);
 }
 
 /**
  * The deferred queue, in the shape `supplement-candidates.jsonl` established.
- * It is the work list for a later human or agent pass — each entry carries the
- * word and the Rhyme Key it must reach, which is all an author needs — and it
- * is what makes the composition's real miss rate countable. Discarding misses
- * would forfeit that, and a second composition rule is meant to be decided from
- * this file's contents rather than from the next frustrating word.
+ * It is the work list for a later pass — each entry carries the word, the Rhyme
+ * Key it must reach and whatever reading the agent did propose, which is all an
+ * author or an editor needs — and it is what makes the composition's real miss
+ * rate countable. Discarding misses would forfeit that, and a second composition
+ * rule is meant to be decided from this file's contents rather than from the
+ * next frustrating word.
+ *
+ * Since #181 the later pass is the Editor's Pass itself: the file is read back
+ * as the Candidate Queue's second section (`scripts/editorDeferred.ts`), where
+ * an unreachable agent is retried and a refused reading is judged. **Append-only
+ * either way** — nothing reads this file and then shortens it.
  */
 function appendToDeferredQueue(deferred: DeferredReading[], path: string): void {
   if (deferred.length === 0) return;

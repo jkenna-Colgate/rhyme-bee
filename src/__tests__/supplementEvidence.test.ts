@@ -73,7 +73,7 @@ describe("gatherEvidence", () => {
     // viceroy's stress currently lands on its first syllable, so the reading's
     // last STRESSED vowel is AY1, not the unstressed final OY0 — the Rhyme Key
     // runs from there: "AY S R OY", not "OY". A misplaced-stress correction
-    // case exactly like the one docs/agents/supplement-judge.md walks through.
+    // case exactly like the ones the Editor's Pass offers a correction for.
     const ctx = context({
       pronunciations: [["viceroy", [["V", "AY1", "S", "R", "OY0"]]]],
       words: ["viceroy"],

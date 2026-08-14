@@ -24,6 +24,17 @@
  * the day is then re-read from while still stale, and `DayReadoutView` would
  * quietly restore the band verdicts it had been withholding.
  *
+ * ## Two ways to name the target, one add
+ *
+ * A batch is aimed at one Rhyme Key, and the request has two ways to say which:
+ * a **date**, whose key this handler resolves out of `data/schedule.json`, and a
+ * **Rhyme Key** named outright, which is how an add raised from the Candidate
+ * Queue travels (#178). The second is not a second add — the words are judged,
+ * written, rebuilt and answered by the same code below — it is the case where
+ * the caller already holds the key and nothing has to be resolved. A Candidate
+ * carries the key its Appeal was recorded against, and most Candidates belong to
+ * no scheduled day at all, so a date could not have reached most of the queue.
+ *
  * ## The first act is skipped when there is nothing to write (#162)
  *
  * #161 refused a Submit with no words, so that a night of Tier judgements alone
@@ -110,7 +121,15 @@ import { repoRoot } from "./repoRoot.ts";
  */
 export interface EditorAddDeps {
   schedule: () => Schedule;
-  runAdds: (words: string[], aim: AddTarget) => Promise<AddOutcome>;
+  /**
+   * `appealed` is the batch's own subset that a player asked for, carried
+   * through to the reading's comment in `data/supplement.dict` and to nothing
+   * else (#178). It is a third parameter rather than a field on `aim` because
+   * an aim is one Rhyme Key for the whole batch and this is per word, and
+   * because `resolveAddOutcome` must never see it: a word a player asked for is
+   * verified exactly as any other word is.
+   */
+  runAdds: (words: string[], aim: AddTarget, appealed: string[]) => Promise<AddOutcome>;
   rebuild: () => Promise<RebuildResult>;
   openIndex: () => RhymeIndex;
   /**
@@ -184,11 +203,26 @@ export function editorAddHandler(deps: EditorAddDeps) {
       }
     } else {
       let aim: AddTarget | null;
-      try {
-        aim = targetIn(deps.schedule(), asked.date);
-      } catch (error) {
-        // The second of the four scopes, and the first of the two that relay.
-        return relayCause(res, "Could not read the schedule", error);
+      if (asked.rhymeKey !== undefined) {
+        // A batch raised from the Candidate Queue, aimed at the key the Appeal
+        // was recorded against (#178). Nothing is resolved and no schedule is
+        // read, because there is nothing left to resolve — and most Candidates
+        // belong to no scheduled day, so a date could not have found this key.
+        //
+        // No `seed`, exactly as the CLI's `--rhymeKey` carries none: there is no
+        // Puzzle behind an aim named outright, and a Seed invented from the
+        // schedule for the keys that happen to have one would be a field whose
+        // meaning changed with the day (`ScheduledAddTarget`, `addOutcome.ts`).
+        aim = { target: asked.rhymeKey, provenance: `${asked.rhymeKey}, from the Candidate Queue` };
+      } else {
+        try {
+          // `asked.date` is a string here: the parser refuses a null date
+          // unless a Rhyme Key was named, and this is the branch where none was.
+          aim = targetIn(deps.schedule(), asked.date!);
+        } catch (error) {
+          // The second of the four scopes, and the first of the two that relay.
+          return relayCause(res, "Could not read the schedule", error);
+        }
       }
       if (aim === null) {
         // Not a malformed request and not the file's fault: the run simply
@@ -202,7 +236,7 @@ export function editorAddHandler(deps: EditorAddDeps) {
       }
 
       try {
-        outcome = await deps.runAdds(asked.words, aim);
+        outcome = await deps.runAdds(asked.words, aim, asked.appealed);
       } catch (error) {
         // What throws past `add` is a pinned source that would not read or a
         // supplement that would not take the append, and both name their own
@@ -219,8 +253,10 @@ export function editorAddHandler(deps: EditorAddDeps) {
       rebuilt,
       // A day is re-read only from an index that was actually rebuilt. See
       // `AddSubmitResult` for why a stale re-read is refused rather than
-      // shown with a caveat on it.
-      readout: rebuilt.ok ? readDay(deps, asked.date) : null,
+      // shown with a caveat on it — and `null` when the request named no date
+      // at all, which is a batch aimed at a Rhyme Key with no day on screen
+      // behind it and so no day to hand back.
+      readout: rebuilt.ok && asked.date !== null ? readDay(deps, asked.date) : null,
     };
     sendJson(res, 200, result);
   };
@@ -258,7 +294,7 @@ export function editorAddPlugin(): Plugin {
   return editorRoute(
     editorAddSpec({
       schedule: readSchedule,
-      runAdds: add,
+      runAdds: (words, aim, appealed) => add(words, aim, { appealed }),
       rebuild: () => rebuildIndex(repoRoot),
       openIndex: builtIndex,
       staleness: () => indexStaleness(repoRoot),

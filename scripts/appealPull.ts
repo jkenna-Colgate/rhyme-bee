@@ -8,8 +8,8 @@
  * the dev-only button would have written them. Nothing new is invented on the
  * way — each object body is already `serialiseCandidate` output, so appending
  * the bodies in listing order yields JSON Lines that `parseCandidates` reads
- * unchanged, and `npm run supplement:candidates` never learns where a record
- * came from.
+ * unchanged, and the Candidate Queue in the Editor's Pass never learns where a
+ * record came from.
  *
  * Nothing here adjudicates, and nothing here judges. The verdict was reached in
  * the player's browser and stays there (ADR-0013); this moves a report *about* a
@@ -19,10 +19,12 @@
  * the record itself, so the queue is self-describing about what has already been
  * pulled — no ledger file to drift out of step with it. Running the pull twice
  * therefore appends nothing the second time, because every key it lists is a key
- * the queue can already derive. The judged-and-archived half counts too: the
- * `--archive` flag on the judging script empties the queue into
- * `supplement-candidates.archived.jsonl`, and the pull is read-only on the
- * bucket, so the archive is the durable record of what has been seen.
+ * the queue can already derive. **Judging does not change that** (#182): the
+ * queue is append-only and no path in the tool empties it, so a record stays
+ * derivable after it has been judged. That is what retired the archive file the
+ * pull used to consult alongside the queue — a Candidate is resolved by the
+ * Rhyme Index rhyming its word, not by being moved out of the file, so there is
+ * one history to read rather than two.
  */
 
 import {
@@ -216,14 +218,13 @@ export function selectNewCandidates(
 }
 
 /**
- * The object keys a queue's records account for. Feed it the live queue and the
- * archive together: between them they are everything the maintainer has ever
- * pulled, and a key in either is a record not to fetch again.
+ * The object keys a queue's records account for. One queue is the whole history:
+ * the file is append-only and nothing empties it, so every record the maintainer
+ * has ever pulled is still in it and a key it derives is a record not to fetch
+ * again.
  */
-export function candidateKeysIn(...queues: readonly string[]): Set<string> {
+export function candidateKeysIn(queue: string): Set<string> {
   const keys = new Set<string>();
-  for (const queue of queues) {
-    for (const candidate of parseCandidates(queue)) keys.add(candidateKey(candidate));
-  }
+  for (const candidate of parseCandidates(queue)) keys.add(candidateKey(candidate));
   return keys;
 }
