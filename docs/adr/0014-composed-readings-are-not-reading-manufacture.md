@@ -71,6 +71,48 @@ real nights the miss rate is a count rather than an impression, and a second
 composition rule can be decided from that number instead of from the next
 frustrating word.
 
+### The boundary is measured: 0.12% against one key, 62% against many
+
+Seven out of seven measured *reach* — how much composition resolves. It says
+nothing about whether an accept is **correct**, which is a different number and
+the one the scope line rests on. That line — *one* verified reading for *one*
+word the editor named — reads as a preference about tidiness. It is not. It is
+where the accept predicate stops working, and the distance either side of it was
+measured on 2026-08-24.
+
+Method: take the 27,039 words with knownness >= 0.9 that **already** have a
+reading, discard it, run `composeReading` as though the word were unread, and
+compare the composed Rhyme Key with the one the real reading yields. The truth is
+known for every word, so every accept is scoreable.
+
+| aimed at | composed onto a key | wrong |
+|---|---|---|
+| one key, named by the editor | 32 | **0.12%** |
+| all 260 scheduled keys | 11,132 | **62.0%** |
+| all 260, compound-only guard | 4,564 | **49.3%** |
+
+The percentages are of the compositions *accepted*, not of the 27,039.
+
+With one target the predicate verifies. With many it **shops**. A spelling can be
+cut at every position, each cut is tried against every key, and something almost
+always lands somewhere: `abandoned` cuts to `abandon+ed` and reaches `EH D`,
+`abortion` to `abort+ion` and reaches `AA N`, `protractor` to `protract+or` and
+reaches `AO R`, `accost` to `acc+ost`. Each is a valid composition of two real
+readings, each is wrong, and nothing in the predicate distinguishes them from
+`spear+mint` — it sees one key at a time and cannot know it was handed 260
+chances at it.
+
+The compound-only guard — both halves at least three characters, tail not in a
+suffix blocklist — was the obvious mitigation, and it bought 62.0% down to 49.3%.
+Half of what it accepts is still wrong. The problem is not suffixes, and no
+refinement of the guard reaches it: the failure is the *number of targets*, which
+is the one thing a guard on the split does not touch.
+
+So the editor naming the word is not a workflow detail to be relaxed for
+throughput later. It is the whole of the guarantee. A batch that supplies its own
+targets is a different mechanism with a two-in-three error rate wearing this
+one's name.
+
 ## Considered Options
 
 **Keep asking the editor to hand-author ARPAbet.** The status quo. Rejected: the
@@ -89,6 +131,14 @@ it and teach the next reader that it is spendable.
 an unchecked generator where ADR-0011 put a human. The freeze's actual concern is
 readings entering the game that nobody has checked, not the letter of which
 module writes them.
+
+**Compose every unread word against every scheduled key and let verification
+sort them.** The apparent free lunch: the accept predicate already exists, so
+point it at the lexicon and harvest what passes. Rejected on the ablation above —
+62.0% of what it accepts is wrong, 49.3% with the obvious guard. Verification is
+only verification when it is *given* the target; supplied with 260 of them it
+degenerates into search. Recorded because the idea is genuinely attractive from
+the code, and its defect is invisible without the measurement.
 
 **Send every word to the agent and build no composition.** Rejected. The
 composition is deterministic, free, inspectable and measured; the agent is none
@@ -111,6 +161,10 @@ of those. Composition first, agent as the fallback for what it cannot resolve.
 - **A fix is global**, unchanged from ADR-0011: an added reading applies to every
   Puzzle that word appears in, which is what makes the nightly workload decay
   instead of recur. Per-Puzzle answer-set overlays stay barred.
+- **The editor naming the word is load-bearing**, and measured: 0.12% wrong
+  against one key, 62.0% against many. It is a correctness boundary rather than a
+  scoping preference, so a proposal to batch composition over words nobody named
+  is a proposal to accept a two-in-three error rate, whatever else surrounds it.
 - **A second composition rule is deferred** until the deferred queue can decide
   it from a number. Proposing one before then is proposing it on the same
   evidence the freeze was written to stop.
