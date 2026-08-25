@@ -1385,3 +1385,26 @@ code {
 .editor-paste-refused button {
   font-size: 0.75rem;
 }
+
+/* The demote gesture inside a pasted row, which is a flex line and not a card:
+   `.editor-demote` is the day view's footer strip under a word's box, and its
+   border-top and fill read as a stray panel when it lands mid-row here. Same
+   buttons, no chrome around them. */
+.editor-paste-demote {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.editor-paste-demote button,
+.editor-paste-dismiss {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+}
+
+/* Quieter than the two demote buttons beside it, because it is the gesture that
+   writes nothing — it clears a row the engine already refuses. */
+.editor-paste-dismiss {
+  color: #6b6558;
+}

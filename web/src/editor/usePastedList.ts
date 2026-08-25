@@ -40,11 +40,22 @@
  * pile on screen instead of asking for a second lookup about words nothing has
  * changed about.
  *
+ * ## What a dismissal is held for, and what it is not
+ *
+ * A word dismissed from the names-and-non-words pile without a write (#191) is
+ * held here for the sitting, beside the paste and under the same rules: memory
+ * only, gone with the tab. It is **not** a demotion and does not pretend to be
+ * one — nothing was written, because for a word with no wordhood there is
+ * nothing true to write. It is kept across a day change all the same, unlike a
+ * refusal: wordhood is a property of the word, so a word dismissed on Tuesday is
+ * still not a word on Wednesday.
+ *
  * No tests, and the reason is not that hooks are exempt from them: every rule
  * this feature has lives in `pastedList.ts`, which is pure and tested over
  * literals, and the endpoint's own refusals are tested through its middleware.
- * What is left here is `useState`, a fetch, a `useMemo` and two effects that
- * hand the accumulated refusals to a function tested over literals.
+ * What is left here is `useState`, a fetch, two `useMemo`s and two effects that
+ * hand the accumulated refusals and dismissals to functions tested over
+ * literals.
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -60,6 +71,12 @@ import { joinPastedList, mergeRefusals, type PastedList } from "./pastedList.ts"
  * map that is already clear is not a re-render.
  */
 const NO_REFUSALS: ReadonlyMap<string, string> = new Map();
+
+/**
+ * Nothing dismissed, as one value — same reason as `NO_REFUSALS`, and the
+ * starting state of a sitting nobody has dismissed anything in.
+ */
+const NOTHING_DISMISSED: ReadonlySet<string> = new Set<string>();
 
 export interface Paste {
   /** What the editor pasted, verbatim — the box's own value. */
@@ -88,12 +105,40 @@ export interface Paste {
    * the evidence reply is, and cleared with it.
    */
   refused: ReadonlyMap<string, string>;
+  /**
+   * Take a word out of the names-and-non-words pile without writing anything.
+   *
+   * For the half of that pile with **no wordhood**, where a demotion would be
+   * stale on arrival: the engine already rejects the word, so the only thing
+   * left to do is stop being shown it (#191). Held for the sitting rather than
+   * written, because there is no true fact to write — and held here rather than
+   * in the panel because a dismissal is a fact about a word and not about a day,
+   * so it survives the editor moving to another date, exactly as a demotion
+   * does.
+   *
+   * The other half needs nothing here: demoting a name the word list holds goes
+   * through the demote route, and the word leaves the pile because the refreshed
+   * demotion list is joined against on the next render.
+   *
+   * **Not a Decline**, whose _Avoid_ list in CONTEXT.md names this word. A
+   * Decline is a ruling on a Candidate and writes one; this clears a row and
+   * writes nothing, and there is no Candidate anywhere near it. The word is
+   * #191's own and is kept because it is the gesture's name on the screen; the
+   * collision is worth knowing about because the editor shell renders real
+   * Declines two tabs over.
+   */
+  dismiss: (word: string) => void;
   /** What went wrong with the last lookup, if anything. Nothing was written. */
   error: string | null;
 }
 
-export function usePastedList(readout: DayReadout | null, result: AddSubmitResult | null): Paste {
+export function usePastedList(
+  readout: DayReadout | null,
+  result: AddSubmitResult | null,
+  demoted: ReadonlySet<string>,
+): Paste {
   const [text, setText] = useState("");
+  const [dismissed, setDismissed] = useState<ReadonlySet<string>>(NOTHING_DISMISSED);
   const [looked, setLooked] = useState<EvidenceReply | null>(null);
   const [looking, setLooking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,10 +173,26 @@ export function usePastedList(readout: DayReadout | null, result: AddSubmitResul
   // against another Rhyme Key, and refuses one that does not answer about the
   // whole residue. Both are rules about what the evidence *is*, so they live
   // where everything else this feature knows lives and are tested over literals.
+  // The committed demotion list and this sitting's write-free dismissals, as one
+  // set, because the join asks one question of it: does the game still hold this
+  // word? The two answer that question the same way and differ only in what was
+  // written, which is the *gesture's* business and not the join's.
+  const gone = useMemo(() => {
+    if (dismissed.size === 0) return demoted;
+    return new Set([...demoted, ...dismissed]);
+  }, [demoted, dismissed]);
+
   const list = useMemo(
-    () => joinPastedList(text, readout, looked),
-    [text, readout, looked],
+    () => joinPastedList(text, readout, looked, gone),
+    [text, readout, looked, gone],
   );
+
+  // No fetch, no re-read and nothing keyed on the day, so the paste and the
+  // evidence it was looked up against both stay exactly as they are — which is
+  // the whole of what "the paste survives a dismissal" costs.
+  const dismiss = useCallback((word: string) => {
+    setDismissed((held) => new Set(held).add(word));
+  }, []);
 
   const look = useCallback(async () => {
     const day = readout !== null && readout.outcome === "day" ? readout : null;
@@ -163,5 +224,5 @@ export function usePastedList(readout: DayReadout | null, result: AddSubmitResul
     }
   }, [readout, list.residue]);
 
-  return { text, setText, list, look, looking, refused, error };
+  return { text, setText, list, look, looking, refused, dismiss, error };
 }

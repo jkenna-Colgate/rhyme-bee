@@ -22,8 +22,16 @@
  * have been four of each to do one night's work, so there is no chunking and no
  * cap here — the editor decides the volume by what they paste.
  *
- * The other two piles are still read-only: demoting the names-and-non-words pile
- * is #191, and acting on what the day has and the list omits is #192.
+ * **The names-and-non-words pile is acted on per word** (#191), and the two
+ * halves of it act differently. A name the word list still holds is demoted
+ * through the existing demote route, which appends to `data/demotions.txt` and
+ * so survives a fresh clone; a word with no wordhood is dismissed from the
+ * screen and nothing is written, because the engine already rejects it and a
+ * demotion would be stale on arrival. That is a per-word gesture and not a bulk
+ * one, because the reason is what the player receives and the editor picks it.
+ *
+ * The remaining pile is still read-only: acting on what the day has and the
+ * list omits is #192.
  *
  * **There is no Tier control, and there is not meant to be one.** Tier follows
  * knownness (ADR-0003, ADR-0015); knownness is shown because it says which words
@@ -40,7 +48,9 @@
  * it is tested over literals, leaving this a render of what that returned.
  */
 
+import { DEMOTION_REASONS, type DemotionReason } from "../../../src/demotions.ts";
 import type { DayReadout, ScheduledDayReadout } from "../../../scripts/editorDay.ts";
+import { DEMOTION_LABEL, DEMOTION_TITLE } from "./demote.ts";
 import { InFlight } from "./InFlight.tsx";
 import {
   pileToAccept,
@@ -49,6 +59,7 @@ import {
   type WordWithoutReading,
 } from "./pastedList.ts";
 import type { Adder } from "./useAdder.ts";
+import type { Demoter } from "./useDemoter.ts";
 import type { Paste } from "./usePastedList.ts";
 
 /** Knownness as the readout shows it, and what an absent row is called. */
@@ -60,10 +71,12 @@ export function PastedListView({
   readout,
   paste,
   adder,
+  demoter,
 }: {
   readout: DayReadout | null;
   paste: Paste;
   adder: Adder;
+  demoter: Demoter;
 }) {
   const day = readout !== null && readout.outcome === "day" ? readout : null;
   const { pasted, covered, residue, buckets } = paste.list;
@@ -130,7 +143,11 @@ export function PastedListView({
                 adder={adder}
               />
               <ReadsElsewherePile words={buckets.readsElsewhere} />
-              <DemotablePile words={buckets.demotable} />
+              <DemotablePile
+                words={buckets.demotable}
+                demoter={demoter}
+                onDismiss={paste.dismiss}
+              />
             </>
           )}
         </>
@@ -409,19 +426,47 @@ function ReadsElsewherePile({ words }: { words: readonly ReadsElsewhereWord[] })
 }
 
 /**
- * Names and junk: what the game should not serve. Shown with the rejection a
- * player would receive, because that is what a demotion records — `Kate`
- * obviously rhymes with `ate`, and a refusal that does not say "that is a name"
- * reads as a bug.
+ * Names and junk: what the game should not serve, and the two gestures that take
+ * them off the list for good.
+ *
+ * Shown with the rejection a player would receive, because that is what a
+ * demotion records — `Kate` obviously rhymes with `ate`, and a refusal that does
+ * not say "that is a name" reads as a bug.
  *
  * A name is here even when the word list holds it, and `pastedList.ts` argues
  * why: the evidence applies no demotions, so a name nobody has demoted yet reads
  * as having wordhood and is being served as an ordinary Answer today. The cost
  * is `bill` and `mark`, which the editor looks at and leaves alone.
  *
- * The demotion gesture itself is #191. This is the pile it will act on.
+ * ## Why the two halves are different gestures
+ *
+ * Because only one of them has anything to write. A name the word list holds is
+ * served today, so demoting it changes what the engine does and belongs in the
+ * committed file. A word the list does not hold is already rejected, so a
+ * demotion for it would be **stale on arrival** — a no-op line in a
+ * hand-curated file, and enough of them would turn `data/demotions.txt` from a
+ * record of corrections into a log of everything a third party ever listed. The
+ * measured `idiotic` day would have contributed 197 of them in one paste.
+ *
+ * Neither half is a bulk gesture, and that is not an oversight: the reason is
+ * the sentence the player receives, and #186 is explicit that per-word attention
+ * is reserved for the cases that genuinely need judgement. This is one — the
+ * pile's own test is name-hood against a list of first names, so it is right
+ * about `algiers` and wrong about `bill`.
+ *
+ * Nothing reports here. A demotion is raised from three panels now and reaches
+ * the editor above the tab strip either way (`DemoteBanner`), which is where a
+ * fact about every day belongs rather than under the pile it was clicked on.
  */
-function DemotablePile({ words }: { words: readonly DemotableWord[] }) {
+function DemotablePile({
+  words,
+  demoter,
+  onDismiss,
+}: {
+  words: readonly DemotableWord[];
+  demoter: Demoter;
+  onDismiss: (word: string) => void;
+}) {
   if (words.length === 0) return null;
 
   return (
@@ -430,18 +475,68 @@ function DemotablePile({ words }: { words: readonly DemotableWord[] }) {
         Names and non-words <span className="editor-muted">({words.length})</span>
       </h3>
       <p className="editor-paste-note">
-        Not words of the game, with the rejection a player would get. A name is listed even
-        if the word list still holds it — that is the demotion worth making. Recording
-        those demotions so the words stop reappearing is a later slice.
+        Not words of the game, with the rejection a player would get. A name the word list
+        still holds is demoted on every day, not just this one — that is the correction
+        worth making. A word the list does not hold is already refused, so dismissing it
+        writes nothing and only clears the row.
       </p>
       <ul className="editor-paste-rows">
         {words.map((entry) => (
           <li key={entry.word}>
             <span className="editor-paste-word">{entry.word}</span>
             <span className="editor-muted">{entry.reason}</span>
+            {entry.writes ? (
+              <DemoteChoice word={entry.word} demoter={demoter} />
+            ) : (
+              <button
+                type="button"
+                className="editor-demote-reason editor-paste-dismiss"
+                title="Not in the word list, so the engine already rejects it. Clears the row; writes nothing."
+                onClick={() => onDismiss(entry.word)}
+              >
+                Dismiss
+              </button>
+            )}
           </li>
         ))}
       </ul>
     </section>
+  );
+}
+
+/**
+ * The demote gesture for one pasted name, with the reason chosen rather than
+ * assumed.
+ *
+ * The same two peer buttons the day panel offers, from the same labels, for the
+ * same reason: that column *is* the rejection the player receives, so it cannot
+ * be defaulted — a name that rhymes must be told it is a name, and calling an
+ * abbreviation somebody's name would be its own small lie. The pile's guess is
+ * printed beside the word as a label and stops there.
+ *
+ * Disabled while any demotion is in flight rather than only this word's: they
+ * all append to one file, and the row goes away by itself when the refreshed
+ * demotion list reaches the join.
+ */
+function DemoteChoice({ word, demoter }: { word: string; demoter: Demoter }) {
+  // One sentence for the row rather than "Demoting…" on both buttons, which
+  // would read as two writes going out for one click.
+  if (demoter.writing === word) return <span className="editor-muted">Demoting…</span>;
+
+  return (
+    <span className="editor-paste-demote" role="group" aria-label={`Demote ${word}`}>
+      {DEMOTION_REASONS.map((reason: DemotionReason) => (
+        <button
+          type="button"
+          key={reason}
+          className="editor-demote-reason"
+          title={DEMOTION_TITLE[reason]}
+          disabled={demoter.writing !== null}
+          onClick={() => void demoter.demote(word, reason)}
+        >
+          {DEMOTION_LABEL[reason]}
+        </button>
+      ))}
+    </span>
   );
 }

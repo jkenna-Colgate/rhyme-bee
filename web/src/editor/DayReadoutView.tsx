@@ -35,7 +35,7 @@ import type { CandidateQueueReadout } from "../../../scripts/editorCandidates.ts
 import { AddQueueView } from "./AddQueueView.tsx";
 import { DayCandidatesView, type CandidateActs } from "./CandidateQueueView.tsx";
 import { correctedDay } from "./correctedDay.ts";
-import { showsDemotionReassurance } from "./demote.ts";
+import { DEMOTION_LABEL, DEMOTION_TITLE, showsDemotionReassurance } from "./demote.ts";
 import type { RetieredWord } from "./retier.ts";
 import type { EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
@@ -642,21 +642,6 @@ function VerdictMenu({
     </div>
   );
 }
-
-// Every key `DEMOTION_REASONS` names is required here — miss one and this object
-// literal fails to compile, so a reason added to the type cannot become a button
-// with no text. The labels name the rejection rather than the file's spelling,
-// because that is what the editor is choosing: the second column of
-// `data/demotions.txt` is the message the player receives.
-const DEMOTION_LABEL: Record<DemotionReason, string> = {
-  "proper-noun": "It’s a name",
-  "not-a-known-word": "It’s not a word",
-};
-
-const DEMOTION_TITLE: Record<DemotionReason, string> = {
-  "proper-noun": "Rejected as a Proper Noun — the player is told it is a name",
-  "not-a-known-word": "Rejected as not a known word — no claim that it is anybody’s name",
-};
 
 /**
  * The demote gesture's **second click**. The first was the word, which opened

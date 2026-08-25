@@ -80,6 +80,12 @@ import type { EvidenceReply, WordFacts } from "./evidence.ts";
 const SEPARATORS = /[\n\r,\t]+/;
 
 /**
+ * Nothing demoted, as one value — the default when a caller has no demotion list
+ * to hand, and one identity rather than a fresh empty set per join.
+ */
+const NOTHING_DEMOTED: ReadonlySet<string> = new Set<string>();
+
+/**
  * A word the day is missing a reading for: the main pile, and the one bucket
  * anything is ever added from.
  */
@@ -137,8 +143,18 @@ export interface ReadsElsewhereWord {
  *
  * That is exactly the correction a demotion exists to make, so a name is offered
  * as one. The cost is a word like `bill` or `mark`, which is genuinely both, and
- * that cost is a per-word judgement in a read-only pile — the editor looks and
- * leaves it alone. The alternative loses the case the pile is for.
+ * that cost is a per-word judgement — the editor looks at the row and leaves it
+ * alone. The alternative loses the case the pile is for.
+ *
+ * ## Why some of these are dismissed without a write
+ *
+ * Because a demotion is a correction, and a correction to nothing is a no-op.
+ * The pile holds two populations: names the word list still holds, which are
+ * served as ordinary Answers and which a demotion genuinely changes; and words
+ * with no wordhood at all, which the engine already rejects. Only the first is
+ * written. {@link DemotableWord.writes} is the distinction, and it is what keeps
+ * `data/demotions.txt` a record of real corrections rather than a log of every
+ * word a third party ever listed.
  */
 export interface DemotableWord {
   word: string;
@@ -150,8 +166,32 @@ export interface DemotableWord {
    * not a category: a demotion recorded without it would tell a player that an
    * abbreviation is somebody's name, or refuse a name without saying it is one.
    * `Kate` obviously rhymes with `ate`, and a silent refusal reads as a bug.
+   *
+   * Precisely, it is the second column a demotion *would* record, so it is what
+   * the player is told on a row that {@link DemotableWord.writes}. On a row that
+   * does not it is a label on what the word is and nothing more: the gate tests
+   * wordhood before name-hood, so a name the word list never held is already
+   * refused as `not-a-known-word` and no demotion changes that.
+   *
+   * It is what the row is labelled with and what a write is *offered* under —
+   * never what a write is made under unasked. The editor picks between the two
+   * (#191), because the pile's own test is name-hood against `data/names.txt`
+   * and that file is a list of first names rather than a ruling: an abbreviation
+   * somebody's parents also chose lands here reading `proper-noun`, and calling
+   * it a name would be the small lie the second column exists to prevent.
    */
   reason: DemotionReason;
+  /**
+   * Whether demoting this word would change what the engine does.
+   *
+   * True when `data/words.txt` still holds it — the name-with-wordhood case,
+   * which is being served as an ordinary Answer today and is exactly the
+   * correction the demotion list exists to make. False when the word has no
+   * wordhood: the engine already rejects it, so a demotion would be **stale on
+   * arrival**, and writing one anyway would fill a hand-curated committed file
+   * with no-ops. Such a word still leaves the screen; nothing is written for it.
+   */
+  writes: boolean;
 }
 
 /** The residue, split on wordhood. Null until the evidence for it has arrived. */
@@ -212,6 +252,7 @@ export function joinPastedList(
   text: string,
   readout: DayReadout | null,
   evidence: EvidenceReply | null = null,
+  demoted: ReadonlySet<string> = NOTHING_DEMOTED,
 ): PastedList {
   if (readout === null || readout.outcome !== "day") {
     return { pasted: 0, covered: 0, residue: [], buckets: null };
@@ -236,7 +277,7 @@ export function joinPastedList(
     pasted: counted,
     covered: counted - residue.length,
     residue,
-    buckets: bucketsOf(residue, readout.rhymeKey, evidence),
+    buckets: bucketsOf(residue, readout.rhymeKey, evidence, demoted),
   };
 }
 
@@ -267,6 +308,7 @@ function bucketsOf(
   residue: readonly string[],
   rhymeKey: RhymeKey,
   evidence: EvidenceReply | null,
+  demoted: ReadonlySet<string>,
 ): PastedBuckets | null {
   if (evidence === null || evidence.rhymeKey !== rhymeKey) return null;
 
@@ -279,12 +321,34 @@ function bucketsOf(
   const demotable: DemotableWord[] = [];
 
   for (const word of residue) {
+    // A word the game no longer holds is offered in **no bucket at all**, and
+    // that one line is what makes a dismissal stick (#191). It covers both ways
+    // a word arrives here: an entry in `data/demotions.txt`, which is durable
+    // and withdraws wordhood on every day the word ever appeared on; and a stale
+    // dismissal this sitting made without a write, held in memory because there
+    // is nothing true to write. Either way nothing is left to do about the word,
+    // and a row offering the demotion again would be offering a no-op.
+    //
+    // Deliberately inside this loop rather than over the residue above it. The
+    // residue is what the evidence reply was asked about, and shortening it
+    // would fail the reply's own "answers about the whole residue" check the
+    // moment anything was dismissed — every bucket would vanish along with the
+    // row the editor had just acted on.
+    if (demoted.has(word)) continue;
+
     // Non-null by the check above, which refused the whole reply rather than let
     // a residue word fall out of the buckets unmentioned.
     const known = facts.get(word) as WordFacts;
 
     if (!known.isWord || known.isName) {
-      demotable.push({ word, reason: known.isName ? "proper-noun" : "not-a-known-word" });
+      demotable.push({
+        word,
+        reason: known.isName ? "proper-noun" : "not-a-known-word",
+        // Wordhood, and not name-hood, is what makes the write worth making: a
+        // name the word list holds is served today, and a word it does not hold
+        // is already refused.
+        writes: known.isWord,
+      });
       continue;
     }
 

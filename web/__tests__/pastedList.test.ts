@@ -341,7 +341,7 @@ describe("joinPastedList: the residue, split on wordhood", () => {
     );
 
     expect(joined.buckets?.demotable).toEqual([
-      { word: "quotic", reason: "not-a-known-word" },
+      { word: "quotic", reason: "not-a-known-word", writes: false },
     ]);
     expect(joined.buckets?.withoutReading).toEqual([]);
   });
@@ -353,7 +353,9 @@ describe("joinPastedList: the residue, split on wordhood", () => {
       evidence([facts("scotic", { isWord: false, isName: true, knownness: null })]),
     );
 
-    expect(joined.buckets?.demotable).toEqual([{ word: "scotic", reason: "proper-noun" }]);
+    expect(joined.buckets?.demotable).toEqual([
+      { word: "scotic", reason: "proper-noun", writes: false },
+    ]);
     expect(joined.buckets?.withoutReading).toEqual([]);
   });
 
@@ -368,7 +370,9 @@ describe("joinPastedList: the residue, split on wordhood", () => {
       evidence([facts("kate", { isWord: true, isName: true, knownness: 0.4 })]),
     );
 
-    expect(joined.buckets?.demotable).toEqual([{ word: "kate", reason: "proper-noun" }]);
+    expect(joined.buckets?.demotable).toEqual([
+      { word: "kate", reason: "proper-noun", writes: true },
+    ]);
     expect(joined.buckets?.withoutReading).toEqual([]);
   });
 
@@ -421,6 +425,51 @@ describe("joinPastedList: the residue, split on wordhood", () => {
     expect(joined.buckets?.withoutReading.map((entry) => entry.word)).toEqual(["macrobiotic", "biotic"]);
     expect(joined.buckets?.readsElsewhere.map((entry) => entry.word)).toEqual(["quadratic"]);
     expect(joined.buckets?.demotable.map((entry) => entry.word)).toEqual(["kate"]);
+  });
+
+  it("offers no bucket at all for a word the demotion list already names", () => {
+    // A dismissal has to stick, and the durable half of that is
+    // `data/demotions.txt`: the word has no wordhood on any day, so there is
+    // nothing left to add it as and nothing left to demote it for.
+    const joined = joinPastedList(
+      "kate\nnecrotic",
+      day(["chaotic"]),
+      evidence([facts("kate", { isName: true, knownness: 0.4 }), facts("necrotic")]),
+      new Set(["kate"]),
+    );
+
+    expect(joined.buckets?.demotable).toEqual([]);
+    expect(joined.buckets?.withoutReading.map((entry) => entry.word)).toEqual(["necrotic"]);
+  });
+
+  it("keeps a demoted word out of the main pile too, not just the demotions", () => {
+    // The evidence context applies no demotions, so a demoted word still reads
+    // as having wordhood. Taking the demotion list at its word here is what
+    // stops the tool asking an agent for a reading for a word the game has
+    // already refused to serve.
+    const joined = joinPastedList(
+      "lbs",
+      day(["chaotic"]),
+      evidence([facts("lbs", { knownness: 0.2 })]),
+      new Set(["lbs"]),
+    );
+
+    expect(joined.buckets).toEqual({ withoutReading: [], readsElsewhere: [], demotable: [] });
+  });
+
+  it("counts a demoted word in the residue all the same", () => {
+    // The residue is what the evidence reply is asked about, and the reply is
+    // refused unless it answers about all of it. Shortening the residue on a
+    // dismissal would take every bucket off the screen with the dismissed row.
+    const joined = joinPastedList(
+      "kate\nnecrotic",
+      day(["chaotic"]),
+      evidence([facts("kate", { isName: true }), facts("necrotic")]),
+      new Set(["kate"]),
+    );
+
+    expect(joined).toMatchObject({ pasted: 2, covered: 0, residue: ["kate", "necrotic"] });
+    expect(joined.buckets).not.toBeNull();
   });
 
   it("still counts what the day covers, and never buckets it", () => {

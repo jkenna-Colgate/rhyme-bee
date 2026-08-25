@@ -263,7 +263,8 @@ list up in another window, alphabetical, and run the two lists past each other.
 >   is listed even when `data/words.txt` still holds it: the evidence applies no
 >   demotions, so a name nobody has demoted yet is being served as an ordinary
 >   Answer today, and that is the demotion worth making. The cost is `bill` and
->   `mark`, which are genuinely both — look and leave them alone.
+>   `mark`, which are genuinely both — look and leave them alone. Acted on per
+>   word since #191, below.
 >
 > This is why the CLI's `not-a-known-word` count is so misleading: the Rhyme
 > Index refuses a word with no reading that way whether we have never heard of
@@ -298,9 +299,27 @@ list up in another window, alphabetical, and run the two lists past each other.
 > moving to another day, whose Rhyme Key a refusal recorded here says nothing
 > about.
 >
-> The other two piles are still read-only: the split tells you what to type into
-> the add queue, and acting on them in bulk is a later slice. There is no Tier
-> control anywhere on this tab and there will not be one — Tier follows knownness
+> Since #191 the names-and-non-words pile is acted on too, one word at a time,
+> and the two halves of it do different things. A name `data/words.txt` still
+> holds is offered as a demotion — the same two buttons the day tab gives a word,
+> **It’s a name** and **It’s not a word** — and pressing one appends to
+> `data/demotions.txt`, which takes the word's wordhood on every day and survives
+> a fresh clone. Everything else in the pile has no wordhood at all, so the engine
+> already rejects it and a demotion would be a no-op line in a hand-curated file:
+> those get a single **Dismiss**, which clears the row and writes nothing. Either
+> way the word is gone from the pile and does not come back on a later paste of
+> the same list — a demoted one for good, a dismissed one for as long as the tab
+> is open.
+>
+> The reason is never guessed on your behalf, because that column is the sentence
+> the player receives: the pile's own test is name-hood against a list of first
+> names, which is right about `algiers` and wrong about `bill`. A demotion raised
+> here reports in the same banner above the tab strip as one raised anywhere else,
+> and the paste is untouched by it — no re-read, no re-paste.
+>
+> The remaining pile is still read-only: **We read these differently** tells you
+> what to look at, and acting on it is a later slice. There is no Tier control
+> anywhere on this tab and there will not be one — Tier follows knownness
 > (ADR-0003, ADR-0015), and knownness is shown there to order the pile, never to
 > set.
 

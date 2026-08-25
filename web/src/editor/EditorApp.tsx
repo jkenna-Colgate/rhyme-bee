@@ -72,7 +72,7 @@
  * screen reports on.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReadCandidate } from "../../../scripts/editorCandidates.ts";
 import { useAdder } from "./useAdder.ts";
 import { useCandidateQueue } from "./useCandidateQueue.ts";
@@ -85,6 +85,7 @@ import { useEditorStatus } from "./useEditorStatus.ts";
 import { usePastedList } from "./usePastedList.ts";
 import { useTierPicker } from "./useTierPicker.ts";
 import { isDemotionDecline, type DeclineChoice } from "./decline.ts";
+import { demotedWords } from "./demote.ts";
 import { CandidateQueueView, type CandidateActs } from "./CandidateQueueView.tsx";
 import { DayReadoutView, DemoteBanner } from "./DayReadoutView.tsx";
 import { EditorTabs, TabPanel, type EditorTab } from "./EditorTabs.tsx";
@@ -130,7 +131,15 @@ export function EditorApp() {
   // add sourced and could not use is a mark the pile carries from then on —
   // held across every later request rather than only the one that raised it
   // (`mergeRefusals`).
-  const paste = usePastedList(readout, adder.result);
+  //
+  // The standing demotion list goes in too, because the evidence route applies
+  // no demotions and would keep offering a word the editor has already refused
+  // — as a name to demote again, or worse, as a word to source a reading for.
+  // Read off the demoter rather than fetched again: it is the same list, and it
+  // refreshes itself on every write, which is what takes a just-demoted word off
+  // the pile without the paste being touched (#191).
+  const demoted = useMemo(() => demotedWords(demoter.state?.standing ?? []), [demoter.state]);
+  const paste = usePastedList(readout, adder.result, demoted);
 
   // The status and the queue are both refreshed by **observing** that a write
   // happened, rather than by callbacks threaded through four hooks. Each of
@@ -332,7 +341,7 @@ export function EditorApp() {
           keeps its text throughout — that is the point of holding it here. */}
       <TabPanel tab="paste" selected={tab}>
         <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <PastedListView readout={readout} paste={paste} adder={adder} />
+          <PastedListView readout={readout} paste={paste} adder={adder} demoter={demoter} />
         </div>
       </TabPanel>
 
