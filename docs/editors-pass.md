@@ -292,7 +292,11 @@ list up in another window, alphabetical, and run the two lists past each other.
 > agent proposed that did not land on the day's Rhyme Key. The row says what was
 > proposed, respelled, with an **Ask again** of its own. Sweeping that word into
 > the next accept would ask the same question and get the same answer with nobody
-> looking — it is the one thing in the pile that needs your eye.
+> looking — it is the one thing in the pile that needs your eye. The mark stays
+> put for the rest of the day's work: a second accept, or a Submit on the day
+> tab, leaves it where it is. What clears it is an **Ask again** that lands, and
+> moving to another day, whose Rhyme Key a refusal recorded here says nothing
+> about.
 >
 > The other two piles are still read-only: the split tells you what to type into
 > the add queue, and acting on them in bulk is a later slice. There is no Tier

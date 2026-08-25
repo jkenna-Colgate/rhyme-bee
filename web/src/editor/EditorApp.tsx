@@ -122,10 +122,15 @@ export function EditorApp() {
   // Accepting its main pile *is* written, and goes through `adder` — the same
   // hook the day panel's Submit uses, the same route, the same rebuild (#190).
   // The panel is handed the whole hook rather than a callback so that both
-  // buttons read one `submitting` flag: two batches in flight would race over
+  // buttons read one `inFlight` field: two batches in flight would race over
   // `data/supplement.dict` and rebuild the index twice from two halves of the
   // night's work.
-  const paste = usePastedList(readout);
+  //
+  // The last answer goes the other way, into the paste, because a reading the
+  // add sourced and could not use is a mark the pile carries from then on —
+  // held across every later request rather than only the one that raised it
+  // (`mergeRefusals`).
+  const paste = usePastedList(readout, adder.result);
 
   // The status and the queue are both refreshed by **observing** that a write
   // happened, rather than by callbacks threaded through four hooks. Each of

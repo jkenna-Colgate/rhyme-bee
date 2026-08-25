@@ -64,6 +64,32 @@ import {
 } from "./add.ts";
 import { readEndpointResponse } from "./fetchError.ts";
 
+/**
+ * Which of the two gestures a request came from: the queue the editor typed, or
+ * the pasted rhyme list's main pile accepted whole (#190).
+ *
+ * Named rather than left as a boolean because it is read three ways — what to
+ * disable, whose progress to draw, and whose failure to print — and the last of
+ * those outlives the request, so the three cannot all be one "is a Submit
+ * running" flag.
+ */
+export type AddGesture = "typed" | "pasted";
+
+/**
+ * A request that produced no answer, and which panel is owed the sentence.
+ *
+ * The gesture travels **on the failure** rather than being read off what is in
+ * flight, because by the time there is something to say nothing is in flight any
+ * more: `post` sets the message on its way out. Without it the paste panel
+ * printed every failure, so a Submit refused on the day tab drew a sentence
+ * under the pasted pile, ending in "The queue is kept" about a queue on another
+ * tab.
+ */
+export interface AddFailure {
+  from: AddGesture;
+  message: string;
+}
+
 export interface Adder {
   /** The words waiting, in the order they were typed. */
   queue: readonly string[];
@@ -96,32 +122,27 @@ export interface Adder {
   /** A word refused before it cost anything: a duplicate, a typo, a full queue. */
   error: string | null;
   /**
-   * True from the click until the whole act — adds, rebuild, re-read — is done,
-   * whichever gesture started it.
+   * Which gesture is in flight — from the click until the whole act (adds,
+   * rebuild, re-read) is done — or `null` when nothing is running.
    *
-   * One flag over both, deliberately. A Submit and a paste accept write the same
-   * file and run the same rebuild, so two of them in flight at once would race
-   * over `data/supplement.dict` and rebuild the index twice from two different
-   * halves of the night's work. Both buttons read this, so starting either one
-   * disables the other.
-   */
-  submitting: boolean;
-  /**
-   * Whether the request in flight is the pasted pile's rather than the typed
-   * queue's (#190).
-   *
-   * The paste panel needs it because a Submit can legitimately run for minutes
-   * and both panels show progress against *their own* word count — without it,
-   * a three-word Submit from the day tab would draw a "this can run to 197
+   * One field over both gestures rather than a flag each, because the two facts
+   * a panel needs are "is *anything* running" and "is it **mine**", and a
+   * boolean pair can be written into a state that means neither (`accepting`
+   * without `submitting`). *Anything* is what disables every button: a Submit
+   * and a paste accept write the same file and run the same rebuild, so two in
+   * flight at once would race over `data/supplement.dict` and rebuild the index
+   * twice from two different halves of the night's work. *Mine* is what gates
+   * the progress line, because each panel counts its own words — without it, a
+   * three-word Submit from the day tab would draw a "this can run to 197
    * minutes" line under the paste box, about a batch that is not running.
    */
-  accepting: boolean;
+  inFlight: AddGesture | null;
   /** Milliseconds since the click, so a long Submit is visibly running. */
   elapsedMs: number;
   /** The last Submit's answer, kept on screen until the next one or a day change. */
   result: AddSubmitResult | null;
   /** A Submit that produced no answer at all, or one the endpoint refused. */
-  submitError: string | null;
+  submitError: AddFailure | null;
   /**
    * Queue a word against an aim, which binds the queue to it.
    *
@@ -181,11 +202,10 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   const [appealed, setAppealed] = useState<readonly string[]>([]);
   const [aim, setAim] = useState<AddAim | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [accepting, setAccepting] = useState(false);
+  const [inFlight, setInFlight] = useState<AddGesture | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [result, setResult] = useState<AddSubmitResult | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<AddFailure | null>(null);
 
   // The callback is read through a ref so the `submit` identity below does not
   // change every time the day does — `submit` is handed to a button, and a
@@ -225,12 +245,12 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   );
 
   useEffect(() => {
-    if (!submitting) return;
+    if (inFlight === null) return;
     const startedAt = Date.now();
     setElapsedMs(0);
     const timer = setInterval(() => setElapsedMs(Date.now() - startedAt), TICK_MS);
     return () => clearInterval(timer);
-  }, [submitting]);
+  }, [inFlight]);
 
   // The Submitted section reports what a batch did to *a* day — each word's
   // outcome and the Rhyme Key it was judged against — so it stops being true the
@@ -298,8 +318,13 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
    * editor would otherwise have to redo.
    */
   const post = useCallback(
-    async (payload: AddSubmitRequest, settled: () => void, kept: string): Promise<void> => {
-      setSubmitting(true);
+    async (
+      from: AddGesture,
+      payload: AddSubmitRequest,
+      settled: () => void,
+      kept: string,
+    ): Promise<void> => {
+      setInFlight(from);
       setError(null);
       setSubmitError(null);
       try {
@@ -310,7 +335,7 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
         });
         const outcome = await readEndpointResponse<AddSubmitResult>(response, "add");
         if (!outcome.ok) {
-          setSubmitError(outcome.error);
+          setSubmitError({ from, message: outcome.error });
           return;
         }
         const answered = outcome.body;
@@ -325,13 +350,15 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
         // instead is the more useful thing: sending it again is safe, because a
         // word that did land comes back as one that already reads and is left
         // alone.
-        setSubmitError(
-          `${cause instanceof Error ? cause.message : "The add endpoint could not be reached."} ` +
+        setSubmitError({
+          from,
+          message:
+            `${cause instanceof Error ? cause.message : "The add endpoint could not be reached."} ` +
             `— is the dev server still running? ${kept}, and sending it again is safe: ` +
             "a word that did get written comes back as one that already reads, and is left alone.",
-        );
+        });
       } finally {
-        setSubmitting(false);
+        setInFlight(null);
       }
     },
     [],
@@ -363,7 +390,7 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
     // landing on another day's Rhyme Key.
     const held = aimHeldFor(boundTo, date);
     if (held !== null) {
-      setSubmitError(held);
+      setSubmitError({ from: "typed", message: held });
       return;
     }
 
@@ -378,6 +405,7 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
     // for every other kind. The key travels only when the queue has one, which
     // is what makes it the aim rather than a second opinion about the day.
     await post(
+      "typed",
       {
         date,
         words: [...batch],
@@ -412,15 +440,15 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   const accept = useCallback(
     async (words: readonly string[], date: string) => {
       if (words.length === 0) return;
-      setAccepting(true);
-      try {
-        // No `rhymeKey` and no `appealed`: the pile was joined against the day
-        // on screen, so the endpoint resolves the key from the schedule, and
-        // nobody Appealed a word a third party's list nominated.
-        await post({ date, words: [...words], appealed: [] }, () => {}, "The paste is kept");
-      } finally {
-        setAccepting(false);
-      }
+      // No `rhymeKey` and no `appealed`: the pile was joined against the day on
+      // screen, so the endpoint resolves the key from the schedule, and nobody
+      // Appealed a word a third party's list nominated.
+      await post(
+        "pasted",
+        { date, words: [...words], appealed: [] },
+        () => {},
+        "The paste is kept",
+      );
     },
     [post],
   );
@@ -432,8 +460,7 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
     appealed,
     aim,
     error,
-    submitting,
-    accepting,
+    inFlight,
     elapsedMs,
     result,
     submitError,

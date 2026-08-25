@@ -359,6 +359,25 @@ function* pastedWords(text: string): Generator<string> {
 }
 
 /**
+ * What one accept-all carries: the words, and how many of them need nobody
+ * asked.
+ *
+ * The count is returned beside the batch rather than left to the caller because
+ * it is a **partition of the batch and not a fact about the pile**. It is
+ * printed under the button — "N of them compose from a compound split and are
+ * written straight away; the rest are asked of an agent" — which is a claim
+ * about the words in the request, so a word held back cannot be counted among
+ * them. Computed separately it would restate the hold-back rule below, in a
+ * second place, where the two are free to drift.
+ */
+export interface AcceptBatch {
+  /** The words the request carries, in the pile's own order. */
+  words: string[];
+  /** How many of those a compound split reaches, so no agent is asked for them. */
+  composes: number;
+}
+
+/**
  * The words in the main pile one gesture may carry, and the readings a previous
  * gesture already tried and could not use.
  *
@@ -397,8 +416,12 @@ function* pastedWords(text: string): Generator<string> {
 export function pileToAccept(
   pile: readonly WordWithoutReading[],
   refused: ReadonlyMap<string, string>,
-): string[] {
-  return pile.filter((entry) => !refused.has(entry.word)).map((entry) => entry.word);
+): AcceptBatch {
+  const carried = pile.filter((entry) => !refused.has(entry.word));
+  return {
+    words: carried.map((entry) => entry.word),
+    composes: carried.filter((entry) => entry.composed !== null).length,
+  };
 }
 
 /**
@@ -438,4 +461,50 @@ export function refusedReadings(
     refused.set(word.word, respell(word.proposed));
   }
   return refused;
+}
+
+/**
+ * Every refusal still standing for this Rhyme Key: the ones already held, plus
+ * what this outcome refused, less what it has since written.
+ *
+ * ## Why refusals accumulate rather than being read off the last outcome
+ *
+ * Because a reading that failed verification is "always handled per-word, never
+ * swept into the bulk accept" (#190), and read off the last outcome alone that
+ * "always" means *for one round*. Only one outcome is on the hook at a time, and
+ * a second accept — or any typed Submit on the day tab — replaces it. The word
+ * would lose its mark, walk back into the next bulk batch, ask the same question
+ * and get the same answer with nobody looking, which is the exact failure the
+ * hold-back exists to prevent.
+ *
+ * ## Why `written` clears the mark
+ *
+ * Because the mark is what makes the per-word "Ask again" worth offering. The
+ * agent is not deterministic, so a second ask can land — and a word that now has
+ * a reading has nothing left for the editor to judge. A map that only ever grew
+ * would flag it for the rest of the sitting against a verdict already overtaken.
+ *
+ * An outcome aimed at another Rhyme Key changes nothing, on `refusedReadings`'
+ * own rule and for its reason: it is not about this pile. That covers the
+ * clearing too — a word written against another key did not get *this* key's
+ * reading, so the refusal held here still stands.
+ */
+export function mergeRefusals(
+  held: ReadonlyMap<string, string>,
+  outcome: AddOutcome | null,
+  rhymeKey: RhymeKey,
+): Map<string, string> {
+  const merged = new Map(held);
+  if (outcome === null || outcome.target !== rhymeKey) return merged;
+
+  for (const word of outcome.words) {
+    if (word.outcome === "written") merged.delete(word.word);
+  }
+  // After the clearing rather than before it, so a word this outcome both wrote
+  // and refused — which one batch cannot produce, but a wire shape does not
+  // promise that — reads as refused rather than as resolved.
+  for (const [word, proposed] of refusedReadings(outcome, rhymeKey)) {
+    merged.set(word, proposed);
+  }
+  return merged;
 }

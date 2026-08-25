@@ -31,11 +31,11 @@ import type { AddTarget, DeferredOutcome, WordOutcome } from "./addOutcome.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
 import {
   MAX_QUEUED_WORDS,
-  WORST_CASE_MS_PER_WORD,
   aimClash,
   aimHeldFor,
   type AddSubmitResult,
 } from "./add.ts";
+import { InFlight } from "./InFlight.tsx";
 import { failureFor } from "./disagreement.ts";
 import { ReadsElsewhere } from "./ReadsElsewhere.tsx";
 import { pendingWork, type EditorStatus } from "./status.ts";
@@ -69,7 +69,14 @@ export function AddQueueView({
   /** The repository's state, for the half of Submit's rule that is not the queue. */
   status: EditorStatus | null;
 }) {
-  const { queue, submitting, typed, setTyped } = adder;
+  const { queue, typed, setTyped } = adder;
+  // Two different questions of the same field. `busy` is whether *any* batch is
+  // running, this panel's or the paste panel's, and it is what shuts every
+  // button — both write the same file and run the same rebuild. `running` is
+  // whether the batch in flight is this one, and it is what may speak in the
+  // first person about a word count only this panel knows.
+  const busy = adder.inFlight !== null;
+  const running = adder.inFlight === "typed";
   // Two questions, and they part company on a queue raised from the Candidate
   // Queue. `takes` is whether a word typed *here* could join the standing queue
   // at all — false for a queue aimed at another day and for one aimed at a Rhyme
@@ -129,14 +136,14 @@ export function AddQueueView({
             // sentence explaining that is the only thing on screen saying it —
             // typing into a field that refuses every word with the same message
             // is the same message twice. `queueWord` refuses anyway.
-            disabled={submitting || takes !== null}
+            disabled={busy || takes !== null}
             onChange={(event) => setTyped(event.target.value)}
           />
         </label>
         <button
           type="submit"
           className="editor-add-queue"
-          disabled={submitting || typed === "" || takes !== null}
+          disabled={busy || typed === "" || takes !== null}
         >
           Queue
         </button>
@@ -185,15 +192,19 @@ export function AddQueueView({
           // a Submit from the wrong day is a perfectly well-formed request.
           // `submit` checks it again instead, so it is not a rule only a button
           // enforces.
-          disabled={!pendingWork(queue.length, status) || submitting || held !== null}
+          disabled={!pendingWork(queue.length, status) || busy || held !== null}
           onClick={() => void adder.submit(date)}
         >
-          {submitting ? "Submitting…" : submitLabel(queue.length)}
+          {running ? "Submitting…" : submitLabel(queue.length)}
         </button>
-        {submitting && <InFlight count={queue.length} elapsedMs={adder.elapsedMs} />}
+        {running && <SubmitInFlight count={queue.length} elapsedMs={adder.elapsedMs} />}
       </div>
 
-      {adder.submitError !== null && <p className="editor-write-failed">{adder.submitError}</p>}
+      {/* This panel's own failures. A paste accept's failure belongs under the
+          pasted pile, where the words it was about still are. */}
+      {adder.submitError?.from === "typed" && (
+        <p className="editor-write-failed">{adder.submitError.message}</p>
+      )}
 
       {adder.result !== null && (
         <Submitted result={adder.result} disagreer={disagreer} corrector={corrector} />
@@ -243,7 +254,7 @@ function Queued({ adder }: { adder: Adder }) {
             type="button"
             className="editor-queued-word"
             title={`Take ${word} back out of the queue`}
-            disabled={adder.submitting}
+            disabled={adder.inFlight !== null}
             onClick={() => adder.unqueueWord(word)}
           >
             <span className="editor-queued-text">{word}</span>
@@ -262,30 +273,28 @@ function Queued({ adder }: { adder: Adder }) {
 }
 
 /**
- * What a Submit shows while it runs.
+ * What a Submit shows while it runs: the shared shell, with this gesture's own
+ * two clauses.
  *
- * A Submit is one request that can legitimately take minutes: a word no compound
- * split reaches is handed to an agent that is given up to a minute, and those
- * waits are serial. A disabled button on its own would be indistinguishable from
- * a hung tab at exactly that moment, so this says three things instead — what is
- * happening, how long it has been happening, and the worst case it is running
- * against. The seconds tick, which is what makes "slow" legible as "running".
- *
- * The bound is stated as a maximum and not as an estimate, because it is one:
- * nearly every word is composed from a compound split in milliseconds and never
- * reaches the agent at all. Quoting the typical case would be the number that
- * makes the slow batch feel broken.
+ * The queue is a handful of words the editor typed and can see above the button,
+ * so this one names no count — "the words" is unambiguous when they are all on
+ * screen — and promises only that nothing is lost, which is the question a
+ * minutes-long wait raises. `InFlight.tsx` argues why the clock and the bound
+ * are not written twice.
  */
-function InFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
-  const worstCaseMinutes = Math.ceil((count * WORST_CASE_MS_PER_WORD) / 60_000);
+function SubmitInFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
   return (
-    <p className="editor-add-inflight" role="status">
-      <strong>{Math.floor(elapsedMs / 1000)}s</strong> — writing {count === 1 ? "the word" : "the words"},
-      then rebuilding the Rhyme Index (about 2 seconds). A word no compound split reaches waits on an
-      agent for up to a minute, so this can run to {worstCaseMinutes}{" "}
-      {worstCaseMinutes === 1 ? "minute" : "minutes"}. Nothing is lost if it does: every word is
-      written or recorded as deferred.
-    </p>
+    <InFlight
+      count={count}
+      elapsedMs={elapsedMs}
+      doing={
+        <>
+          writing {count === 1 ? "the word" : "the words"}, then rebuilding the Rhyme Index
+          (about 2 seconds)
+        </>
+      }
+      leaving="Nothing is lost if it does: every word is written or recorded as deferred."
+    />
   );
 }
 

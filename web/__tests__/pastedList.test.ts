@@ -18,6 +18,7 @@ import type { EvidenceReply, WordFacts } from "../src/editor/evidence.ts";
 import type { AddOutcome, WordOutcome } from "../src/editor/addOutcome.ts";
 import {
   joinPastedList,
+  mergeRefusals,
   pileToAccept,
   refusedReadings,
   type WordWithoutReading,
@@ -505,9 +506,19 @@ function failed(word: string, proposed: Pronunciation): WordOutcome {
   return { outcome: "deferred", word, reason: "agent-reading-failed-verification", proposed };
 }
 
+/** A word an add gave a reading to — the outcome that settles it for good. */
+function written(word: string): WordOutcome {
+  return {
+    outcome: "written",
+    word,
+    phonemes: ["R", "OW0", "B", "AA1", "T", "IH0", "K"],
+    composed: null,
+  };
+}
+
 describe("pileToAccept", () => {
   it("carries the whole pile when nothing has been tried yet", () => {
-    expect(pileToAccept(pile("necrotic", "orthotic", "cirrhotic"), new Map())).toEqual([
+    expect(pileToAccept(pile("necrotic", "orthotic", "cirrhotic"), new Map()).words).toEqual([
       "necrotic",
       "orthotic",
       "cirrhotic",
@@ -521,17 +532,20 @@ describe("pileToAccept", () => {
       composed: composed(["R", "OW0", "B", "AA1", "T", "IH0", "K"]),
     };
 
-    expect(pileToAccept(pile(composes, "necrotic"), new Map())).toEqual(["robotic", "necrotic"]);
+    expect(pileToAccept(pile(composes, "necrotic"), new Map())).toEqual({
+      words: ["robotic", "necrotic"],
+      composes: 1,
+    });
   });
 
   it("holds back a word whose sourced reading failed verification", () => {
     const refused = new Map([["necrotic", "neh-KROT-ik"]]);
 
-    expect(pileToAccept(pile("necrotic", "orthotic"), refused)).toEqual(["orthotic"]);
+    expect(pileToAccept(pile("necrotic", "orthotic"), refused).words).toEqual(["orthotic"]);
   });
 
   it("keeps the pile's own order, which is knownness descending", () => {
-    expect(pileToAccept(pile("macrobiotic", "biotic", "necrotic"), new Map())).toEqual([
+    expect(pileToAccept(pile("macrobiotic", "biotic", "necrotic"), new Map()).words).toEqual([
       "macrobiotic",
       "biotic",
       "necrotic",
@@ -544,11 +558,35 @@ describe("pileToAccept", () => {
       ["orthotic", "or-THOT-ik"],
     ]);
 
-    expect(pileToAccept(pile("necrotic", "orthotic"), refused)).toEqual([]);
+    expect(pileToAccept(pile("necrotic", "orthotic"), refused)).toEqual({
+      words: [],
+      composes: 0,
+    });
   });
 
   it("carries nothing from an empty pile", () => {
-    expect(pileToAccept([], new Map())).toEqual([]);
+    expect(pileToAccept([], new Map())).toEqual({ words: [], composes: 0 });
+  });
+
+  it("counts nothing as composing when no split reaches the key", () => {
+    expect(pileToAccept(pile("necrotic", "orthotic"), new Map()).composes).toBe(0);
+  });
+
+  // The count is a partition of the batch and not of the pile: it is printed
+  // under the button as a claim about the words the request carries, so a word
+  // held back cannot be counted among the ones about to be written.
+  it("does not count a composing word the refusals held back", () => {
+    const composes: WordWithoutReading = {
+      word: "robotic",
+      knownness: 0.9,
+      composed: composed(["R", "OW0", "B", "AA1", "T", "IH0", "K"]),
+    };
+    const refused = new Map([["robotic", "ROH-bo-tik"]]);
+
+    expect(pileToAccept(pile(composes, "necrotic"), refused)).toEqual({
+      words: ["necrotic"],
+      composes: 0,
+    });
   });
 });
 
@@ -606,5 +644,116 @@ describe("refusedReadings", () => {
     );
 
     expect([...refused.keys()]).toEqual(["necrotic", "orthotic"]);
+  });
+});
+
+/**
+ * Refusals survive more than one request (#190).
+ *
+ * The hook holds the map and this is the whole of what it does to it, so the
+ * rule is tested here over literals — a held map and an outcome in, the map as
+ * it now stands out — for the reason every other rule in this feature is.
+ */
+describe("mergeRefusals", () => {
+  it("holds nothing before any add has run", () => {
+    expect(mergeRefusals(new Map(), null, IDIOTIC)).toEqual(new Map());
+  });
+
+  it("adds what this outcome refused", () => {
+    const merged = mergeRefusals(
+      new Map(),
+      outcome([failed("necrotic", ["N", "EH1", "K", "R", "AH0", "T"])]),
+      IDIOTIC,
+    );
+
+    expect([...merged.keys()]).toEqual(["necrotic"]);
+  });
+
+  // The case the accumulation exists for: a second accept, or any typed Submit
+  // on the day tab, replaces the outcome on the hook. A refusal read off that
+  // alone would last exactly one round.
+  it("keeps a refusal an earlier request made when a later one says nothing about it", () => {
+    const held = new Map([["necrotic", "neh-KROT-ik"]]);
+
+    const merged = mergeRefusals(held, outcome([written("robotic")]), IDIOTIC);
+
+    expect(merged.get("necrotic")).toBe("neh-KROT-ik");
+  });
+
+  it("carries every standing refusal alongside a new one", () => {
+    const held = new Map([["necrotic", "neh-KROT-ik"]]);
+
+    const merged = mergeRefusals(
+      held,
+      outcome([failed("orthotic", ["AO1", "R", "TH"])]),
+      IDIOTIC,
+    );
+
+    expect([...merged.keys()]).toEqual(["necrotic", "orthotic"]);
+  });
+
+  // What makes "Ask again" honest: the agent is not deterministic, a second ask
+  // can land, and a word that now reads has nothing left to judge.
+  it("clears the mark on a word this outcome wrote a reading for", () => {
+    const held = new Map([["necrotic", "neh-KROT-ik"]]);
+
+    const merged = mergeRefusals(held, outcome([written("necrotic")]), IDIOTIC);
+
+    expect(merged.has("necrotic")).toBe(false);
+  });
+
+  it("clears one word's mark and leaves the rest standing", () => {
+    const held = new Map([
+      ["necrotic", "neh-KROT-ik"],
+      ["orthotic", "or-THOT-ik"],
+    ]);
+
+    const merged = mergeRefusals(held, outcome([written("necrotic")]), IDIOTIC);
+
+    expect([...merged.keys()]).toEqual(["orthotic"]);
+  });
+
+  it("leaves the held map alone rather than mutating it", () => {
+    const held = new Map([["necrotic", "neh-KROT-ik"]]);
+
+    mergeRefusals(held, outcome([written("necrotic")]), IDIOTIC);
+
+    expect(held.has("necrotic")).toBe(true);
+  });
+
+  it("changes nothing on an outcome judged against another Rhyme Key", () => {
+    const held = new Map([["necrotic", "neh-KROT-ik"]]);
+    const elsewhere = outcome([written("necrotic"), failed("orthotic", ["AO1"])], "AH S T");
+
+    expect(mergeRefusals(held, elsewhere, IDIOTIC)).toEqual(held);
+  });
+
+  it("changes nothing on a null outcome", () => {
+    const held = new Map([["necrotic", "neh-KROT-ik"]]);
+
+    expect(mergeRefusals(held, null, IDIOTIC)).toEqual(held);
+  });
+
+  it("leaves a word the agent never answered about unmarked", () => {
+    const unavailable: WordOutcome = {
+      outcome: "deferred",
+      word: "orthotic",
+      reason: "agent-unavailable",
+      proposed: null,
+    };
+
+    expect(mergeRefusals(new Map(), outcome([unavailable]), IDIOTIC)).toEqual(new Map());
+  });
+
+  it("replaces a standing refusal with what the latest ask proposed", () => {
+    const held = new Map([["necrotic", "neh-KROT-ik"]]);
+
+    const merged = mergeRefusals(
+      held,
+      outcome([failed("necrotic", ["N", "IY1", "K", "R", "AH0", "T"])]),
+      IDIOTIC,
+    );
+
+    expect(merged.get("necrotic")).not.toBe("neh-KROT-ik");
   });
 });

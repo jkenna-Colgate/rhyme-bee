@@ -79,25 +79,38 @@ function sameAim(a: AddAim, b: AddAim): boolean {
 /**
  * How many words the editor may **type** into one queue.
  *
- * The binding cost is not bytes — a hundred words is a couple of kilobytes — it
- * is **time**: a word no compound split reaches goes to an agent that is given
- * up to a minute (`AGENT_TIMEOUT_MS`, `scripts/editorAdd.ts`), and those waits
- * are serial. Fifty words is therefore a worst case of about fifty minutes,
- * which is already past the point where an editor should be splitting the batch
- * rather than watching it. The limit is stated in words because that is the unit
- * whose cost is real.
+ * A browser-side ergonomic guard on the entry field, enforced nowhere else: it
+ * shuts the field at the fifty-first word, and nothing downstream asks about it
+ * again.
  *
- * It is a bound on **hand-typing**, and only that. It used to be the route's
- * bound as well, and #190 separated the two: a pasted rhyme list nominates words
- * by the hundred (197 on the measured `idiotic` day), and the whole point of the
- * paste is that the editor never typed any of them. Holding one number over both
- * would have made the accept-all gesture a batching loop, which is the thing
- * #190 names as explicitly not to build — one Submit is one write, one rebuild
- * and one re-read, and four chunks would be four of each.
+ * ## It is not a cost bound, and #190 is why it stopped being one
  *
- * What the route accepts is {@link MAX_SUBMITTED_WORDS}, and it is enforced
- * there because a cap only a client honours is not a cap. This one is enforced
- * only in the browser, because it is only about the entry field.
+ * The cost it used to bound was **agent minutes** — a word no compound split
+ * reaches goes to an agent that is given up to a minute (`AGENT_TIMEOUT_MS`,
+ * `scripts/editorAdd.ts`), and those waits are serial — and those minutes are
+ * the same whether the word was typed or pasted. #190 accepted that wait
+ * deliberately for the pasted pile: the measured `idiotic` day's 197 words are
+ * an overnight job the editor can walk away from, and the tool states how long
+ * it may run rather than refusing on their behalf. A number that lets 197 pasted
+ * words through and stops 51 typed ones is not bounding a cost, so this one no
+ * longer claims to.
+ *
+ * What it still earns is the field. Fifty is past anything anyone types in a
+ * sitting, and a queue that reaches it is a paste into the wrong box or a stuck
+ * key — worth stopping at the keystroke, where it costs nothing. Stated in words
+ * because that is the unit the editor is working in.
+ *
+ * ## Why nothing enforces it at the route
+ *
+ * The route's bound is {@link MAX_SUBMITTED_WORDS}, and *that* one is enforced
+ * server-side, in `addWriteRequest` — "a cap only a client honours is not a cap"
+ * was the argument for enforcing the route's bound at the route, and it is
+ * untouched. There is **one** route bound rather than two because the route
+ * cannot tell a typed batch from a pasted one, and must not be told: a field the
+ * client sets to choose which cap applies to it is precisely a cap only a client
+ * honours. So the fifty is what the entry field does, the two thousand is what
+ * the route enforces, and the endpoint judges every word the same way whichever
+ * gesture sent it.
  */
 export const MAX_QUEUED_WORDS = 50;
 

@@ -41,10 +41,9 @@
  */
 
 import type { DayReadout, ScheduledDayReadout } from "../../../scripts/editorDay.ts";
-import { WORST_CASE_MS_PER_WORD } from "./add.ts";
+import { InFlight } from "./InFlight.tsx";
 import {
   pileToAccept,
-  refusedReadings,
   type DemotableWord,
   type ReadsElsewhereWord,
   type WordWithoutReading,
@@ -124,7 +123,12 @@ export function PastedListView({
             <ResidueUnlooked paste={paste} />
           ) : (
             <>
-              <WithoutReadingPile words={buckets.withoutReading} day={day} adder={adder} />
+              <WithoutReadingPile
+                words={buckets.withoutReading}
+                refused={paste.refused}
+                day={day}
+                adder={adder}
+              />
               <ReadsElsewherePile words={buckets.readsElsewhere} />
               <DemotablePile words={buckets.demotable} />
             </>
@@ -209,20 +213,22 @@ function ResidueUnlooked({ paste }: { paste: Paste }) {
  */
 function WithoutReadingPile({
   words,
+  refused,
   day,
   adder,
 }: {
   words: readonly WordWithoutReading[];
+  /**
+   * Every reading a request has sourced for this key and could not use, over the
+   * whole sitting. Handed down from `usePastedList` rather than read off the
+   * outcome here, because one outcome is on the hook at a time and a mark read
+   * from there would last exactly one request (`mergeRefusals`).
+   */
+  refused: ReadonlyMap<string, string>;
   day: ScheduledDayReadout;
   adder: Adder;
 }) {
-  // Keyed off the day's own Rhyme Key, so an outcome from a batch raised against
-  // a Candidate's key — routinely not this day's — cannot hold a word back here.
-  const refused = refusedReadings(adder.result?.outcome ?? null, day.rhymeKey);
   const batch = pileToAccept(words, refused);
-  const composes = words.filter(
-    (entry) => entry.composed !== null && !refused.has(entry.word),
-  ).length;
 
   return (
     <section className="editor-list">
@@ -243,43 +249,54 @@ function WithoutReadingPile({
               type="button"
               // Disabled on any batch in flight, this panel's or the day tab's:
               // both write the same file and run the same rebuild.
-              disabled={adder.submitting || batch.length === 0}
-              onClick={() => void adder.accept(batch, day.date)}
+              disabled={adder.inFlight !== null || batch.words.length === 0}
+              onClick={() => void adder.accept(batch.words, day.date)}
             >
-              {adder.accepting ? "Accepting…" : `Accept these ${batch.length} words`}
+              {adder.inFlight === "pasted"
+                ? "Accepting…"
+                : `Accept these ${batch.words.length} words`}
             </button>
             <p className="editor-paste-note">
               One request, one rebuild, one re-read.{" "}
-              {composes === 0
+              {batch.composes === 0
                 ? "None of them composes from a compound split, so each one is asked of an agent."
-                : `${composes} of them compose from a compound split and are written straight away; the rest are asked of an agent.`}{" "}
+                : `${batch.composes} of them compose from a compound split and are written straight away; the rest are asked of an agent.`}{" "}
               An accepted word applies to every Puzzle it appears in, not only this day.
             </p>
           </div>
 
-          {adder.accepting && <AcceptInFlight count={batch.length} elapsedMs={adder.elapsedMs} />}
-          {adder.submitError !== null && <p className="editor-error">{adder.submitError}</p>}
+          {adder.inFlight === "pasted" && (
+            <AcceptInFlight count={batch.words.length} elapsedMs={adder.elapsedMs} />
+          )}
+          {/* This panel's own failures. A Submit refused on the day tab is about
+              a queue that is not here, and its sentence ends "The queue is
+              kept" — read under the pasted pile that is a report about the
+              wrong words. */}
+          {adder.submitError?.from === "pasted" && (
+            <p className="editor-error">{adder.submitError.message}</p>
+          )}
 
           <ul className="editor-paste-rows">
-            {words.map((entry) => (
-              <li key={entry.word}>
-                <span className="editor-paste-word">{entry.word}</span>
-                <span className="editor-muted">{knownnessLabel(entry.knownness)}</span>
-                {entry.composed !== null && (
-                  <span className="editor-paste-composed">
-                    composes: {entry.composed.head.word} + {entry.composed.tail.word}
-                  </span>
-                )}
-                {refused.has(entry.word) && (
-                  <Refused
-                    word={entry.word}
-                    proposed={refused.get(entry.word) as string}
-                    day={day}
-                    adder={adder}
-                  />
-                )}
-              </li>
-            ))}
+            {words.map((entry) => {
+              // Read once and narrowed on, rather than asked twice and asserted:
+              // `has` then `get` is a claim to the compiler that the map did not
+              // move between the two calls.
+              const proposed = refused.get(entry.word);
+              return (
+                <li key={entry.word}>
+                  <span className="editor-paste-word">{entry.word}</span>
+                  <span className="editor-muted">{knownnessLabel(entry.knownness)}</span>
+                  {entry.composed !== null && (
+                    <span className="editor-paste-composed">
+                      composes: {entry.composed.head.word} + {entry.composed.tail.word}
+                    </span>
+                  )}
+                  {proposed !== undefined && (
+                    <Refused word={entry.word} proposed={proposed} day={day} adder={adder} />
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </>
       )}
@@ -316,7 +333,11 @@ function Refused({
     <span className="editor-paste-refused">
       the reading sourced for it was <strong>{proposed}</strong>, which is not{" "}
       <code className="editor-key">{day.rhymeKey}</code> — held back from the bulk accept.{" "}
-      <button type="button" disabled={adder.submitting} onClick={() => void adder.accept([word], day.date)}>
+      <button
+        type="button"
+        disabled={adder.inFlight !== null}
+        onClick={() => void adder.accept([word], day.date)}
+      >
         Ask again for {word}
       </button>
     </span>
@@ -324,28 +345,28 @@ function Refused({
 }
 
 /**
- * What an accept shows while it runs.
+ * What an accept shows while it runs: the shared shell, with this gesture's own
+ * two clauses.
  *
- * `AddQueueView`'s `InFlight` says the same three things for the typed queue, and
- * this is not it: the sentences differ because the batches differ. A pasted pile
- * is words the editor never typed and cannot lose by waiting, and its worst case
- * is hours rather than minutes — so what needs saying is that walking away is
- * safe, which is not something a fifty-word Submit has to promise.
- *
- * The bound is a maximum and not an estimate. A word a compound split reaches is
- * written in milliseconds and never touches an agent; quoting the typical case
- * would be the number that makes the long batch feel broken.
+ * `AddQueueView`'s `SubmitInFlight` fills the same shell differently, and the
+ * difference is deliberate: a pasted pile is words the editor never typed, its
+ * worst case is hours rather than minutes, and the count is worth naming because
+ * it is not the list under the button. So what this one says is that walking
+ * away is safe — which a fifty-word Submit does not have to promise.
  */
 function AcceptInFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
-  const worstCaseMinutes = Math.ceil((count * WORST_CASE_MS_PER_WORD) / 60_000);
   return (
-    <p className="editor-add-inflight" role="status">
-      <strong>{Math.floor(elapsedMs / 1000)}s</strong> — sourcing readings for {count}{" "}
-      {count === 1 ? "word" : "words"}, then rebuilding the Rhyme Index. A word no compound split
-      reaches waits on an agent for up to a minute, so this can run to {worstCaseMinutes}{" "}
-      {worstCaseMinutes === 1 ? "minute" : "minutes"}. It is safe to leave it: every word is
-      written or recorded as deferred, and the paste is still here when it finishes.
-    </p>
+    <InFlight
+      count={count}
+      elapsedMs={elapsedMs}
+      doing={
+        <>
+          sourcing readings for {count} {count === 1 ? "word" : "words"}, then rebuilding the
+          Rhyme Index
+        </>
+      }
+      leaving="It is safe to leave it: every word is written or recorded as deferred, and the paste is still here when it finishes."
+    />
   );
 }
 
