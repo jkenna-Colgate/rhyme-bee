@@ -240,6 +240,12 @@ This is the part no command does for you, and the reason step 1 prints in sorted
 columns across the row rather than one word per line: put a third-party rhyme
 list up in another window, alphabetical, and run the two lists past each other.
 
+> Since #188 the browser tool does this join for you, on its **Rhyme List** tab:
+> paste the third-party list in and every word the day already covers collapses
+> to a count, leaving the residue. It is the same scan, and it is faster than
+> running two lists past each other by eye. What follows is still worth reading —
+> it is what the residue means, and the CLI pass has no equivalent.
+
 For 2026-08-08 that is a rhyme list for `centimeter` against the 25 Answers
 above. What you are hunting is a word that plainly rhymes, that a reasonable
 player would try, and that is on neither list here — `saltpeter` is one.

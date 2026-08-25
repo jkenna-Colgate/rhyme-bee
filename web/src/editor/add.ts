@@ -91,14 +91,26 @@ function sameAim(a: AddAim, b: AddAim): boolean {
  */
 export const MAX_QUEUED_WORDS = 50;
 
-/**
- * Words are lower-case letters, the shape `data/words.txt` holds all 370,105 of
- * its entries in. Checked here, in the browser, so a typo with a stray character
- * in it is refused at the moment it is typed rather than a whole Submit later —
- * the queue's promise is that a mistake costs nothing, and a mistake that is
- * only reported after the batch has run has already cost the batch.
- */
 const WORD = /^[a-z]+$/;
+
+/**
+ * Whether a spelling has the shape of a word: lower-case letters, which is how
+ * `data/words.txt` holds all 370,105 of its entries.
+ *
+ * Checked in the browser so a typo with a stray character in it is refused at
+ * the moment it is typed rather than a whole Submit later — the queue's promise
+ * is that a mistake costs nothing, and a mistake that is only reported after the
+ * batch has run has already cost the batch.
+ *
+ * Exported because the pasted rhyme list asks the same question of a third
+ * party's entries (#188), where the answer means something else entirely — noise
+ * to drop silently rather than a mistake to report. One rule, because a paste
+ * that admitted a spelling the add queue refuses would nominate words that
+ * cannot then be added.
+ */
+export function isWord(word: string): boolean {
+  return WORD.test(word);
+}
 
 export type QueueResult = { ok: true; queue: string[] } | { ok: false; error: string };
 
@@ -117,7 +129,7 @@ export type QueueResult = { ok: true; queue: string[] } | { ok: false; error: st
 export function queueAdd(queue: readonly string[], typed: string): QueueResult {
   const word = normaliseWord(typed);
   if (word === "") return { ok: false, error: "Type a word to add." };
-  if (!WORD.test(word)) {
+  if (!isWord(word)) {
     return { ok: false, error: `“${typed.trim()}” is not a word. An add names one word, in letters.` };
   }
   if (queue.includes(word)) return { ok: false, error: `${word} is already queued.` };

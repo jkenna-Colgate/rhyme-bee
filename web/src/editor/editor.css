@@ -1256,3 +1256,61 @@ code {
   background: #f6ecdd;
   border-color: #bfa982;
 }
+
+/* The pasted rhyme list (#188). Deliberately plain: the panel offers no action
+   in this slice, so there is nothing on it to make prominent. */
+.editor-paste-aim {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+}
+
+.editor-paste-box {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.editor-paste-box textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.4rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+/* The whole of the manual scan, as one figure. */
+.editor-paste-covered {
+  margin: 0.7rem 0 0.4rem;
+  font-size: 0.9rem;
+}
+
+/* A paste the parse could make nothing of. Not an alarm — nothing has failed
+   and nothing was lost — but it has to say more than an empty screen would. */
+.editor-paste-unread {
+  margin: 0.7rem 0 0;
+  font-size: 0.82rem;
+  color: #7a5a2e;
+}
+
+/* Said once, above the list, because the list itself looks like a set of
+   Answers and is not one. */
+.editor-paste-note {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  color: #6b6155;
+}
+
+.editor-paste-words {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  font-size: 0.85rem;
+}

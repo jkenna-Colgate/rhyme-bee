@@ -7,6 +7,11 @@
  * top. #186 adds a fourth panel, which makes the stack untenable, so the panels
  * become tabs and the day is the one that opens.
  *
+ * The Rhyme List panel sits next to the day rather than after the queue,
+ * because pasting a list is done *while reading a day* and against that day's
+ * Rhyme Key (#188) — the two tabs are one activity, and the editor switches
+ * between them repeatedly in a single pass.
+ *
  * Which tab is showing is shell state and not a route. The Editor's Pass has no
  * router, this does not introduce one, and the URL is not somewhere an editor
  * ever needs to come back to — the day is chosen by the date control, which is
@@ -23,10 +28,11 @@
 
 import { useRef, type ReactNode } from "react";
 
-export type EditorTab = "day" | "queue" | "status";
+export type EditorTab = "day" | "paste" | "queue" | "status";
 
 const TABS: { id: EditorTab; label: string }[] = [
   { id: "day", label: "Day" },
+  { id: "paste", label: "Rhyme List" },
   { id: "queue", label: "Candidate Queue" },
   { id: "status", label: "Status" },
 ];
