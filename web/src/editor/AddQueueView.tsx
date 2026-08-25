@@ -27,7 +27,6 @@
  * module for why the two acts are kept apart.
  */
 
-import { useState } from "react";
 import type { AddTarget, DeferredOutcome, WordOutcome } from "./addOutcome.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
 import { MAX_QUEUED_WORDS, aimClash, aimHeldFor, type AddSubmitResult } from "./add.ts";
@@ -74,8 +73,7 @@ export function AddQueueView({
   /** The repository's state, for the half of Submit's rule that is not the queue. */
   status: EditorStatus | null;
 }) {
-  const [typed, setTyped] = useState("");
-  const { queue, submitting } = adder;
+  const { queue, submitting, typed, setTyped } = adder;
   // Two questions, and they part company on a queue raised from the Candidate
   // Queue. `takes` is whether a word typed *here* could join the standing queue
   // at all — false for a queue aimed at another day and for one aimed at a Rhyme

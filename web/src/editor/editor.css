@@ -60,6 +60,48 @@ body {
   font-weight: 400;
 }
 
+/* The panel strip. Underlined rather than boxed: the selected tab reads as the
+   top edge of the panel below it, which is the only cue that needs to carry. */
+.editor-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid #e3ded2;
+  margin-top: 1rem;
+}
+
+.editor-tab {
+  font: inherit;
+  font-size: 0.9rem;
+  color: #6b6558;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+}
+
+.editor-tab:hover {
+  color: #1c1b18;
+}
+
+.editor-tab-on {
+  color: #1c1b18;
+  font-weight: 600;
+  border-bottom-color: #1c1b18;
+}
+
+/* The panel is focusable so the tab strip can hand it the focus, but it is not
+   an interactive control and should not be outlined as one on a mouse click. */
+[role="tabpanel"]:focus-visible {
+  outline: 2px solid #cdc6b6;
+  outline-offset: 4px;
+}
+
+[role="tabpanel"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Dimmed, not blanked, while the next day is fetched. */
 .editor-loading {
   opacity: 0.45;

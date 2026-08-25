@@ -315,26 +315,7 @@ function ScheduledDay({
         <p className="editor-write-failed">{picker.error} The day is unchanged.</p>
       )}
 
-      {/* A refused demotion is the louder of the two: the word is still being
-          served, and the editor has already moved on to the next one. Not on
-          a 409, though — that sentence already says the word has no wordhood
-          ("kate is already demoted, as proper-noun"), so appending "the word
-          is still a word" would contradict what the endpoint just said. */}
-      {demoter.error !== null && (
-        <p className="editor-write-failed">
-          {demoter.error}
-          {showsDemotionReassurance(demoter.alreadyDemoted) && (
-            <>
-              {" "}
-              <strong>Nothing was demoted</strong> — the word is still a word.
-            </>
-          )}
-        </p>
-      )}
-
       {picker.recorded !== null && <Recorded recorded={picker.recorded} />}
-
-      {demoter.recorded !== null && <Demoted demotion={demoter.recorded} />}
 
       {/* Said once, above both lists, rather than inside every verdict menu:
           it is the same sentence for every word, and the lists are columns
@@ -724,6 +705,41 @@ function DemoteMenu({
         </button>
       ))}
     </div>
+  );
+}
+
+/**
+ * What a demotion said, drawn by the shell rather than by the day panel.
+ *
+ * A demotion is raised from two places — a word's verdict menu on the day, and a
+ * Candidate declined as a name on the queue — and it withdraws the word's
+ * wordhood from every Puzzle rather than from the day on screen. So the sentence
+ * it produces is scoped to neither panel, and lives above the tab strip where it
+ * reaches the editor whichever tab they raised it from (#187). Both halves move
+ * together: a refusal and a success are the same gesture answering.
+ */
+export function DemoteBanner({ demoter }: { demoter: Demoter }) {
+  return (
+    <>
+      {/* A refused demotion is the louder of the two: the word is still being
+          served, and the editor has already moved on to the next one. Not on
+          a 409, though — that sentence already says the word has no wordhood
+          ("kate is already demoted, as proper-noun"), so appending "the word
+          is still a word" would contradict what the endpoint just said. */}
+      {demoter.error !== null && (
+        <p className="editor-write-failed">
+          {demoter.error}
+          {showsDemotionReassurance(demoter.alreadyDemoted) && (
+            <>
+              {" "}
+              <strong>Nothing was demoted</strong> — the word is still a word.
+            </>
+          )}
+        </p>
+      )}
+
+      {demoter.recorded !== null && <Demoted demotion={demoter.recorded} />}
+    </>
   );
 }
 

@@ -4,6 +4,11 @@
  * missing — a read and the corrections it produces, which is what an Editor's
  * Pass is (ADR-0016).
  *
+ * The three panels are tabs rather than a stack (`EditorTabs`), opening on the
+ * day. Every hook is held here regardless of which tab is showing, so a switch
+ * refetches nothing and loses nothing; the date control and the banners that
+ * belong to no single panel stay above the strip.
+ *
  * It opens on tomorrow — the endpoint's default, asked for by naming no date at
  * all — because tomorrow is the day an Editor's Pass is nearly always about.
  * Typing a date jumps there, including to a date the run does not cover, which
@@ -41,9 +46,10 @@
  * is about the repository rather than a day — whether the built Rhyme Index is
  * stale, and whether the files the pass writes are committed (#162) — so it is
  * fetched once, refreshed when a write lands or the window is focused, and
- * never keyed to the date. It is drawn here, at the top, and passed down as far
- * as the add queue for the one rule that reads it: Submit is enabled by a stale
- * index as well as by a queued add.
+ * never keyed to the date. It gets a tab of its own, and is *also* passed down
+ * as far as the add queue for the one rule that reads it: Submit is enabled by a
+ * stale index as well as by a queued add — which is why the add queue does not
+ * go quiet about it while the editor is looking at the day.
  *
  * The disagreement recorder is the one hook whose writes are absent from that
  * status — deliberately. `WRITTEN_GROUPS` names the files the
@@ -71,7 +77,8 @@ import { useEditorStatus } from "./useEditorStatus.ts";
 import { useTierPicker } from "./useTierPicker.ts";
 import { isDemotionDecline, type DeclineChoice } from "./decline.ts";
 import { CandidateQueueView, type CandidateActs } from "./CandidateQueueView.tsx";
-import { DayReadoutView } from "./DayReadoutView.tsx";
+import { DayReadoutView, DemoteBanner } from "./DayReadoutView.tsx";
+import { EditorTabs, TabPanel, type EditorTab } from "./EditorTabs.tsx";
 import { StatusView } from "./StatusView.tsx";
 
 export function EditorApp() {
@@ -226,6 +233,10 @@ export function EditorApp() {
   // sticking, so a half-typed date cannot leave the control blank.
   const [typed, setTyped] = useState("");
 
+  // Which panel is showing. Shell state, not a route (`EditorTabs`), and it
+  // opens on the day because the day is what an Editor's Pass is a read of.
+  const [tab, setTab] = useState<EditorTab>("day");
+
   return (
     <main className="editor">
       <header className="editor-head">
@@ -245,52 +256,66 @@ export function EditorApp() {
         </label>
       </header>
 
+      {/* Everything from here to the tab strip is shell chrome: it belongs to no
+          one panel, so it is drawn above them all and reaches the editor
+          whichever tab is showing. A demotion and a Decline are both raised from
+          two panels apiece, and a fetch that failed is about the screen rather
+          than about anything on it. */}
       {error !== null && <section className="editor-alarm">{error}</section>}
 
-      {/* Above the day, and outside the block that dims while a day is fetched:
-          neither fact it shows is about the date on screen, so dimming it on a
-          jump would say it had gone stale when nothing about it had moved. */}
-      <StatusView status={status} error={statusError} />
+      <DemoteBanner demoter={demoter} />
 
-      {/* Beside the status and outside the day's block, for the same reason: a
-          Candidate is aimed at a Rhyme Key rather than at a date, and most of
-          the queue belongs to no scheduled day at all. Dimming it on a jump
-          would say it had gone stale when nothing about it had moved. The acts
-          on it are the reason that holds for the *gestures* too — an add raised
-          here aims at the Candidate's key, so nothing about it is a fact about
-          the day on screen. */}
-      <CandidateQueueView
-        queue={candidates.queue}
-        error={candidates.error}
-        loading={candidates.loading}
-        acts={queueActs}
-      />
-
-      {/* A refused ruling, said once and near the queue it was made on. Quieter
-          than the demote banner in `DayReadoutView` on purpose: a Decline that
-          did not reach the file changes nothing at all, and its whole cost is
-          that the Candidate is still on the queue — which is where it is. */}
+      {/* A refused ruling, said once. Quieter than the demote banner on purpose:
+          a Decline that did not reach the file changes nothing at all, and its
+          whole cost is that the Candidate is still on the queue — which is where
+          it is. */}
       {decliner.error !== null && <p className="editor-write-failed">{decliner.error}</p>}
 
-      {/* The previous day stays on screen while the next one is fetched, dimmed
-          rather than replaced: a blank screen between two days makes a jump feel
-          like a failure, and a day's readout arrives in milliseconds. */}
-      {readout !== null && (
-        <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <DayReadoutView
-            readout={readout}
-            picker={picker}
-            demoter={demoter}
-            adder={adder}
-            disagreer={disagreer}
-            status={status}
-            candidates={candidates.queue}
-            candidateActs={dayActs}
-          />
-        </div>
-      )}
+      <EditorTabs selected={tab} onSelect={setTab} />
 
-      {readout === null && loading && <p className="editor-muted">Reading the day…</p>}
+      <TabPanel tab="day" selected={tab}>
+        {/* The previous day stays on screen while the next one is fetched,
+            dimmed rather than replaced: a blank screen between two days makes a
+            jump feel like a failure, and a day's readout arrives in
+            milliseconds. */}
+        {readout !== null && (
+          <div className={loading ? "editor-body editor-loading" : "editor-body"}>
+            <DayReadoutView
+              readout={readout}
+              picker={picker}
+              demoter={demoter}
+              adder={adder}
+              disagreer={disagreer}
+              status={status}
+              candidates={candidates.queue}
+              candidateActs={dayActs}
+            />
+          </div>
+        )}
+
+        {readout === null && loading && <p className="editor-muted">Reading the day…</p>}
+      </TabPanel>
+
+      {/* Never dimmed while a day is fetched, unlike the day's own block: a
+          Candidate is aimed at a Rhyme Key rather than at a date, and most of
+          the queue belongs to no scheduled day at all, so nothing about it goes
+          stale on a jump. The acts on it are the reason that holds for the
+          *gestures* too — an add raised here aims at the Candidate's key, so
+          nothing about it is a fact about the day on screen. */}
+      <TabPanel tab="queue" selected={tab}>
+        <CandidateQueueView
+          queue={candidates.queue}
+          error={candidates.error}
+          loading={candidates.loading}
+          acts={queueActs}
+        />
+      </TabPanel>
+
+      {/* Not dimmed on a jump either, and for a plainer reason: it is about the
+          repository rather than about the date on screen. */}
+      <TabPanel tab="status" selected={tab}>
+        <StatusView status={status} error={statusError} />
+      </TabPanel>
     </main>
   );
 }

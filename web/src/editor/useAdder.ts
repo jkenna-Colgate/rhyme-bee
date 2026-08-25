@@ -68,6 +68,17 @@ export interface Adder {
   /** The words waiting, in the order they were typed. */
   queue: readonly string[];
   /**
+   * The word half-typed into the entry and not yet queued.
+   *
+   * Held here rather than in `AddQueueView` for the same reason the queue is:
+   * the entry lives on the day panel, and the day panel is unmounted whenever
+   * the editor looks at another tab (#187). State kept in the view would make a
+   * glance at the Candidate Queue mid-word cost the word, which is a thing the
+   * stacked layout could not do and the tabs otherwise would.
+   */
+  typed: string;
+  setTyped: (typed: string) => void;
+  /**
    * Which of them came from the Candidate Queue rather than the editor's own
    * typing (#178). Kept beside the queue rather than inside it because it is a
    * fact about where a word came from and not about the word — every rule the
@@ -117,6 +128,7 @@ const TICK_MS = 500;
 
 export function useAdder(onDay: (readout: DayReadout) => void, date: string | null): Adder {
   const [queue, setQueue] = useState<readonly string[]>([]);
+  const [typed, setTyped] = useState("");
   const [appealed, setAppealed] = useState<readonly string[]>([]);
   const [aim, setAim] = useState<AddAim | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -308,6 +320,8 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
 
   return {
     queue,
+    typed,
+    setTyped,
     appealed,
     aim,
     error,
