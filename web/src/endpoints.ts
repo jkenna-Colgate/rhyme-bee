@@ -216,3 +216,30 @@ export const EDITOR_CORRECTION_PATH = "/api/editor/correction";
  * (ADR-0016).
  */
 export const EDITOR_STATUS_PATH = "/api/editor/status";
+
+/**
+ * Where the Editor's Pass asks what is **true of a list of words** against one
+ * Rhyme Key: `POST` alone, carrying the day's key and the words to ask about,
+ * answering with per-word evidence — wordhood, name status, the readings the
+ * pinned sources hold, a reading composed from a compound split when one reaches
+ * the key, and the word's prevalence row (#189).
+ *
+ * It answers with **evidence and never with buckets**. Wordhood, names,
+ * readings, composition and knownness are all Node-only facts and no module
+ * under `web/src/` can reach them, so this is the seam that carries them across;
+ * how they are then grouped is a browser decision that `pastedList.ts` makes
+ * and that the tickets after this one keep changing. A bucket wire type would
+ * put a UI shape in a contract Node had to agree with, and put the join itself
+ * behind an HTTP call where neither a test nor the view could reach it.
+ *
+ * `POST` because 274 words do not fit a query string, and it is nonetheless a
+ * **read**: it writes no file under `data/`, rebuilds nothing and spawns no
+ * subprocess. It is the third read-only editor path, after the status one and
+ * the Candidate Queue.
+ *
+ * Dev only, and structurally so — `editorEvidencePlugin` is built by
+ * `web/editorRoute.ts`, which declares `apply: "serve"`, so `configureServer`
+ * never runs in a production build and no deployed surface answers this path
+ * (ADR-0016).
+ */
+export const EDITOR_EVIDENCE_PATH = "/api/editor/evidence";

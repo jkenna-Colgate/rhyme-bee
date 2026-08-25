@@ -1314,3 +1314,36 @@ code {
   gap: 0.2rem 0.7rem;
   font-size: 0.85rem;
 }
+
+/* One row per word in each of the three split piles (#189). A row rather than a
+   wrapped chip like `.editor-paste-words` above, because a bucketed word carries
+   more than its spelling — its knownness, a composition, a respelling — and
+   those read as columns rather than as a run of text. */
+.editor-paste-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.editor-paste-rows li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.6rem;
+  padding: 0.12rem 0;
+}
+
+/* Fixed width so the knownness column lines up down the pile: the ordering is
+   the point of the main pile, and a ragged second column hides it. */
+.editor-paste-word {
+  min-width: 11rem;
+  font-weight: 600;
+}
+
+/* A word composition resolves on the spot — the one thing in the pile that
+   needs no further sourcing, so it is the one thing marked. */
+.editor-paste-composed {
+  font-size: 0.78rem;
+  color: #3f6b4a;
+}

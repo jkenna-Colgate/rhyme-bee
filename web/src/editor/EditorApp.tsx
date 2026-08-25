@@ -13,7 +13,9 @@
  * typed rather than something a route answered with, which is precisely why it
  * is held up here with the rest: a paste kept inside its own panel would be lost
  * on the first switch back to the day, since `TabPanel` unmounts what is not
- * showing.
+ * showing. The facts its residue is split on (#189) are held with it, for the
+ * same reason and one more — they are what makes the split, and a lookup the
+ * editor had to repeat after every glance at the day would not be pressed twice.
  *
  * It opens on tomorrow — the endpoint's default, asked for by naming no date at
  * all — because tomorrow is the day an Editor's Pass is nearly always about.
@@ -111,9 +113,11 @@ export function EditorApp() {
   const corrector = useCorrector();
   // Keyed to the *readout* rather than to the date, like the picker and for the
   // same reason: the join is against the two lists the day came back with, and
-  // an add's re-read re-joins the paste the editor is still holding. Nothing
-  // here is fetched — the paste is the editor's own text and never leaves the
-  // browser (ADR-0016).
+  // an add's re-read re-joins the paste the editor is still holding. The paste
+  // itself never leaves the browser; what does is the **residue**, sent to the
+  // dev-only evidence route to be told what is true of each word (#189), and
+  // that lookup is a gesture rather than an effect so it does not run per
+  // keystroke (`usePastedList.ts`). Nothing on either leg is written (ADR-0016).
   const paste = usePastedList(readout);
 
   // The status and the queue are both refreshed by **observing** that a write

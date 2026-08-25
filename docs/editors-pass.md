@@ -245,6 +245,37 @@ list up in another window, alphabetical, and run the two lists past each other.
 > to a count, leaving the residue. It is the same scan, and it is faster than
 > running two lists past each other by eye. What follows is still worth reading —
 > it is what the residue means, and the CLI pass has no equivalent.
+>
+> Since #189 that residue is split for you as well. Press **Look up these N
+> words** and it comes back in three piles:
+>
+> - **Has wordhood, no reading** — the main pile, best known first. Words the
+>   game admits and cannot pronounce, which is where every add worth making
+>   comes from. A word with no prevalence row is here too, ordered last rather
+>   than dropped: it is already a Bonus Word as far as the Rhyme Index is
+>   concerned, and filtering on knownness would hide exactly the finds a player
+>   digs for. A row marked `composes:` needs no reading sourced at all — a
+>   compound split already reaches the day's Rhyme Key.
+> - **We read these differently** — words we already read, just not onto this
+>   key. Changing a reading we hold is a *pronunciation correction* rather than
+>   an add, and is not done from this tab.
+> - **Names and non-words** — with the rejection a player would receive. A name
+>   is listed even when `data/words.txt` still holds it: the evidence applies no
+>   demotions, so a name nobody has demoted yet is being served as an ordinary
+>   Answer today, and that is the demotion worth making. The cost is `bill` and
+>   `mark`, which are genuinely both — look and leave them alone.
+>
+> This is why the CLI's `not-a-known-word` count is so misleading: the Rhyme
+> Index refuses a word with no reading that way whether we have never heard of
+> it or merely cannot pronounce it. On the measured `idiotic` day, 197 of the
+> 239 refused words had wordhood, and the top of that pile by knownness was
+> `macrobiotic`, `biotic`, `necrotic`, `orthotic`, `thrombotic`, `fibrotic` —
+> which is exactly the set a player would want.
+>
+> The tab is read-only: the split tells you what to type into the add queue, and
+> acting on it in bulk is a later slice. There is no Tier control on it and there
+> will not be one — Tier follows knownness (ADR-0003, ADR-0015), and knownness is
+> shown there to order the pile, never to set.
 
 For 2026-08-08 that is a rhyme list for `centimeter` against the 25 Answers
 above. What you are hunting is a word that plainly rhymes, that a reasonable
