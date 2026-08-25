@@ -272,10 +272,33 @@ list up in another window, alphabetical, and run the two lists past each other.
 > `macrobiotic`, `biotic`, `necrotic`, `orthotic`, `thrombotic`, `fibrotic` —
 > which is exactly the set a player would want.
 >
-> The tab is read-only: the split tells you what to type into the add queue, and
-> acting on it in bulk is a later slice. There is no Tier control on it and there
-> will not be one — Tier follows knownness (ADR-0003, ADR-0015), and knownness is
-> shown there to order the pile, never to set.
+> Since #190 the main pile is acted on rather than merely read. **Accept these N
+> words** sends the whole pile to the add route in a single request — one append
+> to `data/supplement.dict`, one rebuild of the Rhyme Index, one re-read of the
+> day. There is no cap and no chunking: you decide the volume by what you paste,
+> and four fifty-word chunks would be four rebuilds to do one night's work.
+>
+> What happens per word is the add route's own and is unchanged. A row marked
+> `composes:` is written immediately with no round trip. Every other word is
+> asked of an agent that is given up to a minute, and those waits are serial — so
+> the measured day's 197 words can legitimately run for hours. The tab says how
+> long it has been running and the worst case it is running against; it is safe
+> to leave it, because every word ends up written or recorded as deferred, and
+> the paste is still in the box when it finishes. Accepted words drop out of the
+> pile and into the already-covered count on the re-read, and they apply to every
+> Puzzle they appear in rather than only this day.
+>
+> One case is held back from the bulk accept and shown per word: a reading the
+> agent proposed that did not land on the day's Rhyme Key. The row says what was
+> proposed, respelled, with an **Ask again** of its own. Sweeping that word into
+> the next accept would ask the same question and get the same answer with nobody
+> looking — it is the one thing in the pile that needs your eye.
+>
+> The other two piles are still read-only: the split tells you what to type into
+> the add queue, and acting on them in bulk is a later slice. There is no Tier
+> control anywhere on this tab and there will not be one — Tier follows knownness
+> (ADR-0003, ADR-0015), and knownness is shown there to order the pile, never to
+> set.
 
 For 2026-08-08 that is a rhyme list for `centimeter` against the 25 Answers
 above. What you are hunting is a word that plainly rhymes, that a reasonable

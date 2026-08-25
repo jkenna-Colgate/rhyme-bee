@@ -15,7 +15,13 @@ import { describe, expect, it } from "vitest";
 import type { DayWord, ScheduledDayReadout } from "../../scripts/editorDay.ts";
 import type { Pronunciation } from "../../src/phonology.ts";
 import type { EvidenceReply, WordFacts } from "../src/editor/evidence.ts";
-import { joinPastedList } from "../src/editor/pastedList.ts";
+import type { AddOutcome, WordOutcome } from "../src/editor/addOutcome.ts";
+import {
+  joinPastedList,
+  pileToAccept,
+  refusedReadings,
+  type WordWithoutReading,
+} from "../src/editor/pastedList.ts";
 
 const DATE = "2026-08-15";
 const IDIOTIC = "AA T IH K";
@@ -472,5 +478,133 @@ describe("joinPastedList: the residue, split on wordhood", () => {
     );
 
     expect(joined.buckets?.withoutReading.map((entry) => entry.word)).toEqual(["necrotic"]);
+  });
+});
+
+/**
+ * The bulk accept (#190): which of the main pile one gesture may carry, and
+ * which reading it already tried and could not use.
+ *
+ * Pure, like the join above, and tested the same way — a literal pile and a
+ * literal outcome in, a literal batch out. The gesture that posts the batch is
+ * the add route's own and is tested where that route is; what is tested here is
+ * only the rule about *what goes in it*.
+ */
+function pile(...words: (string | WordWithoutReading)[]): WordWithoutReading[] {
+  return words.map((entry) =>
+    typeof entry === "string" ? { word: entry, knownness: 0.5, composed: null } : entry,
+  );
+}
+
+function outcome(words: WordOutcome[], target = IDIOTIC): AddOutcome {
+  return { target, provenance: "the day", seed: "idiotic", words };
+}
+
+/** A word the agent proposed a reading for that did not land on the target. */
+function failed(word: string, proposed: Pronunciation): WordOutcome {
+  return { outcome: "deferred", word, reason: "agent-reading-failed-verification", proposed };
+}
+
+describe("pileToAccept", () => {
+  it("carries the whole pile when nothing has been tried yet", () => {
+    expect(pileToAccept(pile("necrotic", "orthotic", "cirrhotic"), new Map())).toEqual([
+      "necrotic",
+      "orthotic",
+      "cirrhotic",
+    ]);
+  });
+
+  it("carries a word no compound split reaches, rather than only the composed ones", () => {
+    const composes: WordWithoutReading = {
+      word: "robotic",
+      knownness: 0.9,
+      composed: composed(["R", "OW0", "B", "AA1", "T", "IH0", "K"]),
+    };
+
+    expect(pileToAccept(pile(composes, "necrotic"), new Map())).toEqual(["robotic", "necrotic"]);
+  });
+
+  it("holds back a word whose sourced reading failed verification", () => {
+    const refused = new Map([["necrotic", "neh-KROT-ik"]]);
+
+    expect(pileToAccept(pile("necrotic", "orthotic"), refused)).toEqual(["orthotic"]);
+  });
+
+  it("keeps the pile's own order, which is knownness descending", () => {
+    expect(pileToAccept(pile("macrobiotic", "biotic", "necrotic"), new Map())).toEqual([
+      "macrobiotic",
+      "biotic",
+      "necrotic",
+    ]);
+  });
+
+  it("carries nothing when every word in the pile was refused", () => {
+    const refused = new Map([
+      ["necrotic", "neh-KROT-ik"],
+      ["orthotic", "or-THOT-ik"],
+    ]);
+
+    expect(pileToAccept(pile("necrotic", "orthotic"), refused)).toEqual([]);
+  });
+
+  it("carries nothing from an empty pile", () => {
+    expect(pileToAccept([], new Map())).toEqual([]);
+  });
+});
+
+describe("refusedReadings", () => {
+  it("finds nothing before any add has run", () => {
+    expect(refusedReadings(null, IDIOTIC)).toEqual(new Map());
+  });
+
+  it("names the word against what was proposed for it, respelled", () => {
+    const refused = refusedReadings(
+      outcome([failed("necrotic", ["N", "EH1", "K", "R", "AH0", "T"])]),
+      IDIOTIC,
+    );
+
+    expect([...refused.keys()]).toEqual(["necrotic"]);
+    expect(refused.get("necrotic")).not.toContain("EH1");
+  });
+
+  it("leaves a word the agent never answered about out of the map", () => {
+    const unavailable: WordOutcome = {
+      outcome: "deferred",
+      word: "orthotic",
+      reason: "agent-unavailable",
+      proposed: null,
+    };
+
+    expect(refusedReadings(outcome([unavailable]), IDIOTIC)).toEqual(new Map());
+  });
+
+  it("leaves a word that was written out of the map", () => {
+    const written: WordOutcome = {
+      outcome: "written",
+      word: "robotic",
+      phonemes: ["R", "OW0", "B", "AA1", "T", "IH0", "K"],
+      composed: null,
+    };
+
+    expect(refusedReadings(outcome([written]), IDIOTIC)).toEqual(new Map());
+  });
+
+  it("refuses an outcome judged against another Rhyme Key", () => {
+    const elsewhere = outcome([failed("necrotic", ["N", "EH1", "K"])], "AH S T");
+
+    expect(refusedReadings(elsewhere, IDIOTIC)).toEqual(new Map());
+  });
+
+  it("holds every refused reading in one batch", () => {
+    const refused = refusedReadings(
+      outcome([
+        failed("necrotic", ["N", "EH1", "K"]),
+        { outcome: "refused-name", word: "kate" },
+        failed("orthotic", ["AO1", "R", "TH"]),
+      ]),
+      IDIOTIC,
+    );
+
+    expect([...refused.keys()]).toEqual(["necrotic", "orthotic"]);
   });
 });

@@ -1347,3 +1347,41 @@ code {
   font-size: 0.78rem;
   color: #3f6b4a;
 }
+
+/* The one gesture that acts on the main pile (#190). Set off above the rows
+   rather than beside them, because it carries the whole pile and a button that
+   sat in the list would read as belonging to whichever word it was next to. */
+.editor-paste-accept {
+  margin: 0 0 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #d8cdb8;
+  border-radius: 4px;
+  background: #fbf7ee;
+}
+
+.editor-paste-accept button {
+  margin-bottom: 0.35rem;
+}
+
+/* Its note sits under the button and says what the one request will do, so the
+   sentence is read before the click rather than after it. */
+.editor-paste-accept .editor-paste-note {
+  margin: 0;
+}
+
+/* A reading that was sourced and refused — the one case in this pile the bulk
+   accept holds back. Warm rather than red: nothing failed, a nomination turned
+   out to be wrong, and the row is a thing to read rather than an alarm. It takes
+   the full row width so the proposal and its retry sit under the word instead of
+   pushing the knownness column out of line. */
+.editor-paste-refused {
+  flex-basis: 100%;
+  padding-left: 0.4rem;
+  border-left: 2px solid #d9b26a;
+  font-size: 0.78rem;
+  color: #7a5a2e;
+}
+
+.editor-paste-refused button {
+  font-size: 0.75rem;
+}

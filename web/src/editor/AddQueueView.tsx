@@ -29,7 +29,13 @@
 
 import type { AddTarget, DeferredOutcome, WordOutcome } from "./addOutcome.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
-import { MAX_QUEUED_WORDS, aimClash, aimHeldFor, type AddSubmitResult } from "./add.ts";
+import {
+  MAX_QUEUED_WORDS,
+  WORST_CASE_MS_PER_WORD,
+  aimClash,
+  aimHeldFor,
+  type AddSubmitResult,
+} from "./add.ts";
 import { failureFor } from "./disagreement.ts";
 import { ReadsElsewhere } from "./ReadsElsewhere.tsx";
 import { pendingWork, type EditorStatus } from "./status.ts";
@@ -38,16 +44,6 @@ import type { Disagreer } from "./useDisagreement.ts";
 import type { Corrector } from "./useCorrector.ts";
 import { CorrectionPanel } from "./CorrectionView.tsx";
 import { honestReading } from "./correction.ts";
-
-/**
- * The worst case one word can cost, in milliseconds: the bound
- * `scripts/editorAdd.ts` puts on the agent it asks to author a reading no
- * compound split reaches. Restated here rather than imported because importing
- * it would pull the module that spawns processes into the browser bundle; it is
- * used only to say how long a Submit *might* take, so a copy that drifted would
- * cost an inaccurate sentence rather than an incorrect act.
- */
-const WORST_CASE_MS_PER_WORD = 60_000;
 
 export function AddQueueView({
   date,

@@ -15,10 +15,15 @@
  * Rhyme Index rejects a word with no reading as `not-a-known-word` either way.
  * 197 of them turned out to have wordhood.
  *
- * **Still read-only.** Accepting the main pile in bulk is #190, demoting the
- * names-and-non-words pile is #191, and acting on what the day has and the list omits is
- * #192. Nothing on this screen writes anything, so there is nothing here an
- * editor can do by mistake.
+ * **The main pile is acted on, in one gesture** (#190): everything with wordhood
+ * goes to the add route in a single request, because one request is one append
+ * to `data/supplement.dict`, one rebuild of the Rhyme Index and one re-read of
+ * the day. Chunking the measured day's 197 words to fit a narrower bound would
+ * have been four of each to do one night's work, so there is no chunking and no
+ * cap here — the editor decides the volume by what they paste.
+ *
+ * The other two piles are still read-only: demoting the names-and-non-words pile
+ * is #191, and acting on what the day has and the list omits is #192.
  *
  * **There is no Tier control, and there is not meant to be one.** Tier follows
  * knownness (ADR-0003, ADR-0015); knownness is shown because it says which words
@@ -35,8 +40,16 @@
  * it is tested over literals, leaving this a render of what that returned.
  */
 
-import type { DayReadout } from "../../../scripts/editorDay.ts";
-import type { DemotableWord, ReadsElsewhereWord, WordWithoutReading } from "./pastedList.ts";
+import type { DayReadout, ScheduledDayReadout } from "../../../scripts/editorDay.ts";
+import { WORST_CASE_MS_PER_WORD } from "./add.ts";
+import {
+  pileToAccept,
+  refusedReadings,
+  type DemotableWord,
+  type ReadsElsewhereWord,
+  type WordWithoutReading,
+} from "./pastedList.ts";
+import type { Adder } from "./useAdder.ts";
 import type { Paste } from "./usePastedList.ts";
 
 /** Knownness as the readout shows it, and what an absent row is called. */
@@ -47,9 +60,11 @@ function knownnessLabel(knownness: number | null): string {
 export function PastedListView({
   readout,
   paste,
+  adder,
 }: {
   readout: DayReadout | null;
   paste: Paste;
+  adder: Adder;
 }) {
   const day = readout !== null && readout.outcome === "day" ? readout : null;
   const { pasted, covered, residue, buckets } = paste.list;
@@ -109,7 +124,7 @@ export function PastedListView({
             <ResidueUnlooked paste={paste} />
           ) : (
             <>
-              <WithoutReadingPile words={buckets.withoutReading} />
+              <WithoutReadingPile words={buckets.withoutReading} day={day} adder={adder} />
               <ReadsElsewherePile words={buckets.readsElsewhere} />
               <DemotablePile words={buckets.demotable} />
             </>
@@ -156,14 +171,59 @@ function ResidueUnlooked({ paste }: { paste: Paste }) {
 }
 
 /**
- * The main pile: words the game admits and cannot pronounce, best known first.
+ * The main pile: words the game admits and cannot pronounce, best known first —
+ * and the one gesture that accepts the lot.
  *
  * This is where the value is. A word with **no prevalence row** is here too,
  * ordered last rather than dropped — it already resolves to a Bonus Word in the
  * Rhyme Index, and filtering on knownness would hide exactly the finds a player
  * digs for.
+ *
+ * ## One button, the whole pile
+ *
+ * Not one button per word. The measured `idiotic` day left 197 words here and
+ * composition resolves close to none of them, so a per-word screen would render
+ * 197 rows and act on almost none. Nor is it chunked: the batch goes in **one**
+ * request, because that is one append, one rebuild and one re-read, and four
+ * fifty-word chunks would be four of each. The bound that remains is a transport
+ * bound at the route (`MAX_SUBMITTED_WORDS`), which the editor is not expected to
+ * meet.
+ *
+ * What the batch does per word is the add route's own business and is unchanged:
+ * a word a compound split reaches is written with no round trip, and every other
+ * one is asked of an agent and recorded as deferred if it comes back with
+ * nothing. Either way the miss is countable rather than silently lost.
+ *
+ * ## What the button does not carry
+ *
+ * A word whose sourced reading came back **refused** — the agent proposed a
+ * pronunciation and `verifyReading` found it did not land on the day's key. That
+ * word is marked in place with what was proposed, respelled, and gets a retry of
+ * its own. Sweeping it into the next accept-all would ask the same question and
+ * get the same answer with nobody looking, which is the one thing in this pile
+ * that genuinely needs the editor's eye.
+ *
+ * **Still no Tier control.** The editor accepts words, never a Tier: which of the
+ * two an accepted word lands in follows its knownness on its own (ADR-0003,
+ * ADR-0015), and it is settled at the rebuild rather than here.
  */
-function WithoutReadingPile({ words }: { words: readonly WordWithoutReading[] }) {
+function WithoutReadingPile({
+  words,
+  day,
+  adder,
+}: {
+  words: readonly WordWithoutReading[];
+  day: ScheduledDayReadout;
+  adder: Adder;
+}) {
+  // Keyed off the day's own Rhyme Key, so an outcome from a batch raised against
+  // a Candidate's key — routinely not this day's — cannot hold a word back here.
+  const refused = refusedReadings(adder.result?.outcome ?? null, day.rhymeKey);
+  const batch = pileToAccept(words, refused);
+  const composes = words.filter(
+    (entry) => entry.composed !== null && !refused.has(entry.word),
+  ).length;
+
   return (
     <section className="editor-list">
       <h3>
@@ -177,6 +237,29 @@ function WithoutReadingPile({ words }: { words: readonly WordWithoutReading[] })
             Best known first. Knownness orders this pile and never shortens it, and the
             Answer/Bonus Word split follows it on its own.
           </p>
+
+          <div className="editor-paste-accept">
+            <button
+              type="button"
+              // Disabled on any batch in flight, this panel's or the day tab's:
+              // both write the same file and run the same rebuild.
+              disabled={adder.submitting || batch.length === 0}
+              onClick={() => void adder.accept(batch, day.date)}
+            >
+              {adder.accepting ? "Accepting…" : `Accept these ${batch.length} words`}
+            </button>
+            <p className="editor-paste-note">
+              One request, one rebuild, one re-read.{" "}
+              {composes === 0
+                ? "None of them composes from a compound split, so each one is asked of an agent."
+                : `${composes} of them compose from a compound split and are written straight away; the rest are asked of an agent.`}{" "}
+              An accepted word applies to every Puzzle it appears in, not only this day.
+            </p>
+          </div>
+
+          {adder.accepting && <AcceptInFlight count={batch.length} elapsedMs={adder.elapsedMs} />}
+          {adder.submitError !== null && <p className="editor-error">{adder.submitError}</p>}
+
           <ul className="editor-paste-rows">
             {words.map((entry) => (
               <li key={entry.word}>
@@ -187,12 +270,82 @@ function WithoutReadingPile({ words }: { words: readonly WordWithoutReading[] })
                     composes: {entry.composed.head.word} + {entry.composed.tail.word}
                   </span>
                 )}
+                {refused.has(entry.word) && (
+                  <Refused
+                    word={entry.word}
+                    proposed={refused.get(entry.word) as string}
+                    day={day}
+                    adder={adder}
+                  />
+                )}
               </li>
             ))}
           </ul>
         </>
       )}
     </section>
+  );
+}
+
+/**
+ * A word an agent authored a reading for that the verification refused.
+ *
+ * Shown rather than swallowed, because the alternative is a word that quietly
+ * does nothing every time the pile is accepted — the editor would learn that a
+ * nomination was wrong only by noticing it had never moved. The proposal is
+ * respelled so the disagreement can be read without decoding ARPAbet: the key
+ * the day wants is at the top of the panel, and what was proposed is here.
+ *
+ * The retry is the same accept, aimed at one word. It is offered because the
+ * agent is not deterministic and a second ask can land — and it is per-word
+ * precisely so that asking again is something the editor decided rather than
+ * something the bulk button did on their behalf.
+ */
+function Refused({
+  word,
+  proposed,
+  day,
+  adder,
+}: {
+  word: string;
+  proposed: string;
+  day: ScheduledDayReadout;
+  adder: Adder;
+}) {
+  return (
+    <span className="editor-paste-refused">
+      the reading sourced for it was <strong>{proposed}</strong>, which is not{" "}
+      <code className="editor-key">{day.rhymeKey}</code> — held back from the bulk accept.{" "}
+      <button type="button" disabled={adder.submitting} onClick={() => void adder.accept([word], day.date)}>
+        Ask again for {word}
+      </button>
+    </span>
+  );
+}
+
+/**
+ * What an accept shows while it runs.
+ *
+ * `AddQueueView`'s `InFlight` says the same three things for the typed queue, and
+ * this is not it: the sentences differ because the batches differ. A pasted pile
+ * is words the editor never typed and cannot lose by waiting, and its worst case
+ * is hours rather than minutes — so what needs saying is that walking away is
+ * safe, which is not something a fifty-word Submit has to promise.
+ *
+ * The bound is a maximum and not an estimate. A word a compound split reaches is
+ * written in milliseconds and never touches an agent; quoting the typical case
+ * would be the number that makes the long batch feel broken.
+ */
+function AcceptInFlight({ count, elapsedMs }: { count: number; elapsedMs: number }) {
+  const worstCaseMinutes = Math.ceil((count * WORST_CASE_MS_PER_WORD) / 60_000);
+  return (
+    <p className="editor-add-inflight" role="status">
+      <strong>{Math.floor(elapsedMs / 1000)}s</strong> — sourcing readings for {count}{" "}
+      {count === 1 ? "word" : "words"}, then rebuilding the Rhyme Index. A word no compound split
+      reaches waits on an agent for up to a minute, so this can run to {worstCaseMinutes}{" "}
+      {worstCaseMinutes === 1 ? "minute" : "minutes"}. It is safe to leave it: every word is
+      written or recorded as deferred, and the paste is still here when it finishes.
+    </p>
   );
 }
 

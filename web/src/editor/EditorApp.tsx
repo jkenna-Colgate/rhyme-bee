@@ -118,6 +118,13 @@ export function EditorApp() {
   // dev-only evidence route to be told what is true of each word (#189), and
   // that lookup is a gesture rather than an effect so it does not run per
   // keystroke (`usePastedList.ts`). Nothing on either leg is written (ADR-0016).
+  //
+  // Accepting its main pile *is* written, and goes through `adder` — the same
+  // hook the day panel's Submit uses, the same route, the same rebuild (#190).
+  // The panel is handed the whole hook rather than a callback so that both
+  // buttons read one `submitting` flag: two batches in flight would race over
+  // `data/supplement.dict` and rebuild the index twice from two halves of the
+  // night's work.
   const paste = usePastedList(readout);
 
   // The status and the queue are both refreshed by **observing** that a write
@@ -320,7 +327,7 @@ export function EditorApp() {
           keeps its text throughout — that is the point of holding it here. */}
       <TabPanel tab="paste" selected={tab}>
         <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <PastedListView readout={readout} paste={paste} />
+          <PastedListView readout={readout} paste={paste} adder={adder} />
         </div>
       </TabPanel>
 

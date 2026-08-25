@@ -60,6 +60,7 @@ import { respell } from "../../../src/respelling.ts";
 import type { ComposedReading } from "../../../src/supplementEvidence.ts";
 import type { DayReadout } from "../../../scripts/editorDay.ts";
 import { isWord } from "./add.ts";
+import type { AddOutcome } from "./addOutcome.ts";
 import type { EvidenceReply, WordFacts } from "./evidence.ts";
 
 /**
@@ -355,4 +356,86 @@ function* pastedWords(text: string): Generator<string> {
     seen.add(word);
     yield word;
   }
+}
+
+/**
+ * The words in the main pile one gesture may carry, and the readings a previous
+ * gesture already tried and could not use.
+ *
+ * ## Why the whole pile goes in one request
+ *
+ * Because the cost that matters is not the click count. One Submit appends to
+ * `data/supplement.dict`, rebuilds the Rhyme Index and re-reads the day, so
+ * chunking the measured day's 197 words into fifties would mean four rebuilds
+ * and four re-reads to do one night's work. #190 is explicit that no batching
+ * loop is introduced, and #186's story 19 is that the editor controls the volume
+ * by what they select rather than by fighting a cap in the tool. So the bound
+ * that remains is a transport bound at the route (`MAX_SUBMITTED_WORDS`), not a
+ * workload one here.
+ *
+ * A word that composes and a word that does not both travel in that one request,
+ * and the endpoint already tells them apart: `resolveAddOutcome` writes a
+ * composed reading with no round trip and asks an agent for the rest. Splitting
+ * them into two gestures here would be this module deciding a thing the add
+ * route decides better, and would leave the bulk of the measured day — where
+ * composition "will resolve close to none" of it — with no gesture at all.
+ *
+ * ## What is held back, and why it is only this
+ *
+ * "Accept-all is offered only where nothing is left to judge." The one thing in
+ * this pile that leaves something to judge is a reading that was **sourced and
+ * refused**: the agent proposed a pronunciation, `verifyReading` found it did
+ * not land on the day's Rhyme Key, and the word came back `deferred` with what
+ * it said. Sweeping that word into the next accept-all would ask the same
+ * question again and get the same answer, silently — so the editor sees the
+ * proposal instead, and learns the nomination was wrong rather than watching a
+ * word do nothing twice.
+ *
+ * A word nobody has asked about yet leaves nothing to judge in the same sense:
+ * there is no proposal to read and no verdict to weigh. It goes in the batch.
+ */
+export function pileToAccept(
+  pile: readonly WordWithoutReading[],
+  refused: ReadonlyMap<string, string>,
+): string[] {
+  return pile.filter((entry) => !refused.has(entry.word)).map((entry) => entry.word);
+}
+
+/**
+ * The readings an add sourced for this key and could not use: each word against
+ * what was proposed for it, respelled.
+ *
+ * Respelled here rather than at the render, because a respelling is what makes
+ * the refusal readable — ARPAbet on a row the editor is being asked to judge is
+ * a row they will skip — and because a pure function over a literal is where
+ * that can be tested.
+ *
+ * ## Why the key is checked
+ *
+ * An `AddOutcome` names the Rhyme Key it was judged against, and an outcome
+ * aimed elsewhere is not about this pile: a batch raised from the Candidate
+ * Queue is aimed at the key an Appeal was recorded against, which is routinely
+ * not the day's. Reading one of those as a refusal here would hold a word back
+ * from the accept-all over a verdict reached about a different family. Same rule
+ * as the join's own refusal of evidence gathered against another key, and it is
+ * here for the same reason: it is a fact about what the evidence *is*.
+ *
+ * `agent-unavailable` is deliberately not in this map. Nothing was proposed and
+ * nothing was judged — the agent did not answer — so there is nothing for the
+ * editor to read and the word is simply asked about again on the next accept.
+ */
+export function refusedReadings(
+  outcome: AddOutcome | null,
+  rhymeKey: RhymeKey,
+): Map<string, string> {
+  const refused = new Map<string, string>();
+  if (outcome === null || outcome.target !== rhymeKey) return refused;
+
+  for (const word of outcome.words) {
+    if (word.outcome !== "deferred") continue;
+    if (word.reason !== "agent-reading-failed-verification") continue;
+    if (word.proposed === null) continue;
+    refused.set(word.word, respell(word.proposed));
+  }
+  return refused;
 }

@@ -77,7 +77,7 @@ function sameAim(a: AddAim, b: AddAim): boolean {
 }
 
 /**
- * How many words one Submit will carry.
+ * How many words the editor may **type** into one queue.
  *
  * The binding cost is not bytes — a hundred words is a couple of kilobytes — it
  * is **time**: a word no compound split reaches goes to an agent that is given
@@ -85,11 +85,56 @@ function sameAim(a: AddAim, b: AddAim): boolean {
  * are serial. Fifty words is therefore a worst case of about fifty minutes,
  * which is already past the point where an editor should be splitting the batch
  * rather than watching it. The limit is stated in words because that is the unit
- * whose cost is real, and it is enforced in the browser *and* at the endpoint:
- * the browser so the fifty-first word is refused before it is queued, the
- * endpoint because a cap only a client honours is not a cap.
+ * whose cost is real.
+ *
+ * It is a bound on **hand-typing**, and only that. It used to be the route's
+ * bound as well, and #190 separated the two: a pasted rhyme list nominates words
+ * by the hundred (197 on the measured `idiotic` day), and the whole point of the
+ * paste is that the editor never typed any of them. Holding one number over both
+ * would have made the accept-all gesture a batching loop, which is the thing
+ * #190 names as explicitly not to build — one Submit is one write, one rebuild
+ * and one re-read, and four chunks would be four of each.
+ *
+ * What the route accepts is {@link MAX_SUBMITTED_WORDS}, and it is enforced
+ * there because a cap only a client honours is not a cap. This one is enforced
+ * only in the browser, because it is only about the entry field.
  */
 export const MAX_QUEUED_WORDS = 50;
+
+/**
+ * How many words one Submit may carry, whatever composed it.
+ *
+ * A **transport bound, not a workload one** — deliberately far above any list an
+ * editor would paste, so that the volume is decided by what they select rather
+ * than by a number in here (#186, story 19). The measured day's pile was 197 and
+ * a third-party list queried for one Rhyme Key does not run to thousands; this
+ * is the size past which a body has stopped being a rhyme list and started being
+ * a mistake.
+ *
+ * There is a bound at all because `MAX_ADD_BODY_BYTES` is derived from it and a
+ * route that will read an unbounded body is a route with no cap. What there is
+ * *not* is a bound tuned to how long the batch will take: that cost is real, it
+ * is stated to the editor while the Submit runs, and it is theirs to accept —
+ * #190 is explicit that the wait is an overnight job to walk away from rather
+ * than something the tool should refuse on their behalf.
+ */
+export const MAX_SUBMITTED_WORDS = 2000;
+
+/**
+ * The worst case one word can cost, in milliseconds: the bound
+ * `scripts/editorAdd.ts` puts on the agent it asks to author a reading no
+ * compound split reaches.
+ *
+ * Restated here rather than imported because importing it would pull the module
+ * that spawns processes into the browser bundle. It is used only to say how long
+ * a Submit *might* take, so a copy that drifted would cost an inaccurate sentence
+ * rather than an incorrect act.
+ *
+ * In this module rather than beside the one view that used to hold it, because
+ * two views now say the sentence — the add queue's own Submit and the pasted
+ * pile's accept (#190) — and a second copy is a second thing to forget to move.
+ */
+export const WORST_CASE_MS_PER_WORD = 60_000;
 
 const WORD = /^[a-z]+$/;
 
