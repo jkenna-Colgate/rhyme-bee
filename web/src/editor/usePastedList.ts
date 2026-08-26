@@ -120,12 +120,11 @@ export interface Paste {
    * through the demote route, and the word leaves the pile because the refreshed
    * demotion list is joined against on the next render.
    *
-   * **Not a Decline**, whose _Avoid_ list in CONTEXT.md names this word. A
-   * Decline is a ruling on a Candidate and writes one; this clears a row and
-   * writes nothing, and there is no Candidate anywhere near it. The word is
-   * #191's own and is kept because it is the gesture's name on the screen; the
-   * collision is worth knowing about because the editor shell renders real
-   * Declines two tabs over.
+   * **Not a Decline**. CONTEXT.md gives **Dismissal** an entry of its own and
+   * draws the line there: a Decline rules on a Candidate a player raised and
+   * always records the ruling, whereas this clears a row, writes nothing, and
+   * has no Candidate anywhere near it. The collision is still worth knowing
+   * about, because the editor shell renders real Declines two tabs over.
    */
   dismiss: (word: string) => void;
   /** What went wrong with the last lookup, if anything. Nothing was written. */
