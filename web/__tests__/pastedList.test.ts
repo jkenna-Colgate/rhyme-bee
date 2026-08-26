@@ -91,7 +91,13 @@ describe("joinPastedList", () => {
   it("counts the covered words rather than listing them", () => {
     const joined = joinPastedList("chaotic\nhypnotic\nnecrotic", day(["chaotic", "hypnotic"]));
 
-    expect(joined).toEqual({ pasted: 3, covered: 2, residue: ["necrotic"], buckets: null });
+    expect(joined).toEqual({
+      pasted: 3,
+      covered: 2,
+      residue: ["necrotic"],
+      lookup: ["necrotic"],
+      buckets: null,
+    });
   });
 
   it("keeps the residue in the order the pasted list gave it", () => {
@@ -106,13 +112,25 @@ describe("joinPastedList", () => {
       day(["chaotic"]),
     );
 
-    expect(joined).toEqual({ pasted: 1, covered: 0, residue: ["necrotic"], buckets: null });
+    expect(joined).toEqual({
+      pasted: 1,
+      covered: 0,
+      residue: ["necrotic"],
+      lookup: ["necrotic", "chaotic"],
+      buckets: null,
+    });
   });
 
   it("drops malformed entries silently", () => {
     const joined = joinPastedList("necrotic\nb1otic\nchaotic¹\nx.y\n'", day([]));
 
-    expect(joined).toEqual({ pasted: 1, covered: 0, residue: ["necrotic"], buckets: null });
+    expect(joined).toEqual({
+      pasted: 1,
+      covered: 0,
+      residue: ["necrotic"],
+      lookup: ["necrotic"],
+      buckets: null,
+    });
   });
 
   it("absorbs surrounding whitespace, blank lines, casing and duplicates", () => {
@@ -125,6 +143,7 @@ describe("joinPastedList", () => {
       pasted: 2,
       covered: 0,
       residue: ["necrotic", "biotic"],
+      lookup: ["necrotic", "biotic", "chaotic"],
       buckets: null,
     });
   });
@@ -132,11 +151,17 @@ describe("joinPastedList", () => {
   it("reads a comma-separated paste as entries, not as one phrase", () => {
     const joined = joinPastedList("chaotic, necrotic, hard hat", day(["chaotic"]));
 
-    expect(joined).toEqual({ pasted: 2, covered: 1, residue: ["necrotic"], buckets: null });
+    expect(joined).toEqual({
+      pasted: 2,
+      covered: 1,
+      residue: ["necrotic"],
+      lookup: ["necrotic"],
+      buckets: null,
+    });
   });
 
   it("returns empty buckets for an empty paste rather than failing", () => {
-    const nothing = { pasted: 0, covered: 0, residue: [], buckets: null };
+    const nothing = { pasted: 0, covered: 0, residue: [], lookup: [], buckets: null };
 
     expect(joinPastedList("", day(["chaotic"]))).toEqual(nothing);
     expect(joinPastedList("   \n\n", day(["chaotic"]))).toEqual(nothing);
@@ -158,11 +183,11 @@ describe("joinPastedList", () => {
     // the editor this happened; the join just reports nothing found.
     const joined = joinPastedList("chaotic necrotic biotic", day(["chaotic"]));
 
-    expect(joined).toEqual({ pasted: 0, covered: 0, residue: [], buckets: null });
+    expect(joined).toEqual({ pasted: 0, covered: 0, residue: [], lookup: [], buckets: null });
   });
 
   it("joins to nothing when the readout is not a day", () => {
-    const nothing = { pasted: 0, covered: 0, residue: [], buckets: null };
+    const nothing = { pasted: 0, covered: 0, residue: [], lookup: [], buckets: null };
 
     expect(joinPastedList("necrotic\nbiotic", null)).toEqual(nothing);
     expect(
@@ -454,7 +479,12 @@ describe("joinPastedList: the residue, split on wordhood", () => {
       new Set(["lbs"]),
     );
 
-    expect(joined.buckets).toEqual({ withoutReading: [], readsElsewhere: [], demotable: [] });
+    expect(joined.buckets).toEqual({
+      oursNotTheirs: [],
+      withoutReading: [],
+      readsElsewhere: [],
+      demotable: [],
+    });
   });
 
   it("counts a demoted word in the residue all the same", () => {
@@ -499,7 +529,12 @@ describe("joinPastedList: the residue, split on wordhood", () => {
   it("returns empty buckets for an empty residue, rather than none at all", () => {
     const joined = joinPastedList("chaotic", day(["chaotic"]), evidence([]));
 
-    expect(joined.buckets).toEqual({ withoutReading: [], readsElsewhere: [], demotable: [] });
+    expect(joined.buckets).toEqual({
+      oursNotTheirs: [],
+      withoutReading: [],
+      readsElsewhere: [],
+      demotable: [],
+    });
   });
 
   it("refuses evidence that does not answer about the whole residue", () => {
@@ -564,6 +599,152 @@ function written(word: string): WordOutcome {
     composed: null,
   };
 }
+
+/**
+ * The one bucket that runs the other way: day **Answers** the pasted list leaves
+ * out (#192).
+ *
+ * Read-only and framed neutrally by design — a third party's omission is
+ * sometimes a signal that our reading is wrong and sometimes just an omission —
+ * so what is asserted here is only membership, ordering and the respelling. No
+ * verdict travels on these rows, and there is none to test.
+ *
+ * The respellings are literals rather than calls to `respell`, which would be a
+ * second copy of the thing under test. `kay-AH-tih-k` is what
+ * `K EY0 AA1 T IH0 K` respells to.
+ */
+describe("joinPastedList: the day's Answers the list omits", () => {
+  const CHAOTIC: Pronunciation = ["K", "EY0", "AA1", "T", "IH0", "K"];
+  const HYPNOTIC: Pronunciation = ["HH", "IH0", "P", "N", "AA1", "T", "IH0", "K"];
+
+  it("puts a day Answer the paste leaves out in its own bucket, respelled", () => {
+    const joined = joinPastedList(
+      "necrotic",
+      day(["chaotic"]),
+      evidence([
+        facts("necrotic"),
+        facts("chaotic", { direct: [{ phonemes: CHAOTIC, key: IDIOTIC }] }),
+      ]),
+    );
+
+    expect(joined.buckets?.oursNotTheirs).toEqual([
+      { word: "chaotic", readings: [{ respelling: "kay-AH-tih-k", key: IDIOTIC }] },
+    ]);
+  });
+
+  it("leaves an Answer the paste does hold out of the bucket, whatever its casing", () => {
+    const joined = joinPastedList(
+      "CHAOTIC\nnecrotic",
+      day(["chaotic"]),
+      evidence([facts("necrotic")]),
+    );
+
+    expect(joined.buckets?.oursNotTheirs).toEqual([]);
+  });
+
+  it("leaves Bonus Words out of the bucket entirely", () => {
+    // The bucket asks whether a word we serve as part of the Puzzle is one a
+    // third party would not. A Bonus Word is already the game saying almost
+    // nobody knows this, so a rhyme list omitting one is the expected case.
+    const joined = joinPastedList(
+      "chaotic",
+      day(["chaotic"], ["zymotic"]),
+      evidence([]),
+    );
+
+    expect(joined.lookup).toEqual([]);
+    expect(joined.buckets?.oursNotTheirs).toEqual([]);
+  });
+
+  it("shows every reading we hold, with the key each of them lands on", () => {
+    const joined = joinPastedList(
+      "necrotic",
+      day(["tear"]),
+      evidence([
+        facts("necrotic"),
+        facts("tear", {
+          direct: [
+            { phonemes: ["T", "IH1", "R"], key: "IH R" },
+            { phonemes: ["T", "EH1", "R"], key: "EH R" },
+          ],
+        }),
+      ]),
+    );
+
+    expect(joined.buckets?.oursNotTheirs).toEqual([
+      {
+        word: "tear",
+        readings: [
+          { respelling: "TIH-r", key: "IH R" },
+          { respelling: "TEH-r", key: "EH R" },
+        ],
+      },
+    ]);
+  });
+
+  it("keeps the Answers in the day's own order", () => {
+    const joined = joinPastedList(
+      "necrotic",
+      day(["chaotic", "hypnotic"]),
+      evidence([
+        facts("necrotic"),
+        facts("chaotic", { direct: [{ phonemes: CHAOTIC, key: IDIOTIC }] }),
+        facts("hypnotic", { direct: [{ phonemes: HYPNOTIC, key: IDIOTIC }] }),
+      ]),
+    );
+
+    expect(joined.buckets?.oursNotTheirs.map((entry) => entry.word)).toEqual([
+      "chaotic",
+      "hypnotic",
+    ]);
+  });
+
+  it("leaves out an Answer the game no longer holds", () => {
+    // On its way out of the Puzzle at the next rebuild, so asking the editor to
+    // weigh our reading of it is asking about a word that will not be there.
+    const joined = joinPastedList(
+      "necrotic",
+      day(["chaotic", "algiers"]),
+      evidence([
+        facts("necrotic"),
+        facts("chaotic", { direct: [{ phonemes: CHAOTIC, key: IDIOTIC }] }),
+      ]),
+      new Set(["algiers"]),
+    );
+
+    expect(joined.lookup).toEqual(["necrotic", "chaotic"]);
+    expect(joined.buckets?.oursNotTheirs.map((entry) => entry.word)).toEqual(["chaotic"]);
+  });
+
+  it("asks one lookup about the residue and the absent Answers together", () => {
+    const joined = joinPastedList("necrotic\nbiotic", day(["chaotic", "hypnotic"]));
+
+    expect(joined.lookup).toEqual(["necrotic", "biotic", "chaotic", "hypnotic"]);
+  });
+
+  it("asks about nothing at all when the paste held no words", () => {
+    // With no third-party list there is no third party to disagree with, and
+    // every Answer would otherwise read as omitted by a list that does not exist.
+    expect(joinPastedList("", day(["chaotic"])).lookup).toEqual([]);
+    expect(joinPastedList("chaotic necrotic biotic", day(["chaotic"])).lookup).toEqual([]);
+  });
+
+  it("splits the residue even when the evidence is short of an absent Answer", () => {
+    // The asymmetry with the residue is deliberate. Refusing the whole split —
+    // the accepts, the demotions — because a read-only comparison came up short
+    // would trade the pile the editor acts on for the one they only read.
+    const joined = joinPastedList(
+      "necrotic",
+      day(["chaotic"]),
+      evidence([facts("necrotic", { knownness: 0.83 })]),
+    );
+
+    expect(joined.buckets?.withoutReading).toEqual([
+      { word: "necrotic", knownness: 0.83, composed: null },
+    ]);
+    expect(joined.buckets?.oursNotTheirs).toEqual([]);
+  });
+});
 
 describe("pileToAccept", () => {
   it("carries the whole pile when nothing has been tried yet", () => {

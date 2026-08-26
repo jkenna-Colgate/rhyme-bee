@@ -19,6 +19,11 @@
  *
  * ## Why the lookup is a gesture and not an effect
  *
+ * What one lookup asks about is the join's own `lookup` — the residue and the
+ * day's Answers the paste omits, in one request, because the ours-not-theirs
+ * bucket shows our reading respelled and the day readout carries no
+ * pronunciation to respell (#192).
+ *
  * The residue changes on every keystroke in the box, and a lookup is not cheap
  * at the far end: `pinnedEvidenceContext` parses `data/cmudict.dict`, applies the
  * committed supplement and runs Normalisation, once per request and deliberately
@@ -85,9 +90,10 @@ export interface Paste {
   /** That text joined against the day on screen, with the buckets when they hold. */
   list: PastedList;
   /**
-   * Ask the endpoint what is true of the residue. A no-op with nothing to ask
-   * about, so the button can be pressed on an empty box without inventing a
-   * request.
+   * Ask the endpoint what is true of the words the join needs facts about — the
+   * residue, and the day's Answers the paste omits, in one request. A no-op with
+   * nothing to ask about, so the button can be pressed on an empty box without
+   * inventing a request.
    */
   look: () => Promise<void>;
   /** Whether a lookup is in flight. */
@@ -195,7 +201,7 @@ export function usePastedList(
 
   const look = useCallback(async () => {
     const day = readout !== null && readout.outcome === "day" ? readout : null;
-    if (day === null || list.residue.length === 0) return;
+    if (day === null || list.lookup.length === 0) return;
 
     setLooking(true);
     setError(null);
@@ -203,7 +209,7 @@ export function usePastedList(
       const response = await fetch(EDITOR_EVIDENCE_PATH, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ rhymeKey: day.rhymeKey, words: list.residue }),
+        body: JSON.stringify({ rhymeKey: day.rhymeKey, words: list.lookup }),
       });
       const read = await readEndpointResponse<EvidenceReply>(response, "evidence");
       if (read.ok) setLooked(read.body);
@@ -221,7 +227,7 @@ export function usePastedList(
     } finally {
       setLooking(false);
     }
-  }, [readout, list.residue]);
+  }, [readout, list.lookup]);
 
   return { text, setText, list, look, looking, refused, dismiss, error };
 }

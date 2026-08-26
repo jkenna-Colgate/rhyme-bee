@@ -55,6 +55,7 @@ import { InFlight } from "./InFlight.tsx";
 import {
   pileToAccept,
   type DemotableWord,
+  type OursNotTheirsWord,
   type ReadsElsewhereWord,
   type WordWithoutReading,
 } from "./pastedList.ts";
@@ -130,12 +131,17 @@ export function PastedListView({
             as Bonus Words.
           </p>
 
-          {residue.length === 0 ? (
+          {residue.length === 0 && (
             <p className="editor-muted">The day covers every word on the list.</p>
-          ) : buckets === null ? (
+          )}
+
+          {buckets === null ? (
             <ResidueUnlooked paste={paste} />
           ) : (
             <>
+              {/* First, per #186's bucket order, and quieter than the rest: it
+                  is small, it is read-only, and nothing in it is work. */}
+              <OursNotTheirsPile words={buckets.oursNotTheirs} />
               <WithoutReadingPile
                 words={buckets.withoutReading}
                 refused={paste.refused}
@@ -166,19 +172,28 @@ export function PastedListView({
  * because a residue is worth seeing whether or not it has been split.
  */
 function ResidueUnlooked({ paste }: { paste: Paste }) {
-  const { residue } = paste.list;
+  const { residue, lookup } = paste.list;
+
+  // A paste that covers the whole day and adds nothing to it leaves the lookup
+  // with nothing to ask about, and the line above has already said so.
+  if (lookup.length === 0) return null;
 
   return (
     <section className="editor-list">
-      <h3>
-        Not in the day <span className="editor-muted">({residue.length})</span>
-      </h3>
+      {residue.length > 0 && (
+        <h3>
+          Not in the day <span className="editor-muted">({residue.length})</span>
+        </h3>
+      )}
       <p className="editor-paste-note">
-        Nominations, not Answers: nothing here has been held against the day’s Rhyme Key.
+        {residue.length > 0 &&
+          "Nominations, not Answers: nothing here has been held against the day’s Rhyme Key. "}
+        The lookup reads the day’s own Answers back as well, so it can show which of them
+        the list leaves out.
       </p>
       <p>
         <button type="button" onClick={() => void paste.look()} disabled={paste.looking}>
-          {paste.looking ? "Looking…" : `Look up these ${residue.length} words`}
+          {paste.looking ? "Looking…" : `Look up ${lookup.length} words`}
         </button>
       </p>
       {paste.error !== null && <p className="editor-error">{paste.error}</p>}
@@ -384,6 +399,57 @@ function AcceptInFlight({ count, elapsedMs }: { count: number; elapsedMs: number
       }
       leaving="It is safe to leave it: every word is written or recorded as deferred, and the paste is still here when it finishes."
     />
+  );
+}
+
+/**
+ * The one bucket that runs the other way: day **Answers** the pasted list leaves
+ * out, each with our own reading respelled so the disagreement can be read
+ * rather than decoded (#192).
+ *
+ * **Read-only, and framed neutrally on purpose.** A third party omitting a word
+ * we serve is *sometimes* a signal that our reading is wrong and sometimes just
+ * an omission, and nothing on this screen can tell which — so the bucket offers
+ * no accept, no dismiss and no correction, and says nothing that would present
+ * their omission as proof we are wrong. Acting on it is out of scope for #186 in
+ * any case: changing a reading we already hold is a pronunciation correction
+ * rather than an add, and has no door from here.
+ *
+ * The respellings are computed in the browser from the readings the evidence
+ * seam carries, because `DayWord` deliberately holds neither a pronunciation nor
+ * a respelling — the day readout omits them so a two-hundred-word payload stays
+ * cheap enough to re-read on every Submit.
+ *
+ * Small — three on the measured `idiotic` day — and quieter than the piles under
+ * it, because nothing in it is work.
+ */
+function OursNotTheirsPile({ words }: { words: readonly OursNotTheirsWord[] }) {
+  if (words.length === 0) return null;
+
+  return (
+    <section className="editor-list editor-paste-aside">
+      <h3>
+        On our list, not on theirs <span className="editor-muted">({words.length})</span>
+      </h3>
+      <p className="editor-paste-note">
+        Answers the day serves that the pasted list leaves out, and how we read them. A
+        rhyme list omits words for its own reasons — this is here to be read, not acted
+        on.
+      </p>
+      <ul className="editor-paste-rows">
+        {words.map((entry) => (
+          <li key={entry.word}>
+            <span className="editor-paste-word">{entry.word}</span>
+            {entry.readings.map((reading) => (
+              <span key={reading.respelling} className="editor-muted">
+                {reading.respelling} —{" "}
+                <code className="editor-key">{reading.key ?? "unstressed"}</code>
+              </span>
+            ))}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

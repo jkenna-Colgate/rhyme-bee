@@ -1341,6 +1341,22 @@ code {
   font-weight: 600;
 }
 
+/* The ours-not-theirs bucket: shown first, read-only, and deliberately quieter
+   than the pile under it. Indented off a rule rather than boxed, so it reads as
+   an aside to the residue rather than as a second pile of work. */
+.editor-paste-aside {
+  margin-bottom: 1.1rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid #e3ded2;
+  font-size: 0.95em;
+}
+
+.editor-paste-aside h3 {
+  border-bottom: none;
+  padding-bottom: 0;
+  color: #857e70;
+}
+
 /* A word composition resolves on the spot — the one thing in the pile that
    needs no further sourcing, so it is the one thing marked. */
 .editor-paste-composed {

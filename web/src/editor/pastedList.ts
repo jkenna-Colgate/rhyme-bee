@@ -58,7 +58,7 @@ import type { DemotionReason } from "../../../src/demotions.ts";
 import type { RhymeKey } from "../../../src/phonology.ts";
 import { respell } from "../../../src/respelling.ts";
 import type { ComposedReading } from "../../../src/supplementEvidence.ts";
-import type { DayReadout } from "../../../scripts/editorDay.ts";
+import type { DayReadout, DayWord } from "../../../scripts/editorDay.ts";
 import { isWord } from "./add.ts";
 import type { AddOutcome } from "./addOutcome.ts";
 import type { EvidenceReply, WordFacts } from "./evidence.ts";
@@ -121,9 +121,34 @@ export interface WordWithoutReading {
  * it is a word. Shown read-only, respelled, so the disagreement can be read
  * rather than decoded: two of the measured `idiotic` day's 274 landed here.
  */
-export interface ReadsElsewhereWord {
+export type ReadsElsewhereWord = RespelledWord;
+
+/**
+ * A word in the day's **Answers** that the pasted list leaves out — the one
+ * bucket that runs the other way, and the only one built from our own words
+ * rather than from theirs.
+ *
+ * Small: three on the measured `idiotic` day. Worth showing because a third
+ * party omitting a word we serve is *sometimes* a signal that our reading is
+ * wrong — and only sometimes, which is why the bucket is **read-only and framed
+ * neutrally**. It carries no verdict and no implied one. Acting on it is out of
+ * scope for #186: sourcing an honest reading for a word that already reads is a
+ * pronunciation correction rather than an add, and has no existing door. The
+ * join computes the bucket either way, so that route is purely additive once
+ * there is evidence of how often the bucket holds a real defect.
+ *
+ * The respelling is computed here rather than read off the readout, because
+ * `DayWord` deliberately carries neither a pronunciation nor a respelling — the
+ * day readout omits them so a two-hundred-word payload stays cheap enough to
+ * re-read on every Submit. So the readings come off the same evidence seam the
+ * residue is split on, and the browser respells them itself, exactly as
+ * `disagreement.ts` already does.
+ */
+export type OursNotTheirsWord = RespelledWord;
+
+/** A word and our own readings of it, respelled, alongside the key each lands on. */
+export interface RespelledWord {
   word: string;
-  /** Our own readings, respelled, alongside the key each lands on. */
   readings: { respelling: string; key: RhymeKey | null }[];
 }
 
@@ -196,6 +221,8 @@ export interface DemotableWord {
 
 /** The residue, split on wordhood. Null until the evidence for it has arrived. */
 export interface PastedBuckets {
+  /** Day Answers the paste omits. Read-only, shown first, and usually empty. */
+  oursNotTheirs: OursNotTheirsWord[];
   /** Has wordhood, no reading. The main pile, ordered by knownness descending. */
   withoutReading: WordWithoutReading[];
   /** Has wordhood and reads, but not on the day's key. Read-only. */
@@ -221,6 +248,26 @@ export interface PastedList {
    */
   residue: string[];
   /**
+   * Exactly the words one lookup should ask about: the residue, then the day's
+   * Answers the paste omits.
+   *
+   * Two populations with nothing in common but the seam they come down. The
+   * residue is asked about because the buckets are a split of it; the absent
+   * Answers are asked about because {@link OursNotTheirsWord} shows our own
+   * reading respelled and the day readout carries no pronunciation to respell.
+   *
+   * Assembled here rather than in the caller so that the rule stays in the
+   * module everything this feature knows lives in — a hook that concatenated the
+   * two lists itself would be the second place to change when a bucket needs a
+   * third. Disjoint by construction: a residue word is one the day does not
+   * cover, and an absent Answer is one the day covers.
+   *
+   * Empty when the paste held no words at all. With no third-party list there is
+   * no third party to disagree with, and every Answer would otherwise read as
+   * omitted by a list that does not exist.
+   */
+  lookup: string[];
+  /**
    * The residue split on wordhood, or **null when no evidence for it has
    * arrived** — the state before the lookup, and after a day change has made an
    * earlier lookup's answers about a different Rhyme Key.
@@ -235,6 +282,10 @@ export interface PastedList {
 
 /**
  * Join a pasted rhyme list against the day on screen.
+ *
+ * The join runs both ways. Pasted words the day covers collapse to a count and
+ * the rest become the residue; day **Answers** the paste omits become the one
+ * bucket that reads back the other direction ({@link OursNotTheirsWord}).
  *
  * **Total, and never null.** An empty paste, a paste of pure noise and a date
  * the schedule does not cover are three different facts, but the caller
@@ -255,7 +306,7 @@ export function joinPastedList(
   demoted: ReadonlySet<string> = NOTHING_DEMOTED,
 ): PastedList {
   if (readout === null || readout.outcome !== "day") {
-    return { pasted: 0, covered: 0, residue: [], buckets: null };
+    return { pasted: 0, covered: 0, residue: [], lookup: [], buckets: null };
   }
 
   // Both sides of the comparison go through `normaliseWord`, so the join can
@@ -267,18 +318,56 @@ export function joinPastedList(
   for (const entry of readout.bonusWords) covered.add(normaliseWord(entry.word));
 
   let counted = 0;
+  // The third party's own list, as a set — named apart from the `pasted` count
+  // below because one is what they listed and the other is how many.
+  const listed = new Set<string>();
   const residue: string[] = [];
   for (const word of pastedWords(text)) {
     counted += 1;
+    listed.add(word);
     if (!covered.has(word)) residue.push(word);
   }
+
+  const absent = counted === 0 ? [] : [...absentAnswers(readout.answers, listed, demoted)];
 
   return {
     pasted: counted,
     covered: counted - residue.length,
     residue,
-    buckets: bucketsOf(residue, readout.rhymeKey, evidence, demoted),
+    lookup: [...residue, ...absent],
+    buckets: bucketsOf(residue, absent, readout.rhymeKey, evidence, demoted),
   };
+}
+
+/**
+ * The day's Answers the paste leaves out, in the readout's own order.
+ *
+ * **Answers and never Bonus Words.** The bucket asks whether a word we serve as
+ * part of the Puzzle is one a third party would not, and a Bonus Word is already
+ * the game saying almost nobody knows this — a rhyme list omitting one is the
+ * expected case rather than a signal.
+ *
+ * A word the game no longer holds is left out for the reason it is left out of
+ * every other bucket: it is on its way out of the Puzzle at the next rebuild,
+ * and asking the editor to weigh our reading of a word they have just refused is
+ * asking about a word that will not be there.
+ *
+ * Deduplicated because the list travels to an endpoint that refuses a request
+ * naming the same word twice, and two spellings in the Answers can normalise
+ * alike even though the index's own are distinct.
+ */
+function* absentAnswers(
+  answers: readonly DayWord[],
+  listed: ReadonlySet<string>,
+  demoted: ReadonlySet<string>,
+): Generator<string> {
+  const seen = new Set<string>();
+  for (const entry of answers) {
+    const word = normaliseWord(entry.word);
+    if (listed.has(word) || demoted.has(word) || seen.has(word)) continue;
+    seen.add(word);
+    yield word;
+  }
 }
 
 /**
@@ -306,6 +395,7 @@ export function joinPastedList(
  */
 function bucketsOf(
   residue: readonly string[],
+  absent: readonly string[],
   rhymeKey: RhymeKey,
   evidence: EvidenceReply | null,
   demoted: ReadonlySet<string>,
@@ -316,6 +406,7 @@ function bucketsOf(
   for (const word of evidence.words) facts.set(word.word, word);
   if (!residue.every((word) => facts.has(word))) return null;
 
+  const oursNotTheirs: OursNotTheirsWord[] = [];
   const withoutReading: WordWithoutReading[] = [];
   const readsElsewhere: ReadsElsewhereWord[] = [];
   const demotable: DemotableWord[] = [];
@@ -353,13 +444,7 @@ function bucketsOf(
     }
 
     if (known.direct.length > 0) {
-      readsElsewhere.push({
-        word,
-        readings: known.direct.map((reading) => ({
-          respelling: respell(reading.phonemes),
-          key: reading.key,
-        })),
-      });
+      readsElsewhere.push({ word, readings: respellings(known) });
       continue;
     }
 
@@ -374,7 +459,40 @@ function bucketsOf(
     withoutReading.push({ word, knownness: known.knownness, composed });
   }
 
-  return { withoutReading: byKnownness(withoutReading), readsElsewhere, demotable };
+  // The absent Answers are asked about in the same request as the residue, so in
+  // the running tool this loop finds every one of them. A word it does not is
+  // skipped rather than refused, and that asymmetry with the residue above is
+  // deliberate: the residue is what everything actionable comes out of, and a
+  // pile silently a word short is a word nobody would then think to look at,
+  // whereas this bucket is read-only and carries no verdict. Refusing the whole
+  // split — the accepts, the demotions — because a read-only comparison came up
+  // short would trade the pile the editor acts on for the one they only read.
+  for (const word of absent) {
+    const known = facts.get(word);
+    if (known === undefined) continue;
+    oursNotTheirs.push({ word, readings: respellings(known) });
+  }
+
+  return {
+    oursNotTheirs,
+    withoutReading: byKnownness(withoutReading),
+    readsElsewhere,
+    demotable,
+  };
+}
+
+/**
+ * Our own readings of a word, respelled, alongside the key each lands on.
+ *
+ * Every one of them rather than the first: a spelling may have more than one
+ * pronunciation, and which of them lands on the day's key is exactly the thing
+ * the editor is reading the row to work out.
+ */
+function respellings(known: WordFacts): RespelledWord["readings"] {
+  return known.direct.map((reading) => ({
+    respelling: respell(reading.phonemes),
+    key: reading.key,
+  }));
 }
 
 /**
