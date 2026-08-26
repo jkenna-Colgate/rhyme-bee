@@ -480,7 +480,7 @@ describe("joinPastedList: the residue, split on wordhood", () => {
     );
 
     expect(joined.buckets).toEqual({
-      oursNotTheirs: [],
+      omittedAnswers: [],
       withoutReading: [],
       readsElsewhere: [],
       demotable: [],
@@ -530,7 +530,7 @@ describe("joinPastedList: the residue, split on wordhood", () => {
     const joined = joinPastedList("chaotic", day(["chaotic"]), evidence([]));
 
     expect(joined.buckets).toEqual({
-      oursNotTheirs: [],
+      omittedAnswers: [],
       withoutReading: [],
       readsElsewhere: [],
       demotable: [],
@@ -627,7 +627,7 @@ describe("joinPastedList: the day's Answers the list omits", () => {
       ]),
     );
 
-    expect(joined.buckets?.oursNotTheirs).toEqual([
+    expect(joined.buckets?.omittedAnswers).toEqual([
       { word: "chaotic", readings: [{ respelling: "kay-AH-tih-k", key: IDIOTIC }] },
     ]);
   });
@@ -639,7 +639,7 @@ describe("joinPastedList: the day's Answers the list omits", () => {
       evidence([facts("necrotic")]),
     );
 
-    expect(joined.buckets?.oursNotTheirs).toEqual([]);
+    expect(joined.buckets?.omittedAnswers).toEqual([]);
   });
 
   it("leaves Bonus Words out of the bucket entirely", () => {
@@ -653,7 +653,7 @@ describe("joinPastedList: the day's Answers the list omits", () => {
     );
 
     expect(joined.lookup).toEqual([]);
-    expect(joined.buckets?.oursNotTheirs).toEqual([]);
+    expect(joined.buckets?.omittedAnswers).toEqual([]);
   });
 
   it("shows every reading we hold, with the key each of them lands on", () => {
@@ -671,7 +671,7 @@ describe("joinPastedList: the day's Answers the list omits", () => {
       ]),
     );
 
-    expect(joined.buckets?.oursNotTheirs).toEqual([
+    expect(joined.buckets?.omittedAnswers).toEqual([
       {
         word: "tear",
         readings: [
@@ -693,7 +693,7 @@ describe("joinPastedList: the day's Answers the list omits", () => {
       ]),
     );
 
-    expect(joined.buckets?.oursNotTheirs.map((entry) => entry.word)).toEqual([
+    expect(joined.buckets?.omittedAnswers.map((entry) => entry.word)).toEqual([
       "chaotic",
       "hypnotic",
     ]);
@@ -713,7 +713,7 @@ describe("joinPastedList: the day's Answers the list omits", () => {
     );
 
     expect(joined.lookup).toEqual(["necrotic", "chaotic"]);
-    expect(joined.buckets?.oursNotTheirs.map((entry) => entry.word)).toEqual(["chaotic"]);
+    expect(joined.buckets?.omittedAnswers.map((entry) => entry.word)).toEqual(["chaotic"]);
   });
 
   it("asks one lookup about the residue and the absent Answers together", () => {
@@ -742,7 +742,7 @@ describe("joinPastedList: the day's Answers the list omits", () => {
     expect(joined.buckets?.withoutReading).toEqual([
       { word: "necrotic", knownness: 0.83, composed: null },
     ]);
-    expect(joined.buckets?.oursNotTheirs).toEqual([]);
+    expect(joined.buckets?.omittedAnswers).toEqual([]);
   });
 });
 

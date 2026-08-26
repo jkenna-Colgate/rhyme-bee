@@ -55,7 +55,7 @@ import { InFlight } from "./InFlight.tsx";
 import {
   pileToAccept,
   type DemotableWord,
-  type OursNotTheirsWord,
+  type OmittedAnswer,
   type ReadsElsewhereWord,
   type WordWithoutReading,
 } from "./pastedList.ts";
@@ -141,7 +141,7 @@ export function PastedListView({
             <>
               {/* First, per #186's bucket order, and quieter than the rest: it
                   is small, it is read-only, and nothing in it is work. */}
-              <OursNotTheirsPile words={buckets.oursNotTheirs} />
+              <OmittedAnswersPile words={buckets.omittedAnswers} />
               <WithoutReadingPile
                 words={buckets.withoutReading}
                 refused={paste.refused}
@@ -423,7 +423,7 @@ function AcceptInFlight({ count, elapsedMs }: { count: number; elapsedMs: number
  * Small — three on the measured `idiotic` day — and quieter than the piles under
  * it, because nothing in it is work.
  */
-function OursNotTheirsPile({ words }: { words: readonly OursNotTheirsWord[] }) {
+function OmittedAnswersPile({ words }: { words: readonly OmittedAnswer[] }) {
   if (words.length === 0) return null;
 
   return (
@@ -440,10 +440,27 @@ function OursNotTheirsPile({ words }: { words: readonly OursNotTheirsWord[] }) {
         {words.map((entry) => (
           <li key={entry.word}>
             <span className="editor-paste-word">{entry.word}</span>
-            {entry.readings.map((reading) => (
-              <span key={reading.respelling} className="editor-muted">
-                {reading.respelling} —{" "}
-                <code className="editor-key">{reading.key ?? "unstressed"}</code>
+            {entry.readings.map((reading, index) => (
+              // Index-keyed, here and in the pile below, because two readings of
+              // one word can respell alike — `tear` would collide with itself.
+              // Safe: the row is rebuilt whole from a reply and never reordered.
+              <span key={index} className="editor-muted">
+                {reading.respelling}
+                {/* The key only when there is more than one reading. #192 asks
+                    for our reading "respelled in plain English rather than
+                    ARPAbet", and on a single-reading Answer the key restates
+                    the day's own key in exactly the notation that criterion was
+                    written to keep off the screen. On a multi-reading word it
+                    earns its place: `tear` reads /ɪr/ and /ɛr/, and which of
+                    them lands on the day is the thing the editor opened the row
+                    to see. `ReadsElsewherePile` shows it unconditionally for
+                    the opposite reason — there the key is never the day's. */}
+                {entry.readings.length > 1 && (
+                  <>
+                    {" — "}
+                    <code className="editor-key">{reading.key ?? "unstressed"}</code>
+                  </>
+                )}
               </span>
             ))}
           </li>
@@ -479,8 +496,8 @@ function ReadsElsewherePile({ words }: { words: readonly ReadsElsewhereWord[] })
         {words.map((entry) => (
           <li key={entry.word}>
             <span className="editor-paste-word">{entry.word}</span>
-            {entry.readings.map((reading) => (
-              <span key={reading.respelling} className="editor-muted">
+            {entry.readings.map((reading, index) => (
+              <span key={index} className="editor-muted">
                 {reading.respelling} — <code className="editor-key">{reading.key ?? "unstressed"}</code>
               </span>
             ))}

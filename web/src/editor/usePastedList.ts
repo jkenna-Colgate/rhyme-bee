@@ -20,7 +20,7 @@
  * ## Why the lookup is a gesture and not an effect
  *
  * What one lookup asks about is the join's own `lookup` — the residue and the
- * day's Answers the paste omits, in one request, because the ours-not-theirs
+ * day's Answers the paste omits, in one request, because the omitted-Answers
  * bucket shows our reading respelled and the day readout carries no
  * pronunciation to respell (#192).
  *

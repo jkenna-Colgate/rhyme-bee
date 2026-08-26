@@ -1341,7 +1341,7 @@ code {
   font-weight: 600;
 }
 
-/* The ours-not-theirs bucket: shown first, read-only, and deliberately quieter
+/* The omitted-Answers bucket: shown first, read-only, and deliberately quieter
    than the pile under it. Indented off a rule rather than boxed, so it reads as
    an aside to the residue rather than as a second pile of work. */
 .editor-paste-aside {

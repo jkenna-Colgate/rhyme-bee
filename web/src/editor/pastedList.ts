@@ -143,8 +143,25 @@ export type ReadsElsewhereWord = RespelledWord;
  * re-read on every Submit. So the readings come off the same evidence seam the
  * residue is split on, and the browser respells them itself, exactly as
  * `disagreement.ts` already does.
+ *
+ * ## Why not a `...Word`, like its three neighbours
+ *
+ * Because it would be claiming something untrue. `WordWithoutReading`,
+ * `ReadsElsewhereWord` and `DemotableWord` each name a property the word itself
+ * carries, in the way `CONTEXT.md` says a **Tier** is carried — every rhyming
+ * word with wordhood holds one whether or not anybody submits it. Nothing here
+ * is like that. Paste one list for `idiotic` and `chaotic` is an omission; paste
+ * a list that happens to include it and, same **Puzzle** and same **Rhyme Key**,
+ * it is not. Membership belongs to a *(word, paste)* pair and lasts the sitting.
+ *
+ * Naming it for the **Answer** also puts the exclusion in the type where it can
+ * be seen: `zymotic`, a **Bonus Word** the list leaves out, is deliberately not
+ * here, and a `...Word` suffix would hide that. The on-screen heading stays
+ * deictic — "On our list, not on theirs" is the right thing to say to an editor
+ * reading the panel — so #186's own phrase for the bucket survives where it was
+ * aimed, at the person, and the code keeps the name that is true.
  */
-export type OursNotTheirsWord = RespelledWord;
+export type OmittedAnswer = RespelledWord;
 
 /** A word and our own readings of it, respelled, alongside the key each lands on. */
 export interface RespelledWord {
@@ -222,7 +239,7 @@ export interface DemotableWord {
 /** The residue, split on wordhood. Null until the evidence for it has arrived. */
 export interface PastedBuckets {
   /** Day Answers the paste omits. Read-only, shown first, and usually empty. */
-  oursNotTheirs: OursNotTheirsWord[];
+  omittedAnswers: OmittedAnswer[];
   /** Has wordhood, no reading. The main pile, ordered by knownness descending. */
   withoutReading: WordWithoutReading[];
   /** Has wordhood and reads, but not on the day's key. Read-only. */
@@ -252,15 +269,15 @@ export interface PastedList {
    * Answers the paste omits.
    *
    * Two populations with nothing in common but the seam they come down. The
-   * residue is asked about because the buckets are a split of it; the absent
-   * Answers are asked about because {@link OursNotTheirsWord} shows our own
+   * residue is asked about because the buckets are a split of it; the omitted
+   * Answers are asked about because {@link OmittedAnswer} shows our own
    * reading respelled and the day readout carries no pronunciation to respell.
    *
    * Assembled here rather than in the caller so that the rule stays in the
    * module everything this feature knows lives in — a hook that concatenated the
    * two lists itself would be the second place to change when a bucket needs a
    * third. Disjoint by construction: a residue word is one the day does not
-   * cover, and an absent Answer is one the day covers.
+   * cover, and an omitted Answer is one the day covers.
    *
    * Empty when the paste held no words at all. With no third-party list there is
    * no third party to disagree with, and every Answer would otherwise read as
@@ -285,7 +302,7 @@ export interface PastedList {
  *
  * The join runs both ways. Pasted words the day covers collapse to a count and
  * the rest become the residue; day **Answers** the paste omits become the one
- * bucket that reads back the other direction ({@link OursNotTheirsWord}).
+ * bucket that reads back the other direction ({@link OmittedAnswer}).
  *
  * **Total, and never null.** An empty paste, a paste of pure noise and a date
  * the schedule does not cover are three different facts, but the caller
@@ -328,14 +345,14 @@ export function joinPastedList(
     if (!covered.has(word)) residue.push(word);
   }
 
-  const absent = counted === 0 ? [] : [...absentAnswers(readout.answers, listed, demoted)];
+  const omitted = counted === 0 ? [] : [...omissionsOf(readout.answers, listed, demoted)];
 
   return {
     pasted: counted,
     covered: counted - residue.length,
     residue,
-    lookup: [...residue, ...absent],
-    buckets: bucketsOf(residue, absent, readout.rhymeKey, evidence, demoted),
+    lookup: [...residue, ...omitted],
+    buckets: bucketsOf(residue, omitted, readout.rhymeKey, evidence, demoted),
   };
 }
 
@@ -347,16 +364,28 @@ export function joinPastedList(
  * the game saying almost nobody knows this — a rhyme list omitting one is the
  * expected case rather than a signal.
  *
+ * ## Why the demotions are read here and not by `covered`
+ *
  * A word the game no longer holds is left out for the reason it is left out of
  * every other bucket: it is on its way out of the Puzzle at the next rebuild,
  * and asking the editor to weigh our reading of a word they have just refused is
  * asking about a word that will not be there.
  *
+ * That reads as inconsistent with the join above, which builds `covered` from
+ * the **built** day and applies no demotions to it — this filter is the one
+ * place in the module that reads something **Corrected Day**–shaped. It is not:
+ * the two choices are the same rule seen from either side, which is **never
+ * re-offer a word the editor has just refused**. Counting a demoted word as
+ * covered is what stops it coming back as residue for a second demotion;
+ * dropping it here is what stops it coming back as an omission, asking the
+ * editor to re-weigh our reading of a word they have already thrown out. Making
+ * either half agree with the other's *shape* would break the rule they share.
+ *
  * Deduplicated because the list travels to an endpoint that refuses a request
  * naming the same word twice, and two spellings in the Answers can normalise
  * alike even though the index's own are distinct.
  */
-function* absentAnswers(
+function* omissionsOf(
   answers: readonly DayWord[],
   listed: ReadonlySet<string>,
   demoted: ReadonlySet<string>,
@@ -395,7 +424,7 @@ function* absentAnswers(
  */
 function bucketsOf(
   residue: readonly string[],
-  absent: readonly string[],
+  omitted: readonly string[],
   rhymeKey: RhymeKey,
   evidence: EvidenceReply | null,
   demoted: ReadonlySet<string>,
@@ -406,7 +435,7 @@ function bucketsOf(
   for (const word of evidence.words) facts.set(word.word, word);
   if (!residue.every((word) => facts.has(word))) return null;
 
-  const oursNotTheirs: OursNotTheirsWord[] = [];
+  const omittedAnswers: OmittedAnswer[] = [];
   const withoutReading: WordWithoutReading[] = [];
   const readsElsewhere: ReadsElsewhereWord[] = [];
   const demotable: DemotableWord[] = [];
@@ -459,7 +488,7 @@ function bucketsOf(
     withoutReading.push({ word, knownness: known.knownness, composed });
   }
 
-  // The absent Answers are asked about in the same request as the residue, so in
+  // The omitted Answers are asked about in the same request as the residue, so in
   // the running tool this loop finds every one of them. A word it does not is
   // skipped rather than refused, and that asymmetry with the residue above is
   // deliberate: the residue is what everything actionable comes out of, and a
@@ -467,14 +496,14 @@ function bucketsOf(
   // whereas this bucket is read-only and carries no verdict. Refusing the whole
   // split — the accepts, the demotions — because a read-only comparison came up
   // short would trade the pile the editor acts on for the one they only read.
-  for (const word of absent) {
+  for (const word of omitted) {
     const known = facts.get(word);
     if (known === undefined) continue;
-    oursNotTheirs.push({ word, readings: respellings(known) });
+    omittedAnswers.push({ word, readings: respellings(known) });
   }
 
   return {
-    oursNotTheirs,
+    omittedAnswers,
     withoutReading: byKnownness(withoutReading),
     readsElsewhere,
     demotable,

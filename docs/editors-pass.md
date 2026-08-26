@@ -246,8 +246,8 @@ list up in another window, alphabetical, and run the two lists past each other.
 > running two lists past each other by eye. What follows is still worth reading —
 > it is what the residue means, and the CLI pass has no equivalent.
 >
-> Since #189 that residue is split for you as well. Press **Look up these N
-> words** and it comes back in three piles:
+> Since #189 that residue is split for you as well. Press **Look up N words**
+> and the residue comes back in three piles:
 >
 > - **Has wordhood, no reading** — the main pile, best known first. Words the
 >   game admits and cannot pronounce, which is where every add worth making
@@ -317,11 +317,35 @@ list up in another window, alphabetical, and run the two lists past each other.
 > here reports in the same banner above the tab strip as one raised anywhere else,
 > and the paste is untouched by it — no re-read, no re-paste.
 >
-> The remaining pile is still read-only: **We read these differently** tells you
-> what to look at, and acting on it is a later slice. There is no Tier control
-> anywhere on this tab and there will not be one — Tier follows knownness
-> (ADR-0003, ADR-0015), and knownness is shown there to order the pile, never to
-> set.
+> Since #192 the join runs the other way too, and a fourth pile sits above the
+> three: **On our list, not on theirs** — Answers the day serves that the pasted
+> list leaves out, each with our own reading respelled. It is not a split of the
+> residue and never was; it is built from our words rather than theirs, which is
+> why it is shown first and set quieter than the piles under it. That is also why
+> the button now reads **Look up N words** where it used to name the residue
+> alone: the one request asks about the residue *and* these, because the day
+> readout carries no pronunciation to respell and the answer has to come off the
+> same evidence seam. A word with more than one reading — `tear` reads /ɪr/ and
+> /ɛr/ — shows the Rhyme Key each lands on, so you can see which one the day
+> caught; a word with a single reading does not, because there the key would only
+> restate the day's own.
+>
+> Bonus Words are deliberately absent: the game already says almost nobody knows
+> those, so a rhyme list omitting one is the expected case and not a signal. Nor
+> is anything you have just demoted or dismissed, which is the same rule the
+> covered count follows — a word you have refused does not come back, in either
+> direction.
+>
+> Read it as a question and not a verdict. A third party omitting a word we serve
+> is *sometimes* our reading being wrong and sometimes just their omission, and
+> nothing on the screen can tell which. On the measured `idiotic` day it held
+> three words.
+>
+> The two remaining piles are read-only: that one, and **We read these
+> differently**, which tells you what to look at while acting on it is a later
+> slice. There is no Tier control anywhere on this tab and there will not be one
+> — Tier follows knownness (ADR-0003, ADR-0015), and knownness is shown there to
+> order the main pile, never to set.
 
 For 2026-08-08 that is a rhyme list for `centimeter` against the 25 Answers
 above. What you are hunting is a word that plainly rhymes, that a reasonable
