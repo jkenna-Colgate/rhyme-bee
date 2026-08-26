@@ -17,12 +17,12 @@
  * fourth file beside it. No module under `web/src/` has ever opened one of
  * those, and none should — so this is the seam that carries the facts across.
  *
- * ## It answers with evidence and never with buckets
+ * ## It answers with evidence and never with piles
  *
  * That is #189's load-bearing decision and `web/src/editor/evidence.ts` argues
  * it at length. The short of it: how the residue is grouped is a browser
  * decision that #190, #191 and #192 each change, while a fact about a word does
- * not move — and shipping buckets over the wire would put the join itself behind
+ * not move — and shipping piles over the wire would put the join itself behind
  * an HTTP call, where neither the view nor a test could reach it.
  *
  * What is left here is therefore nearly empty, which is the point:

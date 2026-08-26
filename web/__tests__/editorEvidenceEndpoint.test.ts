@@ -142,7 +142,7 @@ describe("the dev-only evidence endpoint", () => {
   });
 
   it("answers about a word with no wordhood rather than refusing it", async () => {
-    // The demotable bucket is made of these, so a name has to come back with
+    // The demotable pile is made of these, so a name has to come back with
     // its facts on it — not be dropped for failing a test this route does not
     // apply. Wordhood is the browser's line to draw, not the wire's.
     const reply = await lookup(["kate"]);

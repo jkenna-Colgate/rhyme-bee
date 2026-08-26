@@ -2,7 +2,7 @@
  * What the Editor's Pass asks about a list of words, and what it gets back:
  * **facts about each word, never a verdict about it** (#189).
  *
- * ## Why the wire carries evidence rather than buckets
+ * ## Why the wire carries evidence rather than piles
  *
  * Wordhood, name status, readings, composition and knownness are Node-only —
  * they live in `data/cmudict.dict`, `data/words.txt`, `data/names.txt` and
@@ -16,10 +16,10 @@
  *   one. {@link WordFacts} is that type plus a number, not a parallel set.
  * - **It makes the join genuinely pure.** Two adapters satisfy this shape — the
  *   endpoint, and a hand-built literal in a test — which is what lets
- *   `pastedList.ts` be text-and-facts in, buckets out, with no browser and no
+ *   `pastedList.ts` be text-and-facts in, piles out, with no browser and no
  *   fixture server anywhere near it.
- * - **Buckets would not hold still.** #190, #191 and #192 each change how the
- *   residue is grouped and acted on. A bucket wire type would make every one of
+ * - **Piles would not hold still.** #190, #191 and #192 each change how the
+ *   residue is grouped and acted on. A pile wire type would make every one of
  *   those a change to a contract Node and the browser both had to agree about.
  *   A fact about a word does not move.
  * - **It is the prior art.** `dayCandidates.ts` selects out of a server readout

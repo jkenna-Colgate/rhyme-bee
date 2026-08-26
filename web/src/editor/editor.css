@@ -1316,7 +1316,7 @@ code {
 }
 
 /* One row per word in each of the three split piles (#189). A row rather than a
-   wrapped chip like `.editor-paste-words` above, because a bucketed word carries
+   wrapped chip like `.editor-paste-words` above, because a word in a pile carries
    more than its spelling — its knownness, a composition, a respelling — and
    those read as columns rather than as a run of text. */
 .editor-paste-rows {
@@ -1341,7 +1341,7 @@ code {
   font-weight: 600;
 }
 
-/* The omitted-Answers bucket: shown first, read-only, and deliberately quieter
+/* The omitted-Answers pile: shown first, read-only, and deliberately quieter
    than the pile under it. Indented off a rule rather than boxed, so it reads as
    an aside to the residue rather than as a second pile of work. */
 .editor-paste-aside {

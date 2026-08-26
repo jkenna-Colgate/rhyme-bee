@@ -80,7 +80,7 @@ export function PastedListView({
   demoter: Demoter;
 }) {
   const day = readout !== null && readout.outcome === "day" ? readout : null;
-  const { pasted, covered, residue, buckets } = paste.list;
+  const { pasted, covered, residue, piles } = paste.list;
 
   return (
     <div className="editor-paste">
@@ -135,22 +135,22 @@ export function PastedListView({
             <p className="editor-muted">The day covers every word on the list.</p>
           )}
 
-          {buckets === null ? (
+          {piles === null ? (
             <ResidueUnlooked paste={paste} />
           ) : (
             <>
-              {/* First, per #186's bucket order, and quieter than the rest: it
+              {/* First, per #186's pile order, and quieter than the rest: it
                   is small, it is read-only, and nothing in it is work. */}
-              <OmittedAnswersPile words={buckets.omittedAnswers} />
+              <OmittedAnswersPile words={piles.omittedAnswers} />
               <WithoutReadingPile
-                words={buckets.withoutReading}
+                words={piles.withoutReading}
                 refused={paste.refused}
                 day={day}
                 adder={adder}
               />
-              <ReadsElsewherePile words={buckets.readsElsewhere} />
+              <ReadsElsewherePile words={piles.readsElsewhere} />
               <DemotablePile
-                words={buckets.demotable}
+                words={piles.demotable}
                 demoter={demoter}
                 onDismiss={paste.dismiss}
               />
@@ -403,13 +403,13 @@ function AcceptInFlight({ count, elapsedMs }: { count: number; elapsedMs: number
 }
 
 /**
- * The one bucket that runs the other way: day **Answers** the pasted list leaves
+ * The one pile that runs the other way: day **Answers** the pasted list leaves
  * out, each with our own reading respelled so the disagreement can be read
  * rather than decoded (#192).
  *
  * **Read-only, and framed neutrally on purpose.** A third party omitting a word
  * we serve is *sometimes* a signal that our reading is wrong and sometimes just
- * an omission, and nothing on this screen can tell which — so the bucket offers
+ * an omission, and nothing on this screen can tell which — so the pile offers
  * no accept, no dismiss and no correction, and says nothing that would present
  * their omission as proof we are wrong. Acting on it is out of scope for #186 in
  * any case: changing a reading we already hold is a pronunciation correction

@@ -114,6 +114,7 @@ _Avoid_: Decline (a ruling on a Candidate, and it writes), Demotion (the act on 
 
 **Editor's Pass**:
 The puzzles editor's read of a Daily Puzzle before its date arrives, and the corrections that read produces. It is a *read*, not a play: the editor scans the day's Answers and Bonus Words as text — against a third-party rhyme list in another window — and never opens a Session. The term covers both halves of the loop, because they are one activity rather than two: the pass surfaces a Puzzle that has drifted out of the band it was dealt from or is missing an obvious rhyme, and the words it adds are added in the same sitting, by name alone.
+A **pile** is one of the groups the pass splits words into on screen — the residue's three, and the Answers the pasted list omits. That is the word everywhere: in the panel, in `pastedList.ts`, and in the Dismissal entry above. _Avoid_ bucket, which named the same thing in half the artifacts and now names none of them.
 _Avoid_: play-ahead, preflight, daily review
 
 **Corrected Day**:

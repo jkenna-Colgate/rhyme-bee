@@ -224,11 +224,11 @@ export const EDITOR_STATUS_PATH = "/api/editor/status";
  * pinned sources hold, a reading composed from a compound split when one reaches
  * the key, and the word's prevalence row (#189).
  *
- * It answers with **evidence and never with buckets**. Wordhood, names,
+ * It answers with **evidence and never with piles**. Wordhood, names,
  * readings, composition and knownness are all Node-only facts and no module
  * under `web/src/` can reach them, so this is the seam that carries them across;
  * how they are then grouped is a browser decision that `pastedList.ts` makes
- * and that the tickets after this one keep changing. A bucket wire type would
+ * and that the tickets after this one keep changing. A pile wire type would
  * put a UI shape in a contract Node had to agree with, and put the join itself
  * behind an HTTP call where neither a test nor the view could reach it.
  *

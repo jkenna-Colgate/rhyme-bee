@@ -21,7 +21,7 @@
  *
  * What one lookup asks about is the join's own `lookup` — the residue and the
  * day's Answers the paste omits, in one request, because the omitted-Answers
- * bucket shows our reading respelled and the day readout carries no
+ * pile shows our reading respelled and the day readout carries no
  * pronunciation to respell (#192).
  *
  * The residue changes on every keystroke in the box, and a lookup is not cheap
@@ -33,15 +33,15 @@
  * What that costs is a stale answer, and it is not paid — but the rule that
  * stops it is not here. The last reply is handed to the join unconditionally,
  * and the join refuses one gathered against another Rhyme Key or one that does
- * not answer about the whole residue. Edit the box and the buckets go back to
- * null, which is what is true, and is why `PastedList.buckets` is nullable
+ * not answer about the whole residue. Edit the box and the piles go back to
+ * null, which is what is true, and is why `PastedList.piles` is nullable
  * rather than three empty arrays.
  *
  * A **rebuild is the other way round, and deliberately so**. An accept re-reads
  * the day, the words that got readings are covered by the Puzzle, and the
  * residue shrinks to a *subset* of what the reply answered about — which the
  * join's check (`residue.every((word) => facts.has(word))`) passes. So the
- * buckets survive an accept on pre-rebuild evidence, which is what keeps the
+ * piles survive an accept on pre-rebuild evidence, which is what keeps the
  * pile on screen instead of asking for a second lookup about words nothing has
  * changed about.
  *
@@ -87,7 +87,7 @@ export interface Paste {
   /** What the editor pasted, verbatim — the box's own value. */
   text: string;
   setText: (text: string) => void;
-  /** That text joined against the day on screen, with the buckets when they hold. */
+  /** That text joined against the day on screen, with the piles when they hold. */
   list: PastedList;
   /**
    * Ask the endpoint what is true of the words the join needs facts about — the
