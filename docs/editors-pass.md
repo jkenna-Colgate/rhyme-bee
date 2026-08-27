@@ -240,6 +240,113 @@ This is the part no command does for you, and the reason step 1 prints in sorted
 columns across the row rather than one word per line: put a third-party rhyme
 list up in another window, alphabetical, and run the two lists past each other.
 
+> Since #188 the browser tool does this join for you, on its **Rhyme List** tab:
+> paste the third-party list in and every word the day already covers collapses
+> to a count, leaving the residue. It is the same scan, and it is faster than
+> running two lists past each other by eye. What follows is still worth reading —
+> it is what the residue means, and the CLI pass has no equivalent.
+>
+> Since #189 that residue is split for you as well. Press **Look up N words**
+> and the residue comes back in three piles:
+>
+> - **Has wordhood, no reading** — the main pile, best known first. Words the
+>   game admits and cannot pronounce, which is where every add worth making
+>   comes from. A word with no prevalence row is here too, ordered last rather
+>   than dropped: it is already a Bonus Word as far as the Rhyme Index is
+>   concerned, and filtering on knownness would hide exactly the finds a player
+>   digs for. A row marked `composes:` needs no reading sourced at all — a
+>   compound split already reaches the day's Rhyme Key.
+> - **We read these differently** — words we already read, just not onto this
+>   key. Changing a reading we hold is a *pronunciation correction* rather than
+>   an add, and is not done from this tab.
+> - **Names and non-words** — with the rejection a player would receive. A name
+>   is listed even when `data/words.txt` still holds it: the evidence applies no
+>   demotions, so a name nobody has demoted yet is being served as an ordinary
+>   Answer today, and that is the demotion worth making. The cost is `bill` and
+>   `mark`, which are genuinely both — look and leave them alone. Acted on per
+>   word since #191, below.
+>
+> This is why the CLI's `not-a-known-word` count is so misleading: the Rhyme
+> Index refuses a word with no reading that way whether we have never heard of
+> it or merely cannot pronounce it. On the measured `idiotic` day, 197 of the
+> 239 refused words had wordhood, and the top of that pile by knownness was
+> `macrobiotic`, `biotic`, `necrotic`, `orthotic`, `thrombotic`, `fibrotic` —
+> which is exactly the set a player would want.
+>
+> Since #190 the main pile is acted on rather than merely read. **Accept these N
+> words** sends the whole pile to the add route in a single request — one append
+> to `data/supplement.dict`, one rebuild of the Rhyme Index, one re-read of the
+> day. There is no cap and no chunking: you decide the volume by what you paste,
+> and four fifty-word chunks would be four rebuilds to do one night's work.
+>
+> What happens per word is the add route's own and is unchanged. A row marked
+> `composes:` is written immediately with no round trip. Every other word is
+> asked of an agent that is given up to a minute, and those waits are serial — so
+> the measured day's 197 words can legitimately run for hours. The tab says how
+> long it has been running and the worst case it is running against; it is safe
+> to leave it, because every word ends up written or recorded as deferred, and
+> the paste is still in the box when it finishes. Accepted words drop out of the
+> pile and into the already-covered count on the re-read, and they apply to every
+> Puzzle they appear in rather than only this day.
+>
+> One case is held back from the bulk accept and shown per word: a reading the
+> agent proposed that did not land on the day's Rhyme Key. The row says what was
+> proposed, respelled, with an **Ask again** of its own. Sweeping that word into
+> the next accept would ask the same question and get the same answer with nobody
+> looking — it is the one thing in the pile that needs your eye. The mark stays
+> put for the rest of the day's work: a second accept, or a Submit on the day
+> tab, leaves it where it is. What clears it is an **Ask again** that lands, and
+> moving to another day, whose Rhyme Key a refusal recorded here says nothing
+> about.
+>
+> Since #191 the names-and-non-words pile is acted on too, one word at a time,
+> and the two halves of it do different things. A name `data/words.txt` still
+> holds is offered as a demotion — the same two buttons the day tab gives a word,
+> **It’s a name** and **It’s not a word** — and pressing one appends to
+> `data/demotions.txt`, which takes the word's wordhood on every day and survives
+> a fresh clone. Everything else in the pile has no wordhood at all, so the engine
+> already rejects it and a demotion would be a no-op line in a hand-curated file:
+> those get a single **Dismiss**, which clears the row and writes nothing. Either
+> way the word is gone from the pile and does not come back on a later paste of
+> the same list — a demoted one for good, a dismissed one for as long as the tab
+> is open.
+>
+> The reason is never guessed on your behalf, because that column is the sentence
+> the player receives: the pile's own test is name-hood against a list of first
+> names, which is right about `algiers` and wrong about `bill`. A demotion raised
+> here reports in the same banner above the tab strip as one raised anywhere else,
+> and the paste is untouched by it — no re-read, no re-paste.
+>
+> Since #192 the join runs the other way too, and a fourth pile sits above the
+> three: **On our list, not on theirs** — Answers the day serves that the pasted
+> list leaves out, each with our own reading respelled. It is not a split of the
+> residue and never was; it is built from our words rather than theirs, which is
+> why it is shown first and set quieter than the piles under it. That is also why
+> the button now reads **Look up N words** where it used to name the residue
+> alone: the one request asks about the residue *and* these, because the day
+> readout carries no pronunciation to respell and the answer has to come off the
+> same evidence seam. A word with more than one reading — `tear` reads /ɪr/ and
+> /ɛr/ — shows the Rhyme Key each lands on, so you can see which one the day
+> caught; a word with a single reading does not, because there the key would only
+> restate the day's own.
+>
+> Bonus Words are deliberately absent: the game already says almost nobody knows
+> those, so a rhyme list omitting one is the expected case and not a signal. Nor
+> is anything you have just demoted or dismissed, which is the same rule the
+> covered count follows — a word you have refused does not come back, in either
+> direction.
+>
+> Read it as a question and not a verdict. A third party omitting a word we serve
+> is *sometimes* our reading being wrong and sometimes just their omission, and
+> nothing on the screen can tell which. On the measured `idiotic` day it held
+> three words.
+>
+> The two remaining piles are read-only: that one, and **We read these
+> differently**, which tells you what to look at while acting on it is a later
+> slice. There is no Tier control anywhere on this tab and there will not be one
+> — Tier follows knownness (ADR-0003, ADR-0015), and knownness is shown there to
+> order the main pile, never to set.
+
 For 2026-08-08 that is a rhyme list for `centimeter` against the 25 Answers
 above. What you are hunting is a word that plainly rhymes, that a reasonable
 player would try, and that is on neither list here — `saltpeter` is one.

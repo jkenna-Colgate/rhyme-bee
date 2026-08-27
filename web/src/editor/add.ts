@@ -77,28 +77,98 @@ function sameAim(a: AddAim, b: AddAim): boolean {
 }
 
 /**
- * How many words one Submit will carry.
+ * How many words the editor may **type** into one queue.
  *
- * The binding cost is not bytes — a hundred words is a couple of kilobytes — it
- * is **time**: a word no compound split reaches goes to an agent that is given
- * up to a minute (`AGENT_TIMEOUT_MS`, `scripts/editorAdd.ts`), and those waits
- * are serial. Fifty words is therefore a worst case of about fifty minutes,
- * which is already past the point where an editor should be splitting the batch
- * rather than watching it. The limit is stated in words because that is the unit
- * whose cost is real, and it is enforced in the browser *and* at the endpoint:
- * the browser so the fifty-first word is refused before it is queued, the
- * endpoint because a cap only a client honours is not a cap.
+ * A browser-side ergonomic guard on the entry field, enforced nowhere else: it
+ * shuts the field at the fifty-first word, and nothing downstream asks about it
+ * again.
+ *
+ * ## It is not a cost bound, and #190 is why it stopped being one
+ *
+ * The cost it used to bound was **agent minutes** — a word no compound split
+ * reaches goes to an agent that is given up to a minute (`AGENT_TIMEOUT_MS`,
+ * `scripts/editorAdd.ts`), and those waits are serial — and those minutes are
+ * the same whether the word was typed or pasted. #190 accepted that wait
+ * deliberately for the pasted pile: the measured `idiotic` day's 197 words are
+ * an overnight job the editor can walk away from, and the tool states how long
+ * it may run rather than refusing on their behalf. A number that lets 197 pasted
+ * words through and stops 51 typed ones is not bounding a cost, so this one no
+ * longer claims to.
+ *
+ * What it still earns is the field. Fifty is past anything anyone types in a
+ * sitting, and a queue that reaches it is a paste into the wrong box or a stuck
+ * key — worth stopping at the keystroke, where it costs nothing. Stated in words
+ * because that is the unit the editor is working in.
+ *
+ * ## Why nothing enforces it at the route
+ *
+ * The route's bound is {@link MAX_SUBMITTED_WORDS}, and *that* one is enforced
+ * server-side, in `addWriteRequest` — "a cap only a client honours is not a cap"
+ * was the argument for enforcing the route's bound at the route, and it is
+ * untouched. There is **one** route bound rather than two because the route
+ * cannot tell a typed batch from a pasted one, and must not be told: a field the
+ * client sets to choose which cap applies to it is precisely a cap only a client
+ * honours. So the fifty is what the entry field does, the two thousand is what
+ * the route enforces, and the endpoint judges every word the same way whichever
+ * gesture sent it.
  */
 export const MAX_QUEUED_WORDS = 50;
 
 /**
- * Words are lower-case letters, the shape `data/words.txt` holds all 370,105 of
- * its entries in. Checked here, in the browser, so a typo with a stray character
- * in it is refused at the moment it is typed rather than a whole Submit later —
- * the queue's promise is that a mistake costs nothing, and a mistake that is
- * only reported after the batch has run has already cost the batch.
+ * How many words one Submit may carry, whatever composed it.
+ *
+ * A **transport bound, not a workload one** — deliberately far above any list an
+ * editor would paste, so that the volume is decided by what they select rather
+ * than by a number in here (#186, story 19). The measured day's pile was 197 and
+ * a third-party list queried for one Rhyme Key does not run to thousands; this
+ * is the size past which a body has stopped being a rhyme list and started being
+ * a mistake.
+ *
+ * There is a bound at all because `MAX_ADD_BODY_BYTES` is derived from it and a
+ * route that will read an unbounded body is a route with no cap. What there is
+ * *not* is a bound tuned to how long the batch will take: that cost is real, it
+ * is stated to the editor while the Submit runs, and it is theirs to accept —
+ * #190 is explicit that the wait is an overnight job to walk away from rather
+ * than something the tool should refuse on their behalf.
  */
+export const MAX_SUBMITTED_WORDS = 2000;
+
+/**
+ * The worst case one word can cost, in milliseconds: the bound
+ * `scripts/editorAdd.ts` puts on the agent it asks to author a reading no
+ * compound split reaches.
+ *
+ * Restated here rather than imported because importing it would pull the module
+ * that spawns processes into the browser bundle. It is used only to say how long
+ * a Submit *might* take, so a copy that drifted would cost an inaccurate sentence
+ * rather than an incorrect act.
+ *
+ * In this module rather than beside the one view that used to hold it, because
+ * two views now say the sentence — the add queue's own Submit and the pasted
+ * pile's accept (#190) — and a second copy is a second thing to forget to move.
+ */
+export const WORST_CASE_MS_PER_WORD = 60_000;
+
 const WORD = /^[a-z]+$/;
+
+/**
+ * Whether a spelling has the shape of a word: lower-case letters, which is how
+ * `data/words.txt` holds all 370,105 of its entries.
+ *
+ * Checked in the browser so a typo with a stray character in it is refused at
+ * the moment it is typed rather than a whole Submit later — the queue's promise
+ * is that a mistake costs nothing, and a mistake that is only reported after the
+ * batch has run has already cost the batch.
+ *
+ * Exported because the pasted rhyme list asks the same question of a third
+ * party's entries (#188), where the answer means something else entirely — noise
+ * to drop silently rather than a mistake to report. One rule, because a paste
+ * that admitted a spelling the add queue refuses would nominate words that
+ * cannot then be added.
+ */
+export function isWord(word: string): boolean {
+  return WORD.test(word);
+}
 
 export type QueueResult = { ok: true; queue: string[] } | { ok: false; error: string };
 
@@ -117,7 +187,7 @@ export type QueueResult = { ok: true; queue: string[] } | { ok: false; error: st
 export function queueAdd(queue: readonly string[], typed: string): QueueResult {
   const word = normaliseWord(typed);
   if (word === "") return { ok: false, error: "Type a word to add." };
-  if (!WORD.test(word)) {
+  if (!isWord(word)) {
     return { ok: false, error: `“${typed.trim()}” is not a word. An add names one word, in letters.` };
   }
   if (queue.includes(word)) return { ok: false, error: `${word} is already queued.` };

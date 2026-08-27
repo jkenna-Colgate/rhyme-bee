@@ -30,6 +30,19 @@ import type { IndexStaleness } from "../../scripts/indexArtifact.ts";
 import type { AddSubmitRequest, AddSubmitResult, RebuildResult } from "../src/editor/add.ts";
 import type { AddOutcome, AddTarget } from "../src/editor/addOutcome.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "../editorAddRequest.ts";
+import { MAX_SUBMITTED_WORDS } from "../src/editor/add.ts";
+
+/** `n` distinct spellings, in letters — the shape the parser admits. */
+function spellings(n: number): string[] {
+  return Array.from({ length: n }, (_, at) =>
+    "w" +
+    at
+      .toString(26)
+      .split("")
+      .map((digit) => String.fromCharCode(97 + parseInt(digit, 26)))
+      .join(""),
+  );
+}
 import { editorAddSpec } from "../editorAddPlugin.ts";
 import { editorMiddleware } from "../editorRoute.ts";
 import { callRoute as call, type Answered } from "./routeCall.ts";
@@ -820,10 +833,37 @@ describe("what counts as a Submit", () => {
   });
 
   it("refuses more words than one Submit carries", () => {
-    const words = Array.from({ length: 51 }, (_, n) => "w" + "a".repeat(n + 1));
-    const asked = addWriteRequest(JSON.stringify({ date: "2026-08-10", words }));
+    const asked = addWriteRequest(
+      JSON.stringify({ date: "2026-08-10", words: spellings(MAX_SUBMITTED_WORDS + 1) }),
+    );
 
     expect(asked.ok).toBe(false);
-    expect(asked.ok === false && asked.error).toMatch(/one Submit carries 50/);
+    expect(asked.ok === false && asked.error).toMatch(
+      new RegExp(`one Submit carries ${MAX_SUBMITTED_WORDS}`),
+    );
+  });
+
+  /**
+   * The widening #190 asked for, at the one place it is enforced.
+   *
+   * A paste-sized pile is accepted in **one** request — the measured `idiotic`
+   * day's 197 words — because one Submit is one append, one rebuild and one
+   * re-read, and chunking it to fit the old fifty would have been four of each.
+   * Stated as the measured number rather than as `MAX_SUBMITTED_WORDS - 1`, so
+   * that raising or lowering the bound later still has to leave the day this
+   * feature was measured on working.
+   */
+  it("admits the measured day's whole pile in one request", () => {
+    const words = spellings(197);
+    const asked = addWriteRequest(JSON.stringify({ date: "2026-08-10", words }));
+
+    expect(asked.ok).toBe(true);
+    expect(asked.ok === true && asked.words).toHaveLength(197);
+  });
+
+  it("reads a body that carries a paste-sized pile before the byte cap bites", () => {
+    const body = JSON.stringify({ date: "2026-08-10", words: spellings(197), appealed: [] });
+
+    expect(body.length).toBeLessThanOrEqual(MAX_ADD_BODY_BYTES);
   });
 });

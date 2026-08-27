@@ -64,9 +64,46 @@ import {
 } from "./add.ts";
 import { readEndpointResponse } from "./fetchError.ts";
 
+/**
+ * Which of the two gestures a request came from: the queue the editor typed, or
+ * the pasted rhyme list's main pile accepted whole (#190).
+ *
+ * Named rather than left as a boolean because it is read three ways — what to
+ * disable, whose progress to draw, and whose failure to print — and the last of
+ * those outlives the request, so the three cannot all be one "is a Submit
+ * running" flag.
+ */
+export type AddGesture = "typed" | "pasted";
+
+/**
+ * A request that produced no answer, and which panel is owed the sentence.
+ *
+ * The gesture travels **on the failure** rather than being read off what is in
+ * flight, because by the time there is something to say nothing is in flight any
+ * more: `post` sets the message on its way out. Without it the paste panel
+ * printed every failure, so a Submit refused on the day tab drew a sentence
+ * under the pasted pile, ending in "The queue is kept" about a queue on another
+ * tab.
+ */
+export interface AddFailure {
+  from: AddGesture;
+  message: string;
+}
+
 export interface Adder {
   /** The words waiting, in the order they were typed. */
   queue: readonly string[];
+  /**
+   * The word half-typed into the entry and not yet queued.
+   *
+   * Held here rather than in `AddQueueView` for the same reason the queue is:
+   * the entry lives on the day panel, and the day panel is unmounted whenever
+   * the editor looks at another tab (#187). State kept in the view would make a
+   * glance at the Candidate Queue mid-word cost the word, which is a thing the
+   * stacked layout could not do and the tabs otherwise would.
+   */
+  typed: string;
+  setTyped: (typed: string) => void;
   /**
    * Which of them came from the Candidate Queue rather than the editor's own
    * typing (#178). Kept beside the queue rather than inside it because it is a
@@ -84,14 +121,28 @@ export interface Adder {
   aim: AddAim | null;
   /** A word refused before it cost anything: a duplicate, a typo, a full queue. */
   error: string | null;
-  /** True from the click until the whole act — adds, rebuild, re-read — is done. */
-  submitting: boolean;
+  /**
+   * Which gesture is in flight — from the click until the whole act (adds,
+   * rebuild, re-read) is done — or `null` when nothing is running.
+   *
+   * One field over both gestures rather than a flag each, because the two facts
+   * a panel needs are "is *anything* running" and "is it **mine**", and a
+   * boolean pair can be written into a state that means neither (`accepting`
+   * without `submitting`). *Anything* is what disables every button: a Submit
+   * and a paste accept write the same file and run the same rebuild, so two in
+   * flight at once would race over `data/supplement.dict` and rebuild the index
+   * twice from two different halves of the night's work. *Mine* is what gates
+   * the progress line, because each panel counts its own words — without it, a
+   * three-word Submit from the day tab would draw a "this can run to 197
+   * minutes" line under the paste box, about a batch that is not running.
+   */
+  inFlight: AddGesture | null;
   /** Milliseconds since the click, so a long Submit is visibly running. */
   elapsedMs: number;
   /** The last Submit's answer, kept on screen until the next one or a day change. */
   result: AddSubmitResult | null;
   /** A Submit that produced no answer at all, or one the endpoint refused. */
-  submitError: string | null;
+  submitError: AddFailure | null;
   /**
    * Queue a word against an aim, which binds the queue to it.
    *
@@ -110,6 +161,36 @@ export interface Adder {
    * nothing and a key-aimed one is aimed somewhere the screen is not.
    */
   submit: (date: string) => Promise<void>;
+  /**
+   * Accept a batch of words the editor never typed — the pasted rhyme list's
+   * main pile (#190) — aimed at the day on screen.
+   *
+   * **The same route, the same request shape, the same rebuild.** Not a second
+   * write path, which is the constraint #186 puts at the centre of this feature:
+   * `resolveAddOutcome` already takes an array of words and already produces
+   * exactly the outcomes the paste panel needs, so what is new here is a caller
+   * and nothing else.
+   *
+   * Separate from `submit` for one reason: it must not touch the typed queue.
+   * The queue is bound to an aim, survives a day change on purpose, and is
+   * emptied only by an answer to its own Submit — routing the pile through it
+   * would clash with a standing queue aimed elsewhere, and would empty the
+   * editor's typing on an accept they made from another tab.
+   *
+   * Always **day-aimed**, never key-aimed: the pile was joined against the day
+   * on screen, so the endpoint resolves the key from `data/schedule.json` exactly
+   * as it does for a typed add. Nothing here carries a Rhyme Key of the browser's
+   * own, which is the hole #161 closed and this does not reopen.
+   *
+   * `appealed` is empty and stays empty. Nobody Appealed these words — a third
+   * party's rhyme list nominated them — and the provenance comment that flag
+   * writes into `data/supplement.dict` would be saying something untrue.
+   *
+   * Uncapped here. What bounds the batch is `MAX_SUBMITTED_WORDS` at the route,
+   * and it is a transport bound rather than a workload one; the pile goes in one
+   * request, because one request is one append, one rebuild and one re-read.
+   */
+  accept: (words: readonly string[], date: string) => Promise<void>;
 }
 
 /** How often the elapsed clock is redrawn while a Submit is in flight. */
@@ -117,13 +198,14 @@ const TICK_MS = 500;
 
 export function useAdder(onDay: (readout: DayReadout) => void, date: string | null): Adder {
   const [queue, setQueue] = useState<readonly string[]>([]);
+  const [typed, setTyped] = useState("");
   const [appealed, setAppealed] = useState<readonly string[]>([]);
   const [aim, setAim] = useState<AddAim | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [inFlight, setInFlight] = useState<AddGesture | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [result, setResult] = useState<AddSubmitResult | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<AddFailure | null>(null);
 
   // The callback is read through a ref so the `submit` identity below does not
   // change every time the day does — `submit` is handed to a button, and a
@@ -163,12 +245,12 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
   );
 
   useEffect(() => {
-    if (!submitting) return;
+    if (inFlight === null) return;
     const startedAt = Date.now();
     setElapsedMs(0);
     const timer = setInterval(() => setElapsedMs(Date.now() - startedAt), TICK_MS);
     return () => clearInterval(timer);
-  }, [submitting]);
+  }, [inFlight]);
 
   // The Submitted section reports what a batch did to *a* day — each word's
   // outcome and the Rhyme Key it was judged against — so it stops being true the
@@ -221,6 +303,67 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
     [hold],
   );
 
+  /**
+   * Post one batch and take what comes back: the outcome on screen, the day
+   * re-read from the index the rebuild produced, and whatever the caller settles
+   * on an answer.
+   *
+   * Shared by the typed Submit and the pasted accept (#190) because there is one
+   * route and one rebuild behind both, and a second copy of this would be a
+   * second place for the two to drift on what a failure means. What differs
+   * between them is a callback and a clause, and both are arguments.
+   *
+   * `settled` runs only on an answer the endpoint gave — never on a refusal and
+   * never on a connection that broke — because what it does is discard work the
+   * editor would otherwise have to redo.
+   */
+  const post = useCallback(
+    async (
+      from: AddGesture,
+      payload: AddSubmitRequest,
+      settled: () => void,
+      kept: string,
+    ): Promise<void> => {
+      setInFlight(from);
+      setError(null);
+      setSubmitError(null);
+      try {
+        const response = await fetch(EDITOR_ADD_PATH, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const outcome = await readEndpointResponse<AddSubmitResult>(response, "add");
+        if (!outcome.ok) {
+          setSubmitError({ from, message: outcome.error });
+          return;
+        }
+        const answered = outcome.body;
+        setResult(answered);
+        settled();
+        if (answered.readout !== null) day.current(answered.readout);
+      } catch (cause) {
+        // Deliberately not `endpointFailure`, whose sentence ends "Nothing was
+        // written." That is true of the Tier and demotion routes, which answer
+        // before they write; it is not knowable here — a request whose connection
+        // broke may have written some of the batch already. What can be said
+        // instead is the more useful thing: sending it again is safe, because a
+        // word that did land comes back as one that already reads and is left
+        // alone.
+        setSubmitError({
+          from,
+          message:
+            `${cause instanceof Error ? cause.message : "The add endpoint could not be reached."} ` +
+            `— is the dev server still running? ${kept}, and sending it again is safe: ` +
+            "a word that did get written comes back as one that already reads, and is left alone.",
+        });
+      } finally {
+        setInFlight(null);
+      }
+    },
+    [],
+  );
+
   const submit = useCallback(async (date: string) => {
     // The queue as it stands at the click, not as it stood when this callback
     // was built — the callback is deliberately stable across renders.
@@ -247,76 +390,83 @@ export function useAdder(onDay: (readout: DayReadout) => void, date: string | nu
     // landing on another day's Rhyme Key.
     const held = aimHeldFor(boundTo, date);
     if (held !== null) {
-      setSubmitError(held);
+      setSubmitError({ from: "typed", message: held });
       return;
     }
 
-    setSubmitting(true);
-    setError(null);
-    setSubmitError(null);
-    try {
-      // Built as an `AddSubmitRequest` rather than as a literal, so the body
-      // this posts is checked against the shape the endpoint's parser returns
-      // rather than agreeing with it by hand. Copied out because the queue is
-      // held readonly and the declared field is not — the copy is inert, since
-      // the next line serialises it and the endpoint parses its own.
-      //
-      // The date always travels and is always the day on screen: it is what the
-      // aim is resolved from for a day-aimed queue, and what the answer re-reads
-      // for every other kind. The key travels only when the queue has one, which
-      // is what makes it the aim rather than a second opinion about the day.
-      const payload: AddSubmitRequest = {
+    // Built as an `AddSubmitRequest` rather than as a literal, so the body this
+    // posts is checked against the shape the endpoint's parser returns rather
+    // than agreeing with it by hand. Copied out because the queue is held
+    // readonly and the declared field is not — the copy is inert, since `post`
+    // serialises it and the endpoint parses its own.
+    //
+    // The date always travels and is always the day on screen: it is what the
+    // aim is resolved from for a day-aimed queue, and what the answer re-reads
+    // for every other kind. The key travels only when the queue has one, which
+    // is what makes it the aim rather than a second opinion about the day.
+    await post(
+      "typed",
+      {
         date,
         words: [...batch],
         appealed: [...raised],
         ...(boundTo?.kind === "key" ? { rhymeKey: boundTo.rhymeKey } : {}),
-      };
-      const response = await fetch(EDITOR_ADD_PATH, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const outcome = await readEndpointResponse<AddSubmitResult>(response, "add");
-      if (!outcome.ok) {
-        setSubmitError(outcome.error);
-        return;
-      }
-      const answered = outcome.body;
-      setResult(answered);
+      },
       // The queue empties only on an answer, and empties its binding with it. A
       // refused or unreachable Submit leaves both exactly as they were, because
       // the words are then still missing from the game and retyping them is the
       // one cost this whole design exists to avoid.
-      hold([], [], null);
-      if (answered.readout !== null) day.current(answered.readout);
-    } catch (cause) {
-      // Deliberately not `endpointFailure`, whose sentence ends "Nothing was
-      // written." That is true of the Tier and demotion routes, which answer
-      // before they write; it is not knowable here — a Submit whose connection
-      // broke may have written some of the batch already. What can be said
-      // instead is the more useful thing: resubmitting is safe, because a word
-      // that did land comes back as one that already reads and is left alone.
-      setSubmitError(
-        `${cause instanceof Error ? cause.message : "The add endpoint could not be reached."} ` +
-          "— is the dev server still running? The queue is kept, and submitting it again is safe: " +
-          "a word that did get written comes back as one that already reads, and is left alone.",
+      () => hold([], [], null),
+      "The queue is kept",
+    );
+  }, [hold, post]);
+
+  /**
+   * The pasted pile, accepted whole (#190).
+   *
+   * Nothing is emptied on the answer, unlike `submit`: the paste is not a queue
+   * and is not consumed by being acted on. What takes an accepted word off the
+   * pile is the **re-read** — `post` hands the fresh readout to the day, the
+   * join runs again against it, and a word that got a reading is now covered by
+   * the Puzzle. So the editor never re-pastes, and the words that did not land
+   * are still on screen to be looked at.
+   *
+   * An empty batch returns without a request. `submit` deliberately posts one —
+   * an empty Submit is #162's rebuild-only gesture, decided at the endpoint
+   * against the disk — but there is no such gesture here: an accept with nothing
+   * to accept is a button that should not have been pressable, and the rebuild
+   * it would run is already one click away on the day tab.
+   */
+  const accept = useCallback(
+    async (words: readonly string[], date: string) => {
+      if (words.length === 0) return;
+      // No `rhymeKey` and no `appealed`: the pile was joined against the day on
+      // screen, so the endpoint resolves the key from the schedule, and nobody
+      // Appealed a word a third party's list nominated.
+      await post(
+        "pasted",
+        { date, words: [...words], appealed: [] },
+        () => {},
+        "The paste is kept",
       );
-    } finally {
-      setSubmitting(false);
-    }
-  }, [hold]);
+    },
+    [post],
+  );
 
   return {
     queue,
+    typed,
+    setTyped,
     appealed,
     aim,
     error,
-    submitting,
+    inFlight,
     elapsedMs,
     result,
     submitError,
     queueWord,
     unqueueWord,
     submit,
+    accept,
   };
 }

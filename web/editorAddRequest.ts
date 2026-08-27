@@ -26,7 +26,7 @@
 
 import { normaliseWord } from "../src/cmudict.ts";
 import { isRhymeKeyShape } from "../src/declines.ts";
-import { MAX_QUEUED_WORDS, type AddSubmitRequest } from "./src/editor/add.ts";
+import { MAX_SUBMITTED_WORDS, type AddSubmitRequest } from "./src/editor/add.ts";
 
 /** ISO `YYYY-MM-DD`, the spelling the schedule artifact uses. */
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -53,12 +53,20 @@ const ENVELOPE_BYTES = 128;
 /**
  * What the endpoint will read of a request body before refusing it.
  *
- * `2 × 45 × 50 + 128 = 4628`. The doubling is `appealed` and nothing else: a
+ * `2 × 45 × 2000 + 128 = 180128`. The doubling is `appealed` and nothing else: a
  * batch every word of which was raised from the Candidate Queue names each of
  * them a **second** time in that list (#178), so the words cost twice what they
- * did before this slice. It is a bound on the worst case rather than a widening
- * of what the route accepts — `MAX_QUEUED_WORDS` is unchanged at 50, and a
- * 51-word batch is refused by the count regardless of how few bytes it came in.
+ * did before that slice. It is a bound on the worst case rather than a widening
+ * of what the route accepts — a batch past `MAX_SUBMITTED_WORDS` is refused by
+ * the count regardless of how few bytes it came in.
+ *
+ * It was `MAX_QUEUED_WORDS`-sized until #190, and the widening is the whole of
+ * what that ticket changed about this route: the pasted rhyme list accepts its
+ * main pile in one gesture — 197 words on the measured `idiotic` day — and one
+ * Submit is one append, one rebuild and one re-read. Chunking it to fit a
+ * narrower body would have been four of each to do one night's work. The writer,
+ * the file it appends to and the rebuild it triggers are all unchanged; only the
+ * number of words that may arrive at once moved.
  *
  * Its own constant rather than the demotion route's 512 on that module's
  * reasoning — tying two caps together would mean a change to either being
@@ -66,10 +74,9 @@ const ENVELOPE_BYTES = 128;
  * every other route's: it is the one that carries a list.
  *
  * The byte cap is the cheap guard and not the real one. What actually bounds a
- * Submit is the word count, because a word no compound split reaches costs up to
- * a minute of agent time; see `MAX_QUEUED_WORDS`.
+ * Submit is the word count; see `MAX_SUBMITTED_WORDS`.
  */
-export const MAX_ADD_BODY_BYTES = 2 * BYTES_PER_WORD * MAX_QUEUED_WORDS + ENVELOPE_BYTES;
+export const MAX_ADD_BODY_BYTES = 2 * BYTES_PER_WORD * MAX_SUBMITTED_WORDS + ENVELOPE_BYTES;
 
 /**
  * What a body turned out to be: the Submit it asks for, or the sentence saying
@@ -157,12 +164,12 @@ export function addWriteRequest(body: string): AddWriteRequest {
   if (!Array.isArray(words) || words.some((word) => typeof word !== "string")) {
     return { ok: false, error: "An add names words. Expected a list of them." };
   }
-  if (words.length > MAX_QUEUED_WORDS) {
+  if (words.length > MAX_SUBMITTED_WORDS) {
     return {
       ok: false,
       error:
-        `That is ${words.length} words, and one Submit carries ${MAX_QUEUED_WORDS}. ` +
-        "A word the composition cannot reach waits on an agent for up to a minute, so a longer batch is a longer evening than it looks.",
+        `That is ${words.length} words, and one Submit carries ${MAX_SUBMITTED_WORDS}. ` +
+        "A batch that size is not a rhyme list any more — narrow what you selected and paste it again.",
     };
   }
 

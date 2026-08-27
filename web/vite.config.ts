@@ -15,6 +15,7 @@ import { editorCorrectionPlugin } from "./editorCorrectionPlugin.ts";
 import { editorDayPlugin } from "./editorDayPlugin.ts";
 import { editorDeclinePlugin } from "./editorDeclinePlugin.ts";
 import { editorDemotionPlugin } from "./editorDemotionPlugin.ts";
+import { editorEvidencePlugin } from "./editorEvidencePlugin.ts";
 import { editorStatusPlugin } from "./editorStatusPlugin.ts";
 import { editorTierPlugin } from "./editorTierPlugin.ts";
 import { feedbackPlugin } from "./feedbackPlugin.ts";
@@ -59,17 +60,19 @@ export default defineConfig(({ command }) => {
 
   return {
     root: rootDir,
-    // `feedbackPlugin`, `supplementPlugin` and the eight `editor*` plugins are
+    // `feedbackPlugin`, `supplementPlugin` and the nine `editor*` plugins are
     // dev-only (`apply: "serve"`); `deployHeadersPlugin` and `indexAssetPlugin`
     // are build-only. Five of the editor plugins write to `data/` — and
     // `editorAddPlugin` and `editorCorrectionPlugin` also rebuild `dist-data/`
     // — which is why the build's
-    // inputs are named below rather than defaulted. `editorStatusPlugin` and
-    // `editorCandidatesPlugin` are the two that write nothing at all: the first
-    // reads the artifact's staleness and asks git about the written files, and
-    // #162 gives the tool no commit and no deploy to go with the answer; the
-    // second reads the Candidate Queue, whose every state is derived rather
-    // than stored (#177).
+    // inputs are named below rather than defaulted. `editorStatusPlugin`,
+    // `editorCandidatesPlugin` and `editorEvidencePlugin` are the three that
+    // write nothing at all: the first reads the artifact's staleness and asks
+    // git about the written files, and #162 gives the tool no commit and no
+    // deploy to go with the answer; the second reads the Candidate Queue, whose
+    // every state is derived rather than stored (#177); the third answers what
+    // is true of a list of words against one Rhyme Key, and #186's rule is that
+    // the pasted-list feature adds no new write path at all (#189).
     plugins: [
       react(),
       deployHeadersPlugin(),
@@ -80,6 +83,7 @@ export default defineConfig(({ command }) => {
       editorTierPlugin(),
       editorDemotionPlugin(),
       editorDeclinePlugin(),
+      editorEvidencePlugin(),
       editorCorrectionPlugin(),
       editorAddPlugin(),
       feedbackPlugin(),

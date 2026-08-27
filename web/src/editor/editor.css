@@ -60,6 +60,48 @@ body {
   font-weight: 400;
 }
 
+/* The panel strip. Underlined rather than boxed: the selected tab reads as the
+   top edge of the panel below it, which is the only cue that needs to carry. */
+.editor-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid #e3ded2;
+  margin-top: 1rem;
+}
+
+.editor-tab {
+  font: inherit;
+  font-size: 0.9rem;
+  color: #6b6558;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+}
+
+.editor-tab:hover {
+  color: #1c1b18;
+}
+
+.editor-tab-on {
+  color: #1c1b18;
+  font-weight: 600;
+  border-bottom-color: #1c1b18;
+}
+
+/* The panel is focusable so the tab strip can hand it the focus, but it is not
+   an interactive control and should not be outlined as one on a mouse click. */
+[role="tabpanel"]:focus-visible {
+  outline: 2px solid #cdc6b6;
+  outline-offset: 4px;
+}
+
+[role="tabpanel"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Dimmed, not blanked, while the next day is fetched. */
 .editor-loading {
   opacity: 0.45;
@@ -1213,4 +1255,172 @@ code {
 .editor-deferral-retry:hover:not(:disabled) {
   background: #f6ecdd;
   border-color: #bfa982;
+}
+
+/* The pasted rhyme list (#188). Deliberately plain: the panel offers no action
+   in this slice, so there is nothing on it to make prominent. */
+.editor-paste-aim {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+}
+
+.editor-paste-box {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.editor-paste-box textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.4rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #d8c9b4;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+/* The whole of the manual scan, as one figure. */
+.editor-paste-covered {
+  margin: 0.7rem 0 0.4rem;
+  font-size: 0.9rem;
+}
+
+/* A paste the parse could make nothing of. Not an alarm — nothing has failed
+   and nothing was lost — but it has to say more than an empty screen would. */
+.editor-paste-unread {
+  margin: 0.7rem 0 0;
+  font-size: 0.82rem;
+  color: #7a5a2e;
+}
+
+/* Said once, above the list, because the list itself looks like a set of
+   Answers and is not one. */
+.editor-paste-note {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  color: #6b6155;
+}
+
+.editor-paste-words {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+/* One row per word in each of the three split piles (#189). A row rather than a
+   wrapped chip like `.editor-paste-words` above, because a word in a pile carries
+   more than its spelling — its knownness, a composition, a respelling — and
+   those read as columns rather than as a run of text. */
+.editor-paste-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.editor-paste-rows li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.6rem;
+  padding: 0.12rem 0;
+}
+
+/* Fixed width so the knownness column lines up down the pile: the ordering is
+   the point of the main pile, and a ragged second column hides it. */
+.editor-paste-word {
+  min-width: 11rem;
+  font-weight: 600;
+}
+
+/* The omitted-Answers pile: shown first, read-only, and deliberately quieter
+   than the pile under it. Indented off a rule rather than boxed, so it reads as
+   an aside to the residue rather than as a second pile of work. */
+.editor-paste-aside {
+  margin-bottom: 1.1rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid #e3ded2;
+  font-size: 0.95em;
+}
+
+.editor-paste-aside h3 {
+  border-bottom: none;
+  padding-bottom: 0;
+  color: #857e70;
+}
+
+/* A word composition resolves on the spot — the one thing in the pile that
+   needs no further sourcing, so it is the one thing marked. */
+.editor-paste-composed {
+  font-size: 0.78rem;
+  color: #3f6b4a;
+}
+
+/* The one gesture that acts on the main pile (#190). Set off above the rows
+   rather than beside them, because it carries the whole pile and a button that
+   sat in the list would read as belonging to whichever word it was next to. */
+.editor-paste-accept {
+  margin: 0 0 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #d8cdb8;
+  border-radius: 4px;
+  background: #fbf7ee;
+}
+
+.editor-paste-accept button {
+  margin-bottom: 0.35rem;
+}
+
+/* Its note sits under the button and says what the one request will do, so the
+   sentence is read before the click rather than after it. */
+.editor-paste-accept .editor-paste-note {
+  margin: 0;
+}
+
+/* A reading that was sourced and refused — the one case in this pile the bulk
+   accept holds back. Warm rather than red: nothing failed, a nomination turned
+   out to be wrong, and the row is a thing to read rather than an alarm. It takes
+   the full row width so the proposal and its retry sit under the word instead of
+   pushing the knownness column out of line. */
+.editor-paste-refused {
+  flex-basis: 100%;
+  padding-left: 0.4rem;
+  border-left: 2px solid #d9b26a;
+  font-size: 0.78rem;
+  color: #7a5a2e;
+}
+
+.editor-paste-refused button {
+  font-size: 0.75rem;
+}
+
+/* The demote gesture inside a pasted row, which is a flex line and not a card:
+   `.editor-demote` is the day view's footer strip under a word's box, and its
+   border-top and fill read as a stray panel when it lands mid-row here. Same
+   buttons, no chrome around them. */
+.editor-paste-demote {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.editor-paste-demote button,
+.editor-paste-dismiss {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+}
+
+/* Quieter than the two demote buttons beside it, because it is the gesture that
+   writes nothing — it clears a row the engine already refuses. */
+.editor-paste-dismiss {
+  color: #6b6558;
 }

@@ -38,7 +38,7 @@
  */
 
 import { measureAnswers } from "../../../src/curation.ts";
-import type { Demotion } from "../../../src/demotions.ts";
+import type { Demotion, DemotionReason } from "../../../src/demotions.ts";
 import type { PuzzleFacts } from "../../../src/schedule.ts";
 import type { DayLists } from "./retier.ts";
 
@@ -66,6 +66,34 @@ export interface DemotionWriteResult {
   /** The entry as written, shown rather than described. */
   appended: Demotion;
 }
+
+/**
+ * The two demote buttons' text, and what each promises.
+ *
+ * Every key `DEMOTION_REASONS` names is required here — miss one and this object
+ * literal fails to compile, so a reason added to the type cannot become a button
+ * with no text. The labels name the rejection rather than the file's spelling,
+ * because that is what the editor is choosing: the second column of
+ * `data/demotions.txt` is the message the player receives.
+ *
+ * Here rather than in a view because the gesture is now raised from two panels —
+ * a word's verdict menu on the day, and the pasted list's names-and-non-words
+ * pile (#191) — and one file's one column is worth one wording. Two copies would
+ * drift, and what drifted would be the sentence a player is told. It sits beside
+ * `showsDemotionReassurance` for the same reason that predicate does: it is a
+ * rule about the demote gesture, and a view is where it is rendered rather than
+ * where it is decided.
+ */
+export const DEMOTION_LABEL: Record<DemotionReason, string> = {
+  "proper-noun": "It’s a name",
+  "not-a-known-word": "It’s not a word",
+};
+
+/** What each button promises, spelled out on hover. */
+export const DEMOTION_TITLE: Record<DemotionReason, string> = {
+  "proper-noun": "Rejected as a Proper Noun — the player is told it is a name",
+  "not-a-known-word": "Rejected as not a known word — no claim that it is anybody’s name",
+};
 
 /** The demoted words, by name — all a day needs of the standing list. */
 export function demotedWords(standing: readonly Demotion[]): ReadonlySet<string> {

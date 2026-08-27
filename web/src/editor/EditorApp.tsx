@@ -4,6 +4,19 @@
  * missing — a read and the corrections it produces, which is what an Editor's
  * Pass is (ADR-0016).
  *
+ * The four panels are tabs rather than a stack (`EditorTabs`), opening on the
+ * day. Every hook is held here regardless of which tab is showing, so a switch
+ * refetches nothing and loses nothing; the date control and the banners that
+ * belong to no single panel stay above the strip.
+ *
+ * The pasted rhyme list (#188) is the one panel that holds something the editor
+ * typed rather than something a route answered with, which is precisely why it
+ * is held up here with the rest: a paste kept inside its own panel would be lost
+ * on the first switch back to the day, since `TabPanel` unmounts what is not
+ * showing. The facts its residue is split on (#189) are held with it, for the
+ * same reason and one more — they are what makes the split, and a lookup the
+ * editor had to repeat after every glance at the day would not be pressed twice.
+ *
  * It opens on tomorrow — the endpoint's default, asked for by naming no date at
  * all — because tomorrow is the day an Editor's Pass is nearly always about.
  * Typing a date jumps there, including to a date the run does not cover, which
@@ -41,9 +54,10 @@
  * is about the repository rather than a day — whether the built Rhyme Index is
  * stale, and whether the files the pass writes are committed (#162) — so it is
  * fetched once, refreshed when a write lands or the window is focused, and
- * never keyed to the date. It is drawn here, at the top, and passed down as far
- * as the add queue for the one rule that reads it: Submit is enabled by a stale
- * index as well as by a queued add.
+ * never keyed to the date. It gets a tab of its own, and is *also* passed down
+ * as far as the add queue for the one rule that reads it: Submit is enabled by a
+ * stale index as well as by a queued add — which is why the add queue does not
+ * go quiet about it while the editor is looking at the day.
  *
  * The disagreement recorder is the one hook whose writes are absent from that
  * status — deliberately. `WRITTEN_GROUPS` names the files the
@@ -58,7 +72,7 @@
  * screen reports on.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReadCandidate } from "../../../scripts/editorCandidates.ts";
 import { useAdder } from "./useAdder.ts";
 import { useCandidateQueue } from "./useCandidateQueue.ts";
@@ -68,10 +82,14 @@ import { useDecliner } from "./useDecliner.ts";
 import { useDemoter } from "./useDemoter.ts";
 import { useDisagreement } from "./useDisagreement.ts";
 import { useEditorStatus } from "./useEditorStatus.ts";
+import { usePastedList } from "./usePastedList.ts";
 import { useTierPicker } from "./useTierPicker.ts";
 import { isDemotionDecline, type DeclineChoice } from "./decline.ts";
+import { demotedWords } from "./demote.ts";
 import { CandidateQueueView, type CandidateActs } from "./CandidateQueueView.tsx";
-import { DayReadoutView } from "./DayReadoutView.tsx";
+import { DayReadoutView, DemoteBanner } from "./DayReadoutView.tsx";
+import { EditorTabs, TabPanel, type EditorTab } from "./EditorTabs.tsx";
+import { PastedListView } from "./PastedListView.tsx";
 import { StatusView } from "./StatusView.tsx";
 
 export function EditorApp() {
@@ -94,6 +112,34 @@ export function EditorApp() {
   // on screen would attach a fact about the whole run to a date it happens to
   // have been made from.
   const corrector = useCorrector();
+  // Keyed to the *readout* rather than to the date, like the picker and for the
+  // same reason: the join is against the two lists the day came back with, and
+  // an add's re-read re-joins the paste the editor is still holding. The paste
+  // itself never leaves the browser; what does is the **residue**, sent to the
+  // dev-only evidence route to be told what is true of each word (#189), and
+  // that lookup is a gesture rather than an effect so it does not run per
+  // keystroke (`usePastedList.ts`). Nothing on either leg is written (ADR-0016).
+  //
+  // Accepting its main pile *is* written, and goes through `adder` — the same
+  // hook the day panel's Submit uses, the same route, the same rebuild (#190).
+  // The panel is handed the whole hook rather than a callback so that both
+  // buttons read one `inFlight` field: two batches in flight would race over
+  // `data/supplement.dict` and rebuild the index twice from two halves of the
+  // night's work.
+  //
+  // The last answer goes the other way, into the paste, because a reading the
+  // add sourced and could not use is a mark the pile carries from then on —
+  // held across every later request rather than only the one that raised it
+  // (`mergeRefusals`).
+  //
+  // The standing demotion list goes in too, because the evidence route applies
+  // no demotions and would keep offering a word the editor has already refused
+  // — as a name to demote again, or worse, as a word to source a reading for.
+  // Read off the demoter rather than fetched again: it is the same list, and it
+  // refreshes itself on every write, which is what takes a just-demoted word off
+  // the pile without the paste being touched (#191).
+  const demoted = useMemo(() => demotedWords(demoter.state?.standing ?? []), [demoter.state]);
+  const paste = usePastedList(readout, adder.result, demoted);
 
   // The status and the queue are both refreshed by **observing** that a write
   // happened, rather than by callbacks threaded through four hooks. Each of
@@ -226,6 +272,10 @@ export function EditorApp() {
   // sticking, so a half-typed date cannot leave the control blank.
   const [typed, setTyped] = useState("");
 
+  // Which panel is showing. Shell state, not a route (`EditorTabs`), and it
+  // opens on the day because the day is what an Editor's Pass is a read of.
+  const [tab, setTab] = useState<EditorTab>("day");
+
   return (
     <main className="editor">
       <header className="editor-head">
@@ -245,52 +295,76 @@ export function EditorApp() {
         </label>
       </header>
 
+      {/* Everything from here to the tab strip is shell chrome: it belongs to no
+          one panel, so it is drawn above them all and reaches the editor
+          whichever tab is showing. A demotion and a Decline are both raised from
+          two panels apiece, and a fetch that failed is about the screen rather
+          than about anything on it. */}
       {error !== null && <section className="editor-alarm">{error}</section>}
 
-      {/* Above the day, and outside the block that dims while a day is fetched:
-          neither fact it shows is about the date on screen, so dimming it on a
-          jump would say it had gone stale when nothing about it had moved. */}
-      <StatusView status={status} error={statusError} />
+      <DemoteBanner demoter={demoter} />
 
-      {/* Beside the status and outside the day's block, for the same reason: a
-          Candidate is aimed at a Rhyme Key rather than at a date, and most of
-          the queue belongs to no scheduled day at all. Dimming it on a jump
-          would say it had gone stale when nothing about it had moved. The acts
-          on it are the reason that holds for the *gestures* too — an add raised
-          here aims at the Candidate's key, so nothing about it is a fact about
-          the day on screen. */}
-      <CandidateQueueView
-        queue={candidates.queue}
-        error={candidates.error}
-        loading={candidates.loading}
-        acts={queueActs}
-      />
-
-      {/* A refused ruling, said once and near the queue it was made on. Quieter
-          than the demote banner in `DayReadoutView` on purpose: a Decline that
-          did not reach the file changes nothing at all, and its whole cost is
-          that the Candidate is still on the queue — which is where it is. */}
+      {/* A refused ruling, said once. Quieter than the demote banner on purpose:
+          a Decline that did not reach the file changes nothing at all, and its
+          whole cost is that the Candidate is still on the queue — which is where
+          it is. */}
       {decliner.error !== null && <p className="editor-write-failed">{decliner.error}</p>}
 
-      {/* The previous day stays on screen while the next one is fetched, dimmed
-          rather than replaced: a blank screen between two days makes a jump feel
-          like a failure, and a day's readout arrives in milliseconds. */}
-      {readout !== null && (
-        <div className={loading ? "editor-body editor-loading" : "editor-body"}>
-          <DayReadoutView
-            readout={readout}
-            picker={picker}
-            demoter={demoter}
-            adder={adder}
-            disagreer={disagreer}
-            status={status}
-            candidates={candidates.queue}
-            candidateActs={dayActs}
-          />
-        </div>
-      )}
+      <EditorTabs selected={tab} onSelect={setTab} />
 
-      {readout === null && loading && <p className="editor-muted">Reading the day…</p>}
+      <TabPanel tab="day" selected={tab}>
+        {/* The previous day stays on screen while the next one is fetched,
+            dimmed rather than replaced: a blank screen between two days makes a
+            jump feel like a failure, and a day's readout arrives in
+            milliseconds. */}
+        {readout !== null && (
+          <div className={loading ? "editor-body editor-loading" : "editor-body"}>
+            <DayReadoutView
+              readout={readout}
+              picker={picker}
+              demoter={demoter}
+              adder={adder}
+              disagreer={disagreer}
+              status={status}
+              candidates={candidates.queue}
+              candidateActs={dayActs}
+            />
+          </div>
+        )}
+
+        {readout === null && loading && <p className="editor-muted">Reading the day…</p>}
+      </TabPanel>
+
+      {/* Dimmed on a jump for the day panel's reason and no other: a paste is
+          held against whichever day is on screen, so while the next one is being
+          fetched the counts below the box are the previous day's. The box itself
+          keeps its text throughout — that is the point of holding it here. */}
+      <TabPanel tab="paste" selected={tab}>
+        <div className={loading ? "editor-body editor-loading" : "editor-body"}>
+          <PastedListView readout={readout} paste={paste} adder={adder} demoter={demoter} />
+        </div>
+      </TabPanel>
+
+      {/* Never dimmed while a day is fetched, unlike the day's own block: a
+          Candidate is aimed at a Rhyme Key rather than at a date, and most of
+          the queue belongs to no scheduled day at all, so nothing about it goes
+          stale on a jump. The acts on it are the reason that holds for the
+          *gestures* too — an add raised here aims at the Candidate's key, so
+          nothing about it is a fact about the day on screen. */}
+      <TabPanel tab="queue" selected={tab}>
+        <CandidateQueueView
+          queue={candidates.queue}
+          error={candidates.error}
+          loading={candidates.loading}
+          acts={queueActs}
+        />
+      </TabPanel>
+
+      {/* Not dimmed on a jump either, and for a plainer reason: it is about the
+          repository rather than about the date on screen. */}
+      <TabPanel tab="status" selected={tab}>
+        <StatusView status={status} error={statusError} />
+      </TabPanel>
     </main>
   );
 }
