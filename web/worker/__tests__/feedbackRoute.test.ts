@@ -54,7 +54,7 @@ const filed = () =>
 const CONTEXT = {
   seedWord: "ate",
   score: 42,
-  rank: "Solid",
+  rank: "Troubadour",
   foundAnswers: 7,
   totalAnswers: 30,
   foundBonus: 2,

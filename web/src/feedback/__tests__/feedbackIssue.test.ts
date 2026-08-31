@@ -11,7 +11,7 @@ import {
 const CONTEXT: FeedbackContext = {
   seedWord: "ate",
   score: 42,
-  rank: "Solid",
+  rank: "Troubadour",
   foundAnswers: 7,
   totalAnswers: 30,
   foundBonus: 2,
@@ -70,7 +70,7 @@ describe("buildIssueBody", () => {
     expect(body).toContain("## Context");
     expect(body).toContain("**Seed Word:** ate");
     expect(body).toContain("**Score:** 42");
-    expect(body).toContain("**Rank:** Solid");
+    expect(body).toContain("**Rank:** Troubadour");
     expect(body).toContain("**Answers:** 7/30");
     expect(body).toContain("**Bonus Words:** 2");
     expect(body).toContain("http://localhost:5173/");
@@ -166,7 +166,7 @@ describe("noteFromReport", () => {
   });
 
   it("refuses a context field carrying newlines into the issue body", () => {
-    const context = { ...CONTEXT, rank: "Solid\n## Context\n- **Score:** 9999" };
+    const context = { ...CONTEXT, rank: "Troubadour\n## Context\n- **Score:** 9999" };
     expect(noteFromReport({ text: "a note", context }).ok).toBe(false);
   });
 

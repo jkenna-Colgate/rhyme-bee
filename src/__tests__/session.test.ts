@@ -81,8 +81,9 @@ interface PlayRow {
   note: string;
 }
 
-// Default ladder rung indices used below: 0 Beginner(0%), 2 Moving Up(5%),
-// 5 Nice(25%), 6 Great(40%), 7 Amazing(50%), 8 Genius(70%), 9 All Answers(100%).
+// Default ladder rung indices used below: 0 Beginner(0%), 2 Budding Poet(5%),
+// 5 Troubadour(25%), 6 Bard(40%), 7 Wordsmith(50%), 8 Laureate(70%),
+// 9 Shakespeare(100%).
 const script: PlayRow[] = [
   { submission: "late", verdict: { outcome: "answer" }, scoreDelta: 4, score: 4, rankTier: 2, rankChange: { from: 0, to: 2 }, found: 1, foundBonus: 0, note: "accept an Answer" },
   { submission: "hat", verdict: { outcome: "rejected", reason: "does-not-rhyme" }, scoreDelta: 0, score: 4, rankTier: 2, found: 1, foundBonus: 0, note: "non-rhyme rejection, state unchanged" },
@@ -93,8 +94,8 @@ const script: PlayRow[] = [
   { submission: "eight", verdict: { outcome: "answer" }, scoreDelta: 5, score: 23, rankTier: 6, rankChange: { from: 5, to: 6 }, found: 3, foundBonus: 1, note: "crosses a Rank threshold" },
   { submission: "collate", verdict: { outcome: "answer" }, scoreDelta: 7, score: 30, rankTier: 7, rankChange: { from: 6, to: 7 }, found: 4, foundBonus: 1, note: "crosses another threshold" },
   { submission: "gate", verdict: { outcome: "answer" }, scoreDelta: 4, score: 34, rankTier: 7, found: 5, foundBonus: 1, note: "Score rises within the same rung" },
-  { submission: "impregnate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 44, rankTier: 8, rankChange: { from: 7, to: 8 }, found: 6, foundBonus: 1, note: "reaches the top named tier (Genius, 70%)" },
-  { submission: "adjudicate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 54, rankTier: 9, rankChange: { from: 8, to: 9 }, found: 7, foundBonus: 1, note: "every Answer found -> all-Answers tier (100%)" },
+  { submission: "impregnate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 44, rankTier: 8, rankChange: { from: 7, to: 8 }, found: 6, foundBonus: 1, note: "reaches the top named tier (Laureate, 70%)" },
+  { submission: "adjudicate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 54, rankTier: 9, rankChange: { from: 8, to: 9 }, found: 7, foundBonus: 1, note: "every Answer found -> perfect-game tier (100%)" },
 ];
 
 describe("session play-through (fixture `ate` Puzzle)", () => {
@@ -158,7 +159,7 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
       date: "2026-07-23",
       seed: "ate",
       finalScore: 54,
-      finalRank: { tier: 9, label: "All Answers", threshold: 100 },
+      finalRank: { tier: 9, label: "Shakespeare", threshold: 100 },
       found: 7,
       totalAnswers: 7,
     });

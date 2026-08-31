@@ -34,22 +34,29 @@ export interface ScoringConfig {
  * sits at 70% so it is aspirational, and the 100% tier is reached only by finding
  * every Answer (every Answer scores positive, so 100% means a perfect game).
  *
- * The labels are PROVISIONAL placeholders. Finalising them is deferred (see the
- * session module issue / ADR-0006): they must form an instantly-legible
- * progression where higher unambiguously reads as better. They are pure config
- * data and do not block the module.
+ * The labels are a rhymer's career, from a standing start to the name that ends
+ * the argument. Seniority in a craft is a dimension that sorts without being
+ * taught, which a scale of vague approval ("Good, Solid, Nice") is not. The
+ * bottom rung states a fact rather than passing a verdict — everyone begins a
+ * beginner — and the top one scans as a brag outside the game. Two things that read as
+ * mistakes are not: `Rhymster` is coined and has no second `e`, and Shakespeare
+ * is a Proper Noun, which the game refuses as a Submission but not as praise.
+ * No rung may reach for bee imagery, or for any vocabulary of rhyme *quality* —
+ * the game has exactly one kind of rhyme and the ladder must not imply others.
+ *
+ * They stay pure config data: nothing outside this array knows a rung by name.
  */
 export const DEFAULT_RANK_LADDER: RankTier[] = [
   { threshold: 0, label: "Beginner" },
-  { threshold: 2, label: "Good Start" },
-  { threshold: 5, label: "Moving Up" },
-  { threshold: 8, label: "Good" },
-  { threshold: 15, label: "Solid" },
-  { threshold: 25, label: "Nice" },
-  { threshold: 40, label: "Great" },
-  { threshold: 50, label: "Amazing" },
-  { threshold: 70, label: "Genius" },
-  { threshold: 100, label: "All Answers" },
+  { threshold: 2, label: "First Verse" },
+  { threshold: 5, label: "Budding Poet" },
+  { threshold: 8, label: "Rhymster" },
+  { threshold: 15, label: "Silver Tongue" },
+  { threshold: 25, label: "Troubadour" },
+  { threshold: 40, label: "Bard" },
+  { threshold: 50, label: "Wordsmith" },
+  { threshold: 70, label: "Laureate" },
+  { threshold: 100, label: "Shakespeare" },
 ];
 
 /** The shipped defaults; every knob is expected to be tuned against real play. */

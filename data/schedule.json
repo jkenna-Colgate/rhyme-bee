@@ -15,39 +15,39 @@
       },
       {
         "threshold": 2,
-        "label": "Good Start"
+        "label": "First Verse"
       },
       {
         "threshold": 5,
-        "label": "Moving Up"
+        "label": "Budding Poet"
       },
       {
         "threshold": 8,
-        "label": "Good"
+        "label": "Rhymster"
       },
       {
         "threshold": 15,
-        "label": "Solid"
+        "label": "Silver Tongue"
       },
       {
         "threshold": 25,
-        "label": "Nice"
+        "label": "Troubadour"
       },
       {
         "threshold": 40,
-        "label": "Great"
+        "label": "Bard"
       },
       {
         "threshold": 50,
-        "label": "Amazing"
+        "label": "Wordsmith"
       },
       {
         "threshold": 70,
-        "label": "Genius"
+        "label": "Laureate"
       },
       {
         "threshold": 100,
-        "label": "All Answers"
+        "label": "Shakespeare"
       }
     ]
   },
