@@ -81,8 +81,8 @@ interface PlayRow {
   note: string;
 }
 
-// Default ladder rung indices used below: 0 First Verse(0%), 2 Rhymster(5%),
-// 5 Bard(25%), 6 Sonneteer(40%), 7 Wordsmith(50%), 8 Laureate(70%),
+// Default ladder rung indices used below: 0 Beginner(0%), 2 Budding Poet(5%),
+// 5 Troubadour(25%), 6 Bard(40%), 7 Wordsmith(50%), 8 Laureate(70%),
 // 9 Shakespeare(100%).
 const script: PlayRow[] = [
   { submission: "late", verdict: { outcome: "answer" }, scoreDelta: 4, score: 4, rankTier: 2, rankChange: { from: 0, to: 2 }, found: 1, foundBonus: 0, note: "accept an Answer" },

@@ -74,7 +74,7 @@ What a single Answer is worth: its length, plus a small flat bonus when it is ra
 _Avoid_: using "points" for the Score as a whole (that is the Score); "score" for a single Answer's points
 
 **Rank**:
-The player's progress within a single Puzzle — the thing the game congratulates you for reaching. It is the player's current Score as a percentage of the Puzzle's maximum achievable Score (the sum of every Answer's points), mapped onto an ordered ladder of named Ranks: the word names both the ladder's steps and the one a player is standing on, as it does for the rank of captain. The ladder is a rhymer's career, running from `First Verse` to `Shakespeare`. Because it is a percentage of a per-Puzzle maximum, Rank is comparable across days and adapts to Puzzles of any size without retuning. Bonus Words never affect it. Rank is per-Puzzle and resets each day.
+The player's progress within a single Puzzle — the thing the game congratulates you for reaching. It is the player's current Score as a percentage of the Puzzle's maximum achievable Score (the sum of every Answer's points), mapped onto an ordered ladder of named Ranks: the word names both the ladder's steps and the one a player is standing on, as it does for the rank of captain. The ladder is a rhymer's career, running from `Beginner` to `Shakespeare`. Because it is a percentage of a per-Puzzle maximum, Rank is comparable across days and adapts to Puzzles of any size without retuning. Bonus Words never affect it. Rank is per-Puzzle and resets each day.
 _Avoid_: Level, grade, rung, tier (a Tier is the Answer/Bonus split, which is a property of a word rather than of a player), score (Rank is derived from Score, it is not the Score itself)
 
 **Difficulty**:

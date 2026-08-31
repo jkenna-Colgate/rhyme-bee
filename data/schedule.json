@@ -11,31 +11,31 @@
     "rankLadder": [
       {
         "threshold": 0,
-        "label": "First Verse"
+        "label": "Beginner"
       },
       {
         "threshold": 2,
-        "label": "Budding Poet"
+        "label": "First Verse"
       },
       {
         "threshold": 5,
-        "label": "Rhymster"
+        "label": "Budding Poet"
       },
       {
         "threshold": 8,
-        "label": "Silver Tongue"
+        "label": "Rhymster"
       },
       {
         "threshold": 15,
-        "label": "Troubadour"
+        "label": "Silver Tongue"
       },
       {
         "threshold": 25,
-        "label": "Bard"
+        "label": "Troubadour"
       },
       {
         "threshold": 40,
-        "label": "Sonneteer"
+        "label": "Bard"
       },
       {
         "threshold": 50,
