@@ -11,43 +11,43 @@
     "rankLadder": [
       {
         "threshold": 0,
-        "label": "Beginner"
+        "label": "First Verse"
       },
       {
         "threshold": 2,
-        "label": "Good Start"
+        "label": "Budding Poet"
       },
       {
         "threshold": 5,
-        "label": "Moving Up"
+        "label": "Rhymster"
       },
       {
         "threshold": 8,
-        "label": "Good"
+        "label": "Silver Tongue"
       },
       {
         "threshold": 15,
-        "label": "Solid"
+        "label": "Troubadour"
       },
       {
         "threshold": 25,
-        "label": "Nice"
+        "label": "Bard"
       },
       {
         "threshold": 40,
-        "label": "Great"
+        "label": "Sonneteer"
       },
       {
         "threshold": 50,
-        "label": "Amazing"
+        "label": "Wordsmith"
       },
       {
         "threshold": 70,
-        "label": "Genius"
+        "label": "Laureate"
       },
       {
         "threshold": 100,
-        "label": "All Answers"
+        "label": "Shakespeare"
       }
     ]
   },
