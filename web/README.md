@@ -1,4 +1,4 @@
-# Rhyme Bee — web shell
+# Rhyming Bee — web shell
 
 The playable browser shell over the pure rhyme engine in [`../src`](../src). It
 is a Vite + React app and holds the repo's only runtime dependencies; the engine

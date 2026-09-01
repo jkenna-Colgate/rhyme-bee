@@ -5,6 +5,7 @@
  * shows is derived from the tested engine core in ../src.
  */
 
+import { GAME_NAME } from "./brand.ts";
 import { useRhymeIndex } from "./useRhymeIndex.ts";
 import { PuzzleView } from "./PuzzleView.tsx";
 
@@ -13,7 +14,7 @@ export function App() {
 
   return (
     <main className="shell">
-      <h1 className="shell__brand">Rhyme Bee</h1>
+      <h1 className="shell__brand">{GAME_NAME}</h1>
       {load.status === "loading" && <Loading />}
       {load.status === "error" && <LoadError message={load.message} />}
       {load.status === "ready" && <PuzzleView index={load.index} />}
