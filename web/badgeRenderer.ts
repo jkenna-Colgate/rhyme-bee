@@ -1,0 +1,185 @@
+/**
+ * The Rank badge: label in, PNG bytes out (#196, #202).
+ *
+ * A shared Rank travels as a link card, and a link card is a picture. The badge
+ * is that picture — 1200×630, the Rank name set inside a neutral seal, and
+ * nothing else. No wordmark, no date, no Score, and specifically nothing shaped
+ * like a meter: a gauge or a partly filled ring would re-encode the percentage
+ * the badge exists to withhold, so the art in `badge/template.svg` has none and
+ * this module adds none.
+ *
+ * Everything about *how* the picture is made lives behind `renderBadge` — the
+ * template, the embedded face, the fitting of the label and the rasterisation.
+ * Replacing the art later is an edit inside here and in the template, with the
+ * interface unchanged. There is no renderer abstraction over that, because
+ * there is one implementation and a seam there would be hypothetical.
+ *
+ * ## Build time only
+ *
+ * Nothing here is reachable from the browser bundle or the Worker: it is
+ * imported by `shareAssetPlugin`, which the Vite config runs during a build.
+ * The rasteriser is a native dependency and the display face is a font file,
+ * and neither is shipped — the site declares system font stacks, so there is no
+ * interface typography for the badge to match and it is free to be an award
+ * rather than an extension of the interface.
+ *
+ * The badge's pixels are judged by looking at them, so this module is
+ * deliberately untested. What a test could check here — that bytes came back,
+ * that the header says PNG — would pass on a blank square.
+ */
+
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { Resvg } from "@resvg/resvg-js";
+
+const badgeDir = resolve(dirname(fileURLToPath(import.meta.url)), "badge");
+
+/** The seal, and the two tokens the label is substituted into. */
+const TEMPLATE_FILE = resolve(badgeDir, "template.svg");
+
+/**
+ * The one embedded face: Cinzel, SIL Open Font License (see `badge/font`).
+ *
+ * An inscriptional Roman capital, which is what a seal wants. It is vendored
+ * rather than fetched so a build is not one network hiccup away from a badge
+ * set typeset in whatever the machine happened to have installed.
+ */
+const FONT_FILE = resolve(badgeDir, "font", "Cinzel-Variable.ttf");
+const FONT_FAMILY = "Cinzel";
+
+/** How much of the seal the label may occupy, in user units. */
+const TEXT_WIDTH = 440;
+const TEXT_HEIGHT = 250;
+
+/** Big enough to fill the seal, and no bigger — a short label is not a poster. */
+const MAX_FONT_SIZE = 104;
+
+/** The size everything is measured at, then scaled from. Arbitrary but round. */
+const MEASURED_AT = 100;
+
+/** Line spacing, as a multiple of the font size. */
+const LINE_HEIGHT = 1.15;
+
+const template = readFileSync(TEMPLATE_FILE, "utf8");
+
+/**
+ * Rasteriser options that make the embedded face the only face there is.
+ *
+ * The file is named rather than handed over as a buffer: `fontBuffers` does not
+ * match this face by family name and silently falls through to whatever the
+ * machine has installed, which would typeset the badge differently on every
+ * developer's laptop. System fonts are off for the same reason — a build that
+ * cannot find Cinzel should look wrong here, not quietly ship wrong.
+ */
+const fontOptions = {
+  fontFiles: [FONT_FILE],
+  loadSystemFonts: false,
+  defaultFontFamily: FONT_FAMILY,
+};
+
+function escapeXml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
+ * The ways a label can be broken across lines, for the caller to choose between
+ * by which one fits largest.
+ *
+ * One line always, and — for a label of two or more words — the balanced split
+ * that leaves the longest line as short as it can be. `Silver Tongue` set on
+ * one line is a thin ribbon across a wide seal; stacked, it fills it.
+ */
+function layouts(label: string): string[][] {
+  const words = label.split(/\s+/).filter((word) => word.length > 0);
+  const oneLine = [label];
+  if (words.length < 2) return [oneLine];
+
+  const longest = (at: number) =>
+    Math.max(
+      words.slice(0, at).join(" ").length,
+      words.slice(at).join(" ").length,
+    );
+  let best = 1;
+  for (let at = 2; at < words.length; at++) {
+    if (longest(at) < longest(best)) best = at;
+  }
+
+  return [
+    oneLine,
+    [words.slice(0, best).join(" "), words.slice(best).join(" ")],
+  ];
+}
+
+/** The label as `<tspan>` lines, centred on the template's text anchor. */
+function tspans(lines: string[], fontSize: number): string {
+  const first = -((lines.length - 1) / 2) * LINE_HEIGHT * fontSize;
+  return lines
+    .map((line, index) => {
+      const dy = index === 0 ? first + fontSize * 0.34 : LINE_HEIGHT * fontSize;
+      return `<tspan x="600" dy="${dy.toFixed(2)}">${escapeXml(line)}</tspan>`;
+    })
+    .join("");
+}
+
+function badgeSvg(lines: string[], fontSize: number): string {
+  return template
+    .replaceAll("{{FONT_SIZE}}", String(fontSize))
+    .replaceAll("{{RANK}}", tspans(lines, fontSize));
+}
+
+/**
+ * The largest size at which these lines still fit the seal.
+ *
+ * Measured rather than estimated: the label is rendered once at a nominal size
+ * and the rasteriser is asked for the ink's bounding box, so the fit holds for
+ * whatever face the template asks for and whatever letters a rung is named in.
+ */
+function fittedSize(lines: string[]): number {
+  const measured = new Resvg(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="4000" height="2000">` +
+      `<text x="2000" y="1000" text-anchor="middle" font-family="${FONT_FAMILY}" ` +
+      `font-weight="600" letter-spacing="4" font-size="${MEASURED_AT}">` +
+      tspans(lines, MEASURED_AT) +
+      `</text></svg>`,
+    { font: fontOptions },
+  ).getBBox();
+
+  // No ink means no font matched, which is a broken build rather than a wide
+  // label; the caller writes the badge either way and it is judged by eye.
+  if (measured === undefined) return MAX_FONT_SIZE;
+
+  const scale = Math.min(
+    TEXT_WIDTH / measured.width,
+    TEXT_HEIGHT / measured.height,
+  );
+  return Math.min(MAX_FONT_SIZE, Math.floor(MEASURED_AT * scale));
+}
+
+/**
+ * One badge, as PNG bytes. The only thing that varies across the ladder is the
+ * label: there is deliberately no ramp, because the game's visual identity is
+ * not settled and an un-ramped template commits to nothing.
+ */
+export function renderBadge(label: string): Buffer {
+  let chosen: string[] = [label];
+  let size = 0;
+  for (const lines of layouts(label)) {
+    const fit = fittedSize(lines);
+    if (fit > size) {
+      size = fit;
+      chosen = lines;
+    }
+  }
+
+  return new Resvg(badgeSvg(chosen, size), {
+    font: fontOptions,
+    fitTo: { mode: "original" },
+  })
+    .render()
+    .asPng();
+}

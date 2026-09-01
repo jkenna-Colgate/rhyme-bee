@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The Rank badge, as a link card sees it (#196, #202).
+
+  This file is the art and nothing else: 1200x630, a Rank name set inside a
+  neutral seal. Editing the badge means editing this file — the renderer beside
+  it embeds the font, sets the label and rasterises, and knows nothing about how
+  the seal is drawn.
+
+  Two brace-delimited tokens are substituted at render time, and both concern
+  the label only: FONT_SIZE, the fitted size in px chosen so the longest rung
+  still fits inside the seal, and RANK, the label itself, arriving already
+  split into <tspan> lines.
+
+  Deliberately absent, and to stay absent: the wordmark, the date, the Score,
+  and anything shaped like a meter — an arc, a gauge or a partly filled ring
+  would re-encode the percentage the badge exists to withhold.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#F7F2E7"/>
+
+  <!-- The seal: two closed concentric rings, complete and evenly weighted. -->
+  <g fill="none" stroke="#2C2A26">
+    <circle cx="600" cy="315" r="290" stroke-width="10"/>
+    <circle cx="600" cy="315" r="268" stroke-width="3"/>
+  </g>
+
+  <!-- Ornaments above and below the label, so the seal reads as an award. -->
+  <g fill="#2C2A26">
+    <path d="M600 116 l14 14 -14 14 -14 -14 Z"/>
+    <path d="M600 486 l14 14 -14 14 -14 -14 Z"/>
+    <rect x="486" y="128.5" width="86" height="3"/>
+    <rect x="628" y="128.5" width="86" height="3"/>
+    <rect x="486" y="498.5" width="86" height="3"/>
+    <rect x="628" y="498.5" width="86" height="3"/>
+  </g>
+
+  <text x="600" y="315" text-anchor="middle" fill="#2C2A26"
+        font-family="Cinzel" font-weight="600" letter-spacing="4"
+        font-size="{{FONT_SIZE}}">{{RANK}}</text>
+</svg>

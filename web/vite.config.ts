@@ -9,6 +9,7 @@ import {
 } from "../scripts/indexArtifact.ts";
 import { deployHeadersPlugin } from "./deployHeadersPlugin.ts";
 import { indexAssetPlugin } from "./indexAssetPlugin.ts";
+import { shareAssetPlugin } from "./shareAssetPlugin.ts";
 import { editorAddPlugin } from "./editorAddPlugin.ts";
 import { editorCandidatesPlugin } from "./editorCandidatesPlugin.ts";
 import { editorCorrectionPlugin } from "./editorCorrectionPlugin.ts";
@@ -61,10 +62,10 @@ export default defineConfig(({ command }) => {
   return {
     root: rootDir,
     // `feedbackPlugin`, `supplementPlugin` and the nine `editor*` plugins are
-    // dev-only (`apply: "serve"`); `deployHeadersPlugin` and `indexAssetPlugin`
-    // are build-only. Five of the editor plugins write to `data/` — and
-    // `editorAddPlugin` and `editorCorrectionPlugin` also rebuild `dist-data/`
-    // — which is why the build's
+    // dev-only (`apply: "serve"`); `deployHeadersPlugin`, `indexAssetPlugin` and
+    // `shareAssetPlugin` are build-only. Five of the editor plugins write to
+    // `data/` — and `editorAddPlugin` and `editorCorrectionPlugin` also rebuild
+    // `dist-data/` — which is why the build's
     // inputs are named below rather than defaulted. `editorStatusPlugin`,
     // `editorCandidatesPlugin` and `editorEvidencePlugin` are the three that
     // write nothing at all: the first reads the artifact's staleness and asks
@@ -73,10 +74,18 @@ export default defineConfig(({ command }) => {
     // every state is derived rather than stored (#177); the third answers what
     // is true of a list of words against one Rhyme Key, and #186's rule is that
     // the pasted-list feature adds no new write path at all (#189).
+    //
+    // `shareAssetPlugin` rasterises the Rank badge a shared link card points at,
+    // one per rung (#202). It is the reason the rasteriser and the display face
+    // it embeds are devDependencies: generation is confined to build time, so
+    // neither the bundle nor the Worker gains a rendering dependency. Its origin
+    // comes from the environment rather than from a constant, so no hostname is
+    // baked into a module by accident (#196).
     plugins: [
       react(),
       deployHeadersPlugin(),
       indexAssetPlugin(distDataDir),
+      shareAssetPlugin(process.env.SHARE_ORIGIN ?? ""),
       editorDayPlugin(),
       editorStatusPlugin(),
       editorCandidatesPlugin(),
