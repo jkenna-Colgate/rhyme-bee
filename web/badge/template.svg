@@ -8,8 +8,8 @@
   the seal is drawn.
 
   Two brace-delimited tokens are substituted at render time, and both concern
-  the label only: FONT_SIZE, the fitted size in px chosen so the longest rung
-  still fits inside the seal, and RANK, the label itself, arriving already
+  the label only: FONT_SIZE, the fitted size in px chosen so the longest Rank
+  name still fits inside the seal, and RANK, the label itself, arriving already
   split into <tspan> lines.
 
   Deliberately absent, and to stay absent: the wordmark, the date, the Score,

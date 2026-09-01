@@ -1,9 +1,9 @@
 /**
- * Write one Rank badge into the deploy per rung of the ladder (#196, #202).
+ * Write one badge into the deploy per Rank on the ladder (#196, #202).
  *
  * A shared Rank is a link card, and a link card points at an image on a URL. The
  * badge set is finite and known before anyone plays: the badge carries the Rank
- * name and nothing else, so there are exactly as many badges as there are rungs.
+ * name and nothing else, so there are exactly as many badges as there are Ranks.
  * They are therefore generated here, once, at build time, and shipped as static
  * assets — no request renders anything, no rendering dependency reaches the
  * Worker, and nothing generated is committed.
@@ -26,7 +26,7 @@ import { renderBadge } from "./badgeRenderer.ts";
 import { shareTargets } from "./src/share/shareTargets.ts";
 
 /**
- * Emit one badge per rung under `outDir`.
+ * Emit one badge per Rank under `outDir`.
  *
  * There is no existence check after the loop. An earlier draft stat'd the files
  * it had just written, which could only fail if the filesystem lied — the guard

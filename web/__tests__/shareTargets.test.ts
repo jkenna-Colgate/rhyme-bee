@@ -29,7 +29,7 @@ const ORIGIN = "https://example.test";
 const AWKWARD_LADDERS: Record<string, RankTier[]> = {
   "the shipped ladder": DEFAULT_RANK_LADDER,
   "an empty ladder": [],
-  "a single rung": [{ threshold: 0, label: "Beginner" }],
+  "a single Rank": [{ threshold: 0, label: "Beginner" }],
   "labels that collide once slugged": [
     { threshold: 0, label: "Silver Tongue" },
     { threshold: 50, label: "silver tongue" },
@@ -49,12 +49,12 @@ const AWKWARD_LADDERS: Record<string, RankTier[]> = {
 };
 
 describe("shareTargets", () => {
-  it("returns one target per rung, in ladder order", () => {
+  it("returns one target per Rank, in ladder order", () => {
     const targets = shareTargets(DEFAULT_RANK_LADDER, ORIGIN);
 
     expect(targets).toHaveLength(DEFAULT_RANK_LADDER.length);
     expect(targets.map((target) => target.label)).toEqual(
-      DEFAULT_RANK_LADDER.map((rung) => rung.label),
+      DEFAULT_RANK_LADDER.map((rank) => rank.label),
     );
   });
 
@@ -113,7 +113,7 @@ describe("shareTargets", () => {
   describe.each(Object.entries(AWKWARD_LADDERS))("over %s", (_name, ladder) => {
     const targets = shareTargets(ladder, ORIGIN);
 
-    it("is total: one target per rung, every derived field filled", () => {
+    it("is total: one target per Rank, every derived field filled", () => {
       expect(targets).toHaveLength(ladder.length);
       for (const [index, target] of targets.entries()) {
         // `label` is the caller's own string, passed through rather than
@@ -130,13 +130,13 @@ describe("shareTargets", () => {
           "badgeUrl",
         ];
         for (const field of derived) {
-          expect(target[field], `${field} of rung ${index}`).not.toBe("");
+          expect(target[field], `${field} of Rank ${index}`).not.toBe("");
         }
         expect(target.label).toBe(ladder[index]?.label);
       }
     });
 
-    it("gives every rung a unique, URL-safe slug", () => {
+    it("gives every Rank a unique, URL-safe slug", () => {
       const slugs = targets.map((target) => target.slug);
 
       expect(new Set(slugs).size).toBe(slugs.length);
@@ -146,7 +146,7 @@ describe("shareTargets", () => {
       }
     });
 
-    it("gives every rung exactly one page and exactly one badge, all distinct", () => {
+    it("gives every Rank exactly one page and exactly one badge, all distinct", () => {
       const pages = targets.map((target) => target.pageFile);
       const badges = targets.map((target) => target.badgeFile);
 
@@ -164,7 +164,7 @@ describe("shareTargets", () => {
       }
     });
 
-    it("keeps the badge and the page of a rung on the same slug", () => {
+    it("keeps the badge and the page of a Rank on the same slug", () => {
       for (const target of targets) {
         expect(target.pageFile).toContain(target.slug);
         expect(target.badgeFile).toContain(target.slug);

@@ -163,7 +163,7 @@ function badgeSvg(lines: string[], fontSize: number): string {
  *
  * Measured rather than estimated: the label is rendered once at a nominal size
  * and the rasteriser is asked for the ink's bounding box, so the fit holds for
- * whatever face the template asks for and whatever letters a rung is named in.
+ * whatever face the template asks for and whatever letters a Rank is named in.
  */
 function fittedSize(label: string, lines: string[]): number {
   const measured = new Resvg(

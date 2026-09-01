@@ -76,7 +76,7 @@ export default defineConfig(({ command }) => {
     // the pasted-list feature adds no new write path at all (#189).
     //
     // `shareAssetPlugin` rasterises the Rank badge a shared link card points at,
-    // one per rung (#202). It is the reason the rasteriser and the display face
+    // one per Rank (#202). It is the reason the rasteriser and the display face
     // it embeds are devDependencies: generation is confined to build time, so
     // neither the bundle nor the Worker gains a rendering dependency.
     plugins: [

@@ -1,11 +1,11 @@
 /**
- * One share target per rung of the Rank ladder: the projection both halves of
+ * One share target per Rank on the ladder: the projection both halves of
  * the share feature read, and the reason they cannot disagree (#196, #201).
  *
  * A player who reaches a Rank can send it as a link that unfurls into a card
  * carrying a badge. Open Graph metadata belongs to a *URL* — one address can
  * only ever return one title and one image — so there is a page and a badge per
- * rung, both generated at build time and shipped as static assets. Two quite
+ * Rank, both generated at build time and shipped as static assets. Two quite
  * separate pieces of code therefore have to agree on the same strings: the build
  * maps over these targets to decide what files to write, and the browser looks
  * one up to decide what URL to put in the composer.
@@ -39,7 +39,7 @@ import { GAME_NAME } from "../brand.ts";
 const SHARE_DIR = "share";
 
 /**
- * Everything the build and the browser must agree on for one rung.
+ * Everything the build and the browser must agree on for one Rank.
  *
  * The file fields and the path fields say the same thing twice on purpose: the
  * build writes `pageFile`, the browser asks for `pagePath`, and holding both
@@ -47,9 +47,9 @@ const SHARE_DIR = "share";
  * call site that happens to need the other form.
  */
 export interface ShareTarget {
-  /** The rung's identifier in a URL — unique across the ladder, and URL-safe. */
+  /** The Rank's identifier in a URL — unique across the ladder, and URL-safe. */
   slug: string;
-  /** The rung's label, passed through exactly as the ladder spells it. */
+  /** The label, passed through exactly as the ladder spells it. */
   label: string;
   /** The claim the card makes, and the only place the Rank is stated in words. */
   title: string;
@@ -70,7 +70,7 @@ export interface ShareTarget {
 /**
  * Reduce a label to something that can sit in a path.
  *
- * Readability is the only reason to slug at all rather than number the rungs:
+ * Readability is the only reason to slug at all rather than number the Ranks:
  * the slug is invisible in a rendered card, and visible only in the composer
  * before sending and in destinations that do not unfurl links — where the
  * recipient is looking at a bare URL with no badge either way, and a legible one
@@ -92,13 +92,13 @@ function slugify(label: string): string {
 }
 
 /**
- * The projection. One target per rung, in ladder order, for any ladder at all.
+ * The projection. One target per Rank, in ladder order, for any ladder at all.
  *
  * Totality is the property that matters and it is unconditional: this never
- * throws and never skips a rung, because the alternative is a Rank a player can
+ * throws and never skips a Rank, because the alternative is a Rank a player can
  * reach and cannot share. A label that slugs to nothing — punctuation, a script
  * with no Latin form, the empty string — falls back to its position on the
- * ladder, and a slug already taken by an earlier rung is suffixed until it is
+ * ladder, and a slug already taken by an earlier Rank is suffixed until it is
  * free. Both cases produce an ugly URL for a ladder nobody has written; neither
  * produces a missing badge.
  */
@@ -106,8 +106,8 @@ export function shareTargets(ladder: RankTier[], origin: string): ShareTarget[] 
   const root = origin.replace(/\/+$/, "");
   const taken = new Set<string>();
 
-  return ladder.map((rung, index) => {
-    const base = slugify(rung.label) || `rung-${index + 1}`;
+  return ladder.map((rank, index) => {
+    const base = slugify(rank.label) || `rank-${index + 1}`;
     let slug = base;
     for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
     taken.add(slug);
@@ -117,8 +117,8 @@ export function shareTargets(ladder: RankTier[], origin: string): ShareTarget[] 
 
     return {
       slug,
-      label: rung.label,
-      title: `I got ${rung.label} in ${GAME_NAME}`,
+      label: rank.label,
+      title: `I got ${rank.label} in ${GAME_NAME}`,
       pageFile,
       badgeFile,
       pagePath: `/${pageFile}`,
