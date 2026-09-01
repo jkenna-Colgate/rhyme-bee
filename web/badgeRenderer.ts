@@ -55,13 +55,39 @@ const TEXT_HEIGHT = 250;
 /** Big enough to fill the seal, and no bigger — a short label is not a poster. */
 const MAX_FONT_SIZE = 104;
 
-/** The size everything is measured at, then scaled from. Arbitrary but round. */
-const MEASURED_AT = 100;
+/** The nominal size the label is measured at, then scaled from. Round, and
+ * otherwise arbitrary: nothing is rendered at it. */
+const NOMINAL_FONT_SIZE = 100;
 
 /** Line spacing, as a multiple of the font size. */
 const LINE_HEIGHT = 1.15;
 
 const template = readFileSync(TEMPLATE_FILE, "utf8");
+
+/**
+ * The template's own `<text>` opening tag, and the x it centres on.
+ *
+ * The fitting pass sets the label a second time, off to one side, to measure it.
+ * It reuses this tag rather than restating the family, the weight and the
+ * letter-spacing, because a measurement made under different typography than
+ * the badge is drawn with is not a measurement: editing `letter-spacing` in the
+ * art would otherwise silently invalidate every fit, and the label would creep
+ * over the ring with the build none the wiser.
+ */
+function templateTextTag(): string {
+  const tag = /<text\s[^>]*>/.exec(template)?.[0];
+  if (tag === undefined) {
+    throw new Error(
+      `No <text> element in ${TEMPLATE_FILE}. The badge template must carry ` +
+        "one, with the {{FONT_SIZE}} and {{RANK}} tokens, or no Rank can be " +
+        "set in it.",
+    );
+  }
+  return tag;
+}
+
+const textTag = templateTextTag();
+const textX = /\sx="([^"]*)"/.exec(textTag)?.[1] ?? "0";
 
 /**
  * Rasteriser options that make the embedded face the only face there is.
@@ -121,7 +147,7 @@ function tspans(lines: string[], fontSize: number): string {
   return lines
     .map((line, index) => {
       const dy = index === 0 ? first + fontSize * 0.34 : LINE_HEIGHT * fontSize;
-      return `<tspan x="600" dy="${dy.toFixed(2)}">${escapeXml(line)}</tspan>`;
+      return `<tspan x="${textX}" dy="${dy.toFixed(2)}">${escapeXml(line)}</tspan>`;
     })
     .join("");
 }
@@ -139,25 +165,32 @@ function badgeSvg(lines: string[], fontSize: number): string {
  * and the rasteriser is asked for the ink's bounding box, so the fit holds for
  * whatever face the template asks for and whatever letters a rung is named in.
  */
-function fittedSize(lines: string[]): number {
+function fittedSize(label: string, lines: string[]): number {
   const measured = new Resvg(
     `<svg xmlns="http://www.w3.org/2000/svg" width="4000" height="2000">` +
-      `<text x="2000" y="1000" text-anchor="middle" font-family="${FONT_FAMILY}" ` +
-      `font-weight="600" letter-spacing="4" font-size="${MEASURED_AT}">` +
-      tspans(lines, MEASURED_AT) +
+      textTag.replace("{{FONT_SIZE}}", String(NOMINAL_FONT_SIZE)) +
+      tspans(lines, NOMINAL_FONT_SIZE) +
       `</text></svg>`,
     { font: fontOptions },
   ).getBBox();
 
-  // No ink means no font matched, which is a broken build rather than a wide
-  // label; the caller writes the badge either way and it is judged by eye.
-  if (measured === undefined) return MAX_FONT_SIZE;
+  // No box means the label left no ink — an empty or blank Rank name, since a
+  // name in a script the face has no glyphs for still sets tofu and measures.
+  // That would write a badge with an empty seal on it, which is the failure
+  // this whole ticket exists to keep out of somebody's message thread, so it
+  // stops the build here instead of passing.
+  if (measured === undefined) {
+    throw new Error(
+      `The Rank ${JSON.stringify(label)} set no visible label, so its badge ` +
+        "would be an empty seal. A Rank a player can reach must be shareable.",
+    );
+  }
 
   const scale = Math.min(
     TEXT_WIDTH / measured.width,
     TEXT_HEIGHT / measured.height,
   );
-  return Math.min(MAX_FONT_SIZE, Math.floor(MEASURED_AT * scale));
+  return Math.min(MAX_FONT_SIZE, Math.floor(NOMINAL_FONT_SIZE * scale));
 }
 
 /**
@@ -169,7 +202,7 @@ export function renderBadge(label: string): Buffer {
   let chosen: string[] = [label];
   let size = 0;
   for (const lines of layouts(label)) {
-    const fit = fittedSize(lines);
+    const fit = fittedSize(label, lines);
     if (fit > size) {
       size = fit;
       chosen = lines;

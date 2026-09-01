@@ -78,14 +78,12 @@ export default defineConfig(({ command }) => {
     // `shareAssetPlugin` rasterises the Rank badge a shared link card points at,
     // one per rung (#202). It is the reason the rasteriser and the display face
     // it embeds are devDependencies: generation is confined to build time, so
-    // neither the bundle nor the Worker gains a rendering dependency. Its origin
-    // comes from the environment rather than from a constant, so no hostname is
-    // baked into a module by accident (#196).
+    // neither the bundle nor the Worker gains a rendering dependency.
     plugins: [
       react(),
       deployHeadersPlugin(),
       indexAssetPlugin(distDataDir),
-      shareAssetPlugin(process.env.SHARE_ORIGIN ?? ""),
+      shareAssetPlugin(),
       editorDayPlugin(),
       editorStatusPlugin(),
       editorCandidatesPlugin(),
