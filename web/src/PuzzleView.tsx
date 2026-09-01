@@ -30,6 +30,7 @@ import { localCalendarDate } from "../../src/schedule.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
 import { dailyPuzzle, freePlayPuzzle, openingPuzzle, SCHEDULE, type PuzzleKind } from "./bootPuzzle.ts";
+import { GAME_NAME } from "./brand.ts";
 import { APPEAL_PATH } from "./endpoints.ts";
 import { isFirstVisit, markVisited } from "./firstVisit.ts";
 import { speak, speechSupported } from "./speech.ts";
@@ -293,7 +294,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
  */
 const START_TITLE: Record<PuzzleKind, string> = {
   daily: "Today’s puzzle",
-  tutorial: "Welcome to Rhyme Bee",
+  tutorial: `Welcome to ${GAME_NAME}`,
   free: "Free play",
 };
 

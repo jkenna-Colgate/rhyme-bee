@@ -1,4 +1,4 @@
-# Rhyme Bee
+# Rhyming Bee
 
 A daily word puzzle in the spirit of NYT Spelling Bee, with one substitution: the mechanic is **sound**, not spelling. You are given one word and hunt for as many words as you can that rhyme with it.
 

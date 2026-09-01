@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rhyme Bee</title>
+    <!-- The wordmark is `GAME_NAME` in src/brand.ts; a static document cannot
+         import it, so this literal repeats it and src/__tests__/brand.test.ts
+         reads this title back to keep the two from drifting. -->
+    <title>Rhyming Bee</title>
   </head>
   <body>
     <div id="root"></div>
