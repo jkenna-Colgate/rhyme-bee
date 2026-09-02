@@ -267,6 +267,38 @@ code {
   line-height: 1.1;
 }
 
+/* The share control (#205): a quiet pill under the Rank, permanent rather than
+   timed, and small enough that it does not read as a second Rank. */
+.stat__share {
+  display: block;
+  margin: 0.3rem auto 0;
+  padding: 0.1rem 0.55rem;
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stat__share:hover {
+  color: var(--ink);
+  border-color: var(--muted);
+}
+
+/* Empty until there is something to confirm, so the live region is already on
+   the page when the text arrives. */
+.stat__share-notice:not(:empty) {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.65rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
 /* --- The entry form ----------------------------------------------------- */
 
 .entry {

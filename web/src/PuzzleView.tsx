@@ -16,6 +16,11 @@
  * lines come from `REJECTION_MESSAGE`, which sits with the closed reason set so
  * the REPL says the same thing.
  *
+ * Sharing a Rank (#205) is wiring and nothing more: the control sits beside the
+ * Rank readout on a Daily Puzzle, and every branch behind it — share sheet or
+ * clipboard, and what a cancelled sheet means — belongs to `share/shareGesture`,
+ * which is tested. Taking it touches no Session state.
+ *
  * A Puzzle does not begin until the player taps to start (#116): iOS Safari
  * blocks speech synthesis outside a user gesture, and the Seed Word being
  * spoken is the mechanic, not a garnish — the tap *is* the audio unlock. Which
@@ -23,16 +28,18 @@
  * view only asks it and renders what comes back.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { playableSeeds } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import { localCalendarDate } from "../../src/schedule.ts";
+import type { RankTier } from "../../src/scoring.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
 import { dailyPuzzle, freePlayPuzzle, openingPuzzle, SCHEDULE, type PuzzleKind } from "./bootPuzzle.ts";
 import { GAME_NAME } from "./brand.ts";
 import { APPEAL_PATH } from "./endpoints.ts";
 import { isFirstVisit, markVisited } from "./firstVisit.ts";
+import { shareRank, type ShareContext, type ShareOutcome } from "./share/shareGesture.ts";
 import { speak, speechSupported } from "./speech.ts";
 import { usePuzzleSession } from "./usePuzzleSession.ts";
 import { FeedbackButton } from "./feedback/FeedbackButton.tsx";
@@ -206,7 +213,7 @@ export function PuzzleView({ index }: { index: RhymeIndex }) {
         </button>
       </div>
       <Seed session={session} kind={kind} />
-      <Stats session={session} />
+      <Stats session={session} kind={kind} />
       {/* Both per-Submission flashes are re-keyed on `seq` so each new Submission
           genuinely remounts them (that is what restarts the banner's dismissal
           timer), but they are siblings in this `section`, so their keys must also
@@ -590,25 +597,167 @@ function MissedGroup({
 
 // --- Always-on Score / Rank / progress ----------------------------------------
 
-function Stats({ session }: { session: Session }) {
+function Stats({ session, kind }: { session: Session; kind: PuzzleKind }) {
   const { found, totalAnswers, foundBonus } = session.progress();
   return (
     <dl className="stats" aria-label="Your progress">
       <Stat label="Score" value={`${session.score()}`} />
-      <Stat label="Rank" value={session.rank().label} />
+      {/* The share control lives beside the readout rather than on the
+          Rank-change banner (#205). The banner dismisses itself on a timer,
+          which would turn sharing into a snap decision taken at the moment the
+          player is least ready to make one; here it is in a fixed place, at
+          every Rank including the lowest and at any point in a Session.
+
+          On Free Play it is absent rather than disabled: a Free Play Session is
+          nobody else’s and is not kept, and an inert control needing a sentence
+          of explanation is worse than no control. */}
+      <Stat
+        label="Rank"
+        value={session.rank().label}
+        action={
+          kind === "daily" ? (
+            <ShareRankButton
+              label={session.rank().label}
+              ladder={session.context.config.rankLadder}
+            />
+          ) : null
+        }
+      />
       <Stat label="Answers" value={`${found}/${totalAnswers}`} />
       <Stat label="Bonus" value={`${foundBonus}`} />
     </dl>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label,
+  value,
+  action = null,
+}: {
+  label: string;
+  value: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="stat">
       <dt className="stat__label">{label}</dt>
-      <dd className="stat__value">{value}</dd>
+      {/* The action sits inside the `dd`, not beside it: a `div` grouping inside
+          a `dl` may hold nothing but `dt` and `dd`. */}
+      <dd className="stat__value">
+        {value}
+        {action}
+      </dd>
     </div>
   );
+}
+
+/** How long the share confirmation lingers before it clears itself. */
+const SHARE_NOTICE_MS = 4000;
+
+/**
+ * What each outcome is worth saying, of the four `shareGesture` reports.
+ *
+ * A native share sheet is its own confirmation, and a player who opened one and
+ * backed out already knows what they did — both stay silent. A clipboard write
+ * is invisible, and is the one the player would otherwise have no way of knowing
+ * happened.
+ */
+const SHARE_NOTICE: Record<ShareOutcome, string | null> = {
+  shared: null,
+  copied: "✓ Link copied",
+  dismissed: null,
+  failed: "⚠ Couldn’t share",
+};
+
+/**
+ * Share the Rank the player is standing on (#205).
+ *
+ * Wiring only. Which gesture this browser gets, what URL goes into it and what
+ * counts as a cancelled share are all `shareGesture`’s, where they are tested;
+ * what is left here is a button, the browser’s capabilities, and the sentence
+ * each outcome deserves.
+ *
+ * Its props are a label and a ladder rather than the `Session` they were read
+ * off, so sharing cannot end or alter a Puzzle and has nothing to disclose about
+ * the Answers still unfound — structurally, rather than as a promise in a
+ * comment. It is not a Reveal, and there is nothing here that could make it one.
+ *
+ * A browser with neither a share sheet nor a clipboard gets no control at all,
+ * for the same reason Free Play does not: every press would fail, and an
+ * interface should never offer something inert.
+ */
+function ShareRankButton({ label, ladder }: { label: string; ladder: RankTier[] }) {
+  const [outcome, setOutcome] = useState<ShareOutcome | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const capabilities = browserShareCapabilities();
+
+  // The confirmation is a flash rather than a state the board sits in: left
+  // standing it would still be there beside a Rank the player has since passed.
+  // The control itself is permanent — it is the message that is timed.
+  useEffect(() => {
+    if (outcome === null) return;
+    const timer = setTimeout(() => setOutcome(null), SHARE_NOTICE_MS);
+    return () => clearTimeout(timer);
+  }, [outcome]);
+
+  if (capabilities.share === undefined && capabilities.copy === undefined) return null;
+
+  async function share() {
+    // A second press while a share sheet is open would open a second sheet. The
+    // button stays enabled through it regardless: disabling would drop the focus
+    // a keyboard player is standing on, to settle a race this guard settles.
+    if (sharing) return;
+    setOutcome(null);
+    setSharing(true);
+    try {
+      // `window.location.origin`, not the build’s `SHARE_ORIGIN`: the pages are
+      // static assets of this same deploy, so the host in the address bar is
+      // where the page being linked to lives. A link built from it cannot point
+      // at a deployment this bundle is not the one on.
+      const context = { origin: window.location.origin, ladder, ...capabilities };
+      setOutcome(await shareRank({ label }, context));
+    } finally {
+      setSharing(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="stat__share"
+        onClick={share}
+        aria-busy={sharing}
+        aria-label={`Share your Rank: ${label}`}
+      >
+        Share
+      </button>
+      {/* Rendered whether or not it has anything to say, so the live region is
+          on the page before the text arrives — one inserted along with its
+          message is announced unreliably. */}
+      <span className="stat__share-notice" role="status" aria-live="polite">
+        {outcome === null ? "" : SHARE_NOTICE[outcome]}
+      </span>
+    </>
+  );
+}
+
+/**
+ * What this browser can do, as values.
+ *
+ * `shareGesture` is handed its capabilities rather than reading `navigator` for
+ * itself, which is what leaves both of its paths testable in whichever browser
+ * the suite runs in. Somebody still has to look, and looking is the view’s job:
+ * this is the wiring that pays for the branch not being here. Both are bound —
+ * called detached from the object that owns them, they throw.
+ */
+function browserShareCapabilities(): Pick<ShareContext, "share" | "copy"> {
+  const clipboard: Clipboard | undefined = navigator.clipboard;
+  return {
+    share: typeof navigator.share === "function" ? (data) => navigator.share(data) : undefined,
+    copy:
+      typeof clipboard?.writeText === "function" ? (text) => clipboard.writeText(text) : undefined,
+  };
 }
 
 // --- Per-Submission feedback: every Verdict rendered distinctly (ADR-0005) -----
