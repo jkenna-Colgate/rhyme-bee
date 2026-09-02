@@ -6,15 +6,19 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../index.ts";
+import { SHARE_PATH_PREFIX } from "../../src/share/shareTargets.ts";
 import type { Env } from "../env.ts";
 
-function envServing(asset: string) {
+function envServing(asset: string, present?: (pathname: string) => boolean) {
   const asked: string[] = [];
   const env = {
     ASSETS: {
       fetch: async (request: Request) => {
-        asked.push(new URL(request.url).pathname);
-        return new Response(asset);
+        const { pathname } = new URL(request.url);
+        asked.push(pathname);
+        return present === undefined || present(pathname)
+          ? new Response(asset)
+          : new Response("not found", { status: 404 });
       },
     },
     APPEAL_QUEUE: { put: async () => undefined },
@@ -77,5 +81,42 @@ describe("the deployed Worker", () => {
 
     expect(response.status).toBe(201);
     expect(asked).toEqual([]);
+  });
+
+  /**
+   * Share pages are named after the Ranks, and Ranks get renamed. A link that
+   * has already been sent cannot be edited, so the day a Rank is renamed every
+   * message carrying its URL must still land somewhere that explains the game
+   * (#196, #203). The asset that *does* exist is untouched: it never reaches
+   * this Worker at all in production, and must not be second-guessed here.
+   */
+  describe("a share page the build never wrote", () => {
+    it("falls through to the game's front page rather than a 404", async () => {
+      const { env, asked } = envServing("the game", (pathname) => pathname === "/");
+      const response = await worker.fetch(
+        new Request(url(`${SHARE_PATH_PREFIX}sonneteer.html`)),
+        env,
+      );
+
+      expect(response.status).toBe(200);
+      await expect(response.text()).resolves.toBe("the game");
+      expect(asked).toEqual([`${SHARE_PATH_PREFIX}sonneteer.html`, "/"]);
+    });
+
+    it("leaves a share page that does exist alone", async () => {
+      const { env, asked } = envServing("a badge page", () => true);
+      const response = await worker.fetch(new Request(url(`${SHARE_PATH_PREFIX}beginner.html`)), env);
+
+      await expect(response.text()).resolves.toBe("a badge page");
+      expect(asked).toEqual([`${SHARE_PATH_PREFIX}beginner.html`]);
+    });
+
+    it("still 404s off the share path, so nothing else is quietly rewritten", async () => {
+      const { env, asked } = envServing("the game", () => false);
+      const response = await worker.fetch(new Request(url("/rhyme-index-abc123.json")), env);
+
+      expect(response.status).toBe(404);
+      expect(asked).toEqual(["/rhyme-index-abc123.json"]);
+    });
   });
 });

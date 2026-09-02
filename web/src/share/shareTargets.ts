@@ -39,6 +39,17 @@ import { GAME_NAME } from "../brand.ts";
 const SHARE_DIR = "share";
 
 /**
+ * The path every share page and badge sits under.
+ *
+ * Exported for one caller: the Worker, which needs to recognise a request for a
+ * share page that no build ever wrote — a Rank renamed since the link was sent
+ * — and hand it the front page rather than a 404. It reads the prefix from here
+ * for the same reason nothing else spells a path itself: a Worker that decided
+ * separately where share pages live would stop catching them the day this moved.
+ */
+export const SHARE_PATH_PREFIX = `/${SHARE_DIR}/`;
+
+/**
  * Everything the build and the browser must agree on for one Rank.
  *
  * The file fields and the path fields say the same thing twice on purpose: the

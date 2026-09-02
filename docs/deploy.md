@@ -88,6 +88,17 @@ needs:
 - `_headers` — the cache directives, declared by the deployment rather than
   inherited from host defaults: immutable and long-lived for the hashed index and
   the hashed bundle assets, revalidated for the entry point and the manifest.
+- `share/<rank>.html` and `share/<rank>.png` — one landing page and one badge
+  per Rank on the ladder, generated at build time (#196). A player shares a Rank
+  by sending one of those page URLs; it unfurls into a link card carrying the
+  badge. Nothing renders on request and the Worker gains no route: a share page
+  the build never wrote — a Rank renamed since the link was sent — falls through
+  to the front page in `web/worker/index.ts`.
+
+  The absolute URLs in those pages' Open Graph tags need a hostname, and the
+  build takes it from **`SHARE_ORIGIN`**, defaulting to the public URL above.
+  Set it if this ever deploys somewhere else; a wrong one is silent, producing a
+  card with no badge and no other symptom.
 
 `dist-data/` also accumulates the drop and derivation reports and every probe
 script anyone has written while chasing a rhyme bug. **None of that ships.** The

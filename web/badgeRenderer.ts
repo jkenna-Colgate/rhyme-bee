@@ -32,6 +32,7 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Resvg } from "@resvg/resvg-js";
+import { escapeMarkup } from "./escapeMarkup.ts";
 
 const badgeDir = resolve(dirname(fileURLToPath(import.meta.url)), "badge");
 
@@ -104,14 +105,6 @@ const fontOptions = {
   defaultFontFamily: FONT_FAMILY,
 };
 
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 /**
  * The ways a label can be broken across lines, for the caller to choose between
  * by which one fits largest.
@@ -147,7 +140,7 @@ function tspans(lines: string[], fontSize: number): string {
   return lines
     .map((line, index) => {
       const dy = index === 0 ? first + fontSize * 0.34 : LINE_HEIGHT * fontSize;
-      return `<tspan x="${textX}" dy="${dy.toFixed(2)}">${escapeXml(line)}</tspan>`;
+      return `<tspan x="${textX}" dy="${dy.toFixed(2)}">${escapeMarkup(line)}</tspan>`;
     })
     .join("");
 }

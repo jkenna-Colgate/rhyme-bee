@@ -26,6 +26,46 @@ const rootDir = dirname(fileURLToPath(import.meta.url));
 const distDataDir = resolve(rootDir, "../dist-data");
 
 /**
+ * Where this build will be served from, for the absolute URLs a link card
+ * requires (#196, #203).
+ *
+ * A share page's `og:image` and `og:url` cannot be relative — a scraper
+ * resolves nothing — so somewhere has to know the hostname. That somewhere is
+ * here, in the build's own configuration, and specifically *not* in
+ * `src/share/shareTargets.ts`, which takes the origin as an argument and has a
+ * test forbidding hostname literals. The distinction is the point of #196's
+ * "build input rather than a hardcoded constant": the deployment's address is a
+ * fact about the deployment, so it sits beside the rest of the deployment's
+ * description rather than being baked into a module the bundle imports.
+ *
+ * The default is the playtest's address, the one `wrangler.jsonc` publishes on
+ * — a default rather than a requirement because a build with no origin set is
+ * the ordinary case (`npm run dev`, a local `npm run build`), and demanding a
+ * variable of every build would cost each of them a check that only a deploy to
+ * somewhere new actually needs. `SHARE_ORIGIN` overrides it, which is what makes
+ * moving the deployment a change to the environment rather than to the source.
+ *
+ * What is *not* tolerated is an origin that is set and unusable. `SHARE_ORIGIN=`
+ * or a bare hostname would sail through and produce relative `og:image` URLs —
+ * a card with no badge, and no other symptom anywhere, discovered only by
+ * sending one. So an override that is not an absolute http(s) URL stops the
+ * build here, in the same spirit as the missing-index guard below.
+ */
+const DEPLOY_ORIGIN = "https://bramble-bee.kenna-dev.workers.dev";
+const shareOrigin = resolveShareOrigin(process.env.SHARE_ORIGIN);
+
+function resolveShareOrigin(override: string | undefined): string {
+  if (override === undefined || override === "") return DEPLOY_ORIGIN;
+  if (!/^https?:\/\/[^/]+/.test(override)) {
+    throw new Error(
+      `SHARE_ORIGIN must be an absolute http(s) URL, and is ${JSON.stringify(override)}. ` +
+        "A share page's Open Graph tags need a hostname a scraper can fetch.",
+    );
+  }
+  return override;
+}
+
+/**
  * The web shell. Rooted in `web/`, it resolves the engine's TypeScript source in
  * `../src` directly — Vite (via esbuild) reads the `.ts` imports with no engine
  * build step, so `src/` never gains a runtime dependency.
@@ -75,15 +115,17 @@ export default defineConfig(({ command }) => {
     // is true of a list of words against one Rhyme Key, and #186's rule is that
     // the pasted-list feature adds no new write path at all (#189).
     //
-    // `shareAssetPlugin` rasterises the Rank badge a shared link card points at,
-    // one per Rank (#202). It is the reason the rasteriser and the display face
-    // it embeds are devDependencies: generation is confined to build time, so
-    // neither the bundle nor the Worker gains a rendering dependency.
+    // `shareAssetPlugin` writes the share feature's static assets — one landing
+    // page and one rasterised Rank badge per Rank (#202, #203). It is the reason
+    // the rasteriser and the display face it embeds are devDependencies:
+    // generation is confined to build time, so neither the bundle nor the Worker
+    // gains a rendering dependency, and no request renders anything. The origin
+    // it takes is the only thing about those pages that is not derived.
     plugins: [
       react(),
       deployHeadersPlugin(),
       indexAssetPlugin(distDataDir),
-      shareAssetPlugin(),
+      shareAssetPlugin(shareOrigin),
       editorDayPlugin(),
       editorStatusPlugin(),
       editorCandidatesPlugin(),
