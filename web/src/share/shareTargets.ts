@@ -39,6 +39,16 @@ import { GAME_NAME } from "../brand.ts";
 const SHARE_DIR = "share";
 
 /**
+ * What a share *page* ends in, as against the badge beside it.
+ *
+ * Exported for the Worker, which falls a missing page through to the front page
+ * and must not do the same for a missing badge: HTML returned with a 200 where
+ * an image was asked for is a broken card, and preview scrapers cache what they
+ * are given for a long time on URLs this design deliberately never changes.
+ */
+export const SHARE_PAGE_SUFFIX = ".html";
+
+/**
  * The path every share page and badge sits under.
  *
  * Exported for one caller: the Worker, which needs to recognise a request for a
@@ -123,7 +133,7 @@ export function shareTargets(ladder: RankTier[], origin: string): ShareTarget[] 
     for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
     taken.add(slug);
 
-    const pageFile = `${SHARE_DIR}/${slug}.html`;
+    const pageFile = `${SHARE_DIR}/${slug}${SHARE_PAGE_SUFFIX}`;
     const badgeFile = `${SHARE_DIR}/${slug}.png`;
 
     return {

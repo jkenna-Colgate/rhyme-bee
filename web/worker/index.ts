@@ -16,7 +16,7 @@
  */
 
 import { FEEDBACK_PATH, APPEAL_PATH } from "../src/endpoints.ts";
-import { SHARE_PATH_PREFIX } from "../src/share/shareTargets.ts";
+import { SHARE_PATH_PREFIX, SHARE_PAGE_SUFFIX } from "../src/share/shareTargets.ts";
 import { handleFeedback } from "./feedbackRoute.ts";
 import { handleAppeal } from "./appealRoute.ts";
 import type { Env } from "./env.ts";
@@ -51,8 +51,18 @@ export default {
      * including a missing Rhyme Index artifact: that would replace the loader's
      * "could not fetch the index (404)" with a JSON parse error on a page of
      * HTML, which is a worse answer to the deploy's most important failure.
+     *
+     * Narrow for a second reason: it catches pages only, never the badge beside
+     * them. A missing `.png` answered with the front page's HTML under a 200
+     * would hand a preview scraper markup where it asked for an image, and
+     * scrapers cache what they are given — on URLs this design deliberately
+     * never changes, so a card poisoned during a bad deploy would stay poisoned.
+     * A 404 on a badge is the honest answer and the one a scraper can retry.
      */
-    if (response.status === 404 && pathname.startsWith(SHARE_PATH_PREFIX)) {
+    const isSharePage =
+      pathname.startsWith(SHARE_PATH_PREFIX) && pathname.endsWith(SHARE_PAGE_SUFFIX);
+
+    if (response.status === 404 && isSharePage) {
       return env.ASSETS.fetch(new Request(new URL("/", url)));
     }
 

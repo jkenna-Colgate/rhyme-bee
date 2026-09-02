@@ -111,6 +111,19 @@ describe("the deployed Worker", () => {
       expect(asked).toEqual([`${SHARE_PATH_PREFIX}beginner.html`]);
     });
 
+    it("404s a missing badge rather than answering an image with the front page", async () => {
+      const { env, asked } = envServing("the game", (pathname) => pathname === "/");
+      const response = await worker.fetch(
+        new Request(url(`${SHARE_PATH_PREFIX}beginner.png`)),
+        env,
+      );
+
+      // A scraper that asked for an image and was handed HTML under a 200 caches
+      // a broken card, on a URL this design never changes.
+      expect(response.status).toBe(404);
+      expect(asked).toEqual([`${SHARE_PATH_PREFIX}beginner.png`]);
+    });
+
     it("still 404s off the share path, so nothing else is quietly rewritten", async () => {
       const { env, asked } = envServing("the game", () => false);
       const response = await worker.fetch(new Request(url("/rhyme-index-abc123.json")), env);
