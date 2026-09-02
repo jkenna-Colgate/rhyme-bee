@@ -23,9 +23,16 @@
  * interface typography for the badge to match and it is free to be an award
  * rather than an extension of the interface.
  *
- * The badge's pixels are judged by looking at them, so this module is
- * deliberately untested. What a test could check here — that bytes came back,
- * that the header says PNG — would pass on a blank square.
+ * ## What the tests here can and cannot settle
+ *
+ * The badge's pixels are judged by looking at them: no assertion distinguishes
+ * a well-set seal from a blank square, so none is attempted. What
+ * `__tests__/badgeRenderer.test.ts` covers is the frame around the art — that
+ * bytes come back as a PNG at the size a link card crops to, that a two-word
+ * Rank and a Rank the face has no glyphs for both still render, and that a
+ * label leaving the seal empty throws rather than shipping. Those are the
+ * failures that would otherwise reach a message thread unseen; the art itself
+ * is reviewed by opening it.
  */
 
 import { readFileSync } from "node:fs";

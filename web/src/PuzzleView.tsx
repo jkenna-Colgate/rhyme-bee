@@ -710,11 +710,15 @@ function ShareRankButton({ label, ladder }: { label: string; ladder: RankTier[] 
     setOutcome(null);
     setSharing(true);
     try {
-      // `window.location.origin`, not the build’s `SHARE_ORIGIN`: the pages are
-      // static assets of this same deploy, so the host in the address bar is
-      // where the page being linked to lives. A link built from it cannot point
-      // at a deployment this bundle is not the one on.
-      const context = { origin: window.location.origin, ladder, ...capabilities };
+      // A built bundle links to its own host: the pages are static assets of
+      // this same deploy, so the address bar is where the page being linked to
+      // lives, and a link built from it cannot point at a deployment this
+      // bundle is not the one on. The dev server is the one place that is
+      // false — `shareAssetPlugin` is build-only, so nothing here has written
+      // `/share/` — and it links to the built origin instead, so that a link
+      // taken from a dev session still resolves.
+      const origin = import.meta.env.DEV ? __SHARE_ORIGIN__ : window.location.origin;
+      const context = { origin, ladder, ...capabilities };
       setOutcome(await shareRank({ label }, context));
     } finally {
       setSharing(false);
