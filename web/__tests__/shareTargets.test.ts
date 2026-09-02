@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_RANK_LADDER, type RankTier } from "../../src/scoring.ts";
 import { GAME_NAME } from "../src/brand.ts";
-import { shareTargets, type ShareTarget } from "../src/share/shareTargets.ts";
+import { shareTargetFor, shareTargets, type ShareTarget } from "../src/share/shareTargets.ts";
 
 const ORIGIN = "https://example.test";
 
@@ -170,5 +170,29 @@ describe("shareTargets", () => {
         expect(target.badgeFile).toContain(target.slug);
       }
     });
+  });
+});
+
+describe("shareTargetFor", () => {
+  it("finds the one target a Rank is shared as", () => {
+    for (const target of shareTargets(DEFAULT_RANK_LADDER, ORIGIN)) {
+      expect(shareTargetFor(DEFAULT_RANK_LADDER, ORIGIN, target.label)).toEqual(target);
+    }
+  });
+
+  it("offers nothing for a Rank the ladder does not hold", () => {
+    // The build wrote no page and no badge for it, so there is no URL a caller
+    // could send that would resolve to anything.
+    expect(shareTargetFor(DEFAULT_RANK_LADDER, ORIGIN, "Poet Laureate of Mars")).toBeUndefined();
+    expect(shareTargetFor([], ORIGIN, "Beginner")).toBeUndefined();
+  });
+
+  it("takes the first of a repeated label, whose card says the same thing anyway", () => {
+    const ladder = AWKWARD_LADDERS["labels that collide once slugged"] ?? [];
+    const found = shareTargetFor(ladder, ORIGIN, "Silver Tongue");
+
+    // Only the slug in the path distinguishes them, and a rendered card shows
+    // the badge, the title and the host — never the path.
+    expect(found).toEqual(shareTargets(ladder, ORIGIN)[0]);
   });
 });

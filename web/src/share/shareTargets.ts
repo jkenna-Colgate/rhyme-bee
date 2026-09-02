@@ -139,3 +139,32 @@ export function shareTargets(ladder: RankTier[], origin: string): ShareTarget[] 
     };
   });
 }
+
+/**
+ * The one target a Rank is shared as, or `undefined` if the ladder has no such
+ * Rank.
+ *
+ * The browser's half of the projection. It is here rather than at the call site
+ * for the reason the whole module is here: a caller that looked a target up its
+ * own way would be a second piece of code deciding what identifies a Rank, and
+ * the two could disagree as easily as two pieces of code spelling a path.
+ *
+ * The key is the **label**, not the position on the ladder. Position is exact,
+ * but it would bind the lookup to whichever field the caller's Rank happens to
+ * expose its index as, and the label is what the badge is drawn from and what
+ * the card's title claims — so a target found by label is a card that says the
+ * right thing by construction. Where a ladder repeats a label the first target
+ * wins: the badge and the title are identical either way, and only the slug in
+ * the path differs, which a rendered card does not show.
+ *
+ * `undefined` means a Rank this ladder does not hold, which is a Rank the build
+ * wrote no page and no badge for. There is no URL to offer, and the caller is
+ * told so rather than handed a link that resolves to nothing.
+ */
+export function shareTargetFor(
+  ladder: RankTier[],
+  origin: string,
+  label: string,
+): ShareTarget | undefined {
+  return shareTargets(ladder, origin).find((target) => target.label === label);
+}
