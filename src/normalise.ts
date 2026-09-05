@@ -110,8 +110,21 @@ const SYLLABIFIABLE_SONORANTS = new Set(["L", "N", "M"]);
 /** After a vowel, the one sonorant that absorbs the schwa. */
 const VOWEL_ABSORBING_SONORANT = "L";
 
-/** The one vowel that keeps its own syllable in front of the schwa. */
-const UNABSORBING_VOWEL = "IY";
+/**
+ * The vowels that keep their own syllable in front of the schwa (#209). `IY` is
+ * the original member; `ER` and `EY` were added when the rule's reach was
+ * measured over the words where it actually changes a rhyme verdict, rather
+ * than over every word it rewrites.
+ */
+const UNABSORBING_VOWELS = new Set(["IY", "ER", "EY"]);
+
+/**
+ * The liquids, which keep their own syllable in front of the schwa the way an
+ * unabsorbing vowel does (#209). A liquid is at least as sonorous as the
+ * sonorant that would carry the syllable, so the schwa between them is the only
+ * thing separating two syllable peaks and it stays audible.
+ */
+const LIQUIDS = new Set(["L", "R"]);
 
 /**
  * Rule 2 — the syllabic consonant, the optional schwa before a final sonorant.
@@ -132,7 +145,7 @@ const UNABSORBING_VOWEL = "IY";
  * no single reading to collapse to, and a Seed Word is still spoken and
  * respelled in the reading the data asserts.
  *
- * Four limits keep the claim honest, and each is the difference between a
+ * Five limits keep the claim honest, and each is the difference between a
  * contrast nobody can hear and one everybody can:
  *
  *   - **Only a schwa.** `AH0` alone. A full unstressed vowel is not reducible,
@@ -169,17 +182,50 @@ const UNABSORBING_VOWEL = "IY";
  *     `jeroboam` with `home`. All 18 such words were wrong; all 33 in `L`
  *     were right.
  *
- *     `IY` is then excluded even before `L`, because unlike the offglide
- *     vowels it is a full front vowel holding its own syllable, and the schwa
- *     after it survives into casual speech: `museum` would otherwise rhyme
- *     with `dream`, `librarian` with `green`, `serial` with `feel`.
+ *     `IY`, `ER` and `EY` are then excluded even before `L`. Unlike the
+ *     offglide vowels, each holds its own syllable, and the schwa after it
+ *     survives into casual speech: `museum` would otherwise rhyme with
+ *     `dream`, `librarian` with `green`, `serial` with `feel`, `liberal` and
+ *     `femoral` with `curl`, `betrayal` and `portrayal` with `pale`. `IY` was
+ *     the original member; `ER` and `EY` joined it in #209 (below).
  *
- * Together those limits leave 35 words in the playable lexicon gaining a new
- * Rhyme Key, down from 99. The widest the perceptual claim now goes is `trial`
- * rhyming with `mile` and `betrayal` with `pale` — stated here rather than
- * hidden, so a reviewer who hears two syllables where this rule hears one is
- * challenging the claim, which is the argument worth having. `lion` is *not*
- * reached: it is a nasal after a vowel, so the schwa stays.
+ *   - **Never after a liquid** (#209). `L` and `R` before the schwa block the
+ *     drop whatever the sonorant is. A liquid is at least as sonorous as the
+ *     sonorant that would carry the syllable, so the schwa between them is the
+ *     only thing keeping two syllable peaks apart and it stays audible.
+ *     Unmeasured, this was the larger half of #209: it put `forum` and
+ *     `decorum` in the `storm` family, `foreign` and `baron` in `born`'s and
+ *     `cairn`'s, `column` and `antebellum` in `calm`'s and `elm`'s.
+ *
+ * ## What the limits are measured against
+ *
+ * The figure that matters is not how many words the rule *rewrites* but how
+ * many gain a **new rhyme partner**. For most words the whole family drops the
+ * schwa together, so both Rhyme Keys hold the same members and no verdict
+ * moves: `session`, `button`, `able`, `children` and `patron` all gain a
+ * reading and no partner. Over the wordhood lexicon the rule rewrites 5,604
+ * words and moves a verdict for 1,086 of them.
+ *
+ * Most of that 1,086 is repair rather than reach. Where the rule acts after an
+ * ordinary consonant it is usually patching an inconsistency in the upstream
+ * data — CMUdict transcribes `coarticulation` without the schwa, so the drop
+ * is what lets 936 `-ation` words rhyme with it, and `orgasm`, `rectangle`,
+ * `subsection` and `bifocal` are the same shape. The reach that is a genuine
+ * perceptual claim is the vowel branch: 39 words, and they carry most of the
+ * pair mass because each lands in a large family.
+ *
+ * The widest that claim now goes is `trial` rhyming with `mile` and
+ * `withdrawal` with `wall` — stated here rather than hidden, so a reviewer who
+ * hears two syllables where this rule hears one is challenging the claim,
+ * which is the argument worth having. `lion` is *not* reached: it is a nasal
+ * after a vowel, so the schwa stays.
+ *
+ * One residue is known and accepted. `UW` still absorbs at secondary stress, so
+ * `spiritual`, `contextual`, `textual` and `unusual` keep a reading on `UW L`
+ * and rhyme with `cool`. Cutting them means cutting `cruel` and `duel` with
+ * them — the complaint this rule was built for — because a Rhyme Key strips
+ * stress digits, so `schwaTwins.ts` cannot tell the two apart and no
+ * stress-based limit is expressible on both sides of the rule (#209).
  *
  * A word with a droppable schwa ends up with two Rhyme Keys and so reads as
  * ambiguous, which bars it from being a Seed Word without an explicit key.
@@ -199,12 +245,15 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
   if (!SYLLABIFIABLE_SONORANTS.has(sonorant)) return [];
   if (bareSound(schwa) !== SCHWA || stressOf(schwa) !== 0) return [];
 
-  // After a vowel, only `L` absorbs the schwa, and not even `L` after `IY`.
-  // After a consonant every sonorant does — see the fourth limit above.
+  // After a vowel, only `L` absorbs the schwa, and not after an unabsorbing
+  // vowel. After a liquid nothing absorbs it. After any other consonant every
+  // sonorant does — see the fourth and fifth limits above.
   const preceding = reading.at(-3);
-  if (preceding !== undefined && isVowel(preceding)) {
-    if (sonorant !== VOWEL_ABSORBING_SONORANT) return [];
-    if (bareSound(preceding) === UNABSORBING_VOWEL) return [];
+  if (preceding !== undefined) {
+    if (isVowel(preceding)) {
+      if (sonorant !== VOWEL_ABSORBING_SONORANT) return [];
+      if (UNABSORBING_VOWELS.has(bareSound(preceding))) return [];
+    } else if (LIQUIDS.has(bareSound(preceding))) return [];
   }
 
   // A variant with no stressed vowel left has no Rhyme Key, so it could never

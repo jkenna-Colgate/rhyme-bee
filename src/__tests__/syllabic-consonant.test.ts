@@ -181,11 +181,13 @@ describe("a full vowel still separates two words", () => {
   });
 });
 
-describe("`IY` keeps its own syllable", () => {
-  // Measured, not reasoned: without this limit the rule reached 99 words in the
-  // playable lexicon and got roughly half of them wrong, every error behind
-  // `IY`. The other vowels that reach the schwa end in an offglide that absorbs
-  // it; `/iː/` does not, so the schwa after it stays audible.
+describe("an unabsorbing vowel keeps its own syllable", () => {
+  // Measured, not reasoned. `IY` came first: without that limit the rule reached
+  // 99 words in the playable lexicon and got roughly half of them wrong, every
+  // error behind `IY`. `ER` and `EY` joined it in #209, on a second measurement
+  // taken over the words where the rule changes a rhyme verdict rather than
+  // every word it rewrites. The vowels that still absorb end in an offglide
+  // that swallows the schwa; these three do not, so the schwa stays audible.
 
   it("does not let `museum` rhyme with `dream`", () => {
     const data = target([["museum", [["M", "Y", "UW0", "Z", "IY1", "AH0", "M"]]]]);
@@ -207,6 +209,24 @@ describe("`IY` keeps its own syllable", () => {
     ]);
   });
 
+  it("does not let `liberal` rhyme with `curl`", () => {
+    const data = target([["liberal", [["L", "IH1", "B", "ER0", "AH0", "L"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("liberal")).toEqual([
+      ["L", "IH1", "B", "ER0", "AH0", "L"],
+    ]);
+  });
+
+  it("does not let `betrayal` rhyme with `pale`", () => {
+    const data = target([["betrayal", [["B", "IH0", "T", "R", "EY1", "AH0", "L"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("betrayal")).toEqual([
+      ["B", "IH0", "T", "R", "EY1", "AH0", "L"],
+    ]);
+  });
+
   it("does not let `serial` rhyme with `feel`", () => {
     const data = target([["serial", [["S", "IH1", "R", "IY0", "AH0", "L"]]]]);
     applyNormalisation(data);
@@ -217,8 +237,8 @@ describe("`IY` keeps its own syllable", () => {
   });
 
   it("still absorbs the schwa after the offglide vowels", () => {
-    // The limit is `IY` alone — it must not cost the rule its target words, nor
-    // the uncontroversial cases behind `AW` and `AY`.
+    // The limit is the unabsorbing set alone — it must not cost the rule its
+    // target words, nor the uncontroversial cases behind `AW` and `AY`.
     const data = target([
       ["gruel", [["G", "R", "UW1", "AH0", "L"]]],
       ["towel", [["T", "AW1", "AH0", "L"]]],
@@ -238,6 +258,47 @@ describe("`IY` keeps its own syllable", () => {
     applyNormalisation(data);
 
     expect(data.pronunciations.get("ribbon")).toContainEqual(["R", "IH1", "B", "N"]);
+  });
+});
+
+describe("a liquid before the schwa keeps its own syllable", () => {
+  // A liquid is at least as sonorous as the sonorant that would carry the
+  // syllable, so the schwa between them is the only thing separating two peaks.
+  // Unmeasured, this class was the larger half of #209: it put `forum` in the
+  // `storm` family, `baron` in `cairn`'s and `column` in `calm`'s.
+
+  it("does not let `forum` rhyme with `storm`", () => {
+    const data = target([["forum", [["F", "AO1", "R", "AH0", "M"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("forum")).toEqual([["F", "AO1", "R", "AH0", "M"]]);
+  });
+
+  it("does not let `baron` rhyme with `cairn`", () => {
+    const data = target([["baron", [["B", "EH1", "R", "AH0", "N"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("baron")).toEqual([["B", "EH1", "R", "AH0", "N"]]);
+  });
+
+  it("does not let `column` rhyme with `calm`", () => {
+    const data = target([["column", [["K", "AA1", "L", "AH0", "M"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("column")).toEqual([["K", "AA1", "L", "AH0", "M"]]);
+  });
+
+  it("still absorbs the schwa after a consonant that is not a liquid", () => {
+    // The limit is about the liquid, not about the cluster it sits in: `spasm`
+    // and `session` are the textbook case and must survive.
+    const data = target([
+      ["spasm", [["S", "P", "AE1", "Z", "AH0", "M"]]],
+      ["session", [["S", "EH1", "SH", "AH0", "N"]]],
+    ]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("spasm")).toContainEqual(["S", "P", "AE1", "Z", "M"]);
+    expect(data.pronunciations.get("session")).toContainEqual(["S", "EH1", "SH", "N"]);
   });
 });
 
@@ -279,11 +340,11 @@ describe("after a vowel, only L absorbs the schwa", () => {
   });
 
   it("still absorbs the schwa into an L after a vowel", () => {
-    const data = target([["betrayal", [["B", "IH0", "T", "R", "EY1", "AH0", "L"]]]]);
+    const data = target([["denial", [["D", "IH0", "N", "AY1", "AH0", "L"]]]]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("betrayal")).toContainEqual([
-      "B", "IH0", "T", "R", "EY1", "L",
+    expect(data.pronunciations.get("denial")).toContainEqual([
+      "D", "IH0", "N", "AY1", "L",
     ]);
   });
 

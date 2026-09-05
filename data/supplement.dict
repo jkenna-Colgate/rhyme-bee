@@ -281,3 +281,16 @@ noncaste N AA1 N K EY2 S T
 impaste IH1 M P EY2 S T
 pretaste P R IY1 T EY2 S T
 vambraced V AE1 M B R EY2 S T
+
+# --- Corrections (a reading the syllabic-consonant rule no longer reaches) ---
+
+# squirrel (#209): the rule used to append a schwa-less reading after any vowel
+# but `IY`, which reached `squirrel` (right — it rhymes with `curl`) and
+# `liberal`, `femoral`, `referral`, `deferral`, `epidural` and `postdoctoral`
+# (wrong — none of them does). `ER` is now an unabsorbing vowel, so the rule
+# reaches none of the seven. Six of those are the fix; `squirrel` is the one
+# real reading it cost, and it is asserted here instead. Both readings are
+# genuine: two syllables (`SKWIR-ul`, with `referral`) and one (`skwirl`, with
+# `curl`). ER L, with `curl`.
+squirrel S K W ER1 AH0 L
+squirrel(1) S K W ER1 L
