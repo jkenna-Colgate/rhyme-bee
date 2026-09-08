@@ -281,3 +281,153 @@ noncaste N AA1 N K EY2 S T
 impaste IH1 M P EY2 S T
 pretaste P R IY1 T EY2 S T
 vambraced V AE1 M B R EY2 S T
+hairpin HH EH1 R P IH2 N
+snakeskin S N EY1 K S K IH2 N
+godforsaken G AA1 D F ER0 S EY1 K IH2 N
+unfeminine AH0 N F EH1 M AH0 N IH2 N
+bearskin B EH1 R S K IH2 N
+clothespin K L OW1 DH S P IH2 N
+oilskin OY1 L S K IH2 N
+gherkin G ER1 K IH2 N
+terrapin T EH1 R AA2 P IH2 N
+immunoglobulin IH2 M Y AH0 N OW0 G L AA1 B Y AH0 L IH2 N
+wineskin W IH1 N IH0 S K IH2 N
+ursine ER1 S AY2 N IH1 N
+breastpin B R EH1 S T P IH2 N
+jerkin JH ER1 K IH2 N
+illumine IH2 L UW1 M AH0 N IH1 N
+norepinephrine N AO2 R EH2 P AH0 N EH1 F R IH2 N
+bowfin B AW1 F IH2 N
+consanguine K AH0 N S AE1 NG G W IH2 N
+boffin B AA1 F IH2 N
+zootoxin Z UW1 T AA0 K S IH2 N
+tyrosine T AY1 R AH0 S IH2 N
+firkin F ER1 K IH2 N
+digoxin D IH0 JH AA1 K S IH2 N
+grimalkin G R IH0 M AE1 L K IH2 N
+muezzin M Y UW1 EH0 Z IH2 N
+tocsin T AA1 K S IH2 N
+replevin R EH1 P L AH0 V IH2 N
+djinn D IY1 JH EY1 IH2 N
+maroquin M AA1 R OW0 K W IH2 N
+refreshen R IY0 F R EH1 SH IH2 N
+piggin P IH1 G JH IH2 N
+reimagine R IY0 IH0 M AE1 JH IH2 N
+volucrine V AH0 L UW1 K R IH2 N
+arshin AA1 R SH IH2 N
+anguine AE1 NG G W IH2 N
+leucine L UW1 S IH2 N
+psittacine S IH1 T AH0 S IH2 N
+isoleucine AY2 S OW0 L UW1 S IH2 N
+homelyn HH OW1 M L IH2 N
+takin T IY1 AH0 K IH2 N
+cerumen S AH0 R UW1 M IH2 N
+salesroom S EY1 L Z R UW2 M
+pressroom P R EH1 S R UW2 M
+stateroom S T EY1 T R UW2 M
+coatroom K OW1 T R UW2 M
+sickroom S IH1 K R UW2 M
+tearoom T IY1 R UW2 M
+dayroom D EY1 R UW2 M
+greenroom G R IY1 N R UW2 M
+clubroom K L AH1 B R UW2 M
+guardroom G AA1 R D R UW2 M
+homeroom HH OW1 M R UW2 M
+poolroom P UW1 L R UW2 M
+chartroom CH AA1 R T R UW2 M
+checkroom CH EH1 K R UW2 M
+gunroom G AH1 N R UW2 M
+saleroom S EY1 L R UW2 M
+bookroom B UH1 K R UW2 M
+anteroom AE1 N T IY0 R UW2 M
+taproom T AE1 P R UW2 M
+mudroom M AH1 D R UW2 M
+deplume D IY1 P L UW2 M
+wardroom W AO1 R D R UW2 M
+stillroom S T IH1 L R UW2 M
+subsume S AH0 B S UW1 M
+houseroom HH AW1 S R UW2 M
+grillroom G R IH1 L R UW2 M
+broadloom B R AA1 D L UW2 M
+rheum R UW1 M
+whiskbroom W IH1 S K B R UW2 M
+illume IH2 L UW1 M
+spume S P Y UW1 M
+foredoom F AO1 R D UW2 M
+wareroom W EH1 R R UW2 M
+hecatomb HH EH1 K AH0 T UW2 M
+inhume IH0 N HH Y UW2 M
+brume B R UW1 M
+checkerbloom CH EH1 K ER0 B L UW2 M
+simoom S IH0 M UW1 M
+toom T UW1 M
+coom K UW1 M
+glume G L UW1 M
+grume G R UW1 M
+neume N Y UW1 M
+sloom EH1 S L UW2 M
+choom CH UW1 M
+hoom HH UW1 M
+woom W UW1 M
+spoom S P UW1 M
+cwm K UW1 M
+drawloom D R AA1 L UW2 M
+imposthume IH0 M P AA1 S T UW2 M
+strongroom S T R AA1 NG R UW2 M
+bitume B UH0 T UW1 M
+desume D IH0 Z UW1 M
+effume IH0 F UW1 M
+predoom P R IY1 D UW2 M
+begloom B IY1 G L UW2 M
+semiplume S EH1 M IY0 P L UW2 M
+unplume AH1 N P L UW2 M
+addoom AE1 D D UW2 M
+despume D IH0 S P Y UW1 M
+embloom EH1 M B L UW2 M
+engloom EH1 N G L UW2 M
+maybloom M EY1 B L UW2 M
+microvolume M AY1 K R OW2 V AA2 L Y UW2 M
+preassume P IY1 R IY0 AH0 S UW2 M
+warkloom W AO1 R K L UW2 M
+workloom W ER1 K L UW2 M
+apostume AH0 P AA1 S T UW2 M
+corniplume K AO1 R N IH0 P L UW2 M
+disinhume D IH2 S IH0 N HH Y UW1 M
+envolume EH1 N V AA2 L Y UW2 M
+isohume AY1 S AH0 HH Y UW2 M
+nonlegume N AA1 N L EH2 G Y UW2 M
+overgloom OW1 V ER0 G L UW2 M
+pulviplume P AH1 L V IH0 P L UW2 M
+undergloom AH1 N D ER0 G L UW2 M
+hypervolume HH AY1 P ER0 V AA2 L Y UW2 M
+boxroom B AA1 K S R UW2 M
+cardroom K AA1 R D R UW2 M
+lightroom L AY1 T R UW2 M
+messroom M EH1 S R UW2 M
+cookroom K UH1 K R UW2 M
+jibboom JH IH1 B B UW2 M
+proofroom P R UW1 F R UW2 M
+relume R IH0 L UW1 M
+wagenboom W AE1 G AH0 N B UW2 M
+disselboom D IH1 S AH0 L B UW2 M
+intomb IH0 N T UW2 M
+untomb AH1 N T UW2 M
+insume IH2 N S UW1 M
+interroom IH2 N T ER1 R UW2 M
+pyrgom P IH1 R G UW2 M
+transume T R AE0 N S UW1 M
+introsume IH2 N T R OW0 S UW1 M
+kokerboom K OW1 K ER0 B UW2 M
+displume D IH1 S P L UW2 M
+kumkum KAH0 M K UW1 M
+overconsume OW1 V ER0 K AH0 N S UW2 M
+fireroom F AY1 ER0 R UW2 M
+foreroom F AO1 R R UW2 M
+rebloom R EY1 B L UW2 M
+coffeeroom K AA1 F IY0 R UW2 M
+outbloom AW1 T B L UW2 M
+replume R EY1 P L UW2 M
+impostume IH0 M P AA1 S T UW2 M
+reillume R IY0 IH0 L UW1 M
+filoplume F IY1 L OW0 P L UW2 M
+absume AH B0 S UW1 M
