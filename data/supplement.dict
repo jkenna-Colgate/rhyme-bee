@@ -431,3 +431,16 @@ impostume IH0 M P AA1 S T UW2 M
 reillume R IY0 IH0 L UW1 M
 filoplume F IY1 L OW0 P L UW2 M
 absume AH B0 S UW1 M
+
+# --- Corrections (a reading the syllabic-consonant rule no longer reaches) ---
+
+# squirrel (#209): the rule used to append a schwa-less reading after any vowel
+# but `IY`, which reached `squirrel` (right — it rhymes with `curl`) and
+# `liberal`, `femoral`, `referral`, `deferral`, `epidural` and `postdoctoral`
+# (wrong — none of them does). `ER` is now an unabsorbing vowel, so the rule
+# reaches none of the seven. Six of those are the fix; `squirrel` is the one
+# real reading it cost, and it is asserted here instead. Both readings are
+# genuine: two syllables (`SKWIR-ul`, with `referral`) and one (`skwirl`, with
+# `curl`). ER L, with `curl`.
+squirrel S K W ER1 AH0 L
+squirrel(1) S K W ER1 L
