@@ -83,6 +83,11 @@ governs both:
 >
 > Either way, the committed guardrail set must survive intact.
 
+[ADR-0018](./0018-appending-reach-is-measured-net-of-data-errors.md) adds a third
+clause to the appending bar: the reach is measured **net** of verdicts a
+per-word supplement correction would produce anyway. Measured gross, this bar
+certifies a rule whose whole population is repair of upstream readings.
+
 An appending rule needs the second bar because its perceptual claim does not limit
 it. "No listener can hear a stress digit" is true, and it is equally true of
 `candidate` and of `cities` — yet promoting the first is right and promoting the
