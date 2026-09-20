@@ -125,8 +125,26 @@ receive.
 |---|---|---|
 | CMUdict | pin in `sources.json` | BSD-2-Clause ✅ |
 | Word prevalence norms (Brysbaert et al. 2019) | https://osf.io/5fk8d/ | **Unconfirmed** ⚠️ |
-| Common-word list | pin in `sources.json` | record on selection |
-| Names list | pin in `sources.json` | record on selection |
+| Common-word list (dwyl/english-words) | pin in `sources.json` | Unlicense (declared); provenance contested upstream ⚠️ |
+| Names list (SSA baby names) | pin in `sources.json` | CC0 1.0 ✅ |
+
+✅ CMUdict's BSD-2-Clause notice must be retained wherever its material is
+redistributed, which here means the committed ARPAbet in `supplement.dict` and
+`deferred-readings.jsonl` as well as the served index. The notice text is
+vendored in [THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md).
+
+⚠️ The dwyl list ships the Unlicense, and that is what it declares, but its own
+README says the list came from a now-dead InfoChimps dataset whose copyright it
+says still belongs to them, and an upstream issue asking whether the repackager
+had the right to relicense has no maintainer reply. The maintainer's defence
+elsewhere is that a bare word list is not copyrightable subject matter, which is
+probably right and is the real reason this is safe to use. The declaration is
+recorded together with the contest rather than in place of it.
+
+✅ The SSA names list is CC0 1.0: that is SSA's own assertion in its published
+data inventory, which data.gov harvests. Independently it is a work of the US
+federal government and so public domain in the US. The baby-names pages
+themselves state no terms, which is why the inventory is the citation.
 
 ⚠️ The prevalence-norms licence is unconfirmed — academic-norms use is not a
 commercial licence. This is load-bearing for the Answer/Bonus split and is

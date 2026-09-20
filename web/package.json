@@ -2,6 +2,7 @@
   "name": "rhyme-bee-web",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "The playable web shell over the pure rhyme engine in ../src.",
   "scripts": {

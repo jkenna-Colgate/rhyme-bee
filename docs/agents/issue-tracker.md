@@ -13,7 +13,7 @@ Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all op
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
-The repo is **private**. This changes nothing for `gh`, which is already authenticated, but it does mean issue links are not shareable outside the account.
+The repo is **public**. This changes nothing for `gh`, which is already authenticated, and issue links are shareable: an issue number cited in a commit message, an ADR or a README resolves for any reader.
 
 ## When a skill says "publish to the issue tracker"
 
