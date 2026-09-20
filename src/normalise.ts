@@ -203,16 +203,24 @@ const LIQUIDS = new Set(["L", "R"]);
  * many gain a **new rhyme partner**. For most words the whole family drops the
  * schwa together, so both Rhyme Keys hold the same members and no verdict
  * moves: `session`, `button`, `able`, `children` and `patron` all gain a
- * reading and no partner. Over the wordhood lexicon the rule rewrites 5,604
- * words and moves a verdict for 1,086 of them.
+ * reading and no partner. Over the playable lexicon the rule rewrites 5,018
+ * words and moves a verdict for 1,038 of them — `main` at `d17f082`, with
+ * #209's two limits, in `docs/measurements/syllabic-consonant.md`.
  *
- * Most of that 1,086 is repair rather than reach. Where the rule acts after an
- * ordinary consonant it is usually patching an inconsistency in the upstream
- * data — CMUdict transcribes `coarticulation` without the schwa, so the drop
- * is what lets 936 `-ation` words rhyme with it, and `orgasm`, `rectangle`,
- * `subsection` and `bifocal` are the same shape. The reach that is a genuine
- * perceptual claim is the vowel branch: 39 words, and they carry most of the
- * pair mass because each lands in a large family.
+ * Almost none of that 1,038 is this rule's own reach. 1,005 of them (96.8%)
+ * gain one of just eight partners, and seven of the eight carry a stress mark
+ * that a sibling word in the same index contradicts: `coarticulation` is
+ * marked `EY0` where `articulation` has `EY1`, and 872 of the 1,038 reach it.
+ * The drop does not produce those rhymes. It manufactures a coda, stress
+ * promotion fires on that coda (#86), and the promoted reading carries the
+ * key. ADR-0018 deduces that correcting the stress in `data/supplement.dict`
+ * would give the same verdicts without either rule, which is why reach here is
+ * measured **net** of what a per-word correction produces anyway. Net, this
+ * rule's population is 33 words, and the two limits above were tuned against
+ * the gross figure, so they stand provisional (ADR-0018).
+ *
+ * The reach that is a genuine perceptual claim is the vowel branch. Its size
+ * was last measured before #209 changed it, so no figure is stated here.
  *
  * The widest that claim now goes is `trial` rhyming with `mile` and
  * `withdrawal` with `wall` — stated here rather than hidden, so a reviewer who

@@ -16,9 +16,14 @@ interface Written {
   value: string;
 }
 
-/** A stand-in bucket that records what it was asked to write. */
-function bucket(onPut?: () => never) {
+/**
+ * A stand-in bucket that records what it was asked to write, and a stand-in
+ * limiter that records the keys it was asked about. `allow` of `false` is a
+ * caller already over the limit.
+ */
+function bucket(onPut?: () => never, allow = true) {
   const writes: Written[] = [];
+  const limitKeys: string[] = [];
   const env = {
     ASSETS: { fetch: async () => new Response("the game") },
     APPEAL_QUEUE: {
@@ -28,9 +33,16 @@ function bucket(onPut?: () => never) {
         return undefined;
       },
     },
+    APPEAL_LIMITER: {
+      limit: async ({ key }: { key: string }) => {
+        limitKeys.push(key);
+        return { success: allow };
+      },
+    },
+    FEEDBACK_LIMITER: { limit: async () => ({ success: true }) },
     ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
   } satisfies Env;
-  return { env, writes };
+  return { env, writes, limitKeys };
 }
 
 const report = {
@@ -120,6 +132,33 @@ describe("the should-have-counted endpoint", () => {
 
     expect(response.status).toBe(405);
     expect(response.headers.get("Allow")).toBe("POST");
+  });
+
+  it("refuses a caller over the limit, without reading the body or writing", async () => {
+    const { env, writes } = bucket(undefined, false);
+    const request = post(report);
+    const response = await handleAppeal(request, env);
+
+    expect(response.status).toBe(429);
+    expect(request.bodyUsed).toBe(false);
+    expect(writes).toEqual([]);
+  });
+
+  it("refuses over the limit even when the body is one the cap would have caught", async () => {
+    // The limit is checked before the body is read, so a flood costs no read:
+    // an oversize body from a limited caller is a 429, never a 413.
+    const { env } = bucket(undefined, false);
+    const response = await handleAppeal(post({ ...report, word: "a".repeat(4000) }), env);
+
+    expect(response.status).toBe(429);
+  });
+
+  it("counts the limit against the client IP, and stores it nowhere", async () => {
+    const { env, writes, limitKeys } = bucket();
+    await handleAppeal(post(report, { "CF-Connecting-IP": "203.0.113.7" }), env);
+
+    expect(limitKeys).toEqual(["203.0.113.7"]);
+    expect(JSON.stringify(writes)).not.toContain("203.0.113.7");
   });
 
   it("keeps a storage failure to itself — no bucket name, no raw error", async () => {

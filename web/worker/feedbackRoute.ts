@@ -15,10 +15,13 @@
  * nicety. So the deployed path takes the fallback `resolveTitle` already has, by
  * supplying no generated title at all.
  *
- * There is no rate limiting, deliberately (#114, Step 9). The URL is unlisted
- * and the worst case is junk issues in a private tracker; a cap here would be
- * reversing a recorded decision. Payload validation is a separate concern and is
- * applied in full.
+ * Flooding it is refused by `FEEDBACK_LIMITER`, whose budget is declared in
+ * `wrangler.jsonc` and enforced in the shared envelope. #114 Step 9 decided
+ * against a limit for the playtest, on the premises that the URL was unlisted
+ * and the tracker private; publishing the repository ended both, and this is
+ * the route with the larger blast radius of the two — a note files an issue
+ * under the maintainer's token (#213). Payload validation is a separate concern
+ * and is applied in full.
  */
 
 import {
@@ -66,9 +69,14 @@ function refusalMessage(status: number): string {
 export async function handleFeedback(request: Request, env: Env): Promise<Response> {
   const outcome = await readReport(request, {
     maxBytes: MAX_NOTE_BYTES,
+    limiter: env.FEEDBACK_LIMITER,
     method: "Send a note with POST.",
     tooLarge: "That note is too large.",
     notJson: "That note is not JSON.",
+    // The one refusal here a player reads: the panel shows `error` and keeps
+    // what they typed, so this has to say what to do rather than only what went
+    // wrong.
+    limited: "Too many notes just now. Wait a minute and send this one again.",
     // A refusal returns no note at all, so there is nothing partial to file
     // and the tracker is never called.
     validate: noteFromReport,

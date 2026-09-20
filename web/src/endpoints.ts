@@ -35,6 +35,12 @@
  * `web/src/editor/useDisagreement.ts` builds name the queue this path writes to
  * instead. The URL says `supplement-candidate` for the same reason: the record
  * is what both ends have in common, and the act is not.
+ *
+ * That rule binds the sentences an editor can actually read: the ones
+ * `useDisagreement.ts` builds, and the dev plugin's. It stops at the deployed
+ * Worker, whose refusals say "Appeal" freely and are right to. `editor.html`
+ * is not a build input, and in dev this path is `web/supplementPlugin.ts`, so
+ * the Editor's Pass never meets `web/worker/appealRoute.ts` at all.
  */
 export const APPEAL_PATH = "/api/supplement-candidate";
 

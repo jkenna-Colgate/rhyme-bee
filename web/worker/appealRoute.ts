@@ -11,10 +11,19 @@
  * runtime. What is left here is: read a capped body, hand it over, write or
  * refuse.
  *
- * There is no rate limiting, deliberately (#114, Step 9). The URL is unlisted
- * and the worst case is a bucket that can be emptied; a cap here would be
- * reversing a recorded decision. Payload validation is a separate concern and is
- * applied in full.
+ * Flooding it is refused by `APPEAL_LIMITER`, whose budget is declared in
+ * `wrangler.jsonc` and enforced in the shared envelope. #114 Step 9 decided
+ * against a limit for the playtest, on the premises that the URL was unlisted
+ * and the bucket private; publishing the repository ended both (#213). Payload
+ * validation is a separate concern and is applied in full.
+ *
+ * Every refusal sentence here is written for a player, and says "Appeal"
+ * because a player's act is one. The rule that no sentence the puzzles editor
+ * is shown may say it (argued at `web/src/endpoints.ts`) stops short of this
+ * file: the Editor's Pass posts to this same path (#163), but in dev that path
+ * is answered by `web/supplementPlugin.ts`, and `editor.html` is not a build
+ * input (`web/vite.config.ts`), so nothing an editor reads was ever written
+ * here.
  */
 
 import {
@@ -29,9 +38,11 @@ import type { Env } from "./env.ts";
 export async function handleAppeal(request: Request, env: Env): Promise<Response> {
   const outcome = await readReport(request, {
     maxBytes: MAX_REPORT_BYTES,
+    limiter: env.APPEAL_LIMITER,
     method: "Send an Appeal with POST.",
     tooLarge: "That report is too large.",
     notJson: "That report is not JSON.",
+    limited: "Too many Appeals just now. Try again in a minute.",
     // A refusal returns no candidate at all, so there is nothing partial to
     // write and the bucket is never touched.
     validate: (body) => candidateFromReport(body, new Date().toISOString()),
