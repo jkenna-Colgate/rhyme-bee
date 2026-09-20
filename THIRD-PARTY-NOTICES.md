@@ -5,9 +5,14 @@ works below. Each entry reproduces the notice that work's licence requires be
 retained, not a summary of it. Where a notice already ships beside the asset it
 covers, the entry points there rather than duplicating the text.
 
-Which upstream source feeds which build stage, and the licence status of the
-sources whose material is *not* redistributed, is recorded in
-[docs/data.md](./docs/data.md).
+Which upstream source feeds which build stage, and the licence status of every
+source, is recorded in [docs/data.md](./docs/data.md).
+
+Note that the built Rhyme Index ships **whole** to the browser, pronunciations,
+word list, names and prevalence together, because adjudication happens in the
+player's browser and never crosses the network
+([ADR-0013](./docs/adr/0013-adjudication-never-crosses-the-network.md)). So
+"redistributed" here covers the served artifact, not just the committed files.
 
 ## CMUdict (Carnegie Mellon Pronouncing Dictionary)
 
@@ -53,6 +58,22 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
+
+## Word prevalence norms (Brysbaert et al. 2019)
+
+Used for knownness, which is the proxy the Answer and Bonus Word split is drawn
+from. Values derived from the norms are compiled into the Rhyme Index and so
+reach the browser, which makes this redistribution rather than use.
+
+**No notice is reproduced here because the licence is unconfirmed.** The norms
+are published for academic use, and academic-norms use is not a commercial
+licence. This is recorded honestly rather than resolved: it is load-bearing for
+the Tier split and is tracked as issue #5. See
+[docs/data.md](./docs/data.md#sources-and-licences).
+
+The bulk data is not committed to this repository, and
+[ADR-0013](./docs/adr/0013-adjudication-never-crosses-the-network.md) keeps it
+out of any public repository or bucket.
 
 ## Cinzel (font)
 

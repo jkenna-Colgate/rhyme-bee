@@ -43,11 +43,15 @@ you start, because a rhyme is only a rhyme in an accent. Committing to one
 accent means some verdicts are wrong under yours. That is a stated cost rather
 than an oversight ([ADR-0002](./docs/adr/0002-general-american-is-the-only-accent.md)).
 
-A word that rhymes is either an **Answer**, which scores and counts toward your
-Rank, or a **Bonus Word**, which is a real word almost nobody knows
-(`objurgate`, `tergiversate`) and is celebrated without counting. Rank runs from
-Beginner to Shakespeare as a percentage of the Puzzle's maximum, so it means the
-same thing on a day with thirty Answers and a day with three hundred.
+Every rhyming word that is a word at all holds one of two Tiers. An **Answer**
+scores and counts toward your Rank. A **Bonus Word** is a real word almost
+nobody knows (`objurgate`, `tergiversate`), and is celebrated as a find without
+counting. Names are neither: `Kate` obviously rhymes with `ate`, and is refused
+with a reason of its own, because the space of names has no defensible edge.
+
+Rank runs from Beginner to Shakespeare as a percentage of the Puzzle's maximum
+Score, so it means the same thing on a day with thirty Answers and a day with a
+hundred.
 
 ## How this was built
 
@@ -104,11 +108,13 @@ afternoon on it.
 
 ## Licence and data
 
-The code and the hand-authored data files are MIT licensed. See
-[LICENSE](./LICENSE).
+MIT, see [LICENSE](./LICENSE). That covers the code and the hand-authored data
+files committed alongside it: the pronunciation supplement, the demotion list,
+the Tier override file, the schedule, and the declines and deferred-readings
+records.
 
-The upstream data the build reads is pinned rather than committed, and carries
-its own terms. [docs/data.md](./docs/data.md) records the provenance and licence
+It does not cover the upstream data the build reads, which is pinned rather than
+committed and carries its own terms. [docs/data.md](./docs/data.md) records the provenance and licence
 of each source; [THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md) vendors the
 notices that have to travel with redistributed material, CMUdict's above all.
 

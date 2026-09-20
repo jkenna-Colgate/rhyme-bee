@@ -1,17 +1,20 @@
 # Tier override layer (ADR-0015). Machine-written by the Editor's Pass; never
 # hand-edited.
 #
-# The `measured` column is BLANK ON EVERY ROW BELOW, and for 111 of them that is
-# not what an empty cell ordinarily means. It was emptied deliberately (#214):
-# the values it held were raw word prevalence from the Brysbaert et al. norms,
-# which ADR-0013 says go into no public repository, and this file was the one
-# place they had leaked into a committed artifact.
+# The `measured` column is BLANK ON EVERY ROW BELOW. 111 of the 122 rows held a
+# value and were emptied deliberately (#214); the other 11 were already empty.
+# The values were raw word prevalence from the Brysbaert et al. norms, which
+# ADR-0013 says go into no public repository. This file was the only committed
+# artifact carrying them as data. A handful of individual figures are still
+# quoted in prose, in ADR-0015 and in `tierOverride.ts`, to explain the ranking
+# inversion the layer exists for; those are illustrations, not the dataset.
 #
 # Nothing adjudicative is lost. `overriddenValue` consults `measured` only when
-# a row's verdict is `none`, which is true of exactly one row here, and the
-# build has the real dataset and recomputes that value anyway. What is lost is
-# the cached figure the browser-side editor UI showed, and, for the rows above
-# the line, the record of whether a word had a prevalence row at all.
+# a row's verdict is `none`, true of exactly one row here, and
+# `applyTierOverrides` never reads the column at build time at all, so that
+# row's value comes from the real dataset regardless. What is lost is the cached
+# figure the browser-side editor UI showed, and, for the 111 rows that were
+# emptied, the record of whether the word had a prevalence row at all.
 #
 # For rows appended from here on, an empty cell means what ADR-0015 says it
 # means: the word had no prevalence row.

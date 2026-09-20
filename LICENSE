@@ -19,15 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Scope: the licence above covers the code in this repository and the
-hand-authored data files committed alongside it (the pronunciation supplement,
-the demotion list, the Tier override file, the schedule, and the declines and
-deferred-readings records).
-
-It does not cover the third-party data the build reads, which is pinned rather
-than committed and carries its own terms. Those terms, and the notices some of
-them require be retained, are in THIRD-PARTY-NOTICES.md. Provenance for each
-source is recorded in docs/data.md.
