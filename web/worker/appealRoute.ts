@@ -16,6 +16,14 @@
  * against a limit for the playtest, on the premises that the URL was unlisted
  * and the bucket private; publishing the repository ended both (#213). Payload
  * validation is a separate concern and is applied in full.
+ *
+ * Every refusal sentence here is written for a player, and says "Appeal"
+ * because a player's act is one. The rule that no sentence the puzzles editor
+ * is shown may say it (argued at `web/src/endpoints.ts`) stops short of this
+ * file: the Editor's Pass posts to this same path (#163), but in dev that path
+ * is answered by `web/supplementPlugin.ts`, and `editor.html` is not a build
+ * input (`web/vite.config.ts`), so nothing an editor reads was ever written
+ * here.
  */
 
 import {
