@@ -76,6 +76,12 @@
   // object, a junk note files an issue under the maintainer's token, and one
   // budget would let either abuse starve the other.
   //
+  // `namespace_id` is any positive integer unique within the Cloudflare account,
+  // and is what the counters are actually filed under — two bindings sharing one
+  // would share one budget, which is the thing the paragraph above rules out. It
+  // is not a name and is not shown anywhere; these two are #213's number, so a
+  // later pair can be read off its own ticket and not collide by accident.
+  //
   // `period` accepts only 10 or 60, and counting is per Cloudflare location, so
   // the real global ceiling is the number below times however many locations a
   // caller reaches. The numbers are therefore chosen to sit well above one
@@ -83,6 +89,12 @@
   // Appeal is one tap on one rejection and the button then reads "sent", so 20
   // a minute is far more than a Session can produce; a note is typed prose, and
   // five a minute is already faster than anyone writes.
+  //
+  // Only players are counted here. The Editor's Pass posts to the Appeal path
+  // too, one request per disagreement (#163), and does so in far heavier bursts
+  // than any Session — but it runs against the Vite dev server, where that path
+  // is `supplementPlugin` and this binding does not exist. `editor.html` is not
+  // a build input, so the Editor's Pass never reaches this Worker at all.
   //
   // Requests over the budget are refused in `worker/http.ts`, before the body
   // is read. Serving the game is untouched either way — assets are matched

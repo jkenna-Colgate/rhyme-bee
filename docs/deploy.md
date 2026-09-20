@@ -69,11 +69,13 @@ Worker's settings page showing nothing beforehand is expected, not a fault.
 - **Nothing is bound in the dashboard.** A binding that lives only there is
   clobbered by the next deploy from a config that does not declare it, so
   `web/wrangler.jsonc` is the only home for bindings. Add them there.
-- **Both write endpoints are rate limited**, one budget each, keyed on client IP
-  and declared as bindings in `web/wrangler.jsonc`. #114 Step 9 decided against a
-  limit while the URL was unlisted and the tracker private; publishing the
-  repository ended both premises (#213). Counting is per Cloudflare location, so
-  the numbers are set to make scripted abuse pointless rather than to meter
+- **No IP address is logged or stored**, although both write endpoints are now
+  rate limited by one. `CF-Connecting-IP` is read in `worker/http.ts`, handed to
+  the limiter and dropped there. #114 Step 9 decided against any limit while the
+  URL was unlisted and the tracker private; publishing the repository ended both
+  premises, so the budgets exist now (#213) — one per endpoint, declared as
+  bindings in `web/wrangler.jsonc` like everything else. Counting is per
+  Cloudflare location, so they make scripted abuse pointless rather than meter
   anything exactly.
 - **No secret is in the repository.** `GITHUB_ISSUE_TOKEN` is set on the Worker
   and referenced by name. If a credential ever lands in git history, rotate it
