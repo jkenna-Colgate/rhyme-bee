@@ -22,6 +22,8 @@ function envServing(asset: string, present?: (pathname: string) => boolean) {
       },
     },
     APPEAL_QUEUE: { put: async () => undefined },
+    APPEAL_LIMITER: { limit: async () => ({ success: true }) },
+    FEEDBACK_LIMITER: { limit: async () => ({ success: true }) },
     ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
     GITHUB_ISSUE_TOKEN: "github_pat_0xdeadbeef",
   } satisfies Env;

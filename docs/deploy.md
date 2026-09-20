@@ -69,8 +69,12 @@ Worker's settings page showing nothing beforehand is expected, not a fault.
 - **Nothing is bound in the dashboard.** A binding that lives only there is
   clobbered by the next deploy from a config that does not declare it, so
   `web/wrangler.jsonc` is the only home for bindings. Add them there.
-- **No rate limiting.** Decided for the playtest, not overlooked; see #114 Step 9
-  and the note at the foot of `web/wrangler.jsonc`.
+- **Both write endpoints are rate limited**, one budget each, keyed on client IP
+  and declared as bindings in `web/wrangler.jsonc`. #114 Step 9 decided against a
+  limit while the URL was unlisted and the tracker private; publishing the
+  repository ended both premises (#213). Counting is per Cloudflare location, so
+  the numbers are set to make scripted abuse pointless rather than to meter
+  anything exactly.
 - **No secret is in the repository.** `GITHUB_ISSUE_TOKEN` is set on the Worker
   and referenced by name. If a credential ever lands in git history, rotate it
   rather than rewriting history.

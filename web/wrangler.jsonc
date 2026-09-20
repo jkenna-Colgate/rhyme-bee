@@ -62,13 +62,41 @@
   // referenced by name only (#114, Step 7) — this file is committed.
   "vars": {
     "ISSUE_REPO": "jkenna-Colgate/rhyme-bee"
-  }
+  },
 
-  // There is deliberately **no rate-limiting binding**. #114 Step 9 decided
-  // against one for the playtest: the URL is unlisted, the worst case is junk
-  // issues in a private tracker and a bucket that can be emptied, and both
-  // endpoints already degrade to "reporting broken, game still playable". That
-  // is a decision, not an omission — revisit it if the URL leaks or the
-  // playtest widens beyond friends, and add it here rather than in the
-  // dashboard when you do.
+  // The write endpoints' budgets (#213). #114 Step 9 decided against a limit
+  // for the playtest and said to revisit it if the URL leaked; publishing this
+  // repository is that leak, and it fired on both premises at once — the
+  // hostname is committed here and in the Vite config, and the tracker a note
+  // is filed on became public at the same moment. So this is the revisit, and
+  // the binding is here rather than in the dashboard for the reason at the top
+  // of this file.
+  //
+  // Two limiters rather than one shared budget: a junk Appeal costs an R2
+  // object, a junk note files an issue under the maintainer's token, and one
+  // budget would let either abuse starve the other.
+  //
+  // `period` accepts only 10 or 60, and counting is per Cloudflare location, so
+  // the real global ceiling is the number below times however many locations a
+  // caller reaches. The numbers are therefore chosen to sit well above one
+  // player and well below anything worth scripting, not to meter exactly: an
+  // Appeal is one tap on one rejection and the button then reads "sent", so 20
+  // a minute is far more than a Session can produce; a note is typed prose, and
+  // five a minute is already faster than anyone writes.
+  //
+  // Requests over the budget are refused in `worker/http.ts`, before the body
+  // is read. Serving the game is untouched either way — assets are matched
+  // before this Worker runs at all.
+  "ratelimits": [
+    {
+      "name": "APPEAL_LIMITER",
+      "namespace_id": "2131",
+      "simple": { "limit": 20, "period": 60 }
+    },
+    {
+      "name": "FEEDBACK_LIMITER",
+      "namespace_id": "2132",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ]
 }

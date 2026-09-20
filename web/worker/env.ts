@@ -26,11 +26,35 @@ export interface AppealBucket {
   ): Promise<unknown>;
 }
 
+/**
+ * A rate limiter, as the platform's simple rate-limiting binding presents one:
+ * ask whether a key is still under its budget, and get back whether it is. The
+ * limit and the window are declared in `wrangler.jsonc`, not here, so the
+ * Worker never restates them.
+ *
+ * Deliberately permissive and eventually consistent, and counted per Cloudflare
+ * location rather than globally — so the real ceiling is the configured number
+ * times however many locations an attacker reaches. That is a fact about the
+ * platform, and the reason the numbers in `wrangler.jsonc` are chosen to make
+ * abuse pointless rather than to meter anything exactly.
+ */
+export interface RateLimiter {
+  limit(options: { key: string }): Promise<{ success: boolean }>;
+}
+
 export interface Env {
   /** `assets.binding` in `wrangler.jsonc`. */
   ASSETS: AssetsBinding;
   /** `APPEAL_QUEUE` → the `rhyme-bee-flags` bucket (#114). */
   APPEAL_QUEUE: AppealBucket;
+  /**
+   * The two write endpoints' budgets (#213). Separate bindings with separate
+   * namespaces on purpose: a junk Appeal costs an R2 object, while a junk note
+   * files an issue on a public repository using the maintainer's token, and one
+   * shared budget would let either abuse starve the other.
+   */
+  APPEAL_LIMITER: RateLimiter;
+  FEEDBACK_LIMITER: RateLimiter;
   /**
    * `owner/repo` of the tracker a general note is filed on — a plaintext `var`
    * in `wrangler.jsonc`, because which tracker this game reports to is not a

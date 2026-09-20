@@ -24,10 +24,12 @@ interface Called {
  * An env with a stubbed `fetch` standing in for GitHub, recording what it was
  * asked. `reply` is what GitHub says back; a function is thrown instead, which
  * is how an unreachable tracker shows up. `token` of `null` means the secret was
- * never set at all, which is a different state from its being empty.
+ * never set at all, which is a different state from its being empty. `allow` of
+ * `false` is a caller already over the limit.
  */
-function tracker(reply: Response | (() => never), token: string | null = TOKEN) {
+function tracker(reply: Response | (() => never), token: string | null = TOKEN, allow = true) {
   const calls: Called[] = [];
+  const limitKeys: string[] = [];
   vi.stubGlobal("fetch", async (url: string, init: RequestInit) => {
     calls.push({
       url,
@@ -40,10 +42,17 @@ function tracker(reply: Response | (() => never), token: string | null = TOKEN) 
   const env = {
     ASSETS: { fetch: async () => new Response("the game") },
     APPEAL_QUEUE: { put: async () => undefined },
+    APPEAL_LIMITER: { limit: async () => ({ success: true }) },
+    FEEDBACK_LIMITER: {
+      limit: async ({ key }: { key: string }) => {
+        limitKeys.push(key);
+        return { success: allow };
+      },
+    },
     ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
     GITHUB_ISSUE_TOKEN: token ?? undefined,
   } satisfies Env;
-  return { env, calls };
+  return { env, calls, limitKeys };
 }
 
 const filed = () =>
@@ -157,6 +166,43 @@ describe("the general-note endpoint", () => {
 
     expect(response.status).toBe(405);
     expect(response.headers.get("Allow")).toBe("POST");
+  });
+
+  it("refuses a caller over the limit, without reading the body or filing", async () => {
+    const { env, calls } = tracker(filed(), TOKEN, false);
+    const request = post({ text: "a note", context: CONTEXT });
+    const response = await handleFeedback(request, env);
+
+    expect(response.status).toBe(429);
+    expect(request.bodyUsed).toBe(false);
+    expect(calls).toEqual([]);
+  });
+
+  it("refuses over the limit even when the body is one the cap would have caught", async () => {
+    // The limit is checked before the body is read, so a flood costs no read:
+    // an oversize body from a limited caller is a 429, never a 413.
+    const { env } = tracker(filed(), TOKEN, false);
+    const response = await handleFeedback(post({ text: "a".repeat(20_000), context: CONTEXT }), env);
+
+    expect(response.status).toBe(429);
+  });
+
+  it("refuses over the limit before noticing the credential is unset", async () => {
+    // Both are refusals, but the limit is the cheaper one and comes first — a
+    // flood must not turn into a per-request check of the environment.
+    const { env } = tracker(filed(), null, false);
+    expect((await handleFeedback(post({ text: "a note", context: CONTEXT }), env)).status).toBe(429);
+  });
+
+  it("counts the limit against the client IP, and puts it in no issue", async () => {
+    const { env, calls, limitKeys } = tracker(filed());
+    await handleFeedback(
+      post({ text: "a note", context: CONTEXT }, { "CF-Connecting-IP": "203.0.113.7" }),
+      env,
+    );
+
+    expect(limitKeys).toEqual(["203.0.113.7"]);
+    expect(JSON.stringify(calls[0]!.body)).not.toContain("203.0.113.7");
   });
 
   it("names an unset credential rather than calling the tracker without one", async () => {
