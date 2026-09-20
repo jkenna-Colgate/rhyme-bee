@@ -7,6 +7,13 @@
 .agents/
 .claude/
 
+# Scratch. Drafts and working notes a skill writes on the way to a real
+# artifact: a ticket body before it is filed, a spec before it is published.
+# Never an input to anything, so nothing is lost by ignoring it. Listed
+# because the directory is otherwise untracked-but-unignored, which is one
+# `git add -A` away from committing a draft to a public repository.
+.scratch/
+
 # OS
 .DS_Store
 Thumbs.db
