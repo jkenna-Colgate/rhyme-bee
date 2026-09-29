@@ -120,3 +120,11 @@ _Avoid_: play-ahead, preflight, daily review
 **Corrected Day**:
 A Daily Puzzle as the next rebuild will produce it — every standing Tier verdict and demotion applied to the readout, with the figures re-measured. The Editor's Pass writes corrections to file but does not rebuild the index, so the screen shows arithmetic the browser did, standing in for the artifact that has not caught up. A Corrected Day whose figures differ from the built readout's has *moved*, which withdraws the band verdicts decided against the old figures.
 _Avoid_: Shown day (that is the intermediate value in `demote.ts`), preview, pending day; **pronunciation correction** is a different thing and is always qualified.
+
+**Playability Bar**:
+The minimum standard the game must hold with nobody attending it, stated as outcomes a player can see rather than as properties of the Rhyme Index. It has four parts. **Trust**: a Submission a General American speaker hears as an obvious rhyme is never rejected. **Reachability**: a typical player reaches Laureate on most days. **Continuity**: every date has a Daily Puzzle. **No False Accepts**: a word that does not rhyme, or is not a word, is never scored as an Answer. Stating the bar as outcomes is deliberate: which lever holds a part (a Tier verdict, the size band, the Rank ladder, a pronunciation correction) is a separate decision from what the part demands.
+_Avoid_: Quality bar, threshold, SLA; Difficulty for Reachability (Difficulty is one measured property of a Puzzle, Reachability is what a player experiences of it)
+
+**Synthetic Player**:
+An LLM prompted to play a Puzzle as an ordinary player would: given the Seed Word, it produces the rhymes that come to mind, and each is submitted to the engine as a Submission. It is a measuring instrument, not a player. Genuine rhymes it has rejected estimate Trust failures, the share of maximum Score its Answers reach estimates Reachability, and the Answers it never produces point at the gap between Retrieval and recognition. It stands in for human play only as far as it has been calibrated against real Sessions.
+_Avoid_: Bot, AI player, simulated user
