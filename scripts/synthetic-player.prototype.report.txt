@@ -1,0 +1,150 @@
+
+## smallpox /AA K S/  74 Answers, max 511, Difficulty 0.135 (Fri)
+  haiku#0: 21 words -> 18% Silver Tongue answer 19, not-a-known-word 2
+  haiku#1: 20 words -> 18% Silver Tongue answer 19, not-a-known-word 1
+  haiku#2: 21 words -> 17% Silver Tongue answer 19, not-a-known-word 2
+  sonnet#0: 43 words -> 40% Bard          not-a-known-word 7, answer 35, already-submitted 1
+  sonnet#1: 63 words -> 49% Bard          answer 41, not-a-known-word 16, already-submitted 1, does-not-rhyme 5
+  REJECTED not-a-known-word: hocks (on word list, no reading) x3; smocks (on word list, no reading) x2; crocks (on word list, no reading) x2; chickenpox (on word list, no reading) x2; cowpox (on word list, no reading) x2; detox (not on word list) x2; lockbox (on word list, no reading) x2; hatbox (on word list, no reading) x1; sunblocks (not on word list) x1; gawks (on word list, no reading) x1; phlox (on word list, no reading) x1; snowblocks (not on word list) x1; hemlocks (on word list, no reading) x1; haddocks (on word list, no reading) x1; paddocks (on word list, no reading) x1; bedrocks (on word list, no reading) x1; restocks (on word list, no reading) x1; unlocks (on word list, no reading) x1; gridlocks (not on word list) x1; shamrocks (on word list, no reading) x1
+  REJECTED does-not-rhyme: hammocks (HA-muh-ks) x1; bullocks (BUU-luh-ks) x1; livestock (LEYE-vstah-k) x1; laughingstock (LA-fih-ngstah-k) x1; oxen (AH-ksuh-n) x1
+  REAL APPEALS (14), synthetic produced 5: chocks, *crocks*, *unlocks*, unblocks, *hocks*, undocks, *smocks*, caulks, *restocks*, lummox, auks, backtalks, beanstalks, kickbox
+  NEVER PRODUCED (25/74, most known first): aftershocks 2.44, unorthodox 2.32, sidewalks 2.26, boardwalks 2.23, icebox 2.18, tomahawks 1.85, faux 1.81, nighthawks 1.70, breadbox 1.68, cornstalks 1.61, bollocks 1.53, goldilocks 1.42, xerox 1.40, tinderbox 1.30, balks 1.24, docs 1.15, boondocks 0.97, flummox 0.91, flintlocks 0.89, saltbox 0.77
+
+## wall /AA L/  73 Answers, max 518, Difficulty 0.1409 (Fri)
+  haiku#0: 26 words -> 23% Silver Tongue answer 24, not-a-known-word 1, bonus 1
+  haiku#1: 29 words -> 17% Silver Tongue answer 19, does-not-rhyme 9, bonus 1
+  haiku#2: 29 words -> 23% Silver Tongue answer 24, bonus 3, not-a-known-word 2
+  sonnet#0: 52 words -> 50% Bard          answer 40, bonus 6, does-not-rhyme 1, not-a-known-word 5
+  sonnet#1: 64 words -> 59% Wordsmith     answer 46, bonus 6, not-a-known-word 8, malformed 1, is-the-seed-word 1, does-not-rhyme 1, already-submitted 1
+  REJECTED not-a-known-word: awl (on word list, no reading) x2; trawl (on word list, no reading) x2; seawall (on word list, no reading) x2; curveball (on word list, no reading) x2; hairball (on word list, no reading) x2; skyball (not on word list) x1; yall (not on word list) x1; lowball (on word list, no reading) x1; highball (on word list, no reading) x1; wallfall (not on word list) x1; beachball (not on word list) x1
+  REJECTED does-not-rhyme: claw (KLAH) x1; jaw (JAH) x1; law (LAH) x1; paw (PAH) x1; saw (SAH) x1; raw (RAH) x1; thaw (THAH) x1; flaw (FLAH) x1; gnaw (NAH) x1; wallflower (WAH-lflow-ur) x1; shall (SHA-l) x1
+  REJECTED malformed: free-fall x1
+  BONUS: thrall, befall, scrawl, windfall, landfall, paul, caul, snowfall, caterwaul
+  REAL APPEALS (10), synthetic produced 2: pawl, kickball, *awl*, albuterol, sterol, *trawl*, googol, isopropanol, gumball, wonderwall
+  NEVER PRODUCED (23/73, most known first): doll 2.58, volleyball 2.58, alcohol 2.44, cholesterol 2.43, overhaul 2.31, protocol 2.26, menthol 2.06, cannonball 2.05, ethanol 2.05, reinstall 1.94, hardball 1.84, methanol 1.83, coverall 1.60, cortisol 1.08, preinstall 0.99, banal 0.98, glycol 0.96, catchall 0.94, atoll 0.85, disenthrall 0.60
+
+## trick /IH K/  55 Answers, max 370, Difficulty 0.2135 (Sun)
+  haiku#0: 20 words -> 23% Silver Tongue answer 19, proper-noun 1
+  haiku#1: 18 words -> 21% Silver Tongue answer 17, not-a-known-word 1
+  haiku#2: 22 words -> 31% Troubadour    answer 21, does-not-rhyme 1
+  sonnet#0: 68 words -> 49% Bard          answer 32, is-the-seed-word 1, already-submitted 4, not-a-known-word 5, bonus 1, does-not-rhyme 25
+  sonnet#1: 60 words -> 44% Bard          answer 27, already-submitted 22, is-the-seed-word 1, not-a-known-word 3, bonus 1, proper-noun 1, does-not-rhyme 5
+  REJECTED proper-noun: mic x1; bric x1
+  REJECTED not-a-known-word: snick (on word list, no reading) x3; lic (not on word list) x1; heartsick (on word list, no reading) x1; lovesick (on word list, no reading) x1; airsick (on word list, no reading) x1; cick (not on word list) x1
+  REJECTED does-not-rhyme: drumstick (DRUH-mstih-k) x3; chic (SHEE-k) x2; clique (KLEE-k) x1; critic (KRIH-tih-k) x1; attic (A-tih-k) x1; static (STA-tih-k) x1; magic (MA-jih-k) x2; tragic (TRA-jih-k) x1; comic (KAH-mih-k) x1; panic (PA-nih-k) x1; music (MYOO-zih-k) x1; cosmic (KAH-zmih-k) x1; public (PUH-blih-k) x1; plastic (PLA-stih-k) x1; elastic (ih-LA-stih-k) x1; toxic (TAH-ksih-k) x1; antic (A-ntih-k) x1; frantic (FRA-ntih-k) x1; gothic (GAH-thih-k) x1; mimic (MIH-mih-k) x1; cynic (SIH-nih-k) x1; ethnic (EH-thnih-k) x1; rustic (RUH-stih-k) x1; scenic (SEE-nih-k) x1; basic (BAY-sih-k) x1; creek (KREE-k) x1; seek (SEE-k) x1
+  BONUS: mick
+  REAL APPEALS (10), synthetic produced 2: *magic*, atlantic, chronic, heretic, derrick, cleric, tantric, gimmick, limerick, *lovesick*
+  NEVER PRODUCED (20/55, most known first): sidekick 2.26, lunatic 2.25, dipstick 2.09, slapstick 1.98, nonstick 1.90, handpick 1.71, biopic 1.35, unclick 1.21, nightstick 1.21, knick 1.21, turmeric 1.01, unpick 0.98, firebrick 0.55, shtick 0.53, impolitic 0.38, outkick 0.32, peacenik 0.18, spic 0.15, realpolitik 0.06, bailiwick 0.01
+
+## booze /UW Z/  101 Answers, max 623, Difficulty 0.0433 (Tue)
+  haiku#0: 34 words -> 26% Troubadour    answer 33, not-a-known-word 1
+  haiku#1: 37 words -> 26% Troubadour    answer 33, does-not-rhyme 4
+  haiku#2: 45 words -> 31% Troubadour    answer 40, not-a-known-word 4, does-not-rhyme 1
+  sonnet#0: 107 words -> 57% Wordsmith     answer 63, bonus 1, not-a-known-word 23, already-submitted 5, is-the-seed-word 1, does-not-rhyme 13, malformed 1
+  sonnet#1: 95 words -> 54% Wordsmith     answer 61, already-submitted 7, not-a-known-word 10, does-not-rhyme 16, bonus 1
+  REJECTED not-a-known-word: flues (on word list, no reading) x3; bamboos (on word list, no reading) x3; shoos (on word list, no reading) x2; slews (on word list, no reading) x1; yews (on word list, no reading) x1; fews (not on word list) x1; shrews (on word list, no reading) x2; grues (on word list, no reading) x1; igloos (on word list, no reading) x2; tutus (on word list, no reading) x1; voodoos (on word list, no reading) x1; subdues (on word list, no reading) x2; askews (not on word list) x2; bijoux (on word list, no reading) x1; ragouts (on word list, no reading) x1; poos (not on word list) x1; toos (not on word list) x1; strews (on word list, no reading) x1; trues (on word list, no reading) x1; imbues (on word list, no reading) x2; tofus (on word list, no reading) x1; gnus (on word list, no reading) x1; emus (on word list, no reading) x1; kazoos (on word list, no reading) x2; bamboozles (on word list, no reading) x1; mews (on word list, no reading) x1; construes (on word list, no reading) x1
+  REJECTED does-not-rhyme: close (KLOH-s) x1; propose (pruh-POH-z) x1; suppose (suh-POH-z) x1; those (THOH-z) x1; coos (KOO-s) x3; bayous (BEYE-oo-z) x1; menus (MEH-nyoo-z) x2; debuts (DAY-byoo-z) x1; issues (IH-shoo-z) x2; venues (VEH-noo-z) x2; costumes (kah-STOO-mz) x1; nephews (NEH-fyoo-z) x1; curfews (KUR-fyoo-z) x1; yous (YOO-s) x1; haiku (HEYE-koo) x1; tycoons (teye-KOO-nz) x2; cartoons (kah-RTOO-nz) x1; grooves (GROO-vz) x1; moves (MOO-vz) x1; proves (PROO-vz) x1; removes (ree-MOO-vz) x1; approves (uh-PROO-vz) x1; improves (ih-MPROO-vz) x1; continues (kuh-NTIH-nyoo-z) x1; argues (AH-rgyoo-z) x1; values (VA-lyoo-z) x1; virtues (VUR-choo-z) x1
+  REJECTED malformed: who's x1
+  BONUS: jews
+  REAL APPEALS (7), synthetic produced 6: *subdues*, *coos*, recues, *flues*, *gnus*, *imbues*, *trues*
+  NEVER PRODUCED (27/101, most known first): previews 2.58, flus 2.44, breakthroughs 2.43, gurus 2.27, horseshoes 2.23, mildews 2.12, yahoos 2.09, residues 2.07, reuse 2.06, hindus 2.04, transfuse 1.86, snowshoes 1.80, overuse 1.77, coups 1.72, misconstrues 1.64, cockatoos 1.63, schmooze 1.40, eschews 1.15, chartreuse 0.96, hews 0.85
+
+## landlord /AO R D/  89 Answers, max 713, Difficulty 0.0589 (Wed)
+  haiku#0: 22 words -> 17% Silver Tongue answer 22
+  haiku#1: 40 words -> 30% Troubadour    answer 33, does-not-rhyme 5, not-a-known-word 2
+  haiku#2: 30 words -> 24% Silver Tongue answer 28, not-a-known-word 1, does-not-rhyme 1
+  sonnet#0: 67 words -> 53% Wordsmith     answer 54, not-a-known-word 5, is-the-seed-word 1, already-submitted 5, does-not-rhyme 2
+  sonnet#1: 71 words -> 53% Wordsmith     answer 53, not-a-known-word 10, already-submitted 3, does-not-rhyme 5
+  REJECTED does-not-rhyme: word (WUR-d) x1; toured (TUU-rd) x1; starboard (STAH-rbur-d) x1; lured (LUU-rd) x1; moored (MUU-rd) x1; cupboard (KUH-bur-d) x2; tutored (TOO-tur-d) x1; centipede (SEH-ntih-pee-d) x1; thanksgiving (tha-NGKSGIH-vih-ng) x1; rewards (rih-WAW-rdz) x1; towed (TOH-d) x1; sawed (SAH-d) x1
+  REJECTED not-a-known-word: snored (on word list, no reading) x4; cored (on word list, no reading) x1; encored (on word list, no reading) x2; whiteboard (not on word list) x2; sideboard (on word list, no reading) x2; mored (not on word list) x2; snowboard (not on word list) x1; storeboard (not on word list) x1; lored (on word list, no reading) x1; unbored (on word list, no reading) x1; unscored (on word list, no reading) x1
+  REAL APPEALS (7), synthetic produced 4: *snored*, *cored*, *moored*, unmoored, *toured*, unrestored, seaward
+  NEVER PRODUCED (30/89, most known first): washboard 2.43, unexplored 2.43, underscored 2.33, storyboard 2.27, checkerboard 2.18, backboard 1.83, motherboard 1.79, plasterboard 1.65, baseboard 1.51, prerecord 1.41, underinsured 1.30, pegboard 1.28, smorgasbord 1.26, fingerboard 1.21, paperboard 1.19, shored 1.12, shipboard 1.11, fiberboard 1.11, harpsichord 1.07, wallboard 1.06
+
+## win /IH N/  48 Answers, max 274, Difficulty 0.0415 (Tue)
+  haiku#0: 24 words -> 26% Troubadour    answer 18, does-not-rhyme 6
+  haiku#1: 18 words -> 24% Silver Tongue answer 18
+  haiku#2: 19 words -> 25% Troubadour    answer 19
+  sonnet#0: 35 words -> 36% Troubadour    answer 24, does-not-rhyme 6, bonus 2, already-submitted 3
+  sonnet#1: 68 words -> 35% Troubadour    answer 23, bonus 3, does-not-rhyme 34, not-a-known-word 6, already-submitted 2
+  REJECTED does-not-rhyme: napkin (NA-pkih-n) x2; penguin (PEH-nggwuh-n) x2; muffin (MUH-fuh-n) x3; pumpkin (PUH-mpkih-n) x2; dolphin (DAH-lfuh-n) x2; cabin (KA-buh-n) x3; origin (AW-ruh-juh-n) x2; margarine (MAH-rjur-uh-n) x1; robin (RAH-buh-n) x2; resin (REH-zuh-n) x2; basin (BAY-suh-n) x1; raisin (RAY-zih-n) x1; coffin (KAH-fih-n) x1; bulletin (BUU-lih-tuh-n) x1; discipline (DIH-suh-pluh-n) x1; harmonica (hah-RMAH-nih-kuh) x1; margin (MAH-rjuh-n) x1; virgin (VUR-jih-n) x1; javelin (JA-vuh-luh-n) x1; mandarin (MA-ndur-uh-n) x1; cousin (KUH-zuh-n) x1; dozen (DUH-zuh-n) x1; oregon (AW-ruh-guh-n) x1; deadpan (DEH-dpa-n) x1; gremlin (GREH-mluh-n) x1; goblin (GAH-blih-n) x1; mannequin (MA-nuh-kih-n) x1; satin (SA-tuh-n) x1; latin (LA-tuh-n) x1; muslin (MUH-zluh-n) x1; paladin (PA-luh-dih-n) x1; sequin (SEE-kwuh-n) x1; sardine (sah-RDEE-n) x1; vermin (VUR-mih-n) x1; urchin (UR-chuh-n) x1
+  REJECTED not-a-known-word: biggin (on word list, no reading) x1; sken (on word list, no reading) x1; hoosegow (on word list, no reading) x1; tannin (on word list, no reading) x1; whin (on word list, no reading) x1; rin (on word list, no reading) x1
+  BONUS: herein, linn, lin
+  REAL APPEALS (7), synthetic produced 3: *basin*, lanolin, bobbin, sculpin, *muffin*, statin, *latin*
+  NEVER PRODUCED (22/48, most known first): been 2.58, foreskin 2.32, pigskin 2.26, when 2.17, login 2.16, snakeskin 1.92, sheepskin 1.90, tailspin 1.85, moleskin 1.72, kingpin 1.65, unfeminine 1.58, mandolin 1.58, deerskin 1.57, bearskin 1.45, unpin 1.45, underpin 1.35, clothespin 1.06, linchpin 0.99, yin 0.65, ursine 0.39
+
+## mug /AH G/  25 Answers, max 115, Difficulty 0 (Mon)
+  haiku#0: 17 words -> 50% Bard          answer 16, not-a-known-word 1
+  haiku#1: 17 words -> 50% Bard          answer 16, not-a-known-word 1
+  haiku#2: 17 words -> 55% Wordsmith     answer 17
+  sonnet#0: 32 words -> 72% Laureate      answer 20, not-a-known-word 3, already-submitted 8, is-the-seed-word 1
+  sonnet#1: 24 words -> 78% Laureate      answer 21, not-a-known-word 2, does-not-rhyme 1
+  REJECTED not-a-known-word: glug (on word list, no reading) x4; doormug (not on word list) x1; frug (on word list, no reading) x1; skug (not on word list) x1
+  REJECTED does-not-rhyme: bedbug (BEH-dbuh-g) x1
+  REAL APPEALS (1), synthetic produced 0: shutterbug
+  NEVER PRODUCED (4/25, most known first): debug 1.97, jitterbug 1.83, ugh 1.26, antidrug 1.13
+
+## klutz /AH T S/  25 Answers, max 149, Difficulty 0.047 (Tue)
+  haiku#0: 19 words -> 54% Wordsmith     answer 16, does-not-rhyme 1, not-a-known-word 2
+  haiku#1: 32 words -> 43% Bard          answer 14, does-not-rhyme 15, not-a-known-word 3
+  haiku#2: 20 words -> 40% Troubadour    answer 13, does-not-rhyme 5, not-a-known-word 2
+  sonnet#0: 30 words -> 84% Laureate      answer 21, not-a-known-word 7, does-not-rhyme 2
+  sonnet#1: 29 words -> 90% Laureate      answer 22, not-a-known-word 5, does-not-rhyme 2
+  REJECTED does-not-rhyme: puts (PUU-ts) x3; outs (OW-ts) x1; dusts (DUH-sts) x1; gusts (GUH-sts) x1; busts (BUH-sts) x1; rusts (RUH-sts) x1; crusts (KRUH-sts) x1; hunts (HUH-nts) x1; stunts (STUH-nts) x1; blunts (BLUH-nts) x1; grunts (GRUH-nts) x1; thrusts (THRUH-sts) x1; trusts (TRUH-sts) x1; punts (PUH-nts) x1; shunts (SHUH-nts) x1; cults (KUH-lts) x1; adults (uh-DUH-lts) x1; results (rih-ZUH-lts) x1; insults (ih-NSUH-lts) x1; chestnuts (CHEH-snuh-ts) x2; cutbacks (KUH-tba-ks) x2
+  REJECTED not-a-known-word: tuts (on word list, no reading) x4; smuts (on word list, no reading) x4; lusts (on word list, no reading) x1; bunts (on word list, no reading) x1; runts (on word list, no reading) x1; crosscuts (on word list, no reading) x2; uppercuts (on word list, no reading) x1; rebuts (on word list, no reading) x2; irrigates (on word list, no reading) x1; buttercuts (not on word list) x1; strutz (not on word list) x1
+  NEVER PRODUCED (1/25, most known first): robots 2.34
+
+## delusion /UW ZH AH N/  21 Answers, max 194, Difficulty 0.067 (Wed)
+  haiku#0: 17 words -> 65% Wordsmith     answer 14, not-a-known-word 3
+  haiku#1: 19 words -> 73% Laureate      answer 16, not-a-known-word 3
+  haiku#2: 21 words -> 84% Laureate      answer 18, not-a-known-word 3
+  sonnet#0: 48 words -> 77% Laureate      answer 17, not-a-known-word 4, does-not-rhyme 27
+  sonnet#1: 25 words -> 77% Laureate      answer 17, not-a-known-word 6, does-not-rhyme 1, is-the-seed-word 1
+  REJECTED not-a-known-word: reclusion (on word list, no reading) x2; effusion (on word list, no reading) x4; protrusion (on word list, no reading) x5; elusion (on word list, no reading) x4; obtrusion (on word list, no reading) x2; abstrusion (on word list, no reading) x1; suffusion (on word list, no reading) x1
+  REJECTED does-not-rhyme: persuasion (pur-SWAY-zhuh-n) x1; evasion (ih-VAY-zhuh-n) x1; invasion (ih-NVAY-zhuh-n) x1; occasion (uh-KAY-zhuh-n) x1; abrasion (uh-BRAY-zhuh-n) x1; erosion (ih-ROH-zhuh-n) x1; explosion (ih-KSPLOH-zhuh-n) x1; implosion (ih-MPLOH-zhuh-n) x1; corrosion (kur-OH-zhuh-n) x1; cohesion (koh-HEE-zhuh-n) x1; adhesion (a-DHEE-zhuh-n) x1; lesion (LEE-zhuh-n) x1; vision (VIH-zhuh-n) x1; decision (dih-SIH-zhuh-n) x1; division (dih-VIH-zhuh-n) x1; collision (kuh-LIH-zhuh-n) x1; precision (pree-SIH-zhuh-n) x1; incision (ih-NSIH-zhuh-n) x1; revision (ree-VIH-zhuh-n) x1; provision (pruh-VIH-zhuh-n) x1; television (TEH-luh-vih-zhuh-n) x1; tuition (tyoo-IH-shuh-n) x1; solution (suh-LOO-shuh-n) x1; evolution (eh-vuh-LOO-shuh-n) x1; pollution (puh-LOO-shuh-n) x1; attrition (uh-TRIH-shuh-n) x1; tradition (truh-DIH-shuh-n) x1; perfusion (pur-FYOO-zuh-n) x1
+  NEVER PRODUCED (2/21, most known first): reinfusion 0.77, interfusion 0.66
+
+## microbiologist /AA L AH JH IH S T/  24 Answers, max 294, Difficulty 0.0918 (Thu)
+  haiku#0: 20 words -> 39% Troubadour    answer 10, does-not-rhyme 10
+  haiku#1: 30 words -> 56% Wordsmith     does-not-rhyme 11, answer 14, not-a-known-word 5
+  haiku#2: 26 words -> 59% Wordsmith     answer 14, does-not-rhyme 8, not-a-known-word 4
+  sonnet#0: 39 words -> 72% Laureate      does-not-rhyme 12, answer 18, not-a-known-word 9
+  sonnet#1: 30 words -> 64% Wordsmith     answer 16, does-not-rhyme 9, not-a-known-word 5
+  REJECTED does-not-rhyme: geologist (jee-AH-luh-juh-st) x5; zoologist (zoh-AH-luh-juh-st) x5; psychologist (seye-KAH-luh-juh-st) x5; apologist (uh-PAH-luh-juh-st) x3; urologist (yur-AH-luh-juh-st) x5; gynecologist (geye-nuh-KAH-luh-juh-st) x3; neurologist (nuu-RAH-luh-juh-st) x5; entomologist (eh-ntuh-MAH-luh-juh-st) x4; pathologist (puh-THAH-luh-juh-st) x5; seismologist (seye-ZMAH-luh-juh-st) x5; rheumatologist (roo-muh-TAH-luh-juh-st) x1; endocrinologist (eh-ndoh-kruh-NAH-luh-juh-st) x1; ideologist (eye-dee-AH-luh-juh-st) x2; scientologist (seye-uh-NTAH-luh-juh-st) x1
+  REJECTED not-a-known-word: audiologist (on word list, no reading) x1; etymologist (on word list, no reading) x3; hematologist (on word list, no reading) x2; nephrologist (on word list, no reading) x1; philologist (on word list, no reading) x1; ornithologist (on word list, no reading) x2; mycologist (on word list, no reading) x1; cosmologist (on word list, no reading) x1; astrologist (on word list, no reading) x3; theologist (on word list, no reading) x2; mixologist (on word list, no reading) x1; terminologist (on word list, no reading) x1; egyptologist (on word list, no reading) x1; futurologist (on word list, no reading) x1; mythologist (on word list, no reading) x1; hydrologist (on word list, no reading) x1
+  NEVER PRODUCED (1/24, most known first): serologist 0.04
+
+## litter /IH T ER/  28 Answers, max 222, Difficulty 0.1261 (Fri)
+  haiku#0: 13 words -> 36% Troubadour    answer 12, not-a-known-word 1
+  haiku#1: 16 words -> 46% Bard          answer 15, not-a-known-word 1
+  haiku#2: 17 words -> 46% Bard          answer 15, not-a-known-word 1, bonus 1
+  sonnet#0: 19 words -> 60% Wordsmith     answer 18, not-a-known-word 1
+  sonnet#1: 28 words -> 73% Laureate      answer 22, not-a-known-word 1, is-the-seed-word 1, already-submitted 3, does-not-rhyme 1
+  REJECTED not-a-known-word: jitter (on word list, no reading) x5
+  REJECTED does-not-rhyme: whittler (WIH-tuh-lur) x1
+  BONUS: gritter
+  NEVER PRODUCED (6/28, most known first): outfitter 2.33, counterfeiter 1.44, acquitter 1.01, embitter 0.94, remitter 0.64, aglitter 0.05
+
+## hut /AH T/  38 Answers, max 215, Difficulty 0.1628 (Sat)
+  haiku#0: 17 words -> 29% Troubadour    answer 16, does-not-rhyme 1
+  haiku#1: 15 words -> 23% Silver Tongue answer 14, does-not-rhyme 1
+  haiku#2: 24 words -> 44% Bard          answer 22, does-not-rhyme 1, not-a-known-word 1
+  sonnet#0: 36 words -> 61% Wordsmith     answer 26, not-a-known-word 9, does-not-rhyme 1
+  sonnet#1: 32 words -> 59% Wordsmith     answer 26, not-a-known-word 4, is-the-seed-word 1, does-not-rhyme 1
+  REJECTED does-not-rhyme: put (PUU-t) x3; cutthroat (KUH-tthroh-t) x2
+  REJECTED not-a-known-word: scut (on word list, no reading) x3; crosscut (on word list, no reading) x2; uppercut (on word list, no reading) x2; woodcut (on word list, no reading) x2; butternut (on word list, no reading) x1; tightbutt (not on word list) x1; gunshut (not on word list) x1; clearcut (not on word list) x1; buttercut (not on word list) x1
+  NEVER PRODUCED (8/38, most known first): robot 2.34, somewhat 2.18, precut 1.26, overcut 1.15, scuttlebutt 0.90, groundnut 0.54, intercut 0.46, turbot 0.04
+
+## dish /IH SH/  22 Answers, max 178, Difficulty 0.2303 (Sun)
+  haiku#0: 6 words -> 7% Budding Poet  answer 3, not-a-known-word 3
+  haiku#1: 49 words -> 30% Troubadour    answer 8, not-a-known-word 3, does-not-rhyme 38
+  haiku#2: 47 words -> 7% Budding Poet  answer 3, not-a-known-word 2, does-not-rhyme 42
+  sonnet#0: 8 words -> 7% Budding Poet  answer 3, not-a-known-word 3, is-the-seed-word 1, bonus 1
+  sonnet#1: 15 words -> 7% Budding Poet  answer 3, not-a-known-word 5, is-the-seed-word 1, already-submitted 4, bonus 2
+  REJECTED not-a-known-word: squish (on word list, no reading) x5; pish (on word list, no reading) x3; knish (on word list, no reading) x4; oafish (on word list, no reading) x1; roguish (on word list, no reading) x1
+  REJECTED does-not-rhyme: relish (REH-lih-sh) x2; cherish (CHEH-rih-sh) x2; vanish (VA-nih-sh) x2; finish (FIH-nih-sh) x2; polish (PAH-lih-sh) x2; furnish (FUR-nih-sh) x2; tarnish (TAH-rnih-sh) x2; varnish (VAH-rnih-sh) x2; punish (PUH-nih-sh) x2; banish (BA-nih-sh) x1; abolish (uh-BAH-lih-sh) x2; foolish (FOO-lih-sh) x2; selfish (SEH-lfih-sh) x2; boyish (BOY-ih-sh) x1; childish (CHEYE-ldih-sh) x2; sheepish (SHEE-pih-sh) x2; devilish (DEH-vlih-sh) x2; waspish (WAH-spih-sh) x2; clownish (KLOW-nih-sh) x2; impish (IH-mpih-sh) x2; peevish (PEE-vih-sh) x1; sluggish (SLUH-gih-sh) x1; lavish (LA-vih-sh) x2; radish (RA-dih-sh) x1; hellish (HEH-lih-sh) x1; ticklish (TIH-kuh-lih-sh) x2; garish (GEH-rih-sh) x1; squeamish (SKWEE-mih-sh) x1; whitish (WEYE-tih-sh) x1; brownish (BROW-nih-sh) x1; mulish (MYOO-lih-sh) x2; newish (NOO-ih-sh) x1; establish (ih-STA-blih-sh) x2; publish (PUH-blih-sh) x2; raffish (RA-fih-sh) x1; reddish (REH-dih-sh) x1; faddish (FA-dih-sh) x1; bookish (BUU-kih-sh) x2; perish (PEH-rih-sh) x1; flourish (FLUR-ih-sh) x1; nourish (NUR-ih-sh) x1; distinguish (dih-STIH-nggwih-sh) x1; languish (LA-nggwih-sh) x1; anguish (A-nggwih-sh) x1; demolish (dih-MAH-lih-sh) x1; embellish (ih-MBEH-lih-sh) x1; extinguish (ih-KSTIH-nggwih-sh) x1; stylish (STEYE-lih-sh) x1; girlish (GUR-lih-sh) x1; brackish (BRA-kih-sh) x1; garnish (GAH-rnih-sh) x1; boorish (BUU-rih-sh) x1; owlish (OW-lih-sh) x1; lumpish (LUH-mpih-sh) x1; babyish (BAY-bee-ih-sh) x1; elfish (EH-lfih-sh) x1
+  BONUS: ish, kish, bish
+  NEVER PRODUCED (14/22, most known first): jellyfish 2.33, shellfish 2.17, angelfish 2.07, cuttlefish 1.51, dogfish 1.24, whitefish 1.24, sunfish 1.15, lungfish 0.77, overfish 0.75, flatfish 0.71, sailfish 0.62, redfish 0.62, needlefish 0.51, pipefish 0.32
+
+## Summary
+  haiku: 39 runs, Rank% mean 35% (median 30%, min 7%, max 84%), Laureate on 2/39, 24 words/run, run-to-run Jaccard 0.65, 41s/run, $0.0296/run (API-equivalent)
+  sonnet: 26 runs, Rank% mean 56% (median 59%, min 7%, max 90%), Laureate on 8/26, 46 words/run, run-to-run Jaccard 0.64, 5s/run, $0.0248/run (API-equivalent)
