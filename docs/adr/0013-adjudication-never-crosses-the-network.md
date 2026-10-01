@@ -156,3 +156,19 @@ Any one of these, and the argument above stops holding:
 
 None of these is reached by the game merely being slow to load. That is the
 reversal to watch for, because it is the one that will feel justified.
+
+## Amendment (2026-10-01): Sessions are recorded after the fact
+
+The decision stands: every verdict is reached in the browser with no request in
+flight. What changes is one consequence. "No adjudication telemetry" described
+the playtest as it shipped, and
+[ADR-0019](./0019-session-records-are-whole-and-unlinked.md) decides that a
+Daily Puzzle Session is copied out afterwards as a **Session Record**. Once that
+ships, something does observe what players submit, and the Appeal is no longer
+the only sensor.
+
+This answers the third reversal above without reversing anything. Observing
+Submissions never required judging them on a server: the record leaves on load
+and when the page is hidden, outside the loop, through a route that may fail
+freely like the other two. The two reversals that remain are a public launch and
+a cross-player comparison.
