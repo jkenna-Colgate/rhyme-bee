@@ -1,0 +1,141 @@
+# Where does a player's gap to Laureate live? (#224)
+
+Index index-b2d5ee6d53dbcdba.json. 260 scheduled days, 253 playable, 7 cannot be pinned and fall back to Free Play (2026-09-26 role, 2026-10-11 oil, 2026-11-13 cool, 2027-02-28 storm, 2027-03-07 worn, 2027-04-15 curl, 2027-04-19 smile).
+Laureate is 70% of maximum Score. An Answer is rare below knownness 0.7.
+
+## 1. What the maximum Score is made of (no player, all 253 days)
+
+  Answers per day        mean     43  p10     21  median     34  p90     79
+  native share of max    mean   57%  p10   32%  median   58%  p90   80%
+  compound share of max  mean   32%  p10    9%  median   32%  p90   58%
+  rare share of max      mean   11%  p10    2%  median   10%  p90   21%
+
+  Finding Answers strictly best-known first, Laureate takes:
+    Answers found        mean     32  p10     16  median     25  p90     59
+    share of the Answers mean   74%  p10   71%  median   74%  p90   78%
+    knownness reached    mean   1.44  p10   0.95  median   1.47  p90   1.92
+
+  Days where Laureate is reachable without a single rare Answer:            247/253
+  Days where it is reachable on native common Answers alone (no compounds): 62/253
+
+  Classifier spot check, compound Answers of five days:
+    beard: disappeared, reappeared, uncleared
+    delusion: disillusion, profusion, reinfusion
+    cat: bobcat, butterfat, copycat, doormat, format, muskrat, noncombat, nonfat, polecat, pussycat, reformat, wildcat
+    investor: digester, protester, trimester
+    purifier: campfire, gunfire, highflier, misfire, multiplier, overtire, preamplifier, replier, retire, rewire, unwire, wildfire
+
+## 2. Synthetic Player, haiku: one run on each of 35 days (schedule weeks 1, 2, 3, 4, 9, whole)
+
+  Rank%                  mean   40%  p10   18%  median   39%  p90   58%
+  words typed            mean     19  p10     12  median     19  p90     28
+  Answers found          mean     15  p10     10  median     14  p90     24
+
+  ### The missing share, split by where the unfound Score sits (mean over days)
+    missing in total                   60%
+    common native Answers              22%  (  36% of the gap;   61% of these Answers found)
+    common compounds                   30%  (  49% of the gap;   11% of these Answers found)
+    rare Answers                        9%  (  15% of the gap;   12% of these Answers found)
+    On the 35 days short of Laureate, the shortfall to the 70% line averages   30% of max.
+
+  ### Size: by Answers per day
+    Answers   days   Rank%  Laureate   typed   found  native>=2.2 found
+    20-39       27     42%      0/27      18      13    81%
+    40-59        2     57%       0/2      29      28    90%
+    60-79        4     22%       0/4      22      20    68%
+    80-120       2     22%       0/2      28      28    71%
+    Rank% correlates with: Answers per day r=-0.48, Difficulty r=-0.23, compound share r=-0.35
+    Answers found correlates with Answers per day r=0.73
+
+  ### Difficulty: by weekday (the schedule ramps Mon to Sun)
+    Mon  days   5  Difficulty    1%  Answers     31  Rank%   50%  Laureate      0/5
+    Tue  days   5  Difficulty    4%  Answers     45  Rank%   40%  Laureate      0/5
+    Wed  days   5  Difficulty    5%  Answers     45  Rank%   36%  Laureate      0/5
+    Thu  days   5  Difficulty   11%  Answers     36  Rank%   38%  Laureate      0/5
+    Fri  days   5  Difficulty   12%  Answers     46  Rank%   33%  Laureate      0/5
+    Sat  days   5  Difficulty   16%  Answers     24  Rank%   40%  Laureate      0/5
+    Sun  days   5  Difficulty   21%  Answers     23  Rank%   40%  Laureate      0/5
+
+  ### What each lever would move (same runs, re-scored)
+    as shipped                                                 Rank%   40%  Laureate     0/35
+    Tier: every rare Answer becomes a Bonus Word               Rank%   42%  Laureate     0/35
+    Tier: every common compound becomes a Bonus Word           Rank%   55%  Laureate    10/35
+    Tier: both                                                 Rank%   63%  Laureate    13/35
+    Size: band capped at 60 Answers (days kept)                Rank%   43%  Laureate     0/30
+    Size: band capped at 40 Answers (days kept)                Rank%   42%  Laureate     0/27
+    Size capped at 60 and compounds to Bonus                   Rank%   59%  Laureate    10/30
+    Size capped at 40 and compounds to Bonus                   Rank%   59%  Laureate    10/27
+    Ladder: Laureate line at 60%                               Rank%   40%  Laureate     3/35
+    Ladder: Laureate line at 50%                               Rank%   40%  Laureate    11/35
+    Ladder: Laureate line at 40%                               Rank%   40%  Laureate    17/35
+    Ladder at 50% and compounds to Bonus                       Rank%   55%  Laureate    21/35
+
+  ### Rejections: exposure to the trust-drives-effort cause
+    per run:    0.9 on the word list with no reading,    0.0 not on the word list,    2.8 does-not-rhyme,    0.4 Bonus Words
+    20/35 runs meet at least one missing-reading rejection; the first comes at word 15 (median), with 3 Answers still found after it (mean).
+    If every Session stopped dead at that first rejection: Rank% would lose    9% of max on those days (an upper bound, not an estimate).
+
+  ### Best-known native Answers this run never produced (sample of 74)
+    exclaim (blame), nickname (blame), concept (slept), doll (wall), tattoos (booze), characteristic (idealistic), stalks (smallpox), talked (shellshocked), talks (smallpox), twos (booze), flus (booze), chaired (laird), revenues (booze), jukebox (smallpox), upstage (cage), statues (booze), alcohol (wall), eater (centimeter), cholesterol (wall), prided (lopsided), gentle (sentimental), bibliography (pornography), brawl (wall), breakthroughs (booze), statistic (idealistic), grimm (him), coconut (hut), chalked (shellshocked), chalks (smallpox), surname (blame), stalked (shellshocked), volunteered (beard), robots (klutz), robot (hut), hymn (him), paradox (smallpox), meter (centimeter), leaped (slept), frontiered (beard), fared (laird)
+
+## 2. Synthetic Player, sonnet: one run on each of 35 days (schedule weeks 1, 2, 3, 4, 9, whole)
+
+  Rank%                  mean   56%  p10   32%  median   60%  p90   77%
+  words typed            mean     36  p10     20  median     30  p90     52
+  Answers found          mean     21  p10     11  median     18  p90     40
+
+  ### The missing share, split by where the unfound Score sits (mean over days)
+    missing in total                   44%
+    common native Answers              16%  (  36% of the gap;   72% of these Answers found)
+    common compounds                   20%  (  45% of the gap;   44% of these Answers found)
+    rare Answers                        8%  (  18% of the gap;   20% of these Answers found)
+    On the 26 days short of Laureate, the shortfall to the 70% line averages   22% of max.
+
+  ### Size: by Answers per day
+    Answers   days   Rank%  Laureate   typed   found  native>=2.2 found
+    20-39       27     56%      8/27      30      16    85%
+    40-59        2     67%       0/2      40      31    87%
+    60-79        4     48%       1/4      44      36    91%
+    80-120       2     55%       0/2      87      59    95%
+    Rank% correlates with: Answers per day r=-0.11, Difficulty r=-0.42, compound share r=-0.07
+    Answers found correlates with Answers per day r=0.88
+
+  ### Difficulty: by weekday (the schedule ramps Mon to Sun)
+    Mon  days   5  Difficulty    1%  Answers     31  Rank%   53%  Laureate      2/5
+    Tue  days   5  Difficulty    4%  Answers     45  Rank%   72%  Laureate      2/5
+    Wed  days   5  Difficulty    5%  Answers     45  Rank%   63%  Laureate      3/5
+    Thu  days   5  Difficulty   11%  Answers     36  Rank%   59%  Laureate      1/5
+    Fri  days   5  Difficulty   12%  Answers     46  Rank%   53%  Laureate      1/5
+    Sat  days   5  Difficulty   16%  Answers     24  Rank%   48%  Laureate      0/5
+    Sun  days   5  Difficulty   21%  Answers     23  Rank%   42%  Laureate      0/5
+
+  ### What each lever would move (same runs, re-scored)
+    as shipped                                                 Rank%   56%  Laureate     9/35
+    Tier: every rare Answer becomes a Bonus Word               Rank%   59%  Laureate    10/35
+    Tier: every common compound becomes a Bonus Word           Rank%   64%  Laureate    15/35
+    Tier: both                                                 Rank%   73%  Laureate    23/35
+    Size: band capped at 60 Answers (days kept)                Rank%   57%  Laureate     9/30
+    Size: band capped at 40 Answers (days kept)                Rank%   56%  Laureate     8/27
+    Size capped at 60 and compounds to Bonus                   Rank%   67%  Laureate    15/30
+    Size capped at 40 and compounds to Bonus                   Rank%   66%  Laureate    13/27
+    Ladder: Laureate line at 60%                               Rank%   56%  Laureate    18/35
+    Ladder: Laureate line at 50%                               Rank%   56%  Laureate    24/35
+    Ladder: Laureate line at 40%                               Rank%   56%  Laureate    29/35
+    Ladder at 50% and compounds to Bonus                       Rank%   64%  Laureate    28/35
+
+  ### Rejections: exposure to the trust-drives-effort cause
+    per run:    3.7 on the word list with no reading,    1.0 not on the word list,    7.3 does-not-rhyme,    0.9 Bonus Words
+    32/35 runs meet at least one missing-reading rejection; the first comes at word 16 (median), with 8 Answers still found after it (mean).
+    If every Session stopped dead at that first rejection: Rank% would lose   17% of max on those days (an upper bound, not an estimate).
+
+  ### Best-known native Answers this run never produced (sample of 41)
+    doll (wall), aired (laird), dared (laird), flus (booze), preying (taxpaying), chaired (laird), alcohol (wall), impaired (laird), eater (centimeter), scared (laird), cholesterol (wall), prided (lopsided), port (import), breakthroughs (booze), grimm (him), robots (klutz), robot (hut), meter (centimeter), leaped (slept), frontiered (beard), fared (laird), buts (klutz), declared (laird), cared (laird), cashiered (beard), buffeting (taxpaying), all (wall), shared (laird), bared (laird), neared (beard), greying (taxpaying), paired (laird), gurus (booze), protocol (wall), snared (laird), persevered (beard), fussed (bust), repeater (centimeter), sluts (klutz), slut (hut)
+
+## 3. Do the two models agree on which days are hard? (35 days with both)
+
+  Rank% haiku vs sonnet across days: r=0.48; mean gap   16%
+
+## 4. Run-to-run noise (days with repeat runs from #223)
+
+  haiku: within-day SD of Rank%    5% over 13 days; across-day SD   15% over 35 days
+  sonnet: within-day SD of Rank%    2% over 13 days; across-day SD   20% over 35 days
