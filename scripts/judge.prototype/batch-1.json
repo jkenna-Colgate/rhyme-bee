@@ -1,0 +1,939 @@
+[
+ {
+  "id": "rusty|AH S T",
+  "word": "rusty",
+  "seedWord": "bust",
+  "rhymeKey": "AH S T",
+  "seedReading": "B AH1 S T",
+  "seedRespelling": "BUH-st",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [
+    {
+     "phonemes": "R AH1 S T IY0",
+     "key": "AH S T IY",
+     "respelling": "RUH-stee"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "erosion|UW ZH AH N",
+  "word": "erosion",
+  "seedWord": "delusion",
+  "rhymeKey": "UW ZH AH N",
+  "seedReading": "D IH0 L UW1 ZH AH0 N",
+  "seedRespelling": "dih-LOO-zhuh-n",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "IH0 R OW1 ZH AH0 N",
+     "key": "OW ZH AH N",
+     "respelling": "ih-ROH-zhuh-n"
+    },
+    {
+     "phonemes": "IH0 R OW1 ZH N",
+     "key": "OW ZH N",
+     "respelling": "ih-ROH-zhn"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "dogmatic|AA T IH K",
+  "word": "dogmatic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "D AA0 G M AE1 T IH0 K",
+     "key": "AE T IH K",
+     "respelling": "dah-GMA-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "asthmatic|AA T IH K",
+  "word": "asthmatic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "AE0 Z M AE1 T IH0 K",
+     "key": "AE T IH K",
+     "respelling": "a-ZMA-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "sawed|AO R D",
+  "word": "sawed",
+  "seedWord": "landlord",
+  "rhymeKey": "AO R D",
+  "seedReading": "L AE1 N D L AO2 R D",
+  "seedRespelling": "LA-ndlaw-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S AA1 D",
+     "key": "AA D",
+     "respelling": "SAH-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "democratic|AA T IH K",
+  "word": "democratic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "D EH2 M AH0 K R AE1 T IH0 K",
+     "key": "AE T IH K",
+     "respelling": "deh-muh-KRA-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "bandleader|IY D ER",
+  "word": "bandleader",
+  "seedWord": "cheerleader",
+  "rhymeKey": "IY D ER",
+  "seedReading": "CH IH1 R L IY2 D ER0",
+  "seedRespelling": "CHIH-rlee-dur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "B AE1 N D L IY0 D ER0",
+     "key": "AE N D L IY D ER",
+     "respelling": "BA-ndlee-dur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "results|AH T S",
+  "word": "results",
+  "seedWord": "klutz",
+  "rhymeKey": "AH T S",
+  "seedReading": "K L AH1 T S",
+  "seedRespelling": "KLUH-ts",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "R IH0 Z AH1 L T S",
+     "key": "AH L T S",
+     "respelling": "rih-ZUH-lts"
+    },
+    {
+     "phonemes": "R IY0 Z AH1 L T S",
+     "key": "AH L T S",
+     "respelling": "ree-ZUH-lts"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "ear|IH R D",
+  "word": "ear",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "seedReading": "B IH1 R D",
+  "seedRespelling": "BIH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "IY1 R",
+     "key": "IY R",
+     "respelling": "EE-r"
+    },
+    {
+     "phonemes": "IH1 R",
+     "key": "IH R",
+     "respelling": "IH-r"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "trusty|AH S T",
+  "word": "trusty",
+  "seedWord": "bust",
+  "rhymeKey": "AH S T",
+  "seedReading": "B AH1 S T",
+  "seedRespelling": "BUH-st",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "T R AH1 S T IY0",
+     "key": "AH S T IY",
+     "respelling": "TRUH-stee"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "sacramental|EH N T AH L",
+  "word": "sacramental",
+  "seedWord": "sentimental",
+  "rhymeKey": "EH N T AH L",
+  "seedReading": "S EH2 N T AH0 M EH1 N T AH0 L",
+  "seedRespelling": "seh-ntuh-MEH-ntuh-l",
+  "kind": "wrong-reading",
+  "source": "appeal",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S AE1 K R AH0 M AH0 N T AH0 L",
+     "key": "AE K R AH M AH N T AH L",
+     "respelling": "SA-kruh-muh-ntuh-l"
+    },
+    {
+     "phonemes": "S AE1 K R AH0 M AH0 N T L",
+     "key": "AE K R AH M AH N T L",
+     "respelling": "SA-kruh-muh-ntl"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "haiku|UW Z",
+  "word": "haiku",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "HH AY1 K UW0",
+     "key": "AY K UW",
+     "respelling": "HEYE-koo"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "barometer|IY T ER",
+  "word": "barometer",
+  "seedWord": "centimeter",
+  "rhymeKey": "IY T ER",
+  "seedReading": "S EH1 N T AH0 M IY2 T ER0",
+  "seedRespelling": "SEH-ntuh-mee-tur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "B ER0 AA1 M IH0 T ER0",
+     "key": "AA M IH T ER",
+     "respelling": "bur-AH-mih-tur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "theft|EH P T",
+  "word": "theft",
+  "seedWord": "slept",
+  "rhymeKey": "EH P T",
+  "seedReading": "S L EH1 P T",
+  "seedRespelling": "SLEH-pt",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "TH EH1 F T",
+     "key": "EH F T",
+     "respelling": "THEH-ft"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "blotter|AA P ER",
+  "word": "blotter",
+  "seedWord": "grasshopper",
+  "rhymeKey": "AA P ER",
+  "seedReading": "G R AE1 S HH AA2 P ER0",
+  "seedRespelling": "GRA-shah-pur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "B L AA1 T ER0",
+     "key": "AA T ER",
+     "respelling": "BLAH-tur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "frontier|IH R D",
+  "word": "frontier",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "seedReading": "B IH1 R D",
+  "seedRespelling": "BIH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "F R AH0 N T IH1 R",
+     "key": "IH R",
+     "respelling": "fruh-NTIH-r"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "furnish|IH SH",
+  "word": "furnish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "F ER1 N IH0 SH",
+     "key": "ER N IH SH",
+     "respelling": "FUR-nih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "embellish|IH SH",
+  "word": "embellish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "IH0 M B EH1 L IH0 SH",
+     "key": "EH L IH SH",
+     "respelling": "ih-MBEH-lih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "heretic|IH K",
+  "word": "heretic",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "seedReading": "T R IH1 K",
+  "seedRespelling": "TRIH-k",
+  "kind": "stress",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "HH EH1 R AH0 T IH0 K",
+     "key": "EH R AH T IH K",
+     "respelling": "HEH-ruh-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "debuts|UW Z",
+  "word": "debuts",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "D EY1 B Y UW0 Z",
+     "key": "EY B Y UW Z",
+     "respelling": "DAY-byoo-z"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "cherish|IH SH",
+  "word": "cherish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [
+    {
+     "phonemes": "CH EH1 R IH0 SH",
+     "key": "EH R IH SH",
+     "respelling": "CHEH-rih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "issues|UW Z",
+  "word": "issues",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "IH1 SH UW0 Z",
+     "key": "IH SH UW Z",
+     "respelling": "IH-shoo-z"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "gothic|IH K",
+  "word": "gothic",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "seedReading": "T R IH1 K",
+  "seedRespelling": "TRIH-k",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "G AA1 TH IH0 K",
+     "key": "AA TH IH K",
+     "respelling": "GAH-thih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "tantric|IH K",
+  "word": "tantric",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "seedReading": "T R IH1 K",
+  "seedRespelling": "TRIH-k",
+  "kind": "stress",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "T AE1 N T R IH0 K",
+     "key": "AE N T R IH K",
+     "respelling": "TA-ntrih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "unbored|AO R D",
+  "word": "unbored",
+  "seedWord": "landlord",
+  "rhymeKey": "AO R D",
+  "seedReading": "L AE1 N D L AO2 R D",
+  "seedRespelling": "LA-ndlaw-rd",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "AH1 N B AO2 R D",
+    "head": "un",
+    "tail": "bored"
+   }
+  }
+ },
+ {
+  "id": "pawl|AA L",
+  "word": "pawl",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": "W AA1 L",
+  "seedRespelling": "WAH-l",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "pawling",
+     "readings": [
+      "P AA1 L IH0 NG"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  }
+ },
+ {
+  "id": "askews|UW Z",
+  "word": "askews",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": false,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "askew",
+     "readings": [
+      "AH0 S K Y UW1"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "AH0 S K Y UW2 Z",
+    "head": "a",
+    "tail": "skews"
+   }
+  }
+ },
+ {
+  "id": "heartsick|IH K",
+  "word": "heartsick",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "seedReading": "T R IH1 K",
+  "seedRespelling": "TRIH-k",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "HH AA1 R T S IH2 K",
+    "head": "heart",
+    "tail": "sick"
+   }
+  }
+ },
+ {
+  "id": "smocked|AA K T",
+  "word": "smocked",
+  "seedWord": "shellshocked",
+  "rhymeKey": "AA K T",
+  "seedReading": "SH EH1 L SH AA2 K T",
+  "seedRespelling": "SHEH-lshah-kt",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "smock",
+     "readings": [
+      "S M AA1 K"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "EH1 S M AA2 K T",
+    "head": "s",
+    "tail": "mocked"
+   }
+  }
+ },
+ {
+  "id": "whin|IH N",
+  "word": "whin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "whines",
+     "readings": [
+      "W AY1 N Z",
+      "HH W AY1 N Z"
+     ],
+     "rhymes": false
+    },
+    {
+     "word": "whining",
+     "readings": [
+      "W AY1 N IH0 NG",
+      "HH W AY1 N IH0 NG"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  }
+ },
+ {
+  "id": "pedometer|IY T ER",
+  "word": "pedometer",
+  "seedWord": "centimeter",
+  "rhymeKey": "IY T ER",
+  "seedReading": "S EH1 N T AH0 M IY2 T ER0",
+  "seedRespelling": "SEH-ntuh-mee-tur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "shrews|UW Z",
+  "word": "shrews",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "beanstalks|AA K S",
+  "word": "beanstalks",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B IY1 N S T AA2 K S",
+    "head": "bean",
+    "tail": "stalks"
+   }
+  }
+ },
+ {
+  "id": "doormug|AH G",
+  "word": "doormug",
+  "seedWord": "mug",
+  "rhymeKey": "AH G",
+  "seedReading": "M AH1 G",
+  "seedRespelling": "MUH-g",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": false,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "D AO1 R M AH2 G",
+    "head": "door",
+    "tail": "mug"
+   }
+  }
+ },
+ {
+  "id": "norse|tier",
+  "word": "norse",
+  "seedWord": "horse",
+  "rhymeKey": "AO R S",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "N AO1 R S",
+     "key": "AO R S",
+     "respelling": "NAW-rs"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "jews|tier",
+  "word": "jews",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "JH UW1 Z",
+     "key": "UW Z",
+     "respelling": "JOO-z"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "grander|tier",
+  "word": "grander",
+  "seedWord": "commander",
+  "rhymeKey": "AE N D ER",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "G R AE1 N D ER0",
+     "key": "AE N D ER",
+     "respelling": "GRA-ndur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ },
+ {
+  "id": "crim|tier",
+  "word": "crim",
+  "seedWord": "him",
+  "rhymeKey": "IH M",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "K R IH1 M",
+     "key": "IH M",
+     "respelling": "KRIH-m"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  }
+ }
+]

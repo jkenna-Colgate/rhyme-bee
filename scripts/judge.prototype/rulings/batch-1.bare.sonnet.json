@@ -1,0 +1,278 @@
+{
+ "beanstalks|AA K S": {
+  "word": "beanstalks",
+  "verdict": "rhymes",
+  "reading": "B IY1 N S T AA2 K S",
+  "confidence": "high",
+  "why": "Secondary stress on stalk, which is AA K S in merged GA, the same as pox.",
+  "verified": true
+ },
+ "smocked|AA K T": {
+  "word": "smocked",
+  "verdict": "rhymes",
+  "reading": "S M AA1 K T",
+  "confidence": "high",
+  "why": "Ends in AA K T, the same as shocked.",
+  "verified": true
+ },
+ "pawl|AA L": {
+  "word": "pawl",
+  "verdict": "rhymes",
+  "reading": "P AO1 L",
+  "confidence": "high",
+  "why": "A real word (a ratchet catch) that is pronounced like wall's AO L in merged GA.",
+  "verified": false
+ },
+ "blotter|AA P ER": {
+  "word": "blotter",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in AA T ER, but the key is AA P ER, so the consonant differs."
+ },
+ "asthmatic|AA T IH K": {
+  "word": "asthmatic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on -mat- (AE T IH K), not the AA T IH K key."
+ },
+ "democratic|AA T IH K": {
+  "word": "democratic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on -crat- (AE T IH K), not the AA T IH K key."
+ },
+ "dogmatic|AA T IH K": {
+  "word": "dogmatic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on -mat- (AE T IH K), not the AA T IH K key."
+ },
+ "doormug|AH G": {
+  "word": "doormug",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is not an English word."
+ },
+ "rusty|AH S T": {
+  "word": "rusty",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed AH1 is followed by S T IY0, so the sounds from the stressed vowel on don't match AH1 S T."
+ },
+ "trusty|AH S T": {
+  "word": "trusty",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in an unstressed IY after AH1 S T, so the key doesn't match and the final syllable differs."
+ },
+ "results|AH T S": {
+  "word": "results",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its stress is on the second syllable, giving AH1 L T S, which is not AH1 T S."
+ },
+ "sawed|AO R D": {
+  "word": "sawed",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is pronounced S AO1 D with no R, so it doesn't match AO R D."
+ },
+ "unbored|AO R D": {
+  "word": "unbored",
+  "verdict": "rhymes",
+  "reading": "AH0 N B AO1 R D",
+  "confidence": "high",
+  "why": "The stress is on 'bored', so the key is AO1 R D, the same as landlord's AO2 R D.",
+  "verified": true
+ },
+ "sacramental|EH N T AH L": {
+  "word": "sacramental",
+  "verdict": "rhymes",
+  "reading": "S AE2 K R AH0 M EH1 N T AH0 L",
+  "confidence": "high",
+  "why": "Its last stressed vowel is EH1 N T AH0 L, the same as sentimental.",
+  "verified": true
+ },
+ "theft|EH P T": {
+  "word": "theft",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "EH1 F T ends in F T, while slept ends in P T."
+ },
+ "gothic|IH K": {
+  "word": "gothic",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its final syllable is an unstressed IH K, the same sounds as trick, but the stress falls on the first syllable (G AA1 TH IH0 K)."
+ },
+ "heartsick|IH K": {
+  "word": "heartsick",
+  "verdict": "rhymes",
+  "reading": "HH AA1 R T S IH2 K",
+  "confidence": "medium",
+  "why": "Compound whose second element 'sick' keeps secondary stress, so the key IH-K is stressed.",
+  "verified": true
+ },
+ "heretic|IH K": {
+  "word": "heretic",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on the first syllable and the final -ic is unstressed IH0 K."
+ },
+ "tantric|IH K": {
+  "word": "tantric",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on 'tan' and the final -ric is unstressed IH0 K."
+ },
+ "whin|IH N": {
+  "word": "whin",
+  "verdict": "rhymes",
+  "reading": "W IH1 N",
+  "confidence": "medium",
+  "why": "A real word (gorse), pronounced like 'win' in merged General American.",
+  "verified": true
+ },
+ "ear|IH R D": {
+  "word": "ear",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is IY1 R with no final D and a different vowel from IH1 R D."
+ },
+ "frontier|IH R D": {
+  "word": "frontier",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in IH1 R with no D, so it does not match IH1 R D."
+ },
+ "cherish|IH SH": {
+  "word": "cherish",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on 'cher' and the final -ish is unstressed IH0 SH."
+ },
+ "embellish|IH SH": {
+  "word": "embellish",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on 'bel' and the final -ish is unstressed IH0 SH."
+ },
+ "furnish|IH SH": {
+  "word": "furnish",
+  "verdict": "weak",
+  "reading": "F ER1 N IH0 SH",
+  "confidence": "high",
+  "why": "Final syllable is -ish, but the stress is on the first syllable, so the final syllable is unstressed."
+ },
+ "bandleader|IY D ER": {
+  "word": "bandleader",
+  "verdict": "rhymes",
+  "reading": "B AE1 N D L IY2 D ER0",
+  "confidence": "high",
+  "why": "Secondary stress on -lead- followed by -er gives IY2 D ER0, the same as cheerleader.",
+  "verified": true
+ },
+ "barometer|IY T ER": {
+  "word": "barometer",
+  "verdict": "no-rhyme",
+  "reading": "B ER0 AA1 M AH0 T ER0",
+  "confidence": "high",
+  "why": "The last stressed vowel is the AA in -rom-, so the key is AA M AH T ER, not IY T ER."
+ },
+ "pedometer|IY T ER": {
+  "word": "pedometer",
+  "verdict": "no-rhyme",
+  "reading": "P AH0 D AA1 M AH0 T ER0",
+  "confidence": "high",
+  "why": "Stress falls on -dom-, so the key is AA M AH T ER, not IY T ER."
+ },
+ "askews|UW Z": {
+  "word": "askews",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Askew is an adverb or adjective with no standard plural or verb form."
+ },
+ "debuts|UW Z": {
+  "word": "debuts",
+  "verdict": "rhymes",
+  "reading": "D EY0 B Y UW1 Z",
+  "confidence": "medium",
+  "why": "Americans say debut with a silent t, so the plural ends in the stressed UW Z.",
+  "verified": true
+ },
+ "haiku|UW Z": {
+  "word": "haiku",
+  "verdict": "no-rhyme",
+  "reading": "HH AY1 K UW0",
+  "confidence": "high",
+  "why": "Stress is on the first syllable and it has no final Z, so the key is AY K UW."
+ },
+ "issues|UW Z": {
+  "word": "issues",
+  "verdict": "no-rhyme",
+  "reading": "IH1 SH UW0 Z",
+  "confidence": "high",
+  "why": "The stressed vowel is IH, so the key is IH SH UW Z, not UW Z."
+ },
+ "shrews|UW Z": {
+  "word": "shrews",
+  "verdict": "rhymes",
+  "reading": "SH R UW1 Z",
+  "confidence": "high",
+  "why": "Plural of shrew, ending in the same stressed /uz/ as booze.",
+  "verified": true
+ },
+ "erosion|UW ZH AH N": {
+  "word": "erosion",
+  "verdict": "no-rhyme",
+  "reading": "IH0 R OW1 ZH AH0 N",
+  "confidence": "high",
+  "why": "Its stressed vowel is /oʊ/ (ro-), not the /u/ of delusion, so the keys differ."
+ },
+ "grander|tier": {
+  "word": "grander",
+  "verdict": "answer",
+  "reading": "G R AE1 N D ER0",
+  "confidence": "medium",
+  "why": "Comparative of 'grand' is a common word, and it rhymes with 'commander' (both end in -ander, /ændər/)."
+ },
+ "norse|tier": {
+  "word": "norse",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Norse is a proper adjective for people and culture, and it's capitalized, so it isn't an ordinary rhyme answer."
+ },
+ "crim|tier": {
+  "word": "crim",
+  "verdict": "bonus",
+  "reading": "K R IH1 M",
+  "confidence": "medium",
+  "why": "Crim is slang or a clipped form of 'criminal' that appears in few dictionaries, and few players would think of it."
+ },
+ "jews|tier": {
+  "word": "jews",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Jews is a capitalized proper noun for an ethnic and religious group, so it isn't a common-word rhyme answer."
+ }
+}
