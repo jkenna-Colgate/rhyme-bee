@@ -1,0 +1,1680 @@
+[
+ {
+  "id": "abrased|EY S T",
+  "word": "abrased",
+  "seedWord": "toothpaste",
+  "rhymeKey": "EY S T",
+  "seedReading": "T UW1 TH P EY2 S T",
+  "seedRespelling": "TOO-thpay-st",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "addoom|UW M",
+  "word": "addoom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "AE1 D D UW2 M",
+    "head": "ad",
+    "tail": "doom"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "anguine|IH N",
+  "word": "anguine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "arshin|IH N",
+  "word": "arshin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "AA1 R SH IH2 N",
+    "head": "ar",
+    "tail": "shin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "befall|tier",
+  "word": "befall",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "B IH0 F AA1 L",
+     "key": "AA L",
+     "respelling": "bih-FAH-l"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "bonus"
+ },
+ {
+  "id": "begloom|UW M",
+  "word": "begloom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B IY1 G L UW2 M",
+    "head": "be",
+    "tail": "gloom"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "boffin|IH N",
+  "word": "boffin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B AA1 F IH2 N",
+    "head": "boff",
+    "tail": "in"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "bookroom|UW M",
+  "word": "bookroom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B UH1 K R UW2 M",
+    "head": "book",
+    "tail": "room"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "bowfin|IH N",
+  "word": "bowfin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B AW1 F IH2 N",
+    "head": "bow",
+    "tail": "fin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "breastpin|IH N",
+  "word": "breastpin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B R EH1 S T P IH2 N",
+    "head": "breast",
+    "tail": "pin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "cerumen|IH N",
+  "word": "cerumen",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "choom|UW M",
+  "word": "choom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "clothespin|IH N",
+  "word": "clothespin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "K L OW1 DH S P IH2 N",
+    "head": "clothe",
+    "tail": "spin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "consanguine|IH N",
+  "word": "consanguine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "digoxin|IH N",
+  "word": "digoxin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "effume|UW M",
+  "word": "effume",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "engloom|UW M",
+  "word": "engloom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "EH1 N G L UW2 M",
+    "head": "en",
+    "tail": "gloom"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "enschedule|EH JH UW L",
+  "word": "enschedule",
+  "seedWord": "schedule",
+  "rhymeKey": "EH JH UW L",
+  "seedReading": "S K EH1 JH UW0 L",
+  "seedRespelling": "SKEH-joo-l",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "EH1 N S K EH2 JH UW0 L",
+    "head": "en",
+    "tail": "schedule"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "envolume|UW M",
+  "word": "envolume",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "EH1 N V AA2 L Y UW2 M",
+    "head": "en",
+    "tail": "volume"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "ferrule|UW L",
+  "word": "ferrule",
+  "seedWord": "cool",
+  "rhymeKey": "UW L",
+  "seedReading": "K UW1 L",
+  "seedRespelling": "KOO-l",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "F ER1 R UW2 L",
+    "head": "fer",
+    "tail": "rule"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "ferule|UW L",
+  "word": "ferule",
+  "seedWord": "cool",
+  "rhymeKey": "UW L",
+  "seedReading": "K UW1 L",
+  "seedRespelling": "KOO-l",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "F EY1 R UW2 L",
+    "head": "fe",
+    "tail": "rule"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "fireroom|UW M",
+  "word": "fireroom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "F AY1 ER0 R UW2 M",
+    "head": "fire",
+    "tail": "room"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "firkin|IH N",
+  "word": "firkin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "firkins",
+     "readings": [
+      "F ER1 K IH0 N Z"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "F ER1 K IH2 N",
+    "head": "fir",
+    "tail": "kin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "foreroom|UW M",
+  "word": "foreroom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "F AO1 R R UW2 M",
+    "head": "fore",
+    "tail": "room"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "gaist|EY S T",
+  "word": "gaist",
+  "seedWord": "toothpaste",
+  "rhymeKey": "EY S T",
+  "seedReading": "T UW1 TH P EY2 S T",
+  "seedRespelling": "TOO-thpay-st",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "JH IY1 EY2 S T",
+    "head": "g",
+    "tail": "aist"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "gherkin|IH N",
+  "word": "gherkin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "godforsaken|IH N",
+  "word": "godforsaken",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "grimalkin|IH N",
+  "word": "grimalkin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "hecatomb|UW M",
+  "word": "hecatomb",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "homelyn|IH N",
+  "word": "homelyn",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "HH OW1 M L IH2 N",
+    "head": "home",
+    "tail": "lyn"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "hoom|UW M",
+  "word": "hoom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "illumine|IH N",
+  "word": "illumine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "illumined",
+     "readings": [
+      "IH2 L UW1 M AH0 N D"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "immunoglobulin|IH N",
+  "word": "immunoglobulin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "interroom|UW M",
+  "word": "interroom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "IH2 N T ER1 R UW2 M",
+    "head": "inter",
+    "tail": "room"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "introsume|UW M",
+  "word": "introsume",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "isoleucine|IH N",
+  "word": "isoleucine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "jerkin|IH N",
+  "word": "jerkin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "jerkins",
+     "readings": [
+      "JH ER1 K IH0 N Z"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "JH ER1 K IH2 N",
+    "head": "jerk",
+    "tail": "in"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "kumkum|UW M",
+  "word": "kumkum",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "leapt|tier",
+  "word": "leapt",
+  "seedWord": "slept",
+  "rhymeKey": "EH P T",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "L EH1 P T",
+     "key": "EH P T",
+     "respelling": "LEH-pt"
+    },
+    {
+     "phonemes": "L IY1 P T",
+     "key": "IY P T",
+     "respelling": "LEE-pt"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "bonus"
+ },
+ {
+  "id": "leucine|IH N",
+  "word": "leucine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "leucocytozoon|UW N",
+  "word": "leucocytozoon",
+  "seedWord": "noon",
+  "rhymeKey": "UW N",
+  "seedReading": "N UW1 N",
+  "seedRespelling": "NOO-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "lightroom|UW M",
+  "word": "lightroom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "L AY1 T R UW2 M",
+    "head": "light",
+    "tail": "room"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "maroquin|IH N",
+  "word": "maroquin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "M AA1 R OW0 K W IH2 N",
+    "head": "maro",
+    "tail": "quin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "microvolume|UW M",
+  "word": "microvolume",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "M AY1 K R OW2 V AA2 L Y UW2 M",
+    "head": "micro",
+    "tail": "volume"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "muezzin|IH N",
+  "word": "muezzin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "noncaste|EY S T",
+  "word": "noncaste",
+  "seedWord": "toothpaste",
+  "rhymeKey": "EY S T",
+  "seedReading": "T UW1 TH P EY2 S T",
+  "seedRespelling": "TOO-thpay-st",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "norepinephrine|IH N",
+  "word": "norepinephrine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "overgloom|UW M",
+  "word": "overgloom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "OW1 V ER0 G L UW2 M",
+    "head": "over",
+    "tail": "gloom"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "piggin|IH N",
+  "word": "piggin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "P IH1 G JH IH2 N",
+    "head": "pig",
+    "tail": "gin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "protozoon|UW N",
+  "word": "protozoon",
+  "seedWord": "noon",
+  "rhymeKey": "UW N",
+  "seedReading": "N UW1 N",
+  "seedRespelling": "NOO-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "psittacine|IH N",
+  "word": "psittacine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "pulviplume|UW M",
+  "word": "pulviplume",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "pustule|UW L",
+  "word": "pustule",
+  "seedWord": "buhl",
+  "rhymeKey": "UW L",
+  "seedReading": "B Y UW1 L",
+  "seedRespelling": "BYOO-l",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "pyrgom|UW M",
+  "word": "pyrgom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "quixotic|tier",
+  "word": "quixotic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "K W IH0 K S AA1 T IH0 K",
+     "key": "AA T IH K",
+     "respelling": "kwih-KSAH-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "bonus"
+ },
+ {
+  "id": "racoon|UW N",
+  "word": "racoon",
+  "seedWord": "noon",
+  "rhymeKey": "UW N",
+  "seedReading": "N UW1 N",
+  "seedRespelling": "NOO-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R AA1 K UW2 N",
+    "head": "ra",
+    "tail": "coon"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "refreshen|IH N",
+  "word": "refreshen",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "reimagine|IH N",
+  "word": "reimagine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "replevin|IH N",
+  "word": "replevin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R EH1 P L AH0 V IH2 N",
+    "head": "rep",
+    "tail": "levin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "replume|UW M",
+  "word": "replume",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R EY1 P L UW2 M",
+    "head": "re",
+    "tail": "plume"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "scrawl|tier",
+  "word": "scrawl",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 3,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S K R AA1 L",
+     "key": "AA L",
+     "respelling": "SKRAH-l"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "bonus"
+ },
+ {
+  "id": "snowfall|tier",
+  "word": "snowfall",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S N OW1 F AA0 L",
+     "key": "OW F AA L",
+     "respelling": "SNOH-fah-l"
+    },
+    {
+     "phonemes": "S N OW1 F AA2 L",
+     "key": "AA L",
+     "respelling": "SNOH-fah-l"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "bonus"
+ },
+ {
+  "id": "spoom|UW M",
+  "word": "spoom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "takin|IH N",
+  "word": "takin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "T IY1 AH0 K IH2 N",
+    "head": "t",
+    "tail": "akin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "terrapin|IH N",
+  "word": "terrapin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "T EH1 R AA2 P IH2 N",
+    "head": "terra",
+    "tail": "pin"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "thrall|tier",
+  "word": "thrall",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 5,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "TH R AA1 L",
+     "key": "AA L",
+     "respelling": "THRAH-l"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "bonus"
+ },
+ {
+  "id": "tocsin|IH N",
+  "word": "tocsin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "tyrosine|IH N",
+  "word": "tyrosine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "unfeminine|IH N",
+  "word": "unfeminine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "ursine|IH N",
+  "word": "ursine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "volucrine|IH N",
+  "word": "volucrine",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "warkloom|UW M",
+  "word": "warkloom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "W AO1 R K L UW2 M",
+    "head": "wark",
+    "tail": "loom"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "windfall|tier",
+  "word": "windfall",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": null,
+  "seedRespelling": null,
+  "kind": "tier",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "W IH1 N D F AA2 L",
+     "key": "AA L",
+     "respelling": "WIH-ndfah-l"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "bonus"
+ },
+ {
+  "id": "winos|IY N OW Z",
+  "word": "winos",
+  "seedWord": "casinos",
+  "rhymeKey": "IY N OW Z",
+  "seedReading": "K AH0 S IY1 N OW0 Z",
+  "seedRespelling": "kuh-SEE-noh-z",
+  "kind": "wrong-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "W IY1 N OW0 S",
+     "key": "IY N OW S",
+     "respelling": "WEE-noh-s"
+    },
+    {
+     "phonemes": "W IY1 N OW2 S",
+     "key": "OW S",
+     "respelling": "WEE-noh-s"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "woom|UW M",
+  "word": "woom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "workloom|UW M",
+  "word": "workloom",
+  "seedWord": "tomb",
+  "rhymeKey": "UW M",
+  "seedReading": "T UW1 M",
+  "seedRespelling": "TOO-m",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "W ER1 K L UW2 M",
+    "head": "work",
+    "tail": "loom"
+   }
+  },
+  "onFile": "rhymes"
+ },
+ {
+  "id": "zootoxin|IH N",
+  "word": "zootoxin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "supplement",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "onFile": "rhymes"
+ }
+]

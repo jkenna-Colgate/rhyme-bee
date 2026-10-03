@@ -56,7 +56,11 @@ const tuningLabels: Record<string, Label> = {};
 if (existsSync(labelDir)) {
   for (const f of readdirSync(labelDir)) if (!f.startsWith("heldout")) Object.assign(tuningLabels, labelsIn(f));
 }
-const truth: Record<string, Label> = { ...Object.fromEntries(pairs.filter((p) => p.onFile).map((p) => [p.id, p.onFile!])), ...labelsIn(`${set}.labels.json`) };
+// A reviewed ruling outranks the one on file: the review is the maintainer's ear, the file may not be.
+const truth: Record<string, Label> = {
+  ...Object.fromEntries(pairs.filter((p) => p.onFile).map((p) => [p.id, p.onFile!])),
+  ...(set === "heldout" ? labelsIn("heldout.labels.json") : tuningLabels),
+};
 
 // Shots come from the tuning side only. The held-out set is never quoted to the judge.
 const shotPool: (Pair & { label: Label })[] = [];

@@ -1,0 +1,1879 @@
+{
+ "cruzados|AA D OW Z": {
+  "word": "cruzados",
+  "verdict": "rhymes",
+  "reading": "K R UW0 Z AA1 D OW2 Z",
+  "confidence": "medium",
+  "why": "Plural of cruzado, a real word, with secondary stress on the final -ados vowel, matching avocados' OW2 Z key.",
+  "verified": false
+ },
+ "frocked|AA K T": {
+  "word": "frocked",
+  "verdict": "rhymes",
+  "reading": "F R AA1 K T",
+  "confidence": "high",
+  "why": "Real word ending in the same AA K T as shellshocked in merged GA.",
+  "verified": true
+ },
+ "enthrall|AA L": {
+  "word": "enthrall",
+  "verdict": "rhymes",
+  "reading": "EH0 N TH R AO1 L",
+  "confidence": "high",
+  "why": "Stress falls on the final syllable, which is AO L (the same as AA L in merged GA), like wall.",
+  "verified": false
+ },
+ "enschedule|EH JH UW L": {
+  "word": "enschedule",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "Not an English word; 'en-' is not a productive prefix on schedule."
+ },
+ "repped|EH P T": {
+  "word": "repped",
+  "verdict": "rhymes",
+  "reading": "R EH1 P T",
+  "confidence": "medium",
+  "why": "Past tense of the verb rep, with a stressed EH P T like slept.",
+  "verified": true
+ },
+ "schlepped|EH P T": {
+  "word": "schlepped",
+  "verdict": "rhymes",
+  "reading": "SH L EH1 P T",
+  "confidence": "high",
+  "why": "Real word, stressed EH P T, same as slept.",
+  "verified": true
+ },
+ "airburst|ER S T": {
+  "word": "airburst",
+  "verdict": "rhymes",
+  "reading": "EH1 R B ER2 S T",
+  "confidence": "medium",
+  "why": "Compound with secondary stress on the final ER S T, matching thirst.",
+  "verified": true
+ },
+ "bratwurst|ER S T": {
+  "word": "bratwurst",
+  "verdict": "rhymes",
+  "reading": "B R AE1 T W ER2 S T",
+  "confidence": "medium",
+  "why": "Final syllable carries secondary stress in American speech, giving ER S T like thirst.",
+  "verified": true
+ },
+ "abased|EY S T": {
+  "word": "abased",
+  "verdict": "rhymes",
+  "reading": "AH0 B EY1 S T",
+  "confidence": "high",
+  "why": "Abased is stressed on the second syllable and ends in EY1 S T, matching paste.",
+  "verified": true
+ },
+ "abrased|EY S T": {
+  "word": "abrased",
+  "verdict": "rhymes",
+  "reading": "AH0 B R EY1 S T",
+  "confidence": "low",
+  "why": "Abrase is a rare but attested verb, and its past tense ends in stressed EY1 S T.",
+  "verified": true
+ },
+ "cased|EY S T": {
+  "word": "cased",
+  "verdict": "rhymes",
+  "reading": "K EY1 S T",
+  "confidence": "high",
+  "why": "Cased is the past tense of case and ends in EY1 S T.",
+  "verified": true
+ },
+ "effaced|EY S T": {
+  "word": "effaced",
+  "verdict": "rhymes",
+  "reading": "IH0 F EY1 S T",
+  "confidence": "high",
+  "why": "Effaced is stressed on its final syllable, which is EY1 S T.",
+  "verified": true
+ },
+ "emplaced|EY S T": {
+  "word": "emplaced",
+  "verdict": "rhymes",
+  "reading": "EH0 M P L EY1 S T",
+  "confidence": "medium",
+  "why": "Emplaced is a real word with stress on the last syllable, ending in EY1 S T.",
+  "verified": true
+ },
+ "enlaced|EY S T": {
+  "word": "enlaced",
+  "verdict": "rhymes",
+  "reading": "EH0 N L EY1 S T",
+  "confidence": "medium",
+  "why": "Enlace is a real, if rare, verb, and enlaced ends in stressed EY1 S T.",
+  "verified": true
+ },
+ "gaist|EY S T": {
+  "word": "gaist",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Gaist is not a standard English word. It appears only as a dialect or Scots spelling or as a name."
+ },
+ "impaste|EY S T": {
+  "word": "impaste",
+  "verdict": "rhymes",
+  "reading": "IH0 M P EY1 S T",
+  "confidence": "medium",
+  "why": "Impaste is a real verb meaning to apply paste, with stress on the final EY1 S T.",
+  "verified": true
+ },
+ "mayst|EY S T": {
+  "word": "mayst",
+  "verdict": "rhymes",
+  "reading": "M EY1 S T",
+  "confidence": "medium",
+  "why": "Archaic 'mayst' is pronounced like 'maist', ending in EY1 S T.",
+  "verified": true
+ },
+ "noncaste|EY S T": {
+  "word": "noncaste",
+  "verdict": "no-rhyme",
+  "reading": "N AA2 N K AE1 S T",
+  "confidence": "medium",
+  "why": "'Caste' has the vowel of 'past' (AE), not the long A of 'paste'."
+ },
+ "outraced|EY S T": {
+  "word": "outraced",
+  "verdict": "rhymes",
+  "reading": "AW2 T R EY1 S T",
+  "confidence": "high",
+  "why": "'Outraced' ends in 'raced', which is EY1 S T.",
+  "verified": true
+ },
+ "pretaste|EY S T": {
+  "word": "pretaste",
+  "verdict": "rhymes",
+  "reading": "P R IY1 T EY2 S T",
+  "confidence": "medium",
+  "why": "The secondary stress on 'taste' gives the key EY S T.",
+  "verified": true
+ },
+ "retaste|EY S T": {
+  "word": "retaste",
+  "verdict": "rhymes",
+  "reading": "R IY0 T EY1 S T",
+  "confidence": "medium",
+  "why": "The stress falls on 'taste', which has the same ending as 'paste'.",
+  "verified": true
+ },
+ "unbraced|EY S T": {
+  "word": "unbraced",
+  "verdict": "rhymes",
+  "reading": "AH0 N B R EY1 S T",
+  "confidence": "high",
+  "why": "'Unbraced' ends in 'braced', which is EY1 S T.",
+  "verified": true
+ },
+ "undefaced|EY S T": {
+  "word": "undefaced",
+  "verdict": "rhymes",
+  "reading": "AH2 N D IH0 F EY1 S T",
+  "confidence": "medium",
+  "why": "The stress falls on 'faced', which is EY1 S T.",
+  "verified": true
+ },
+ "undisgraced|EY S T": {
+  "word": "undisgraced",
+  "verdict": "rhymes",
+  "reading": "AH2 N D IH0 S G R EY1 S T",
+  "confidence": "medium",
+  "why": "The stress falls on 'graced', which is EY1 S T.",
+  "verified": true
+ },
+ "unfaced|EY S T": {
+  "word": "unfaced",
+  "verdict": "rhymes",
+  "reading": "AH0 N F EY1 S T",
+  "confidence": "medium",
+  "why": "Real, if uncommon, word whose last stressed vowel is the EY in 'faced', so it matches EY1 S T.",
+  "verified": true
+ },
+ "ungraced|EY S T": {
+  "word": "ungraced",
+  "verdict": "rhymes",
+  "reading": "AH0 N G R EY1 S T",
+  "confidence": "high",
+  "why": "Stress falls on 'graced', which ends in EY1 S T.",
+  "verified": true
+ },
+ "unspaced|EY S T": {
+  "word": "unspaced",
+  "verdict": "rhymes",
+  "reading": "AH0 N S P EY1 S T",
+  "confidence": "medium",
+  "why": "Stress falls on 'spaced', which ends in EY1 S T.",
+  "verified": true
+ },
+ "vambraced|EY S T": {
+  "word": "vambraced",
+  "verdict": "rhymes",
+  "reading": "V AE1 M B R EY2 S T",
+  "confidence": "medium",
+  "why": "The secondary stress on -braced gives EY2 S T, matching the key.",
+  "verified": true
+ },
+ "anguine|IH N": {
+  "word": "anguine",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "medium",
+  "why": "It is stressed on the first syllable (ANG-gwin), so the final -guine is unstressed, though some say it with a -gwyne ending."
+ },
+ "arshin|IH N": {
+  "word": "arshin",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "medium",
+  "why": "The usual pronunciation is ar-SHEEN, with a stressed IY and not IH."
+ },
+ "bearskin|IH N": {
+  "word": "bearskin",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is stressed on 'bear', and the final -skin syllable is unstressed IH0 N."
+ },
+ "boffin|IH N": {
+  "word": "boffin",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is stressed on 'boff', and the final -fin syllable is unstressed IH0 N."
+ },
+ "bowfin|IH N": {
+  "word": "bowfin",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on BOW, and the final syllable -fin is unstressed IH0 N."
+ },
+ "breastpin|IH N": {
+  "word": "breastpin",
+  "verdict": "rhymes",
+  "reading": "B R EH1 S T P IH2 N",
+  "confidence": "medium",
+  "why": "It is a compound, and the second element -pin carries secondary stress, so it ends in IH2 N.",
+  "verified": true
+ },
+ "cerumen|IH N": {
+  "word": "cerumen",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "The last stressed vowel is UW1, so the key is UW M AH N, not IH N."
+ },
+ "clothespin|IH N": {
+  "word": "clothespin",
+  "verdict": "rhymes",
+  "reading": "K L OW1 Z P IH2 N",
+  "confidence": "high",
+  "why": "It is a compound, and -pin carries secondary stress on IH.",
+  "verified": true
+ },
+ "consanguine|IH N": {
+  "word": "consanguine",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Stress falls on -sang-, and the final syllable -guine is unstressed IH0 N."
+ },
+ "digoxin|IH N": {
+  "word": "digoxin",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on -gox-, and the final -in is unstressed IH0 N."
+ },
+ "djinn|IH N": {
+  "word": "djinn",
+  "verdict": "rhymes",
+  "reading": "JH IH1 N",
+  "confidence": "high",
+  "why": "It is a real word pronounced like 'jin', with the same IH1 N as win.",
+  "verified": true
+ },
+ "firkin|IH N": {
+  "word": "firkin",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on FIR, and the final -kin is unstressed IH0 N."
+ },
+ "gherkin|IH N": {
+  "word": "gherkin",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is ER (ER1 K IH0 N), not IH."
+ },
+ "godforsaken|IH N": {
+  "word": "godforsaken",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Last stress is on EY (EY1 K AH0 N)."
+ },
+ "grimalkin|IH N": {
+  "word": "grimalkin",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Stress is on the second syllable (-MAL-), and the final -kin (IH0 N) is unstressed."
+ },
+ "hairpin|IH N": {
+  "word": "hairpin",
+  "verdict": "rhymes",
+  "reading": "HH EH1 R P IH2 N",
+  "confidence": "high",
+  "why": "Compound with secondary stress on -pin, so it ends in IH N like win.",
+  "verified": true
+ },
+ "homelyn|IH N": {
+  "word": "homelyn",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "low",
+  "why": "It is an obscure word for a ray fish, stressed on HOME- with an unstressed -lyn (IH0 N)."
+ },
+ "illumine|IH N": {
+  "word": "illumine",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on UW (UW1 M IH0 N)."
+ },
+ "immunoglobulin|IH N": {
+  "word": "immunoglobulin",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Last stress is on -glob- (AA1 B Y AH0 L IH0 N)."
+ },
+ "isoleucine|IH N": {
+  "word": "isoleucine",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Last stress is on -leu- (UW1 S IY0 N) or the final -cine (IY N), not IH N."
+ },
+ "jerkin|IH N": {
+  "word": "jerkin",
+  "verdict": "weak",
+  "reading": "JH ER1 K IH0 N",
+  "confidence": "medium",
+  "why": "Stress is on the first syllable and the unstressed final -kin has the IH N sounds."
+ },
+ "leucine|IH N": {
+  "word": "leucine",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is said LOO-seen, so the last stressed vowel is a long E, not IH."
+ },
+ "maroquin|IH N": {
+  "word": "maroquin",
+  "verdict": "rhymes",
+  "reading": "M AE1 R AH0 K IH2 N",
+  "confidence": "low",
+  "why": "Dictionaries give a secondary stress on the final -kin, which makes the key IH N.",
+  "verified": true
+ },
+ "muezzin|IH N": {
+  "word": "muezzin",
+  "verdict": "weak",
+  "reading": "M Y UW0 EH1 Z IH0 N",
+  "confidence": "medium",
+  "why": "Stress falls on -ezz-, and the final -zin is unstressed IH N."
+ },
+ "norepinephrine|IH N": {
+  "word": "norepinephrine",
+  "verdict": "weak",
+  "reading": "N AO2 R EH2 P IH0 N EH1 F R IH0 N",
+  "confidence": "low",
+  "why": "The main stress is on -neph-, and the final -rine is often unstressed IH N, though some say it as -reen."
+ },
+ "oilskin|IH N": {
+  "word": "oilskin",
+  "verdict": "rhymes",
+  "reading": "OY1 L S K IH2 N",
+  "confidence": "medium",
+  "why": "In this compound, -skin keeps a secondary stress on IH, so the key is IH N.",
+  "verified": true
+ },
+ "piggin|IH N": {
+  "word": "piggin",
+  "verdict": "weak",
+  "reading": "P IH1 G IH0 N",
+  "confidence": "low",
+  "why": "The first syllable is stressed and the final -gin is unstressed, though many speakers say it with a schwa."
+ },
+ "psittacine|IH N": {
+  "word": "psittacine",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Its secondary-stressed ending is -sine, said like AY N or EE N, not IH N."
+ },
+ "refreshen|IH N": {
+  "word": "refreshen",
+  "verdict": "no-rhyme",
+  "reading": "R IH0 F R EH1 SH AH0 N",
+  "confidence": "high",
+  "why": "The last stressed vowel is EH1 and the word ends in AH0 N, so it doesn't match IH1 N."
+ },
+ "reimagine|IH N": {
+  "word": "reimagine",
+  "verdict": "weak",
+  "reading": "R IY0 IH1 M AH0 JH IH0 N",
+  "confidence": "medium",
+  "why": "The final syllable is IH0 N, but the stress falls earlier on the IH1 in 'im'."
+ },
+ "replevin|IH N": {
+  "word": "replevin",
+  "verdict": "weak",
+  "reading": "R IH0 P L EH1 V IH0 N",
+  "confidence": "medium",
+  "why": "The ending is IH0 N, but the stress is on the earlier EH1."
+ },
+ "snakeskin|IH N": {
+  "word": "snakeskin",
+  "verdict": "rhymes",
+  "reading": "S N EY1 K S K IH2 N",
+  "confidence": "high",
+  "why": "'Skin' carries secondary stress, so the word ends in IH2 N, the same key as 'win'.",
+  "verified": true
+ },
+ "takin|IH N": {
+  "word": "takin",
+  "verdict": "weak",
+  "reading": "T AA1 K IH0 N",
+  "confidence": "low",
+  "why": "If it's the animal 'takin', the stress is on the first syllable and the final IH0 N is unstressed. The respelling of 'taking' would be weak in the same way."
+ },
+ "terrapin|IH N": {
+  "word": "terrapin",
+  "verdict": "weak",
+  "reading": "T EH1 R AH0 P IH0 N",
+  "confidence": "high",
+  "why": "The stress is on the first syllable and the final IH0 N is unstressed."
+ },
+ "tocsin|IH N": {
+  "word": "tocsin",
+  "verdict": "weak",
+  "reading": "T AA1 K S IH0 N",
+  "confidence": "high",
+  "why": "The stress is on the first syllable and the final IH0 N is unstressed."
+ },
+ "tyrosine|IH N": {
+  "word": "tyrosine",
+  "verdict": "no-rhyme",
+  "reading": "T AY1 R AH0 S IY2 N",
+  "confidence": "high",
+  "why": "It ends in IY2 N ('-seen'), not IH N."
+ },
+ "unfeminine|IH N": {
+  "word": "unfeminine",
+  "verdict": "weak",
+  "reading": "AH2 N F EH1 M AH0 N IH0 N",
+  "confidence": "medium",
+  "why": "Stress is on 'fem' and the final syllable is an unstressed 'nin' with the same sounds as the key."
+ },
+ "ursine|IH N": {
+  "word": "ursine",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is said ER1 S AY2 N, so the last stressed vowel is AY, not IH."
+ },
+ "volucrine|IH N": {
+  "word": "volucrine",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "low",
+  "why": "It most likely ends in AY2 N like 'ursine', not IH N."
+ },
+ "wineskin|IH N": {
+  "word": "wineskin",
+  "verdict": "rhymes",
+  "reading": "W AY1 N S K IH2 N",
+  "confidence": "medium",
+  "why": "The final syllable 'skin' carries secondary stress, so the key from the last stressed vowel is IH N.",
+  "verified": true
+ },
+ "zootoxin|IH N": {
+  "word": "zootoxin",
+  "verdict": "weak",
+  "reading": "Z UW2 AH0 T AA1 K S IH0 N",
+  "confidence": "medium",
+  "why": "Stress is on 'tox' and the final 'in' is unstressed."
+ },
+ "pinnule|IH N Y UW L": {
+  "word": "pinnule",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is P IH1 N Y UW0 L, which ends in UW L, not the key IH N Y UW AH L."
+ },
+ "frontiered|IH R D": {
+  "word": "frontiered",
+  "verdict": "rhymes",
+  "reading": "F R AH0 N T IH1 R D",
+  "confidence": "low",
+  "why": "It is a rare but real adjective, stressed on 'tier' and ending in IH R D like 'beard'.",
+  "verified": true
+ },
+ "leered|IH R D": {
+  "word": "leered",
+  "verdict": "rhymes",
+  "reading": "L IH1 R D",
+  "confidence": "high",
+  "why": "It is the past tense of 'leer', with exactly the same ending as 'beard'.",
+  "verified": true
+ },
+ "racketeered|IH R D": {
+  "word": "racketeered",
+  "verdict": "rhymes",
+  "reading": "R AE2 K AH0 T IH1 R D",
+  "confidence": "high",
+  "why": "Stress falls on the final syllable, which is -eered /IH1 R D/, the same as beard.",
+  "verified": true
+ },
+ "speared|IH R D": {
+  "word": "speared",
+  "verdict": "rhymes",
+  "reading": "S P IH1 R D",
+  "confidence": "high",
+  "why": "It is a one-syllable word ending in IH1 R D.",
+  "verified": true
+ },
+ "uncleared|IH R D": {
+  "word": "uncleared",
+  "verdict": "rhymes",
+  "reading": "AH0 N K L IH1 R D",
+  "confidence": "medium",
+  "why": "It is a real adjective, and its last stressed vowel is IH1 R D.",
+  "verified": true
+ },
+ "veneered|IH R D": {
+  "word": "veneered",
+  "verdict": "rhymes",
+  "reading": "V AH0 N IH1 R D",
+  "confidence": "high",
+  "why": "The stress is on the final syllable, which is /IH1 R D/.",
+  "verified": true
+ },
+ "campesinos|IY N OW Z": {
+  "word": "campesinos",
+  "verdict": "rhymes",
+  "reading": "K AE2 M P AH0 S IY1 N OW0 Z",
+  "confidence": "medium",
+  "why": "It is a dictionary-listed loanword that ends in the same stressed -sinos /IY1 N OW0 Z/ as casinos.",
+  "verified": true
+ },
+ "latinos|IY N OW Z": {
+  "word": "latinos",
+  "verdict": "rhymes",
+  "reading": "L AH0 T IY1 N OW0 Z",
+  "confidence": "high",
+  "why": "It is a common noun that ends in stressed /IY1 N OW0 Z/, like casinos.",
+  "verified": true
+ },
+ "winos|IY N OW Z": {
+  "word": "winos",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its stressed vowel is AY1 (/W AY1 N OW0 Z/), not IY1."
+ },
+ "burritos|IY T OW Z": {
+  "word": "burritos",
+  "verdict": "rhymes",
+  "reading": "B ER0 IY1 T OW0 Z",
+  "confidence": "high",
+  "why": "It ends in stressed /IY1 T OW0 Z/, the same as mosquitoes.",
+  "verified": true
+ },
+ "lobos|OW B OW Z": {
+  "word": "lobos",
+  "verdict": "rhymes",
+  "reading": "L OW1 B OW0 Z",
+  "confidence": "high",
+  "why": "Lobos (wolves) is stressed on the first syllable and ends in OW-B-OW-Z, like hoboes.",
+  "verified": true
+ },
+ "centavos|OW Z": {
+  "word": "centavos",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Stress falls on 'ta' (sen-TAH-vohz), so the key is AA-V-OW-Z, not OW-Z."
+ },
+ "overjoy|OY": {
+  "word": "overjoy",
+  "verdict": "rhymes",
+  "reading": "OW2 V ER0 JH OY1",
+  "confidence": "high",
+  "why": "The stress is on the final OY, the same as joy.",
+  "verified": true
+ },
+ "viceroy|OY": {
+  "word": "viceroy",
+  "verdict": "rhymes",
+  "reading": "V AY1 S R OY2",
+  "confidence": "high",
+  "why": "The final syllable carries secondary stress on OY, which matches joy.",
+  "verified": true
+ },
+ "ampoule|UW L": {
+  "word": "ampoule",
+  "verdict": "rhymes",
+  "reading": "AE1 M P UW2 L",
+  "confidence": "medium",
+  "why": "The final syllable is pronounced 'pool' with secondary stress, so it ends in UW-L.",
+  "verified": true
+ },
+ "cagoule|UW L": {
+  "word": "cagoule",
+  "verdict": "rhymes",
+  "reading": "K AH0 G UW1 L",
+  "confidence": "high",
+  "why": "Stress is on the final syllable (ka-GOOL), which matches cool.",
+  "verified": true
+ },
+ "ferrule|UW L": {
+  "word": "ferrule",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "low",
+  "why": "Stress is on the first syllable, and the unstressed final syllable can be said -ool, though many say -ul."
+ },
+ "ferule|UW L": {
+  "word": "ferule",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "low",
+  "why": "Stress is on the first syllable, and the unstressed final syllable can be said -ool, though many say -ul."
+ },
+ "globule|UW L": {
+  "word": "globule",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on the first syllable (GLOB-yool), so the final -ule is unstressed."
+ },
+ "lobule|UW L": {
+  "word": "lobule",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on LOB-, so the final -ule is unstressed."
+ },
+ "macromolecule|UW L": {
+  "word": "macromolecule",
+  "verdict": "rhymes",
+  "reading": "M AE2 K R OW0 M AA1 L AH0 K Y UW2 L",
+  "confidence": "medium",
+  "why": "The final syllable carries secondary stress (-cule), giving the key UW L.",
+  "verified": true
+ },
+ "majuscule|UW L": {
+  "word": "majuscule",
+  "verdict": "rhymes",
+  "reading": "M AE1 JH AH0 S K Y UW2 L",
+  "confidence": "medium",
+  "why": "The final syllable has secondary stress (MAJ-uh-skyool), so it ends in the key UW L.",
+  "verified": true
+ },
+ "pule|UW L": {
+  "word": "pule",
+  "verdict": "rhymes",
+  "reading": "P Y UW1 L",
+  "confidence": "high",
+  "why": "A one-syllable word with the same stressed UW L ending as cool.",
+  "verified": true
+ },
+ "pustule|UW L": {
+  "word": "pustule",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on PUS-, so the final -tule is unstressed."
+ },
+ "spicule|UW L": {
+  "word": "spicule",
+  "verdict": "rhymes",
+  "reading": "S P IH1 K Y UW2 L",
+  "confidence": "low",
+  "why": "Dictionaries often give the final syllable secondary stress, but it is often said unstressed, so this is uncertain.",
+  "verified": true
+ },
+ "absume|UW M": {
+  "word": "absume",
+  "verdict": "rhymes",
+  "reading": "AH0 B S UW1 M",
+  "confidence": "low",
+  "why": "It is a rare, obsolete English word meaning 'to consume', stressed on the last syllable, so it ends in UW M like tomb.",
+  "verified": true
+ },
+ "addoom|UW M": {
+  "word": "addoom",
+  "verdict": "rhymes",
+  "reading": "AH0 D UW1 M",
+  "confidence": "low",
+  "why": "Rare archaic word (to adjudge) stressed on -doom, which matches the key UW-M.",
+  "verified": true
+ },
+ "anteroom|UW M": {
+  "word": "anteroom",
+  "verdict": "rhymes",
+  "reading": "AE1 N T ER0 R UW2 M",
+  "confidence": "high",
+  "why": "The final syllable -room carries secondary stress and ends in UW-M.",
+  "verified": true
+ },
+ "apostume|UW M": {
+  "word": "apostume",
+  "verdict": "rhymes",
+  "reading": "AE1 P AH0 S T UW2 M",
+  "confidence": "medium",
+  "why": "The archaic word for an abscess has secondary stress on -tume, ending in UW-M.",
+  "verified": true
+ },
+ "begloom|UW M": {
+  "word": "begloom",
+  "verdict": "rhymes",
+  "reading": "B IH0 G L UW1 M",
+  "confidence": "medium",
+  "why": "The verb be-GLOOM is stressed on its final syllable, which has the key UW-M.",
+  "verified": true
+ },
+ "bitume|UW M": {
+  "word": "bitume",
+  "verdict": "rhymes",
+  "reading": "B IH0 T UW1 M",
+  "confidence": "medium",
+  "why": "The archaic form of bitumen is stressed on the final syllable, which has the key UW-M.",
+  "verified": true
+ },
+ "bookroom|UW M": {
+  "word": "bookroom",
+  "verdict": "rhymes",
+  "reading": "B UH1 K R UW2 M",
+  "confidence": "medium",
+  "why": "In this compound, -room keeps secondary stress and ends in UW-M.",
+  "verified": true
+ },
+ "boxroom|UW M": {
+  "word": "boxroom",
+  "verdict": "rhymes",
+  "reading": "B AA1 K S R UW2 M",
+  "confidence": "medium",
+  "why": "In this compound, -room keeps secondary stress and ends in UW-M.",
+  "verified": true
+ },
+ "broadloom|UW M": {
+  "word": "broadloom",
+  "verdict": "rhymes",
+  "reading": "B R AA1 D L UW2 M",
+  "confidence": "high",
+  "why": "The final syllable -loom has secondary stress and ends in UW-M.",
+  "verified": true
+ },
+ "brume|UW M": {
+  "word": "brume",
+  "verdict": "rhymes",
+  "reading": "B R UW1 M",
+  "confidence": "medium",
+  "why": "Rare literary word for mist, pronounced to rhyme with tomb.",
+  "verified": true
+ },
+ "cardroom|UW M": {
+  "word": "cardroom",
+  "verdict": "rhymes",
+  "reading": "K AA1 R D R UW2 M",
+  "confidence": "medium",
+  "why": "The final syllable 'room' carries secondary stress on UW, so the key is UW M.",
+  "verified": true
+ },
+ "chartroom|UW M": {
+  "word": "chartroom",
+  "verdict": "rhymes",
+  "reading": "CH AA1 R T R UW2 M",
+  "confidence": "medium",
+  "why": "The final syllable 'room' carries secondary stress on UW, so the key is UW M.",
+  "verified": true
+ },
+ "checkerbloom|UW M": {
+  "word": "checkerbloom",
+  "verdict": "rhymes",
+  "reading": "CH EH1 K ER0 B L UW2 M",
+  "confidence": "low",
+  "why": "A real plant name (Sidalcea) whose final 'bloom' keeps secondary stress, so it ends in UW M.",
+  "verified": true
+ },
+ "checkroom|UW M": {
+  "word": "checkroom",
+  "verdict": "rhymes",
+  "reading": "CH EH1 K R UW2 M",
+  "confidence": "medium",
+  "why": "The final syllable 'room' carries secondary stress on UW, so the key is UW M.",
+  "verified": true
+ },
+ "choom|UW M": {
+  "word": "choom",
+  "verdict": "rhymes",
+  "reading": "CH UW1 M",
+  "confidence": "low",
+  "why": "Slang for 'friend' (Canadian/Cyberpunk usage), pronounced exactly like the key; its dictionary status is uncertain.",
+  "verified": true
+ },
+ "clubroom|UW M": {
+  "word": "clubroom",
+  "verdict": "rhymes",
+  "reading": "K L AH1 B R UW2 M",
+  "confidence": "medium",
+  "why": "The final syllable 'room' carries secondary stress on UW, so the key is UW M.",
+  "verified": true
+ },
+ "coatroom|UW M": {
+  "word": "coatroom",
+  "verdict": "rhymes",
+  "reading": "K OW1 T R UW2 M",
+  "confidence": "medium",
+  "why": "The final syllable 'room' carries secondary stress on UW, so the key is UW M.",
+  "verified": true
+ },
+ "coffeeroom|UW M": {
+  "word": "coffeeroom",
+  "verdict": "rhymes",
+  "reading": "K AO1 F IY0 R UW2 M",
+  "confidence": "medium",
+  "why": "A compound with secondary stress on 'room', so its key is UW M.",
+  "verified": true
+ },
+ "cookroom|UW M": {
+  "word": "cookroom",
+  "verdict": "rhymes",
+  "reading": "K UH1 K R UW2 M",
+  "confidence": "medium",
+  "why": "A compound (a ship's galley) with secondary stress on 'room', so its key is UW M.",
+  "verified": true
+ },
+ "coom|UW M": {
+  "word": "coom",
+  "verdict": "rhymes",
+  "reading": "K UW1 M",
+  "confidence": "medium",
+  "why": "A dictionary word for coal dust, said 'koom', so it matches tomb exactly.",
+  "verified": true
+ },
+ "corniplume|UW M": {
+  "word": "corniplume",
+  "verdict": "rhymes",
+  "reading": "K AO1 R N IH0 P L UW2 M",
+  "confidence": "low",
+  "why": "An archaic word that ends in secondary-stressed 'plume', so its key is UW M.",
+  "verified": true
+ },
+ "cwm|UW M": {
+  "word": "cwm",
+  "verdict": "rhymes",
+  "reading": "K UW1 M",
+  "confidence": "high",
+  "why": "A Welsh-derived English word (a glacial valley) said 'koom', so it matches tomb.",
+  "verified": true
+ },
+ "dayroom|UW M": {
+  "word": "dayroom",
+  "verdict": "rhymes",
+  "reading": "D EY1 R UW2 M",
+  "confidence": "high",
+  "why": "A compound with secondary stress on 'room', so its key is UW M.",
+  "verified": true
+ },
+ "deplume|UW M": {
+  "word": "deplume",
+  "verdict": "rhymes",
+  "reading": "D IH0 P L UW1 M",
+  "confidence": "high",
+  "why": "The stress is on the final syllable, so its key is UW M.",
+  "verified": true
+ },
+ "despume|UW M": {
+  "word": "despume",
+  "verdict": "rhymes",
+  "reading": "D IH0 S P Y UW1 M",
+  "confidence": "medium",
+  "why": "The stress is on 'spume', and the key starts at the vowel, so it is UW M.",
+  "verified": true
+ },
+ "desume|UW M": {
+  "word": "desume",
+  "verdict": "rhymes",
+  "reading": "D IH0 Z UW1 M",
+  "confidence": "medium",
+  "why": "Rare real verb (to derive) with stress on the final -sume, which is /uːm/.",
+  "verified": true
+ },
+ "disinhume|UW M": {
+  "word": "disinhume",
+  "verdict": "rhymes",
+  "reading": "D IH2 S IH0 N HH Y UW1 M",
+  "confidence": "medium",
+  "why": "Real word (to exhume) with final stressed -hume, /(h)juːm/, which ends in the key UW1 M.",
+  "verified": true
+ },
+ "displume|UW M": {
+  "word": "displume",
+  "verdict": "rhymes",
+  "reading": "D IH0 S P L UW1 M",
+  "confidence": "medium",
+  "why": "Real word (to strip of feathers) with final stressed -plume.",
+  "verified": true
+ },
+ "disselboom|UW M": {
+  "word": "disselboom",
+  "verdict": "rhymes",
+  "reading": "D IH1 S AH0 L B UW2 M",
+  "confidence": "low",
+  "why": "Dictionary-listed word (wagon pole) whose final -boom carries secondary stress on /uːm/.",
+  "verified": true
+ },
+ "drawloom|UW M": {
+  "word": "drawloom",
+  "verdict": "rhymes",
+  "reading": "D R AO1 L UW2 M",
+  "confidence": "medium",
+  "why": "Compound noun whose second element -loom keeps secondary stress, giving UW2 M.",
+  "verified": true
+ },
+ "effume|UW M": {
+  "word": "effume",
+  "verdict": "rhymes",
+  "reading": "EH0 F Y UW1 M",
+  "confidence": "low",
+  "why": "Obscure real word (to breathe out) with final stressed -fume, /juːm/.",
+  "verified": true
+ },
+ "embloom|UW M": {
+  "word": "embloom",
+  "verdict": "rhymes",
+  "reading": "EH0 M B L UW1 M",
+  "confidence": "medium",
+  "why": "Archaic but real word (to cover with bloom) ending in stressed /uːm/.",
+  "verified": true
+ },
+ "engloom|UW M": {
+  "word": "engloom",
+  "verdict": "rhymes",
+  "reading": "EH0 N G L UW1 M",
+  "confidence": "medium",
+  "why": "Archaic but real word (to make gloomy) ending in stressed /uːm/.",
+  "verified": true
+ },
+ "envolume|UW M": {
+  "word": "envolume",
+  "verdict": "weak",
+  "reading": null,
+  "confidence": "low",
+  "why": "A rare word stressed on 'vol', with a final unstressed '-ume' (Y UW M) that matches the key's sounds."
+ },
+ "filoplume|UW M": {
+  "word": "filoplume",
+  "verdict": "rhymes",
+  "reading": "F IH1 L AH0 P L UW2 M",
+  "confidence": "medium",
+  "why": "'Plume' carries secondary stress, so the word ends in the key UW M.",
+  "verified": true
+ },
+ "fireroom|UW M": {
+  "word": "fireroom",
+  "verdict": "rhymes",
+  "reading": "F AY1 ER0 R UW2 M",
+  "confidence": "medium",
+  "why": "A compound whose 'room' keeps secondary stress, ending in UW M.",
+  "verified": true
+ },
+ "foredoom|UW M": {
+  "word": "foredoom",
+  "verdict": "rhymes",
+  "reading": "F AO0 R D UW1 M",
+  "confidence": "high",
+  "why": "Stressed on 'doom', which has the same rhyme as 'tomb'.",
+  "verified": true
+ },
+ "foreroom|UW M": {
+  "word": "foreroom",
+  "verdict": "rhymes",
+  "reading": "F AO1 R R UW2 M",
+  "confidence": "low",
+  "why": "A rare compound, but 'room' keeps secondary stress and ends in UW M.",
+  "verified": true
+ },
+ "glume|UW M": {
+  "word": "glume",
+  "verdict": "rhymes",
+  "reading": "G L UW1 M",
+  "confidence": "high",
+  "why": "A botanical term (grass bract) that rhymes with 'tomb'.",
+  "verified": true
+ },
+ "greenroom|UW M": {
+  "word": "greenroom",
+  "verdict": "rhymes",
+  "reading": "G R IY1 N R UW2 M",
+  "confidence": "high",
+  "why": "'Room' carries secondary stress and ends in UW M.",
+  "verified": true
+ },
+ "grillroom|UW M": {
+  "word": "grillroom",
+  "verdict": "rhymes",
+  "reading": "G R IH1 L R UW2 M",
+  "confidence": "medium",
+  "why": "A compound whose 'room' keeps secondary stress, ending in UW M.",
+  "verified": true
+ },
+ "grume|UW M": {
+  "word": "grume",
+  "verdict": "rhymes",
+  "reading": "G R UW1 M",
+  "confidence": "medium",
+  "why": "Grume is a real, if rare, word for a thick clot, pronounced to rhyme with 'room'.",
+  "verified": true
+ },
+ "guardroom|UW M": {
+  "word": "guardroom",
+  "verdict": "rhymes",
+  "reading": "G AA1 R D R UW2 M",
+  "confidence": "medium",
+  "why": "The compound's secondary stress falls on 'room', which has the key UW-M.",
+  "verified": true
+ },
+ "gunroom|UW M": {
+  "word": "gunroom",
+  "verdict": "rhymes",
+  "reading": "G AH1 N R UW2 M",
+  "confidence": "medium",
+  "why": "The compound's secondary stress falls on 'room', which has the key UW-M.",
+  "verified": true
+ },
+ "hecatomb|UW M": {
+  "word": "hecatomb",
+  "verdict": "no-rhyme",
+  "reading": "HH EH1 K AH0 T OW2 M",
+  "confidence": "medium",
+  "why": "The usual pronunciation ends in 'tohm' (OW-M), not UW-M."
+ },
+ "homeroom|UW M": {
+  "word": "homeroom",
+  "verdict": "rhymes",
+  "reading": "HH OW1 M R UW2 M",
+  "confidence": "high",
+  "why": "The final syllable 'room' carries secondary stress and has the key UW-M.",
+  "verified": true
+ },
+ "hoom|UW M": {
+  "word": "hoom",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "'Hoom' is not a standard English word."
+ },
+ "houseroom|UW M": {
+  "word": "houseroom",
+  "verdict": "rhymes",
+  "reading": "HH AW1 S R UW2 M",
+  "confidence": "medium",
+  "why": "The compound's secondary stress falls on 'room', which has the key UW-M.",
+  "verified": true
+ },
+ "hypervolume|UW M": {
+  "word": "hypervolume",
+  "verdict": "no-rhyme",
+  "reading": "HH AY1 P ER0 V AA2 L Y UW0 M",
+  "confidence": "medium",
+  "why": "The last stressed vowel is AA in 'vol', and the final UW is unstressed, so the key does not match."
+ },
+ "illume|UW M": {
+  "word": "illume",
+  "verdict": "rhymes",
+  "reading": "IH0 L UW1 M",
+  "confidence": "medium",
+  "why": "A poetic word meaning to light up, stressed on the final syllable, which ends in UW1 M like tomb.",
+  "verified": true
+ },
+ "imposthume|UW M": {
+  "word": "imposthume",
+  "verdict": "rhymes",
+  "reading": "IH0 M P AA1 S T UW2 M",
+  "confidence": "medium",
+  "why": "An archaic word for abscess whose final syllable carries secondary stress, so the last stressed vowel is UW2 M.",
+  "verified": true
+ },
+ "impostume|UW M": {
+  "word": "impostume",
+  "verdict": "rhymes",
+  "reading": "IH0 M P AA1 S T UW2 M",
+  "confidence": "medium",
+  "why": "A spelling variant of imposthume, with the same secondary-stressed final UW2 M.",
+  "verified": true
+ },
+ "inhume|UW M": {
+  "word": "inhume",
+  "verdict": "rhymes",
+  "reading": "IH0 N HH Y UW1 M",
+  "confidence": "high",
+  "why": "A real word meaning to bury, stressed on the final syllable, ending in UW1 M.",
+  "verified": true
+ },
+ "insume|UW M": {
+  "word": "insume",
+  "verdict": "rhymes",
+  "reading": "IH0 N S UW1 M",
+  "confidence": "low",
+  "why": "A rare, obsolete word meaning to take in, which would be stressed on the final syllable as in-SUME.",
+  "verified": true
+ },
+ "interroom|UW M": {
+  "word": "interroom",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "It isn't an English word."
+ },
+ "intomb|UW M": {
+  "word": "intomb",
+  "verdict": "rhymes",
+  "reading": "IH0 N T UW1 M",
+  "confidence": "medium",
+  "why": "A variant of entomb, stressed on the final syllable and ending in UW1 M.",
+  "verified": true
+ },
+ "introsume|UW M": {
+  "word": "introsume",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "It isn't an English word."
+ },
+ "isohume|UW M": {
+  "word": "isohume",
+  "verdict": "rhymes",
+  "reading": "AY1 S OW0 HH Y UW2 M",
+  "confidence": "medium",
+  "why": "A meteorology term for a line of equal humidity, with secondary stress on -hume, which gives the key UW-M.",
+  "verified": true
+ },
+ "jibboom|UW M": {
+  "word": "jibboom",
+  "verdict": "rhymes",
+  "reading": "JH IH1 B UW2 M",
+  "confidence": "medium",
+  "why": "A nautical word whose last syllable -boom carries secondary stress and ends in UW-M.",
+  "verified": true
+ },
+ "kokerboom|UW M": {
+  "word": "kokerboom",
+  "verdict": "rhymes",
+  "reading": "K OW1 K ER0 B UW2 M",
+  "confidence": "low",
+  "why": "The quiver tree is a dictionary word, and -boom is pronounced like 'boom' with secondary stress.",
+  "verified": true
+ },
+ "kumkum|UW M": {
+  "word": "kumkum",
+  "verdict": "no-rhyme",
+  "reading": "K UH1 M K UH2 M",
+  "confidence": "low",
+  "why": "The Hindi powder is said with the short UH vowel, so it does not end in UW-M."
+ },
+ "lightroom|UW M": {
+  "word": "lightroom",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "low",
+  "why": "It is a software brand name or a run-together 'light room', not an established English word."
+ },
+ "maybloom|UW M": {
+  "word": "maybloom",
+  "verdict": "rhymes",
+  "reading": "M EY1 B L UW2 M",
+  "confidence": "medium",
+  "why": "A hawthorn blossom, with secondary stress on -bloom, ending in UW-M.",
+  "verified": true
+ },
+ "messroom|UW M": {
+  "word": "messroom",
+  "verdict": "rhymes",
+  "reading": "M EH1 S R UW2 M",
+  "confidence": "medium",
+  "why": "A real compound word whose final -room has secondary stress and is pronounced UW-M.",
+  "verified": true
+ },
+ "microvolume|UW M": {
+  "word": "microvolume",
+  "verdict": "no-rhyme",
+  "reading": "M AY1 K R OW0 V AA2 L Y UW0 M",
+  "confidence": "medium",
+  "why": "The last stressed vowel is AA in -vol-, so the key is AA-L-Y-UW-M, not UW-M."
+ },
+ "mudroom|UW M": {
+  "word": "mudroom",
+  "verdict": "rhymes",
+  "reading": "M AH1 D R UW2 M",
+  "confidence": "medium",
+  "why": "Secondary stress on room, which has the vowel UW and ends in M, so it matches tomb's key.",
+  "verified": true
+ },
+ "neume|UW M": {
+  "word": "neume",
+  "verdict": "rhymes",
+  "reading": "N UW1 M",
+  "confidence": "high",
+  "why": "A musical notation term pronounced like 'noom', which has the same key as tomb.",
+  "verified": true
+ },
+ "nonlegume|UW M": {
+  "word": "nonlegume",
+  "verdict": "rhymes",
+  "reading": "N AA2 N L EH1 G Y UW2 M",
+  "confidence": "low",
+  "why": "Legume carries a secondary stress on its last syllable, so it counts as a full rhyme. If that syllable were unstressed it would be weak.",
+  "verified": true
+ },
+ "outbloom|UW M": {
+  "word": "outbloom",
+  "verdict": "rhymes",
+  "reading": "AW1 T B L UW2 M",
+  "confidence": "medium",
+  "why": "The compound ends in bloom, which has a stressed UW followed by M.",
+  "verified": true
+ },
+ "overconsume|UW M": {
+  "word": "overconsume",
+  "verdict": "rhymes",
+  "reading": "OW2 V ER0 K AH0 N S UW1 M",
+  "confidence": "high",
+  "why": "The stress falls on the final syllable, 'soom', which has the same key as tomb.",
+  "verified": true
+ },
+ "overgloom|UW M": {
+  "word": "overgloom",
+  "verdict": "rhymes",
+  "reading": "OW1 V ER0 G L UW2 M",
+  "confidence": "low",
+  "why": "A rare word that ends in gloom, with a secondary stress on UW followed by M.",
+  "verified": true
+ },
+ "poolroom|UW M": {
+  "word": "poolroom",
+  "verdict": "rhymes",
+  "reading": "P UW1 L R UW2 M",
+  "confidence": "medium",
+  "why": "Secondary stress on room, with the vowel UW followed by M.",
+  "verified": true
+ },
+ "preassume|UW M": {
+  "word": "preassume",
+  "verdict": "rhymes",
+  "reading": "P R IY2 AH0 S UW1 M",
+  "confidence": "medium",
+  "why": "The stress falls on the final syllable, 'soom', which has the same key as tomb.",
+  "verified": true
+ },
+ "predoom|UW M": {
+  "word": "predoom",
+  "verdict": "rhymes",
+  "reading": "P R IY0 D UW1 M",
+  "confidence": "medium",
+  "why": "A rare but real verb (to doom beforehand), stressed on 'doom', which has the same vowel and ending as 'tomb'.",
+  "verified": true
+ },
+ "pressroom|UW M": {
+  "word": "pressroom",
+  "verdict": "rhymes",
+  "reading": "P R EH1 S R UW2 M",
+  "confidence": "medium",
+  "why": "The second element 'room' carries secondary stress with the vowel UW and M, which matches the key.",
+  "verified": true
+ },
+ "proofroom|UW M": {
+  "word": "proofroom",
+  "verdict": "rhymes",
+  "reading": "P R UW1 F R UW2 M",
+  "confidence": "medium",
+  "why": "A printing term whose final 'room' has secondary stress and ends in UW M.",
+  "verified": true
+ },
+ "pulviplume|UW M": {
+  "word": "pulviplume",
+  "verdict": "rhymes",
+  "reading": "P AH1 L V IH0 P L UW2 M",
+  "confidence": "low",
+  "why": "A rare ornithological term (powder-down feather) whose final 'plume' has secondary stress and ends in UW M.",
+  "verified": true
+ },
+ "pyrgom|UW M": {
+  "word": "pyrgom",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "low",
+  "why": "An obscure mineral term that doesn't end in a stressed UW M; it would be pronounced something like PER-gum or PIR-gum."
+ },
+ "rebloom|UW M": {
+  "word": "rebloom",
+  "verdict": "rhymes",
+  "reading": "R IY0 B L UW1 M",
+  "confidence": "high",
+  "why": "Stress falls on 'bloom', which ends in the same UW M as 'tomb'.",
+  "verified": true
+ },
+ "reillume|UW M": {
+  "word": "reillume",
+  "verdict": "rhymes",
+  "reading": "R IY2 IH0 L UW1 M",
+  "confidence": "medium",
+  "why": "A dictionary variant of 'relume', stressed on the final syllable, which is UW M.",
+  "verified": true
+ },
+ "relume|UW M": {
+  "word": "relume",
+  "verdict": "rhymes",
+  "reading": "R IY0 L UW1 M",
+  "confidence": "high",
+  "why": "A real word (to light again) with final stress on 'lume', which is UW M.",
+  "verified": true
+ },
+ "replume|UW M": {
+  "word": "replume",
+  "verdict": "rhymes",
+  "reading": "R IY0 P L UW1 M",
+  "confidence": "medium",
+  "why": "Rare verb 'to plume again', stressed on 'plume', which ends in UW-M.",
+  "verified": true
+ },
+ "rheum|UW M": {
+  "word": "rheum",
+  "verdict": "rhymes",
+  "reading": "R UW1 M",
+  "confidence": "high",
+  "why": "Real word, pronounced exactly like 'room', ending in UW-M.",
+  "verified": true
+ },
+ "saleroom|UW M": {
+  "word": "saleroom",
+  "verdict": "rhymes",
+  "reading": "S EY1 L R UW2 M",
+  "confidence": "medium",
+  "why": "Compound whose second element 'room' carries secondary stress on UW-M.",
+  "verified": true
+ },
+ "salesroom|UW M": {
+  "word": "salesroom",
+  "verdict": "rhymes",
+  "reading": "S EY1 L Z R UW2 M",
+  "confidence": "medium",
+  "why": "Compound whose second element 'room' carries secondary stress on UW-M.",
+  "verified": true
+ },
+ "semiplume|UW M": {
+  "word": "semiplume",
+  "verdict": "rhymes",
+  "reading": "S EH1 M IY0 P L UW2 M",
+  "confidence": "medium",
+  "why": "Technical feather term; the final 'plume' has secondary stress and ends in UW-M.",
+  "verified": true
+ },
+ "sickroom|UW M": {
+  "word": "sickroom",
+  "verdict": "rhymes",
+  "reading": "S IH1 K R UW2 M",
+  "confidence": "medium",
+  "why": "Compound whose second element 'room' carries secondary stress on UW-M.",
+  "verified": true
+ },
+ "simoom|UW M": {
+  "word": "simoom",
+  "verdict": "rhymes",
+  "reading": "S IH0 M UW1 M",
+  "confidence": "high",
+  "why": "Desert wind word with final stress on 'moom', ending in UW-M.",
+  "verified": true
+ },
+ "sloom|UW M": {
+  "word": "sloom",
+  "verdict": "rhymes",
+  "reading": "S L UW1 M",
+  "confidence": "low",
+  "why": "Obscure dialect word for slumber, pronounced to rhyme with 'room'.",
+  "verified": true
+ },
+ "spoom|UW M": {
+  "word": "spoom",
+  "verdict": "rhymes",
+  "reading": "S P UW1 M",
+  "confidence": "medium",
+  "why": "Spoom is an old nautical verb meaning to run before the wind, and it ends in the same UW-M as tomb.",
+  "verified": true
+ },
+ "spume|UW M": {
+  "word": "spume",
+  "verdict": "rhymes",
+  "reading": "S P Y UW1 M",
+  "confidence": "high",
+  "why": "Spume ends in stressed UW-M, with the Y glide sitting before the key vowel.",
+  "verified": true
+ },
+ "stateroom|UW M": {
+  "word": "stateroom",
+  "verdict": "rhymes",
+  "reading": "S T EY1 T R UW2 M",
+  "confidence": "high",
+  "why": "The secondary stress falls on -room, which has the same UW-M as tomb.",
+  "verified": true
+ },
+ "stillroom|UW M": {
+  "word": "stillroom",
+  "verdict": "rhymes",
+  "reading": "S T IH1 L R UW2 M",
+  "confidence": "medium",
+  "why": "Stillroom is a real, if rare, word, and -room carries secondary stress on UW-M.",
+  "verified": true
+ },
+ "strongroom|UW M": {
+  "word": "strongroom",
+  "verdict": "rhymes",
+  "reading": "S T R AO1 NG R UW2 M",
+  "confidence": "high",
+  "why": "The secondary stress falls on -room, which ends in UW-M like tomb.",
+  "verified": true
+ },
+ "subsume|UW M": {
+  "word": "subsume",
+  "verdict": "rhymes",
+  "reading": "S AH0 B S UW1 M",
+  "confidence": "high",
+  "why": "The stress falls on the last syllable, -sume, which is UW-M.",
+  "verified": true
+ },
+ "taproom|UW M": {
+  "word": "taproom",
+  "verdict": "rhymes",
+  "reading": "T AE1 P R UW2 M",
+  "confidence": "high",
+  "why": "The secondary stress falls on -room, which has the same UW-M as tomb.",
+  "verified": true
+ },
+ "tearoom|UW M": {
+  "word": "tearoom",
+  "verdict": "rhymes",
+  "reading": "T IY1 R UW2 M",
+  "confidence": "high",
+  "why": "The secondary stress falls on -room, which has the same UW-M as tomb.",
+  "verified": true
+ },
+ "toom|UW M": {
+  "word": "toom",
+  "verdict": "rhymes",
+  "reading": "T UW1 M",
+  "confidence": "medium",
+  "why": "Scots word meaning 'empty', pronounced like tomb.",
+  "verified": true
+ },
+ "transume|UW M": {
+  "word": "transume",
+  "verdict": "rhymes",
+  "reading": "T R AE0 N S UW1 M",
+  "confidence": "low",
+  "why": "A rare or archaic verb with final stressed -sume, which matches the key.",
+  "verified": true
+ },
+ "undergloom|UW M": {
+  "word": "undergloom",
+  "verdict": "rhymes",
+  "reading": "AH1 N D ER0 G L UW2 M",
+  "confidence": "low",
+  "why": "A rare compound whose secondary stress falls on -gloom, giving the key UW M.",
+  "verified": true
+ },
+ "unplume|UW M": {
+  "word": "unplume",
+  "verdict": "rhymes",
+  "reading": "AH0 N P L UW1 M",
+  "confidence": "medium",
+  "why": "A real verb with final stressed -plume, which matches the key.",
+  "verified": true
+ },
+ "untomb|UW M": {
+  "word": "untomb",
+  "verdict": "rhymes",
+  "reading": "AH0 N T UW1 M",
+  "confidence": "medium",
+  "why": "A real verb meaning to remove from a tomb, with final stressed -tomb.",
+  "verified": true
+ },
+ "wagenboom|UW M": {
+  "word": "wagenboom",
+  "verdict": "rhymes",
+  "reading": "V AA1 G AH0 N B UW2 M",
+  "confidence": "low",
+  "why": "An Afrikaans-derived tree name, listed in English dictionaries, with secondary stress on -boom.",
+  "verified": true
+ },
+ "wardroom|UW M": {
+  "word": "wardroom",
+  "verdict": "rhymes",
+  "reading": "W AO1 R D R UW2 M",
+  "confidence": "medium",
+  "why": "Compound with secondary stress on -room, which has the vowel UW and matches the key.",
+  "verified": true
+ },
+ "wareroom|UW M": {
+  "word": "wareroom",
+  "verdict": "rhymes",
+  "reading": "W EH1 R R UW2 M",
+  "confidence": "medium",
+  "why": "Compound with secondary stress on -room, which has the vowel UW and matches the key.",
+  "verified": true
+ },
+ "warkloom|UW M": {
+  "word": "warkloom",
+  "verdict": "rhymes",
+  "reading": "W AO1 R K L UW2 M",
+  "confidence": "low",
+  "why": "Obscure dialectal variant of workloom (a tool), a dictionary word with secondary stress on -loom, which matches the key UW-M.",
+  "verified": true
+ },
+ "whiskbroom|UW M": {
+  "word": "whiskbroom",
+  "verdict": "rhymes",
+  "reading": "W IH1 S K B R UW2 M",
+  "confidence": "high",
+  "why": "A compound ending in broom, which has secondary stress on UW and ends in M, so it matches tomb.",
+  "verified": true
+ },
+ "woom|UW M": {
+  "word": "woom",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "It is not a standard English word."
+ },
+ "workloom|UW M": {
+  "word": "workloom",
+  "verdict": "rhymes",
+  "reading": "W ER1 K L UW2 M",
+  "confidence": "low",
+  "why": "Obscure dictionary word (a tool or implement) with secondary stress on -loom, giving UW2 M.",
+  "verified": true
+ },
+ "apolune|UW N": {
+  "word": "apolune",
+  "verdict": "rhymes",
+  "reading": "AE1 P AH0 L UW2 N",
+  "confidence": "medium",
+  "why": "A real astronomy term (the farthest point of a lunar orbit) whose last syllable carries secondary stress on UW-N.",
+  "verified": true
+ },
+ "barracoon|UW N": {
+  "word": "barracoon",
+  "verdict": "rhymes",
+  "reading": "B AE2 R AH0 K UW1 N",
+  "confidence": "high",
+  "why": "A real word for a slave enclosure, with final stress on UW-N.",
+  "verified": true
+ },
+ "doubloon|UW N": {
+  "word": "doubloon",
+  "verdict": "rhymes",
+  "reading": "D AH0 B L UW1 N",
+  "confidence": "high",
+  "why": "Final-stressed UW-N, so it matches noon exactly.",
+  "verified": true
+ },
+ "forenoon|UW N": {
+  "word": "forenoon",
+  "verdict": "rhymes",
+  "reading": "F AO1 R N UW2 N",
+  "confidence": "high",
+  "why": "A compound ending in noon, which keeps secondary stress on UW-N.",
+  "verified": true
+ },
+ "gadroon|UW N": {
+  "word": "gadroon",
+  "verdict": "rhymes",
+  "reading": "G AH0 D R UW1 N",
+  "confidence": "medium",
+  "why": "A real word for ornamental edging, stressed on the final syllable, so it ends in UW1 N like noon.",
+  "verified": true
+ },
+ "gossoon|UW N": {
+  "word": "gossoon",
+  "verdict": "rhymes",
+  "reading": "G AA0 S UW1 N",
+  "confidence": "medium",
+  "why": "A real Irish-English word for a boy, with final stress and the same UW1 N ending.",
+  "verified": true
+ },
+ "lagune|UW N": {
+  "word": "lagune",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "This is a French or variant spelling of lagoon and is not a standard English word."
+ },
+ "leucocytozoon|UW N": {
+  "word": "leucocytozoon",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "low",
+  "why": "It is a technical genus name, and its last stressed vowel is probably the OW1 or AA2 of 'zo-on', not UW1 N."
+ },
+ "macaroon|UW N": {
+  "word": "macaroon",
+  "verdict": "rhymes",
+  "reading": "M AE2 K ER0 UW1 N",
+  "confidence": "high",
+  "why": "The final syllable carries primary stress and is pronounced like noon.",
+  "verified": true
+ },
+ "patroon|UW N": {
+  "word": "patroon",
+  "verdict": "rhymes",
+  "reading": "P AH0 T R UW1 N",
+  "confidence": "medium",
+  "why": "A real word for a Dutch land grantee, stressed on the final syllable and ending in UW1 N.",
+  "verified": true
+ },
+ "picaroon|UW N": {
+  "word": "picaroon",
+  "verdict": "rhymes",
+  "reading": "P IH2 K ER0 UW1 N",
+  "confidence": "medium",
+  "why": "A real word for a rogue or pirate, with final stress and the UW1 N ending.",
+  "verified": true
+ },
+ "poltroon|UW N": {
+  "word": "poltroon",
+  "verdict": "rhymes",
+  "reading": "P AA0 L T R UW1 N",
+  "confidence": "high",
+  "why": "A real word for a coward, stressed on the final syllable and ending in UW1 N.",
+  "verified": true
+ },
+ "protozoon|UW N": {
+  "word": "protozoon",
+  "verdict": "no-rhyme",
+  "reading": "P R OW2 T AH0 Z OW1 AA0 N",
+  "confidence": "high",
+  "why": "Last stressed vowel is the OW in 'zo', followed by 'on', so it doesn't end in UW N."
+ },
+ "puccoon|UW N": {
+  "word": "puccoon",
+  "verdict": "rhymes",
+  "reading": "P AH0 K UW1 N",
+  "confidence": "high",
+  "why": "A plant name stressed on the final syllable, ending in UW1 N.",
+  "verified": true
+ },
+ "racoon|UW N": {
+  "word": "racoon",
+  "verdict": "rhymes",
+  "reading": "R AE0 K UW1 N",
+  "confidence": "high",
+  "why": "A variant spelling of raccoon, which ends in stressed UW1 N.",
+  "verified": true
+ },
+ "ratoon|UW N": {
+  "word": "ratoon",
+  "verdict": "rhymes",
+  "reading": "R AE0 T UW1 N",
+  "confidence": "high",
+  "why": "A sugarcane shoot, stressed on the final syllable and ending in UW1 N.",
+  "verified": true
+ },
+ "repugn|UW N": {
+  "word": "repugn",
+  "verdict": "rhymes",
+  "reading": "R IH0 P Y UW1 N",
+  "confidence": "medium",
+  "why": "Pronounced 're-PYOON'. The Y comes before the vowel, so the key UW1 N matches.",
+  "verified": true
+ },
+ "rigadoon|UW N": {
+  "word": "rigadoon",
+  "verdict": "rhymes",
+  "reading": "R IH2 G AH0 D UW1 N",
+  "confidence": "high",
+  "why": "A dance name with final stress on UW1 N.",
+  "verified": true
+ },
+ "shoon|UW N": {
+  "word": "shoon",
+  "verdict": "rhymes",
+  "reading": "SH UW1 N",
+  "confidence": "medium",
+  "why": "An archaic plural of 'shoe' that is still a dictionary word, pronounced exactly UW1 N.",
+  "verified": true
+ },
+ "simoon|UW N": {
+  "word": "simoon",
+  "verdict": "rhymes",
+  "reading": "S IH0 M UW1 N",
+  "confidence": "high",
+  "why": "A desert wind, stressed on the final syllable and ending in UW1 N.",
+  "verified": true
+ },
+ "spittoon|UW N": {
+  "word": "spittoon",
+  "verdict": "rhymes",
+  "reading": "S P IH0 T UW1 N",
+  "confidence": "high",
+  "why": "Spittoon has primary stress on the final syllable, pronounced /UW1 N/, matching noon.",
+  "verified": true
+ },
+ "spontoon|UW N": {
+  "word": "spontoon",
+  "verdict": "rhymes",
+  "reading": "S P AA0 N T UW1 N",
+  "confidence": "high",
+  "why": "Spontoon (a type of pike) is stressed on the final syllable, ending in /UW1 N/.",
+  "verified": true
+ },
+ "walloon|UW N": {
+  "word": "walloon",
+  "verdict": "rhymes",
+  "reading": "W AA0 L UW1 N",
+  "confidence": "medium",
+  "why": "Walloon (a French-speaking Belgian) is stressed on the last syllable, ending in /UW1 N/; it is a real word, not just a name.",
+  "verified": true
+ },
+ "frocked|tier": {
+  "word": "frocked",
+  "verdict": "bonus",
+  "reading": "F R AA1 K T",
+  "confidence": "medium",
+  "why": "A real but uncommon participle (\"frocked priest\") that few people would produce when hunting rhymes."
+ },
+ "pocked|tier": {
+  "word": "pocked",
+  "verdict": "bonus",
+  "reading": "P AA1 K T",
+  "confidence": "low",
+  "why": "A real word, but \"pockmarked\" is the usual form and few players would think of it among -ocked rhymes."
+ },
+ "befall|tier": {
+  "word": "befall",
+  "verdict": "answer",
+  "reading": "B IH0 F AO1 L",
+  "confidence": "medium",
+  "why": "A familiar verb that players hunting rhymes for \"wall\" commonly list alongside \"install\" and \"recall\"."
+ },
+ "caterwaul|tier": {
+  "word": "caterwaul",
+  "verdict": "bonus",
+  "reading": "K AE1 T ER0 W AO2 L",
+  "confidence": "high",
+  "why": "A rare, somewhat archaic word that hardly anyone would think of for \"wall\"."
+ },
+ "landfall|tier": {
+  "word": "landfall",
+  "verdict": "bonus",
+  "reading": "L AE1 N D F AO2 L",
+  "confidence": "medium",
+  "why": "A compound with \"fall\" that is mostly weather jargon, so it is unlikely to come to mind."
+ },
+ "scrawl|tier": {
+  "word": "scrawl",
+  "verdict": "answer",
+  "reading": "S K R AO1 L",
+  "confidence": "high",
+  "why": "A common everyday word that rhymes directly and that players would readily try."
+ },
+ "snowfall|tier": {
+  "word": "snowfall",
+  "verdict": "bonus",
+  "reading": "S N OW1 F AO2 L",
+  "confidence": "medium",
+  "why": "A transparent compound of \"snow\" and \"fall\" that few players would produce as a rhyme."
+ },
+ "thrall|tier": {
+  "word": "thrall",
+  "verdict": "bonus",
+  "reading": "TH R AO1 L",
+  "confidence": "medium",
+  "why": "A real word, but literary and archaic, so it is not a typical first-wave rhyme."
+ },
+ "windfall|tier": {
+  "word": "windfall",
+  "verdict": "answer",
+  "reading": "W IH1 N D F AO2 L",
+  "confidence": "medium",
+  "why": "Common everyday word that ends in the same sound as 'wall', so a player would likely try it."
+ },
+ "flopper|tier": {
+  "word": "flopper",
+  "verdict": "bonus",
+  "reading": "F L AA1 P ER0",
+  "confidence": "medium",
+  "why": "A transparent flop+er derivation that few players would think of."
+ },
+ "swapper|tier": {
+  "word": "swapper",
+  "verdict": "bonus",
+  "reading": "S W AA1 P ER0",
+  "confidence": "medium",
+  "why": "A transparent swap+er derivation that few players would produce."
+ },
+ "despotic|tier": {
+  "word": "despotic",
+  "verdict": "bonus",
+  "reading": "D IH0 S P AA1 T IH0 K",
+  "confidence": "medium",
+  "why": "A real word, but less common than other rhymes of 'idiotic'."
+ },
+ "quixotic|tier": {
+  "word": "quixotic",
+  "verdict": "answer",
+  "reading": "K W IH0 K S AA1 T IH0 K",
+  "confidence": "medium",
+  "why": "A fairly well-known adjective that educated adults would plausibly think of as a rhyme for 'idiotic'."
+ },
+ "perforce|tier": {
+  "word": "perforce",
+  "verdict": "bonus",
+  "reading": "P ER0 F AO1 R S",
+  "confidence": "high",
+  "why": "An archaic or literary adverb that hardly anyone would produce."
+ },
+ "leapt|tier": {
+  "word": "leapt",
+  "verdict": "answer",
+  "reading": "L EH1 P T",
+  "confidence": "high",
+  "why": "A common past tense of 'leap' that rhymes exactly with 'slept'."
+ },
+ "sept|tier": {
+  "word": "sept",
+  "verdict": "bonus",
+  "reading": "S EH1 P T",
+  "confidence": "high",
+  "why": "An obscure word for a clan or division, which few players would think of."
+ },
+ "herein|tier": {
+  "word": "herein",
+  "verdict": "bonus",
+  "reading": "HH IH0 R IH1 N",
+  "confidence": "high",
+  "why": "A stiff legalistic adverb that hardly anyone hunting rhymes for 'win' would think of, and its stress pattern (her-IN) is a stretch as a rhyme."
+ }
+}

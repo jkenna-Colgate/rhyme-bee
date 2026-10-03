@@ -1,0 +1,274 @@
+{
+ "beanstalks|AA K S": {
+  "word": "beanstalks",
+  "verdict": "rhymes",
+  "reading": "B IY1 N S T AA2 K S",
+  "confidence": "high",
+  "why": "Plural of beanstalk, standard English word with last stressed vowel AA, matching seed's AA K S key.",
+  "verified": true
+ },
+ "smocked|AA K T": {
+  "word": "smocked",
+  "verdict": "rhymes",
+  "reading": "S M AA1 K T",
+  "confidence": "high",
+  "why": "Past tense of smock (to gather fabric), real English word with AA K T matching seed's key.",
+  "verified": true
+ },
+ "pawl|AA L": {
+  "word": "pawl",
+  "verdict": "rhymes",
+  "reading": "P AA1 L",
+  "confidence": "high",
+  "why": "Mechanical device (pivoted bar), real English word with AA L matching seed's key.",
+  "verified": true
+ },
+ "blotter|AA P ER": {
+  "word": "blotter",
+  "verdict": "no-rhyme",
+  "reading": "B L AA1 T ER0",
+  "confidence": "high",
+  "why": "Real word but rhyme key is AA T ER (ends with T), not AA P ER (seed ends with P)."
+ },
+ "asthmatic|AA T IH K": {
+  "word": "asthmatic",
+  "verdict": "no-rhyme",
+  "reading": "AE0 Z M AE1 T IH0 K",
+  "confidence": "high",
+  "why": "Real word but rhyme key is AE T IH K (vowel AE), not AA T IH K (seed has AA)."
+ },
+ "democratic|AA T IH K": {
+  "word": "democratic",
+  "verdict": "no-rhyme",
+  "reading": "D EH0 M AH0 K R AE1 T IH0 K",
+  "confidence": "high",
+  "why": "Real word but rhyme key is AE T IH K (vowel AE), not AA T IH K (seed has AA)."
+ },
+ "dogmatic|AA T IH K": {
+  "word": "dogmatic",
+  "verdict": "no-rhyme",
+  "reading": "D AA0 G M AE1 T IH0 K",
+  "confidence": "high",
+  "why": "Real word but rhyme key is AE T IH K (vowel AE), not AA T IH K (seed has AA)."
+ },
+ "doormug|AH G": {
+  "word": "doormug",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "Not in dictionary; not a recognized English compound word, only door + mug run together."
+ },
+ "rusty|AH S T": {
+  "word": "rusty",
+  "verdict": "no-rhyme",
+  "reading": "R AH1 S T IY0",
+  "confidence": "high",
+  "why": "Rhyme key is AH S T IY (from stressed AH to end), which doesn't match bust's AH S T."
+ },
+ "trusty|AH S T": {
+  "word": "trusty",
+  "verdict": "no-rhyme",
+  "reading": "T R AH1 S T IY0",
+  "confidence": "high",
+  "why": "Rhyme key is AH S T IY, same extra syllable problem as rusty; doesn't match bust's AH S T."
+ },
+ "results|AH T S": {
+  "word": "results",
+  "verdict": "no-rhyme",
+  "reading": "R AH1 Z AH1 L T S",
+  "confidence": "high",
+  "why": "Rhyme key is AH L T S; the L breaks the rhyme with klutz's AH T S."
+ },
+ "sawed|AO R D": {
+  "word": "sawed",
+  "verdict": "no-rhyme",
+  "reading": "S AA1 D",
+  "confidence": "high",
+  "why": "Rhyme key is AA D; landlord's AO R D includes an R that sawed lacks."
+ },
+ "unbored|AO R D": {
+  "word": "unbored",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "Not in Wiktionary, engine unable to read it; not a recognized standard English word."
+ },
+ "sacramental|EH N T AH L": {
+  "word": "sacramental",
+  "verdict": "no-rhyme",
+  "reading": "S AE1 K R AH0 M AH0 N T AH0 L",
+  "confidence": "high",
+  "why": "Rhyme key starts with AE, sentimental's starts with EH; vowels don't match and sacramental has extra sounds."
+ },
+ "theft|EH P T": {
+  "word": "theft",
+  "verdict": "no-rhyme",
+  "reading": "TH EH1 F T",
+  "confidence": "high",
+  "why": "Rhyme key is EH F T; slept's is EH P T. The F and P don't match."
+ },
+ "gothic|IH K": {
+  "word": "gothic",
+  "verdict": "no-rhyme",
+  "reading": "G AA1 TH IH0 K",
+  "confidence": "high",
+  "why": "Rhyme key is AA TH IH K; trick's is IH K. The initial AA TH prevents a rhyme."
+ },
+ "heartsick|IH K": {
+  "word": "heartsick",
+  "verdict": "rhymes",
+  "reading": "HH AA1 R T S IH2 K",
+  "confidence": "medium",
+  "why": "Real word likely pronounced with secondary stress on the final syllable like 'homesick', yielding the IH K rhyme key.",
+  "verified": true
+ },
+ "heretic|IH K": {
+  "word": "heretic",
+  "verdict": "no-rhyme",
+  "reading": "HH EH1 R AH0 T IH0 K",
+  "confidence": "high",
+  "why": "Primary stress on the first syllable makes the rhyme key EH R AH T IH K, not IH K."
+ },
+ "tantric|IH K": {
+  "word": "tantric",
+  "verdict": "no-rhyme",
+  "reading": "T AE1 N T R IH0 K",
+  "confidence": "high",
+  "why": "Primary stress on the first syllable makes the rhyme key AE N T R IH K, not IH K."
+ },
+ "whin|IH N": {
+  "word": "whin",
+  "verdict": "rhymes",
+  "reading": "W IH1 N",
+  "confidence": "high",
+  "why": "Real English word (prickly shrub) with stress on its only vowel, matching the IH N rhyme key.",
+  "verified": true
+ },
+ "ear|IH R D": {
+  "word": "ear",
+  "verdict": "no-rhyme",
+  "reading": "IH1 R",
+  "confidence": "high",
+  "why": "Pronounced without the final D sound; the rhyme key IH R does not match the seed word's IH R D."
+ },
+ "frontier|IH R D": {
+  "word": "frontier",
+  "verdict": "no-rhyme",
+  "reading": "F R AH0 N T IH1 R",
+  "confidence": "high",
+  "why": "Pronounced without the final D sound; the rhyme key IH R does not match the seed word's IH R D."
+ },
+ "cherish|IH SH": {
+  "word": "cherish",
+  "verdict": "no-rhyme",
+  "reading": "CH EH1 R IH0 SH",
+  "confidence": "high",
+  "why": "Primary stress on the first syllable makes the rhyme key EH R IH SH, not IH SH."
+ },
+ "embellish|IH SH": {
+  "word": "embellish",
+  "verdict": "no-rhyme",
+  "reading": "IH0 M B EH1 L IH0 SH",
+  "confidence": "high",
+  "why": "Primary stress on the middle syllable makes the rhyme key EH L IH SH, not IH SH."
+ },
+ "furnish|IH SH": {
+  "word": "furnish",
+  "verdict": "no-rhyme",
+  "reading": "F ER1 N IH0 SH",
+  "confidence": "high",
+  "why": "Key is ER N IH SH, not IH SH; wrong starting vowel"
+ },
+ "bandleader|IY D ER": {
+  "word": "bandleader",
+  "verdict": "no-rhyme",
+  "reading": "B AE1 N D L IY0 D ER0",
+  "confidence": "medium",
+  "why": "Engine shows key AE N D L IY D ER, not IY D ER; but secondary stress on -leader might vary by speaker"
+ },
+ "barometer|IY T ER": {
+  "word": "barometer",
+  "verdict": "no-rhyme",
+  "reading": "B ER0 AA1 M IH0 T ER0",
+  "confidence": "high",
+  "why": "Key is AA M IH T ER, not IY T ER; last stressed vowel is AA not IY"
+ },
+ "pedometer|IY T ER": {
+  "word": "pedometer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Wiktionary IPA suggests key would start from AA, not IY, so it won't match centimeter's IY T ER"
+ },
+ "askews|UW Z": {
+  "word": "askews",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "No Wiktionary entry and engine has no reading; askew is not standardly used as a verb"
+ },
+ "debuts|UW Z": {
+  "word": "debuts",
+  "verdict": "no-rhyme",
+  "reading": "D EY1 B Y UW0 Z",
+  "confidence": "high",
+  "why": "Key is EY B Y UW Z starting from first syllable's stress, not UW Z"
+ },
+ "haiku|UW Z": {
+  "word": "haiku",
+  "verdict": "no-rhyme",
+  "reading": "HH AY1 K UW0",
+  "confidence": "high",
+  "why": "Key is AY K UW and word ends in -ku not -z; completely different"
+ },
+ "issues|UW Z": {
+  "word": "issues",
+  "verdict": "no-rhyme",
+  "reading": "IH1 SH UW0 Z",
+  "confidence": "high",
+  "why": "Key is IH SH UW Z with stress on first syllable, not UW Z"
+ },
+ "shrews|UW Z": {
+  "word": "shrews",
+  "verdict": "rhymes",
+  "reading": "SH R UW1 Z",
+  "confidence": "high",
+  "why": "Shrews has the identical rhyme key (UW Z) as booze, rhyming perfectly in General American.",
+  "verified": true
+ },
+ "erosion|UW ZH AH N": {
+  "word": "erosion",
+  "verdict": "no-rhyme",
+  "reading": "IH0 R OW1 ZH AH0 N",
+  "confidence": "high",
+  "why": "Erosion's rhyme key (OW ZH AH N) differs from delusion's (UW ZH AH N) in the stressed vowel—OW vs UW—so they don't rhyme."
+ },
+ "grander|tier": {
+  "word": "grander",
+  "verdict": "answer",
+  "reading": "G R AE1 N D ER0",
+  "confidence": "high",
+  "why": "Common comparative form of 'grand' that ordinary players would readily consider when hunting rhymes."
+ },
+ "norse|tier": {
+  "word": "norse",
+  "verdict": "bonus",
+  "reading": "N AO1 R S",
+  "confidence": "medium",
+  "why": "Valid but literary/cultural term not an obvious first rhyme choice when brainstorming rhymes for 'horse'."
+ },
+ "crim|tier": {
+  "word": "crim",
+  "verdict": "bonus",
+  "reading": "K R IH1 M",
+  "confidence": "high",
+  "why": "Informal slang for criminal, not a standard formal English word an average player would produce."
+ },
+ "jews|tier": {
+  "word": "jews",
+  "verdict": "not-a-word",
+  "reading": "JH UW1 Z",
+  "confidence": "high",
+  "why": "Proper noun referring to an ethnic/religious group, which word games exclude like other proper nouns."
+ }
+}
