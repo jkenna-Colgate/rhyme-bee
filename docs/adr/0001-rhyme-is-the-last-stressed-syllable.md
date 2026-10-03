@@ -23,3 +23,20 @@ Two words rhyme when the sounds from their **last stressed vowel** to the end of
 CMUdict encodes contrasts at a finer resolution than the ear. Read literally, it promoted sub-perceptual distinctions to confident rejections — `talked` was refused for `docked` over `AO` versus `AA`, a difference the maintainer could not hear across repeated replays. There *is* an interpretation layer: pronunciations are normalised at build time, before this rule runs.
 
 **The rule itself is unchanged, and nothing else in this ADR is affected.** Rhyme is still the sounds from the last stressed vowel to the end of the word; `chocolate` still does not rhyme with `ate`, and a committed guardrail table now enforces that it never will. Only the reading the rule is applied to has changed.
+
+## Amendment (2026-10-03)
+
+**The rule is unchanged again, and a second verdict now sits beside it**, by
+[ADR-0020](./0020-a-weak-rhyme-is-accepted-and-not-scored.md).
+
+A Submission that matches the Seed Word only on an unstressed final syllable
+(`magic` for `trick`) is still not a Rhyme. It is no longer rejected: it is
+accepted as a Weak Rhyme and scores nothing. "Final syllable, stress ignored"
+stays rejected as the definition of a Rhyme.
+
+One detail of that rejected option is corrected. It says the option admits
+`chocolate`, `private` and `climate` for `ate`. Matched by sound it does not:
+those words end in `AH0 T`, so what it admits is `chocolate` for `hut`. The
+option was right to be rejected, and the example was a spelling match where the
+option is a sound match. `chocolate` is not a Rhyme for `ate` and not a Weak
+Rhyme for it either.

@@ -13,7 +13,7 @@ The sequence of sounds running from a word's last stressed vowel to the end of t
 
 **Rhyme**:
 Two words rhyme when they share a Rhyme Key. Spelling is irrelevant: `eight` rhymes with `ate`, `chocolate` and `commensurate` do not (their final vowel is an unstressed schwa, not /eɪ/). A Submission rhymes if *any* of its Rhyme Keys matches, so `read` is a legitimate rhyme for `bed` — the Seed Word, by contrast, is pinned to exactly one.
-_Avoid_: Perfect rhyme, slant rhyme, near rhyme (this game has only one kind of rhyme)
+_Avoid_: Perfect rhyme, slant rhyme, near rhyme (only one kind of Rhyme scores; a Weak Rhyme is accepted without being one, and has an entry of its own)
 
 **General American**:
 The single accent the game adjudicates in — specifically *merged* General American, which has the cot–caught merger, so `stalk` rhymes with `stock` and `ball` with `doll`. Rhyme is a property of a word pair *in an accent*, so the game commits to one and says so. Under any other accent some verdicts will be wrong, and that is an accepted cost. See [ADR-0002](./docs/adr/0002-general-american-is-the-only-accent.md).
@@ -49,17 +49,21 @@ A copy of one Daily Puzzle Session, sent from the player's browser after the fac
 _Avoid_: Telemetry, analytics, tracking, log; report (an Appeal is a report a player chose to send, and nobody chooses a Session Record)
 
 **Reveal**:
-The end-of-game disclosure of what the player never found — the missed Answers, and the Bonus Words they never reached. It is a **give-up gate, not a peek**: taking the Reveal ends the Session, which is what keeps the Score and Rank it freezes honest. A Reveal a player could take mid-Puzzle and then carry on from would quietly empty Rank of meaning, since the remaining Answers would be there for the copying. Helping a player who is stuck *keep playing* is not the Reveal's job and belongs to the hint system; the two are deliberately separate mechanics.
+The end-of-game disclosure of what the player never found — the missed Answers, and the Bonus Words they never reached. Weak Rhymes are never part of it: they are not settled in advance, so there is no list of them to disclose. It is a **give-up gate, not a peek**: taking the Reveal ends the Session, which is what keeps the Score and Rank it freezes honest. A Reveal a player could take mid-Puzzle and then carry on from would quietly empty Rank of meaning, since the remaining Answers would be there for the copying. Helping a player who is stuck *keep playing* is not the Reveal's job and belongs to the hint system; the two are deliberately separate mechanics.
 _Avoid_: Hint (a hint helps you keep playing, a Reveal ends the play), "show answers" as something available mid-Puzzle
 
 **Submission**:
-A word the player enters as an attempted rhyme for the Seed Word. Each Submission resolves to an Answer, a Bonus Word, or a rejection. The Seed Word itself and any word already accepted this Puzzle are rejected.
+A word the player enters as an attempted rhyme for the Seed Word. Each Submission resolves to an Answer, a Bonus Word, a Weak Rhyme, or a rejection. The Seed Word itself and any word already accepted this Puzzle are rejected.
 
 **Answer**:
 A Submission that rhymes with the Seed Word and is a word a reasonable player could be expected to know. The test is knownness, not corpus frequency: `defenestrate` is rare in print but widely known, so it is an Answer, and a long rare one, which makes it among the highest-scoring words in the game.
 
 **Bonus Word**:
 A Submission that rhymes and is a genuine English word, but one almost nobody knows — `objurgate`, `tergiversate`. Accepted and celebrated as a find rather than treated as an error, but not counted toward the Puzzle.
+
+**Weak Rhyme**:
+A Submission that is a word and is not a Rhyme, but whose final syllable has the same sounds as the Seed Word's Rhyme Key with the stress falling earlier in the word: `magic` for `trick`, `abandoning` for `wing`. It is accepted and scores nothing. The player sees it exactly as a Bonus Word, with no label of its own, because a label would have to be right about every word, and some ears hear `abandoning` as a full rhyme where they hear `magic` as a poor one. It is not a Bonus Word in the model: a Weak Rhyme holds no Tier, is worked out when it is submitted rather than settled before the date begins, and is never part of the Reveal. It can only occur when the Seed Word's Rhyme Key is a single syllable. See [ADR-0020](./docs/adr/0020-a-weak-rhyme-is-accepted-and-not-scored.md).
+_Avoid_: Near rhyme, slant rhyme (those mean different sounds, and a Weak Rhyme has the same sounds under different stress); Bonus Word for anything but what the player is shown
 
 **Tier**:
 Which of the two accepted kinds a rhyming word is — an Answer, which counts toward the Score, or a Bonus Word, which is celebrated but does not. Every rhyming word with wordhood holds a Tier whether or not any player ever submits it, so a Puzzle's Answers and Bonus Words are settled before its date begins. The split is drawn on knownness ([ADR-0003](./docs/adr/0003-word-prevalence-not-corpus-frequency.md)) — but *what* a Tier is stays separate from *how* a word arrives at one.
@@ -93,11 +97,11 @@ _Avoid_: "inflected key" (inflection *density* is not the test — /aɪnd/ is in
 A name. Never valid, however well it rhymes, because the space of names is unbounded and has no defensible edge. Rejected with a reason of its own, since `Kate` obviously rhymes with `ate` and a silent refusal reads as a bug.
 
 **Appeal**:
-A player's report that a Submission the game rejected should have counted as an Answer. It contests a verdict already delivered and never asks for one — adjudication happens in the player's browser and stays there — so raising an Appeal changes nothing about the Session it came from, and the player plays on.
+A player's report that a Submission the game did not count as an Answer should have been one. The Submission may have been rejected, or accepted without scoring, as a Bonus Word or a Weak Rhyme is. It contests a verdict already delivered and never asks for one — adjudication happens in the player's browser and stays there — so raising an Appeal changes nothing about the Session it came from, and the player plays on.
 _Avoid_: Flag (the maintainer-facing schedule review flags the days worth reading first, and that is the word's only other use), challenge, dispute, complaint
 
 **Candidate**:
-The record an Appeal becomes: the Submission, the reason the engine gave for rejecting it, and the context a judge needs to rule on it later. Judging is a separate pass over the Candidate Queue, and may end in a correction to the pronunciation the engine reads — so a Candidate is the report, never the fix.
+The record an Appeal becomes: the Submission, the verdict the engine gave it, and the context a judge needs to rule on it later. Judging is a separate pass over the Candidate Queue, and may end in a correction to the pronunciation the engine reads — so a Candidate is the report, never the fix.
 _Avoid_: Suggestion, correction, fix (those name what judging may produce, not what the player sent)
 
 **Candidate Queue**:
