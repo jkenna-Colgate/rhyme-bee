@@ -165,3 +165,90 @@ This amendment does not loosen the freeze. A demotion is data, it is global
 measurement surfaced and the one #51 reported. Widening it means measuring
 again, and "make the names filter correct" remains barred as the unbounded
 backlog it is.
+
+## Amendment, 2026-10-07: two normalisation rules join the closed set
+
+Settled in
+[Which rhymes score, which are accepted without scoring, and which are rejected?](https://github.com/jkenna-Colgate/rhyme-bee/issues/232).
+The freeze stands at **five normalisation rules** and thirty affix rules. Both
+additions are decided and not built. The Rhyme rule is unchanged (ADR-0001,
+amended the same day to name the substitution property both rules must keep).
+
+### Weak "ih" and weak "uh" are one sound in a scoring Rhyme
+
+After the stressed vowel of a Rhyme Key, `IH0` and `AH0` are read as each other.
+
+It **replaces**, so ADR-0010 admits it only if the contrast is unavailable to a
+General American listener and the guardrail set survives.
+
+- **The contrast.** The source dictionary writes the same ending both ways. It
+  has `abated` with one and `annotated` with the other (families of 397 and 78),
+  `advises` and `arises` (96 and 21), `collection` and `direction` (53 and 2),
+  `adaptability` and `accessibility` (40 and 66). None of those pairs rhyme
+  today. The maintainer read 21 rows sampled evenly across the merges, the nine
+  most doubtful included (`miracle` / `lyrical`, `momentous` / `prentice`,
+  `rhesus` / `prosthesis`), and heard a rhyme in every one.
+- **Reach.** 1,049 groups of families join; 5,024 Answer-band words gain rhymes;
+  the largest family stays at 832. Eighteen scheduled Seed Words are inside a
+  merge, and 208 Answer-band words now rejected on fifteen of them become
+  Answers (`utility` for `facility`, `severity` for `sincerity`, `geologist`
+  for `microbiologist`).
+- **Guardrails.** Every committed pair sets a weak vowel against a full one or
+  turns on the low-back merge, so none can move. That is an argument from the
+  shape of the rule; the guardrail test has to confirm it when the rule is built.
+- **Two pairs of scheduled days become one Puzzle:** `facility` with `utility`,
+  and `personality` with `hospitality`. The schedule has to drop or redraw one
+  of each.
+
+It applies where a Rhyme is decided. The Weak Rhyme test (ADR-0020) still has to
+see which weak vowel the dictionary wrote, so the build may not erase it from
+the reading a Weak Rhyme is worked out from.
+
+### After "eye", "ow" or "oy", "er" and plain `r` are read as each other
+
+`AY`, `AW` or `OY` followed by `ER0` also reads with `R`, and the reverse. It is
+what is left of "an extra or missing syllable": General American says `fire` and
+`hour` with one syllable or two, and the dictionary writes `fire`, `hour` and
+`flour` both ways but `expire` with plain `r` only and `higher` with "er" only.
+
+It **appends**, in both directions, so ADR-0010 asks for its reach and its error
+rate.
+
+- **Reach.** 366 words gain a Rhyme Key, 316 of them in the Answer band, over 68
+  keys. The largest family does not grow. On the schedule, 115 Answers on four
+  Seed Words: `expire` 85, `purifier` 23, `hardwired` 5, `power` 2.
+- **Error rate.** All 115 were read and one is wrong, `skier`. The fault is a
+  source reading ("sky-r") that already scores for `expire` today. Off the
+  schedule the rule joins `lawyer` and `destroyer` to `noir` and `boudoir`,
+  which the source writes with "oy". The three readings are corrected in
+  `data/supplement.dict`. The families off the schedule were read only in part.
+- **Guardrails.** The nine committed pairs still refuse, and so do `fire` /
+  `far`, `fire` / `fur`, `player` / `hair` and `lower` / `lore`.
+
+### What was not made a rule
+
+The `l` half of the same idea (a long vowel, weak "uh" and `l`, read without the
+"uh") is not written. Most of it already ships as the vowel branch of the
+syllabic consonant rule (`trial` for `mile`, `jewel` for `cool`). What that
+branch misses goes in by hand: `gruel`, and seventeen plain `-s` and `-ed` forms
+of words it already reaches (`dialed`, `fuels`, `vials`). With the three
+corrections above that is 21 hand-written readings. Long e and long a before `l`
+(`serial` for `meal`, `betrayal` for `male`) stay rejected, as the shipped
+rule's own limit intends.
+
+### The unfreeze clause was not met, and is not repealed
+
+The clause asks for evidence that players other than the maintainer are meeting
+a rejection class. Neither rule has it: no Appeal on file (189 rows, read
+2026-10-07) is of either shape. Both were found by measurement while deciding
+which rhymes score, and both are admitted on the maintainer's ruling.
+
+The reason is the effort they belong to, running the game with nobody attending
+it ([#218](https://github.com/jkenna-Colgate/rhyme-bee/issues/218)). A class
+nobody Appeals still fails Trust for each player who meets it, and Appeals
+understate any class whose rejection looks deliberate. The clause stands for
+every further rule, and so does the discipline that made these two admissible:
+reach measured, error rate stated, guardrails intact.
+
+The header in `data/supplement.dict` that says "three normalisation rules" is
+corrected when the rules are built.
