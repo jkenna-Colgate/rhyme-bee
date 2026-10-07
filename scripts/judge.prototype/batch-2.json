@@ -1,0 +1,3456 @@
+[
+ {
+  "id": "spectrometer|IY T ER",
+  "word": "spectrometer",
+  "seedWord": "centimeter",
+  "rhymeKey": "IY T ER",
+  "seedReading": "S EH1 N T AH0 M IY2 T ER0",
+  "seedRespelling": "SEH-ntuh-mee-tur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S P EH0 K T R AA1 M AH0 T ER0",
+     "key": "AA M AH T ER",
+     "respelling": "speh-KTRAH-muh-tur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "coincided|AY D IH D",
+  "word": "coincided",
+  "seedWord": "lopsided",
+  "rhymeKey": "AY D IH D",
+  "seedReading": "L AA1 P S AY1 D IH0 D",
+  "seedRespelling": "LAH-pseye-dih-d",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "K OW2 AH0 N S AY1 D AH0 D",
+     "key": "AY D AH D",
+     "respelling": "koh-uh-NSEYE-duh-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "reaches the key by the weak-vowel Normalisation"
+  }
+ },
+ {
+  "id": "rocker|AA P ER",
+  "word": "rocker",
+  "seedWord": "grasshopper",
+  "rhymeKey": "AA P ER",
+  "seedReading": "G R AE1 S HH AA2 P ER0",
+  "seedRespelling": "GRA-shah-pur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [
+    {
+     "phonemes": "R AA1 K ER0",
+     "key": "AA K ER",
+     "respelling": "RAH-kur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "ashram|AE M",
+  "word": "ashram",
+  "seedWord": "bam",
+  "rhymeKey": "AE M",
+  "seedReading": "B AE1 M",
+  "seedRespelling": "BA-m",
+  "kind": "wrong-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "AE1 SH R AA0 M",
+     "key": "AE SH R AA M",
+     "respelling": "A-shrah-m"
+    },
+    {
+     "phonemes": "AE1 SH R AA2 M",
+     "key": "AA M",
+     "respelling": "A-shrah-m"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the engine's reading does not reach the key, and Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "lairs|EH R Z",
+  "word": "lairs",
+  "seedWord": "housewares",
+  "rhymeKey": "EH R Z",
+  "seedReading": "HH AW1 S W EH2 R Z",
+  "seedRespelling": "HOW-sweh-rz",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "lair",
+     "readings": [
+      "L EH1 R"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "EH1 L EH2 R Z",
+    "head": "l",
+    "tail": "airs"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of lair reaches the key"
+  }
+ },
+ {
+  "id": "abolish|IH SH",
+  "word": "abolish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "AH0 B AA1 L IH0 SH",
+     "key": "AA L IH SH",
+     "respelling": "uh-BAH-lih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "speedometer|IY T ER",
+  "word": "speedometer",
+  "seedWord": "centimeter",
+  "rhymeKey": "IY T ER",
+  "seedReading": "S EH1 N T AH0 M IY2 T ER0",
+  "seedRespelling": "SEH-ntuh-mee-tur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S P IY0 D AA1 M AH0 T ER0",
+     "key": "AA M AH T ER",
+     "respelling": "spee-DAH-muh-tur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "construes|UW Z",
+  "word": "construes",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "construe",
+     "readings": [
+      "K AH0 N S T R UW1"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of construe reaches the key"
+  }
+ },
+ {
+  "id": "devilish|IH SH",
+  "word": "devilish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "D EH1 V L IH0 SH",
+     "key": "EH V L IH SH",
+     "respelling": "DEH-vlih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "averred|EH R D",
+  "word": "averred",
+  "seedWord": "laird",
+  "rhymeKey": "EH R D",
+  "seedReading": "L EH1 R D",
+  "seedRespelling": "LEH-rd",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "aver",
+     "readings": [
+      "EY1 V ER0"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "EY2 V IY1 EH2 R D",
+    "head": "av",
+    "tail": "erred"
+   }
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "no reading on file; the regular form of aver does not reach the key"
+  }
+ },
+ {
+  "id": "ragouts|UW Z",
+  "word": "ragouts",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "livestock|AA K S",
+  "word": "livestock",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "L AY1 V S T AA2 K",
+     "key": "AA K",
+     "respelling": "LEYE-vstah-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "holler|AA P ER",
+  "word": "holler",
+  "seedWord": "grasshopper",
+  "rhymeKey": "AA P ER",
+  "seedReading": "G R AE1 S HH AA2 P ER0",
+  "seedRespelling": "GRA-shah-pur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "HH AA1 L ER0",
+     "key": "AA L ER",
+     "respelling": "HAH-lur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "reshared|EH R D",
+  "word": "reshared",
+  "seedWord": "laird",
+  "rhymeKey": "EH R D",
+  "seedReading": "L EH1 R D",
+  "seedRespelling": "LEH-rd",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R EY1 SH EH2 R D",
+    "head": "re",
+    "tail": "shared"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "magic|IH K",
+  "word": "magic",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "seedReading": "T R IH1 K",
+  "seedRespelling": "TRIH-k",
+  "kind": "stress",
+  "source": "appeal",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [
+    {
+     "phonemes": "M AE1 JH IH0 K",
+     "key": "AE JH IH K",
+     "respelling": "MA-jih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "unheard|EH R D",
+  "word": "unheard",
+  "seedWord": "laird",
+  "rhymeKey": "EH R D",
+  "seedReading": "L EH1 R D",
+  "seedRespelling": "LEH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "AH0 N HH ER1 D",
+     "key": "ER D",
+     "respelling": "uh-NHUR-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "swayer|EY ER",
+  "word": "swayer",
+  "seedWord": "mayor",
+  "rhymeKey": "EY ER",
+  "seedReading": "M EY1 ER0",
+  "seedRespelling": "MAY-ur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "S W EY1 ER0",
+    "head": "sway",
+    "tail": "er"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "pulchritude|UW D",
+  "word": "pulchritude",
+  "seedWord": "exclude",
+  "rhymeKey": "UW D",
+  "seedReading": "IH0 K S K L UW1 D",
+  "seedRespelling": "ih-KSKLOO-d",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "shall|AA L",
+  "word": "shall",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": "W AA1 L",
+  "seedRespelling": "WAH-l",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "SH AE1 L",
+     "key": "AE L",
+     "respelling": "SHA-l"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "boorish|IH SH",
+  "word": "boorish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "B UH1 R IH0 SH",
+     "key": "UH R IH SH",
+     "respelling": "BUU-rih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "foolish|IH SH",
+  "word": "foolish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "F UW1 L IH0 SH",
+     "key": "UW L IH SH",
+     "respelling": "FOO-lih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "frantic|AA T IH K",
+  "word": "frantic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "F R AE1 N T IH0 K",
+     "key": "AE N T IH K",
+     "respelling": "FRA-ntih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "blurred|EH R D",
+  "word": "blurred",
+  "seedWord": "laird",
+  "rhymeKey": "EH R D",
+  "seedReading": "L EH1 R D",
+  "seedRespelling": "LEH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "B L ER1 D",
+     "key": "ER D",
+     "respelling": "BLUR-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "pane|EY M",
+  "word": "pane",
+  "seedWord": "blame",
+  "rhymeKey": "EY M",
+  "seedReading": "B L EY1 M",
+  "seedRespelling": "BLAY-m",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P EY1 N",
+     "key": "EY N",
+     "respelling": "PAY-n"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "paddocks|AA K S",
+  "word": "paddocks",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "paddock",
+     "readings": [
+      "P AE1 D AH0 K"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "P AE1 D D AA2 K S",
+    "head": "pad",
+    "tail": "docks"
+   }
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "no reading on file; the regular form of paddock does not reach the key"
+  }
+ },
+ {
+  "id": "perish|IH SH",
+  "word": "perish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P EH1 R IH0 SH",
+     "key": "EH R IH SH",
+     "respelling": "PEH-rih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "queer|IH R D",
+  "word": "queer",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "seedReading": "B IH1 R D",
+  "seedRespelling": "BIH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "K W IH1 R",
+     "key": "IH R",
+     "respelling": "KWIH-r"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "gruel|UW L",
+  "word": "gruel",
+  "seedWord": "buhl",
+  "rhymeKey": "UW L",
+  "seedReading": "B Y UW1 L",
+  "seedRespelling": "BYOO-l",
+  "kind": "wrong-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "G R UW1 IH0 L",
+     "key": "UW IH L",
+     "respelling": "GROO-ih-l"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "reaches the key by a hand-written reading"
+  }
+ },
+ {
+  "id": "cartography|AA G R AH F IY",
+  "word": "cartography",
+  "seedWord": "pornography",
+  "rhymeKey": "AA G R AH F IY",
+  "seedReading": "P AO0 R N AA1 G R AH0 F IY0",
+  "seedRespelling": "paw-RNAH-gruh-fee",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "shaded|AY D IH D",
+  "word": "shaded",
+  "seedWord": "lopsided",
+  "rhymeKey": "AY D IH D",
+  "seedReading": "L AA1 P S AY1 D IH0 D",
+  "seedRespelling": "LAH-pseye-dih-d",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "SH EY1 D IH0 D",
+     "key": "EY D IH D",
+     "respelling": "SHAY-dih-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the engine's reading does not reach the key, and Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "costumes|UW Z",
+  "word": "costumes",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "K AA0 S T UW1 M Z",
+     "key": "UW M Z",
+     "respelling": "kah-STOO-mz"
+    },
+    {
+     "phonemes": "K AA1 S T UW0 M Z",
+     "key": "AA S T UW M Z",
+     "respelling": "KAH-stoo-mz"
+    },
+    {
+     "phonemes": "K AA1 S T UW2 M Z",
+     "key": "UW M Z",
+     "respelling": "KAH-stoo-mz"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the engine's reading does not reach the key, and Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "furred|EH R D",
+  "word": "furred",
+  "seedWord": "laird",
+  "rhymeKey": "EH R D",
+  "seedReading": "L EH1 R D",
+  "seedRespelling": "LEH-rd",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "furr",
+     "readings": [
+      "F ER1"
+     ],
+     "rhymes": false
+    },
+    {
+     "word": "fur",
+     "readings": [
+      "F ER1"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "no reading on file; the regular form of fur does not reach the key"
+  }
+ },
+ {
+  "id": "dusts|AH T S",
+  "word": "dusts",
+  "seedWord": "klutz",
+  "rhymeKey": "AH T S",
+  "seedReading": "K L AH1 T S",
+  "seedRespelling": "KLUH-ts",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "D AH1 S T S",
+     "key": "AH S T S",
+     "respelling": "DUH-sts"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "trawl|AA L",
+  "word": "trawl",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": "W AA1 L",
+  "seedRespelling": "WAH-l",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "T IY1 R AA2 L",
+    "head": "t",
+    "tail": "rawl"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "abiotic|AA T IH K",
+  "word": "abiotic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "endocrinologist|AA L AH JH IH S T",
+  "word": "endocrinologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "EH2 N D OW0 K R AH0 N AA1 L AH0 JH AH0 S T",
+     "key": "AA L AH JH AH S T",
+     "respelling": "eh-ndoh-kruh-NAH-luh-juh-st"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "reaches the key by the weak-vowel Normalisation"
+  }
+ },
+ {
+  "id": "cheer|IH R D",
+  "word": "cheer",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "seedReading": "B IH1 R D",
+  "seedRespelling": "BIH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "CH IH1 R",
+     "key": "IH R",
+     "respelling": "CHIH-r"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "flaying|EY IH NG",
+  "word": "flaying",
+  "seedWord": "taxpaying",
+  "rhymeKey": "EY IH NG",
+  "seedReading": "T AE1 K S P EY2 IH0 NG",
+  "seedRespelling": "TA-kspay-ih-ng",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "flay",
+     "readings": [
+      "F L EY1"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "EH1 F L EY2 IH0 NG",
+    "head": "f",
+    "tail": "laying"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of flay reaches the key"
+  }
+ },
+ {
+  "id": "extinguish|IH SH",
+  "word": "extinguish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "IH0 K S T IH1 NG G W IH0 SH",
+     "key": "IH NG G W IH SH",
+     "respelling": "ih-KSTIH-nggwih-sh"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "virtues|UW Z",
+  "word": "virtues",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "V ER1 CH UW0 Z",
+     "key": "ER CH UW Z",
+     "respelling": "VUR-choo-z"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the last syllable matches and is unstressed: no Points"
+  }
+ },
+ {
+  "id": "appear|IH R D",
+  "word": "appear",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "seedReading": "B IH1 R D",
+  "seedRespelling": "BIH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "AH0 P IH1 R",
+     "key": "IH R",
+     "respelling": "uh-PIH-r"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "knocker|AA P ER",
+  "word": "knocker",
+  "seedWord": "grasshopper",
+  "rhymeKey": "AA P ER",
+  "seedReading": "G R AE1 S HH AA2 P ER0",
+  "seedRespelling": "GRA-shah-pur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "no reading on file; Wiktionary does not end in the key's sounds"
+  }
+ },
+ {
+  "id": "persuasion|UW ZH AH N",
+  "word": "persuasion",
+  "seedWord": "delusion",
+  "rhymeKey": "UW ZH AH N",
+  "seedReading": "D IH0 L UW1 ZH AH0 N",
+  "seedRespelling": "dih-LOO-zhuh-n",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P ER0 S W EY1 ZH AH0 N",
+     "key": "EY ZH AH N",
+     "respelling": "pur-SWAY-zhuh-n"
+    },
+    {
+     "phonemes": "P ER0 S W EY1 ZH N",
+     "key": "EY ZH N",
+     "respelling": "pur-SWAY-zhn"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "stages|EY JH",
+  "word": "stages",
+  "seedWord": "cage",
+  "rhymeKey": "EY JH",
+  "seedReading": "K EY1 JH",
+  "seedRespelling": "KAY-j",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S T EY1 JH AH0 Z",
+     "key": "EY JH AH Z",
+     "respelling": "STAY-juh-z"
+    },
+    {
+     "phonemes": "S T EY1 JH IH0 Z",
+     "key": "EY JH IH Z",
+     "respelling": "STAY-jih-z"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "pain|EY M",
+  "word": "pain",
+  "seedWord": "blame",
+  "rhymeKey": "EY M",
+  "seedReading": "B L EY1 M",
+  "seedRespelling": "BLAY-m",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P EY1 N",
+     "key": "EY N",
+     "respelling": "PAY-n"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "astrologist|AA L AH JH IH S T",
+  "word": "astrologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 3,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "those|UW Z",
+  "word": "those",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "DH OW1 Z",
+     "key": "OW Z",
+     "respelling": "THOH-z"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "static|AA T IH K",
+  "word": "static",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S T AE1 T IH0 K",
+     "key": "AE T IH K",
+     "respelling": "STA-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "wallflower|AA L",
+  "word": "wallflower",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": "W AA1 L",
+  "seedRespelling": "WAH-l",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "W AA1 L F L AW2 ER0",
+     "key": "AW ER",
+     "respelling": "WAH-lflow-ur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "romantic|AA T IH K",
+  "word": "romantic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "R OW0 M AE1 N T IH0 K",
+     "key": "AE N T IH K",
+     "respelling": "roh-MA-ntih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "lored|AO R D",
+  "word": "lored",
+  "seedWord": "landlord",
+  "rhymeKey": "AO R D",
+  "seedReading": "L AE1 N D L AO2 R D",
+  "seedRespelling": "LA-ndlaw-rd",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "lor",
+     "readings": [
+      "L AO1 R"
+     ],
+     "rhymes": false
+    },
+    {
+     "word": "lore",
+     "readings": [
+      "L AO1 R"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of lore reaches the key"
+  }
+ },
+ {
+  "id": "bedrocks|AA K S",
+  "word": "bedrocks",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "bedrock",
+     "readings": [
+      "B EH1 D R AA2 K"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "B EH1 D R AA2 K S",
+    "head": "bed",
+    "tail": "rocks"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of bedrock reaches the key"
+  }
+ },
+ {
+  "id": "emus|UW Z",
+  "word": "emus",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "emu",
+     "readings": [
+      "IY1 M Y UW2"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of emu reaches the key"
+  }
+ },
+ {
+  "id": "coxswain|EY N",
+  "word": "coxswain",
+  "seedWord": "gain",
+  "rhymeKey": "EY N",
+  "seedReading": "G EY1 N",
+  "seedRespelling": "GAY-n",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "K AA1 K S S W EY2 N",
+    "head": "cox",
+    "tail": "swain"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; cox + swain would reach the key, and Wiktionary does not end in the key's sounds"
+  }
+ },
+ {
+  "id": "water|AA P ER",
+  "word": "water",
+  "seedWord": "grasshopper",
+  "rhymeKey": "AA P ER",
+  "seedReading": "G R AE1 S HH AA2 P ER0",
+  "seedRespelling": "GRA-shah-pur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "W AA1 T ER0",
+     "key": "AA T ER",
+     "respelling": "WAH-tur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "towed|AO R D",
+  "word": "towed",
+  "seedWord": "landlord",
+  "rhymeKey": "AO R D",
+  "seedReading": "L AE1 N D L AO2 R D",
+  "seedRespelling": "LA-ndlaw-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "T OW1 D",
+     "key": "OW D",
+     "respelling": "TOH-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "hairball|AA L",
+  "word": "hairball",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": "W AA1 L",
+  "seedRespelling": "WAH-l",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "HH EH1 R B AA2 L",
+    "head": "hair",
+    "tail": "ball"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the compound hair + ball reaches the key"
+  }
+ },
+ {
+  "id": "suppose|UW Z",
+  "word": "suppose",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S AH0 P OW1 Z",
+     "key": "OW Z",
+     "respelling": "suh-POH-z"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "emphatic|AA T IH K",
+  "word": "emphatic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "EH0 M F AE1 T IH0 K",
+     "key": "AE T IH K",
+     "respelling": "eh-MFA-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "wane|EY M",
+  "word": "wane",
+  "seedWord": "blame",
+  "rhymeKey": "EY M",
+  "seedReading": "B L EY1 M",
+  "seedRespelling": "BLAY-m",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [
+    {
+     "phonemes": "W EY1 N",
+     "key": "EY N",
+     "respelling": "WAY-n"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "blessed|EH P T",
+  "word": "blessed",
+  "seedWord": "slept",
+  "rhymeKey": "EH P T",
+  "seedReading": "S L EH1 P T",
+  "seedRespelling": "SLEH-pt",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [
+    {
+     "phonemes": "B L EH1 S T",
+     "key": "EH S T",
+     "respelling": "BLEH-st"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "engineer|IH R D",
+  "word": "engineer",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "seedReading": "B IH1 R D",
+  "seedRespelling": "BIH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "EH1 N JH AH0 N IH1 R",
+     "key": "IH R",
+     "respelling": "EH-njuh-nih-r"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "skinflint|IH N T",
+  "word": "skinflint",
+  "seedWord": "sprint",
+  "rhymeKey": "IH N T",
+  "seedReading": "S P R IH1 N T",
+  "seedRespelling": "SPRIH-nt",
+  "kind": "stress",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S K IH1 N F L IH0 N T",
+     "key": "IH N F L IH N T",
+     "respelling": "SKIH-nflih-nt"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "the dictionary marks no stress on the last syllable, and the spelling splits as skin + flint: a compound missing a mark is a missing reading"
+  }
+ },
+ {
+  "id": "mycologist|AA L AH JH IH S T",
+  "word": "mycologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "no reading on file; Wiktionary does not end in the key's sounds"
+  }
+ },
+ {
+  "id": "herd|EH R D",
+  "word": "herd",
+  "seedWord": "laird",
+  "rhymeKey": "EH R D",
+  "seedReading": "L EH1 R D",
+  "seedRespelling": "LEH-rd",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "HH ER1 D",
+     "key": "ER D",
+     "respelling": "HUR-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "geologist|AA L AH JH IH S T",
+  "word": "geologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 5,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "JH IY0 AA1 L AH0 JH AH0 S T",
+     "key": "AA L AH JH AH S T",
+     "respelling": "jee-AH-luh-juh-st"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "reaches the key by the weak-vowel Normalisation"
+  }
+ },
+ {
+  "id": "athletic|AA T IH K",
+  "word": "athletic",
+  "seedWord": "idiotic",
+  "rhymeKey": "AA T IH K",
+  "seedReading": "IH2 D IY0 AA1 T IH0 K",
+  "seedRespelling": "ih-dee-AH-tih-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "AE0 TH L EH1 T IH0 K",
+     "key": "EH T IH K",
+     "respelling": "a-THLEH-tih-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the engine's reading does not reach the key, and Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "father|AA P ER",
+  "word": "father",
+  "seedWord": "grasshopper",
+  "rhymeKey": "AA P ER",
+  "seedReading": "G R AE1 S HH AA2 P ER0",
+  "seedRespelling": "GRA-shah-pur",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "F AA1 DH ER0",
+     "key": "AA DH ER",
+     "respelling": "FAH-thur"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "two dictionaries agree it does not reach the key"
+  }
+ },
+ {
+  "id": "gawks|AA K S",
+  "word": "gawks",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "gawk",
+     "readings": [
+      "G AA1 K"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of gawk reaches the key"
+  }
+ },
+ {
+  "id": "waded|AY D IH D",
+  "word": "waded",
+  "seedWord": "lopsided",
+  "rhymeKey": "AY D IH D",
+  "seedReading": "L AA1 P S AY1 D IH0 D",
+  "seedRespelling": "LAH-pseye-dih-d",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "W EY1 D IH0 D",
+     "key": "EY D IH D",
+     "respelling": "WAY-dih-d"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "the engine's reading does not reach the key, and Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "nuzzled|IH R D",
+  "word": "nuzzled",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "seedReading": "B IH1 R D",
+  "seedRespelling": "BIH-rd",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "nuzzle",
+     "readings": [
+      "N AH1 Z AH0 L",
+      "N AH1 Z L"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "no-rhyme",
+   "why": "no reading on file; the regular form of nuzzle does not reach the key"
+  }
+ },
+ {
+  "id": "resigner|AY N ER",
+  "word": "resigner",
+  "seedWord": "diner",
+  "rhymeKey": "AY N ER",
+  "seedReading": "D AY1 N ER0",
+  "seedRespelling": "DEYE-nur",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R EY1 S AY2 N ER0",
+    "head": "re",
+    "tail": "signer"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "skint|IH N T",
+  "word": "skint",
+  "seedWord": "sprint",
+  "rhymeKey": "IH N T",
+  "seedReading": "S P R IH1 N T",
+  "seedRespelling": "SPRIH-nt",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "EH1 S K IH2 N T",
+    "head": "s",
+    "tail": "kint"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "googol|AA L",
+  "word": "googol",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": "W AA1 L",
+  "seedRespelling": "WAH-l",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "tutus|UW Z",
+  "word": "tutus",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "tutu",
+     "readings": [
+      "T UW1 T UW2"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of tutu reaches the key"
+  }
+ },
+ {
+  "id": "roguish|IH SH",
+  "word": "roguish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "spearmint|IH N T",
+  "word": "spearmint",
+  "seedWord": "sprint",
+  "rhymeKey": "IH N T",
+  "seedReading": "S P R IH1 N T",
+  "seedRespelling": "SPRIH-nt",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "S P IH1 R M IH2 N T",
+    "head": "spear",
+    "tail": "mint"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the compound spear + mint reaches the key, and Wiktionary ends in its sounds"
+  }
+ },
+ {
+  "id": "bijoux|UW Z",
+  "word": "bijoux",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "elided|AY D IH D",
+  "word": "elided",
+  "seedWord": "lopsided",
+  "rhymeKey": "AY D IH D",
+  "seedReading": "L AA1 P S AY1 D IH0 D",
+  "seedRespelling": "LAH-pseye-dih-d",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "snored|AO R D",
+  "word": "snored",
+  "seedWord": "landlord",
+  "rhymeKey": "AO R D",
+  "seedReading": "L AE1 N D L AO2 R D",
+  "seedRespelling": "LA-ndlaw-rd",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 4,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "snore",
+     "readings": [
+      "S N AO1 R"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "EH1 S N AO2 R D",
+    "head": "s",
+    "tail": "nored"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of snore reaches the key"
+  }
+ },
+ {
+  "id": "dialed|AY L D",
+  "word": "dialed",
+  "seedWord": "wild",
+  "rhymeKey": "AY L D",
+  "seedReading": "W AY1 L D",
+  "seedRespelling": "WEYE-ld",
+  "kind": "wrong-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "D AY1 AH0 L D",
+     "key": "AY AH L D",
+     "respelling": "DEYE-uh-ld"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "reaches the key by the r rule, or one of the 17 -s and -ed readings"
+  }
+ },
+ {
+  "id": "psychologist|AA L AH JH IH S T",
+  "word": "psychologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 5,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "S AY0 K AA1 L AH0 JH AH0 S T",
+     "key": "AA L AH JH AH S T",
+     "respelling": "seye-KAH-luh-juh-st"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "reaches the key by the weak-vowel Normalisation"
+  }
+ },
+ {
+  "id": "hocks|AA K S",
+  "word": "hocks",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 3,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "hock",
+     "readings": [
+      "HH AA1 K"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of hock reaches the key"
+  }
+ },
+ {
+  "id": "caulks|AA K S",
+  "word": "caulks",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "caulk",
+     "readings": [
+      "K AA1 K"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of caulk reaches the key"
+  }
+ },
+ {
+  "id": "beader|IY D ER",
+  "word": "beader",
+  "seedWord": "cheerleader",
+  "rhymeKey": "IY D ER",
+  "seedReading": "CH IH1 R L IY2 D ER0",
+  "seedRespelling": "CHIH-rlee-dur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B IY1 IY2 D ER0",
+    "head": "b",
+    "tail": "eader"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "obtrusion|UW ZH AH N",
+  "word": "obtrusion",
+  "seedWord": "delusion",
+  "rhymeKey": "UW ZH AH N",
+  "seedReading": "D IH0 L UW1 ZH AH0 N",
+  "seedRespelling": "dih-LOO-zhuh-n",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "hematologist|AA L AH JH IH S T",
+  "word": "hematologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "slews|UW Z",
+  "word": "slews",
+  "seedWord": "booze",
+  "rhymeKey": "UW Z",
+  "seedReading": "B UW1 Z",
+  "seedRespelling": "BOO-z",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "slew",
+     "readings": [
+      "S L UW1"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the regular form of slew reaches the key"
+  }
+ },
+ {
+  "id": "seismometer|IY T ER",
+  "word": "seismometer",
+  "seedWord": "centimeter",
+  "rhymeKey": "IY T ER",
+  "seedReading": "S EH1 N T AH0 M IY2 T ER0",
+  "seedRespelling": "SEH-ntuh-mee-tur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "phlox|AA K S",
+  "word": "phlox",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "P IY1 EY1 CH L AA2 K S",
+    "head": "ph",
+    "tail": "lox"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "auks|AA K S",
+  "word": "auks",
+  "seedWord": "smallpox",
+  "rhymeKey": "AA K S",
+  "seedReading": "S M AA1 L P AA2 K S",
+  "seedRespelling": "SMAH-lpah-ks",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "crake|EY K",
+  "word": "crake",
+  "seedWord": "fake",
+  "rhymeKey": "EY K",
+  "seedReading": "F EY1 K",
+  "seedRespelling": "FAY-k",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "S IY1 R EY2 K",
+    "head": "c",
+    "tail": "rake"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "supe|UW P",
+  "word": "supe",
+  "seedWord": "group",
+  "rhymeKey": "UW P",
+  "seedReading": "G R UW1 P",
+  "seedRespelling": "GROO-p",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "epigraph|AE F",
+  "word": "epigraph",
+  "seedWord": "calf",
+  "rhymeKey": "AE F",
+  "seedReading": "K AE1 F",
+  "seedRespelling": "KA-f",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "enlace|EY S",
+  "word": "enlace",
+  "seedWord": "base",
+  "rhymeKey": "EY S",
+  "seedReading": "B EY1 S",
+  "seedRespelling": "BAY-s",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "enlaced",
+     "readings": [
+      "EH1 N L EY2 S T"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "EH1 N L EY2 S",
+    "head": "en",
+    "tail": "lace"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "relayer|EY ER",
+  "word": "relayer",
+  "seedWord": "mayor",
+  "rhymeKey": "EY ER",
+  "seedReading": "M EY1 ER0",
+  "seedRespelling": "MAY-ur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R EY1 L EY2 ER0",
+    "head": "re",
+    "tail": "layer"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "seismography|AA G R AH F IY",
+  "word": "seismography",
+  "seedWord": "pornography",
+  "rhymeKey": "AA G R AH F IY",
+  "seedReading": "P AO0 R N AA1 G R AH0 F IY0",
+  "seedRespelling": "paw-RNAH-gruh-fee",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "awl|AA L",
+  "word": "awl",
+  "seedWord": "wall",
+  "rhymeKey": "AA L",
+  "seedReading": "W AA1 L",
+  "seedRespelling": "WAH-l",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "recane|EY N",
+  "word": "recane",
+  "seedWord": "gain",
+  "rhymeKey": "EY N",
+  "seedReading": "G EY1 N",
+  "seedRespelling": "GAY-n",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R EY1 K EY2 N",
+    "head": "re",
+    "tail": "cane"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "rin|IH N",
+  "word": "rin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "rines",
+     "readings": [
+      "R AY1 N Z"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "AA1 R IH2 N",
+    "head": "r",
+    "tail": "in"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "tannin|IH N",
+  "word": "tannin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "T AE1 N IH2 N",
+    "head": "tann",
+    "tail": "in"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "undersigner|AY N ER",
+  "word": "undersigner",
+  "seedWord": "diner",
+  "rhymeKey": "AY N ER",
+  "seedReading": "D AY1 N ER0",
+  "seedRespelling": "DEYE-nur",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "AH1 N D ER0 S AY2 N ER0",
+    "head": "under",
+    "tail": "signer"
+   }
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; the compound under + signer reaches the key"
+  }
+ },
+ {
+  "id": "bandsaw|AA",
+  "word": "bandsaw",
+  "seedWord": "jaw",
+  "rhymeKey": "AA",
+  "seedReading": "JH AA1",
+  "seedRespelling": "JAH",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "B AE1 N D S AA2",
+    "head": "band",
+    "tail": "saw"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "decoct|AA K T",
+  "word": "decoct",
+  "seedWord": "docked",
+  "rhymeKey": "AA K T",
+  "seedReading": "D AA1 K T",
+  "seedRespelling": "DAH-kt",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "D EH1 K AA2 K T",
+    "head": "dec",
+    "tail": "oct"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "zoologist|AA L AH JH IH S T",
+  "word": "zoologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 5,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "Z OW0 AA1 L AH0 JH AH0 S T",
+     "key": "AA L AH JH AH S T",
+     "respelling": "zoh-AH-luh-juh-st"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "reaches the key by the weak-vowel Normalisation"
+  }
+ },
+ {
+  "id": "gorse|AO R S",
+  "word": "gorse",
+  "seedWord": "horse",
+  "rhymeKey": "AO R S",
+  "seedReading": "HH AO1 R S",
+  "seedRespelling": "HAW-rs",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "rhyme",
+   "why": "no reading on file; Wiktionary reads it as one syllable ending in the key"
+  }
+ },
+ {
+  "id": "terminologist|AA L AH JH IH S T",
+  "word": "terminologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "sculpin|IH N",
+  "word": "sculpin",
+  "seedWord": "win",
+  "rhymeKey": "IH N",
+  "seedReading": "W IH1 N",
+  "seedRespelling": "WIH-n",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "upwelling|EH L IH NG",
+  "word": "upwelling",
+  "seedWord": "storytelling",
+  "rhymeKey": "EH L IH NG",
+  "seedReading": "S T AO1 R IY0 T EH2 L IH0 NG",
+  "seedRespelling": "STAW-ree-teh-lih-ng",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "AH1 P W EH2 L IH0 NG",
+    "head": "up",
+    "tail": "welling"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "touristic|IH S T IH K",
+  "word": "touristic",
+  "seedWord": "idealistic",
+  "rhymeKey": "IH S T IH K",
+  "seedReading": "AY0 D IY2 AH0 L IH1 S T IH0 K",
+  "seedRespelling": "eye-dee-uh-LIH-stih-k",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "barer|EY ER",
+  "word": "barer",
+  "seedWord": "mayor",
+  "rhymeKey": "EY ER",
+  "seedReading": "M EY1 ER0",
+  "seedRespelling": "MAY-ur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "obeyer|EY ER",
+  "word": "obeyer",
+  "seedWord": "mayor",
+  "rhymeKey": "EY ER",
+  "seedReading": "M EY1 ER0",
+  "seedRespelling": "MAY-ur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "OW1 B EY2 ER0",
+    "head": "o",
+    "tail": "beyer"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "suffusion|UW ZH AH N",
+  "word": "suffusion",
+  "seedWord": "delusion",
+  "rhymeKey": "UW ZH AH N",
+  "seedReading": "D IH0 L UW1 ZH AH0 N",
+  "seedRespelling": "dih-LOO-zhuh-n",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "waspish|IH SH",
+  "word": "waspish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "seedReading": "D IH1 SH",
+  "seedRespelling": "DIH-sh",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "W AA1 S P IH2 SH",
+    "head": "wasp",
+    "tail": "ish"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "dragoon|UW N",
+  "word": "dragoon",
+  "seedWord": "noon",
+  "rhymeKey": "UW N",
+  "seedReading": "N UW1 N",
+  "seedRespelling": "NOO-n",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "philologist|AA L AH JH IH S T",
+  "word": "philologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "darer|EY ER",
+  "word": "darer",
+  "seedWord": "mayor",
+  "rhymeKey": "EY ER",
+  "seedReading": "M EY1 ER0",
+  "seedRespelling": "MAY-ur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "cubistic|IH S T IH K",
+  "word": "cubistic",
+  "seedWord": "idealistic",
+  "rhymeKey": "IH S T IH K",
+  "seedReading": "AY0 D IY2 AH0 L IH1 S T IH0 K",
+  "seedRespelling": "eye-dee-uh-LIH-stih-k",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "elute|UW T",
+  "word": "elute",
+  "seedWord": "shoot",
+  "rhymeKey": "UW T",
+  "seedReading": "SH UW1 T",
+  "seedRespelling": "SHOO-t",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "IY1 L UW2 T",
+    "head": "e",
+    "tail": "lute"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "clique|IH K",
+  "word": "clique",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "seedReading": "T R IH1 K",
+  "seedRespelling": "TRIH-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "K L IY1 K",
+     "key": "IY K",
+     "respelling": "KLEE-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "the engine's reading does not reach the key, and Wiktionary's ends in its sounds"
+  }
+ },
+ {
+  "id": "creek|IH K",
+  "word": "creek",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "seedReading": "T R IH1 K",
+  "seedRespelling": "TRIH-k",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": true,
+   "readings": [
+    {
+     "phonemes": "K R IY1 K",
+     "key": "IY K",
+     "respelling": "KREE-k"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "the engine's reading does not reach the key, and Wiktionary's ends in its sounds"
+  }
+ },
+ {
+  "id": "unmoored|AO R D",
+  "word": "unmoored",
+  "seedWord": "landlord",
+  "rhymeKey": "AO R D",
+  "seedReading": "L AE1 N D L AO2 R D",
+  "seedRespelling": "LA-ndlaw-rd",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "jitter|IH T ER",
+  "word": "jitter",
+  "seedWord": "litter",
+  "rhymeKey": "IH T ER",
+  "seedReading": "L IH1 T ER0",
+  "seedRespelling": "LIH-tur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 5,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "jitters",
+     "readings": [
+      "JH IH1 T ER0 Z"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ },
+ {
+  "id": "recompiled|AY L D",
+  "word": "recompiled",
+  "seedWord": "wild",
+  "rhymeKey": "AY L D",
+  "seedReading": "W AY1 L D",
+  "seedRespelling": "WEYE-ld",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "R EY1 K AH0 M P AY2 L D",
+    "head": "re",
+    "tail": "compiled"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "tautological|AA JH IH K AH L",
+  "word": "tautological",
+  "seedWord": "technological",
+  "rhymeKey": "AA JH IH K AH L",
+  "seedReading": "T EH2 K N AH0 L AA1 JH IH0 K AH0 L",
+  "seedRespelling": "teh-knuh-LAH-jih-kuh-l",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 0,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "theologist|AA L AH JH IH S T",
+  "word": "theologist",
+  "seedWord": "microbiologist",
+  "rhymeKey": "AA L AH JH IH S T",
+  "seedReading": "M AY2 K R OW0 B IY0 AA1 L AH0 JH IH0 S T",
+  "seedRespelling": "meye-kroh-bee-AH-luh-jih-st",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "needer|IY D ER",
+  "word": "needer",
+  "seedWord": "cheerleader",
+  "rhymeKey": "IY D ER",
+  "seedReading": "CH IH1 R L IY2 D ER0",
+  "seedRespelling": "CHIH-rlee-dur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "N IY1 D ER0",
+    "head": "need",
+    "tail": "er"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary has no entry"
+  }
+ },
+ {
+  "id": "dander|AE N D ER",
+  "word": "dander",
+  "seedWord": "commander",
+  "rhymeKey": "AE N D ER",
+  "seedReading": "K AH0 M AE1 N D ER0",
+  "seedRespelling": "kuh-MA-ndur",
+  "kind": "no-reading",
+  "source": "appeal",
+  "producedBy": 2,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "D IY1 AE2 N D ER0",
+    "head": "d",
+    "tail": "ander"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "no reading on file; Wiktionary ends in the key's sounds and does not mark stress"
+  }
+ }
+]

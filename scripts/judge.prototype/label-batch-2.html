@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>PROTOTYPE judge labels: batch-2</title>
+<style>
+  body { font: 17px/1.5 system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+  h1 { font-size: 1.1rem; margin: 0; } .intro { color: #555; font-size: .9rem; }
+  .rule { background: #f6f6f6; border-radius: 8px; padding: .8rem 1rem; font-size: .9rem; margin: 1rem 0; }
+  .rule li { margin: .2rem 0; }
+  .card { border: 1px solid #ccc; border-radius: 10px; padding: 1.5rem; margin: 1.2rem 0; }
+  .pair { font-size: 1.7rem; line-height: 1.35; } .pair b { color: #7a3ff2; } .say { color: #777; font-size: 1rem; }
+  .why { margin: .8rem 0 1rem; color: #444; font-size: .92rem; }
+  button { font: inherit; padding: .5rem .9rem; margin: .25rem 0; border: 1px solid #999; border-radius: 8px; background: #fff; cursor: pointer; display: block; width: 100%; text-align: left; }
+  button small { display: block; color: #666; } button.on { background: #7a3ff2; color: #fff; border-color: #7a3ff2; } button.on small { color: #e6dcff; }
+  .nav button { display: inline-block; width: auto; font-size: .85rem; margin-right: .3rem; }
+  kbd { font-size: .75rem; border: 1px solid #aaa; border-radius: 4px; padding: 0 .3rem; margin-right: .4rem; }
+  .state { font-size: .88rem; color: #555; }
+  table { border-collapse: collapse; font-size: .82rem; } td { padding: 0 .6rem 0 0; }
+</style>
+<h1>PROTOTYPE (#231): the pairs the rules could not decide, set <code>batch-2</code></h1>
+<p class="intro">128 pairs are in this set. The rules labelled 79 of them with nobody's ear. These 49 are left, each because a fact about how a word is said is missing. No judge ruling is shown.</p>
+<div class="rule">
+  <b>The one question: is the pair a Rhyme?</b> A Rhyme is what scores Points.
+  <ul>
+    <li>One word has a stressed syllable, main or secondary, whose vowel and everything after it are identical to the other word's from its last stressed vowel on. The consonants before the vowel are ignored.</li>
+    <li>One differing sound is no Rhyme. An extra or missing syllable is no Rhyme.</li>
+    <li>A match on an unstressed last syllable is no Rhyme. Whether it is accepted without Points is not asked here.</li>
+    <li>Counted as the same: weak "ih" and weak "uh" after the stressed vowel; "er" and plain r after "eye", "ow" or "oy".</li>
+    <li>A compound keeps a stress on its last part (<code>carsick</code>, <code>drumstick</code>).</li>
+  </ul>
+  Each card shows the pair both ways and takes one ruling for both. Whether the word deserves to be an Answer or a Bonus Word is not asked.
+</div>
+<p class="intro">Keys: 1, 2 or 3 to rule, Enter to skip forward, Backspace to go back.</p>
+<div class="state" id="progress"></div>
+<div class="card" id="card"></div>
+<div class="nav"><button id="back">Back</button><button id="next">Next</button><button id="export">Export labels</button></div>
+<h1 style="margin-top:1.5rem">Rulings so far</h1>
+<div class="state" id="tally"></div>
+<table id="log"></table>
+<script>
+const SET = "batch-2";
+const ITEMS = [{"id":"ragouts|UW Z","word":"ragouts","seed":"booze","say":"BOO-z","why":"no reading on file; Wiktionary has no entry"},{"id":"reshared|EH R D","word":"reshared","seed":"laird","say":"LEH-rd","why":"no reading on file; Wiktionary has no entry"},{"id":"swayer|EY ER","word":"swayer","seed":"mayor","say":"MAY-ur","why":"no reading on file; Wiktionary has no entry"},{"id":"pulchritude|UW D","word":"pulchritude","seed":"exclude","say":"ih-KSKLOO-d","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"cartography|AA G R AH F IY","word":"cartography","seed":"pornography","say":"paw-RNAH-gruh-fee","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"abiotic|AA T IH K","word":"abiotic","seed":"idiotic","say":"ih-dee-AH-tih-k","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"astrologist|AA L AH JH IH S T","word":"astrologist","seed":"microbiologist","say":"meye-kroh-bee-AH-luh-jih-st","why":"no reading on file; Wiktionary has no entry"},{"id":"coxswain|EY N","word":"coxswain","seed":"gain","say":"GAY-n","why":"no reading on file; cox + swain would reach the key, and Wiktionary does not end in the key's sounds"},{"id":"skinflint|IH N T","word":"skinflint","seed":"sprint","say":"SPRIH-nt","why":"the dictionary marks no stress on the last syllable, and the spelling splits as skin + flint: a compound missing a mark is a missing reading"},{"id":"resigner|AY N ER","word":"resigner","seed":"diner","say":"DEYE-nur","why":"no reading on file; Wiktionary has no entry"},{"id":"googol|AA L","word":"googol","seed":"wall","say":"WAH-l","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"roguish|IH SH","word":"roguish","seed":"dish","say":"DIH-sh","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"bijoux|UW Z","word":"bijoux","seed":"booze","say":"BOO-z","why":"no reading on file; Wiktionary has no entry"},{"id":"elided|AY D IH D","word":"elided","seed":"lopsided","say":"LAH-pseye-dih-d","why":"no reading on file; Wiktionary has no entry"},{"id":"beader|IY D ER","word":"beader","seed":"cheerleader","say":"CHIH-rlee-dur","why":"no reading on file; Wiktionary has no entry"},{"id":"obtrusion|UW ZH AH N","word":"obtrusion","seed":"delusion","say":"dih-LOO-zhuh-n","why":"no reading on file; Wiktionary has no entry"},{"id":"hematologist|AA L AH JH IH S T","word":"hematologist","seed":"microbiologist","say":"meye-kroh-bee-AH-luh-jih-st","why":"no reading on file; Wiktionary has no entry"},{"id":"seismometer|IY T ER","word":"seismometer","seed":"centimeter","say":"SEH-ntuh-mee-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"auks|AA K S","word":"auks","seed":"smallpox","say":"SMAH-lpah-ks","why":"no reading on file; Wiktionary has no entry"},{"id":"epigraph|AE F","word":"epigraph","seed":"calf","say":"KA-f","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"enlace|EY S","word":"enlace","seed":"base","say":"BAY-s","why":"no reading on file; Wiktionary has no entry"},{"id":"relayer|EY ER","word":"relayer","seed":"mayor","say":"MAY-ur","why":"no reading on file; Wiktionary has no entry"},{"id":"seismography|AA G R AH F IY","word":"seismography","seed":"pornography","say":"paw-RNAH-gruh-fee","why":"no reading on file; Wiktionary has no entry"},{"id":"recane|EY N","word":"recane","seed":"gain","say":"GAY-n","why":"no reading on file; Wiktionary has no entry"},{"id":"tannin|IH N","word":"tannin","seed":"win","say":"WIH-n","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"bandsaw|AA","word":"bandsaw","seed":"jaw","say":"JAH","why":"no reading on file; Wiktionary has no entry"},{"id":"decoct|AA K T","word":"decoct","seed":"docked","say":"DAH-kt","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"terminologist|AA L AH JH IH S T","word":"terminologist","seed":"microbiologist","say":"meye-kroh-bee-AH-luh-jih-st","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"sculpin|IH N","word":"sculpin","seed":"win","say":"WIH-n","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"upwelling|EH L IH NG","word":"upwelling","seed":"storytelling","say":"STAW-ree-teh-lih-ng","why":"no reading on file; Wiktionary has no entry"},{"id":"touristic|IH S T IH K","word":"touristic","seed":"idealistic","say":"eye-dee-uh-LIH-stih-k","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"barer|EY ER","word":"barer","seed":"mayor","say":"MAY-ur","why":"no reading on file; Wiktionary has no entry"},{"id":"obeyer|EY ER","word":"obeyer","seed":"mayor","say":"MAY-ur","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"suffusion|UW ZH AH N","word":"suffusion","seed":"delusion","say":"dih-LOO-zhuh-n","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"waspish|IH SH","word":"waspish","seed":"dish","say":"DIH-sh","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"dragoon|UW N","word":"dragoon","seed":"noon","say":"NOO-n","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"philologist|AA L AH JH IH S T","word":"philologist","seed":"microbiologist","say":"meye-kroh-bee-AH-luh-jih-st","why":"no reading on file; Wiktionary has no entry"},{"id":"darer|EY ER","word":"darer","seed":"mayor","say":"MAY-ur","why":"no reading on file; Wiktionary has no entry"},{"id":"cubistic|IH S T IH K","word":"cubistic","seed":"idealistic","say":"eye-dee-uh-LIH-stih-k","why":"no reading on file; Wiktionary has no entry"},{"id":"elute|UW T","word":"elute","seed":"shoot","say":"SHOO-t","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"clique|IH K","word":"clique","seed":"trick","say":"TRIH-k","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"creek|IH K","word":"creek","seed":"trick","say":"TRIH-k","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"unmoored|AO R D","word":"unmoored","seed":"landlord","say":"LA-ndlaw-rd","why":"no reading on file; Wiktionary has no entry"},{"id":"jitter|IH T ER","word":"jitter","seed":"litter","say":"LIH-tur","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"recompiled|AY L D","word":"recompiled","seed":"wild","say":"WEYE-ld","why":"no reading on file; Wiktionary has no entry"},{"id":"tautological|AA JH IH K AH L","word":"tautological","seed":"technological","say":"teh-knuh-LAH-jih-kuh-l","why":"no reading on file; Wiktionary has no entry"},{"id":"theologist|AA L AH JH IH S T","word":"theologist","seed":"microbiologist","say":"meye-kroh-bee-AH-luh-jih-st","why":"no reading on file; Wiktionary has no entry"},{"id":"needer|IY D ER","word":"needer","seed":"cheerleader","say":"CHIH-rlee-dur","why":"no reading on file; Wiktionary has no entry"},{"id":"dander|AE N D ER","word":"dander","seed":"commander","say":"kuh-MA-ndur","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"}];
+const KEY = "PROTOTYPE-judge-labels-" + SET;
+const OPTIONS = [
+  ["rhyme", "Rhyme", "Scores Points, in both directions."],
+  ["no-rhyme", "Not a Rhyme", "No Points in either direction. It may still be accepted without Points; the engine works that out."],
+  ["out", "Leave it out", "I do not know how the word is said, or it is the lunatic shape. No label is written and no judge is scored on it."],
+];
+let labels = JSON.parse(localStorage.getItem(KEY) || "{}");
+let at = Math.max(0, ITEMS.findIndex((it) => !labels[it.id]));
+if (ITEMS.every((it) => labels[it.id])) at = ITEMS.length - 1;
+
+function rule(label) {
+  labels[ITEMS[at].id] = label;
+  localStorage.setItem(KEY, JSON.stringify(labels));
+  if (at < ITEMS.length - 1) at++;
+  render();
+}
+function render() {
+  const it = ITEMS[at], done = ITEMS.filter((x) => labels[x.id]).length;
+  document.getElementById("progress").textContent = "Pair " + (at + 1) + " of " + ITEMS.length + ". Ruled: " + done + (done === ITEMS.length ? ". All done: press Export labels." : "");
+  document.getElementById("card").innerHTML =
+    '<div class="pair">' + it.word + ' <span class="say">for</span> <b>' + it.seed + '</b> <span class="say">' + (it.say ? "(" + it.say + ")" : "") + "</span><br>" +
+    "<b>" + it.seed + '</b> <span class="say">for</span> ' + it.word + "</div>" +
+    '<div class="why">Why the rules stopped: ' + it.why + ".</div>" +
+    OPTIONS.map(([v, text, causes], i) => '<button data-v="' + v + '" class="' + (labels[it.id] === v ? "on" : "") + '"><kbd>' + (i + 1) + "</kbd>" + text + "<small>" + causes + "</small></button>").join("");
+  document.querySelectorAll("#card button").forEach((b) => (b.onclick = () => rule(b.dataset.v)));
+  const tally = {};
+  Object.values(labels).forEach((l) => (tally[l] = (tally[l] || 0) + 1));
+  document.getElementById("tally").textContent = Object.entries(tally).map(([l, n]) => l + " " + n).join(", ") || "none yet";
+  document.getElementById("log").innerHTML = ITEMS.filter((x) => labels[x.id]).slice(-12).reverse()
+    .map((x) => "<tr><td>" + x.word + " for " + x.seed + ", " + x.seed + " for " + x.word + "</td><td><b>" + labels[x.id] + "</b></td></tr>").join("");
+}
+document.getElementById("back").onclick = () => { at = Math.max(0, at - 1); render(); };
+document.getElementById("next").onclick = () => { at = Math.min(ITEMS.length - 1, at + 1); render(); };
+document.getElementById("export").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(labels, null, 1)], { type: "application/json" }));
+  a.download = SET + ".labels.json";
+  a.click();
+};
+document.onkeydown = (e) => {
+  const n = Number(e.key);
+  if (n >= 1 && n <= OPTIONS.length) rule(OPTIONS[n - 1][0]);
+  else if (e.key === "Enter") document.getElementById("next").click();
+  else if (e.key === "Backspace") document.getElementById("back").click();
+};
+render();
+</script>

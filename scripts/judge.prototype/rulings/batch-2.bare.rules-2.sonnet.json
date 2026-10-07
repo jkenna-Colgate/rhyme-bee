@@ -1,0 +1,960 @@
+{
+ "bandsaw|AA": {
+  "word": "bandsaw",
+  "verdict": "rhyme",
+  "reading": "B AE1 N D S AO2",
+  "confidence": "high",
+  "why": "Compound whose last part 'saw' keeps secondary stress and rhymes with 'jaw'.",
+  "verified": true
+ },
+ "cartography|AA G R AH F IY": {
+  "word": "cartography",
+  "verdict": "rhyme",
+  "reading": "K AA0 R T AA1 G R AH0 F IY0",
+  "confidence": "high",
+  "why": "Stressed AA1 G R AH0 F IY0 matches pornography's key.",
+  "verified": true
+ },
+ "seismography|AA G R AH F IY": {
+  "word": "seismography",
+  "verdict": "rhyme",
+  "reading": "S AY0 Z M AA1 G R AH0 F IY0",
+  "confidence": "high",
+  "why": "Stressed AA1 G R AH0 F IY0 matches pornography's key.",
+  "verified": true
+ },
+ "tautological|AA JH IH K AH L": {
+  "word": "tautological",
+  "verdict": "rhyme",
+  "reading": "T AO2 T AH0 L AA1 JH IH0 K AH0 L",
+  "confidence": "high",
+  "why": "Last stressed syllable AA1 JH IH0 K AH0 L matches technological in merged GA.",
+  "verified": true
+ },
+ "auks|AA K S": {
+  "word": "auks",
+  "verdict": "rhyme",
+  "reading": "AO1 K S",
+  "confidence": "high",
+  "why": "Merged cot/caught vowel plus K S matches smallpox's AA2 K S.",
+  "verified": true
+ },
+ "bedrocks|AA K S": {
+  "word": "bedrocks",
+  "verdict": "rhyme",
+  "reading": "B EH1 D R AA2 K S",
+  "confidence": "high",
+  "why": "Compound ending in 'rocks' with the same AA K S rime as smallpox.",
+  "verified": true
+ },
+ "caulks|AA K S": {
+  "word": "caulks",
+  "verdict": "rhyme",
+  "reading": "K AO1 K S",
+  "confidence": "high",
+  "why": "Rime AO K S equals AA K S in merged GA.",
+  "verified": true
+ },
+ "gawks|AA K S": {
+  "word": "gawks",
+  "verdict": "rhyme",
+  "reading": "G AO1 K S",
+  "confidence": "high",
+  "why": "Rime AO K S equals AA K S in merged GA.",
+  "verified": true
+ },
+ "hocks|AA K S": {
+  "word": "hocks",
+  "verdict": "rhyme",
+  "reading": "HH AA1 K S",
+  "confidence": "high",
+  "why": "Same AA-K-S rime as smallpox's stressed 'pox'.",
+  "verified": true
+ },
+ "livestock|AA K S": {
+  "word": "livestock",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Ends in AA-K with no final S, so the rime differs from 'pox'."
+ },
+ "paddocks|AA K S": {
+  "word": "paddocks",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on the first syllable (AE D AH K S), so the Rhyme Key is not AA-K-S."
+ },
+ "phlox|AA K S": {
+  "word": "phlox",
+  "verdict": "rhyme",
+  "reading": "F L AA1 K S",
+  "confidence": "high",
+  "why": "Rime AA-K-S matches 'pox'.",
+  "verified": true
+ },
+ "decoct|AA K T": {
+  "word": "decoct",
+  "verdict": "rhyme",
+  "reading": "D IH0 K AA1 K T",
+  "confidence": "medium",
+  "why": "Stress falls on the final syllable, giving AA-K-T, the same rime as 'docked'.",
+  "verified": true
+ },
+ "awl|AA L": {
+  "word": "awl",
+  "verdict": "rhyme",
+  "reading": "AO1 L",
+  "confidence": "high",
+  "why": "Homophone of 'wall' in General American.",
+  "verified": true
+ },
+ "googol|AA L": {
+  "word": "googol",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is UW with a weak final syllable, not AO-L."
+ },
+ "hairball|AA L": {
+  "word": "hairball",
+  "verdict": "rhyme",
+  "reading": "HH EH1 R B AO2 L",
+  "confidence": "high",
+  "why": "Compound whose last part keeps secondary stress with the AO-L rime of 'wall'.",
+  "verified": true
+ },
+ "shall|AA L": {
+  "word": "shall",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed 'shall' has the short-a vowel (AE L), not the AO L of 'wall'."
+ },
+ "trawl|AA L": {
+  "word": "trawl",
+  "verdict": "rhyme",
+  "reading": "T R AO1 L",
+  "confidence": "high",
+  "why": "Same AO L rime as 'wall' in merged General American.",
+  "verified": true
+ },
+ "wallflower|AA L": {
+  "word": "wallflower",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its last stressed syllable is 'flower' (AW2 ER0), so the Rhyme Key is not AO L."
+ },
+ "astrologist|AA L AH JH IH S T": {
+  "word": "astrologist",
+  "verdict": "rhyme",
+  "reading": "AH0 S T R AA1 L AH0 JH IH0 S T",
+  "confidence": "high",
+  "why": "Stress on -rol- followed by weak -uh-jist, matching the key of 'microbiologist'.",
+  "verified": true
+ },
+ "endocrinologist|AA L AH JH IH S T": {
+  "word": "endocrinologist",
+  "verdict": "rhyme",
+  "reading": "EH2 N D OW0 K R AH0 N AA1 L AH0 JH IH0 S T",
+  "confidence": "high",
+  "why": "Stress on -nol- followed by -o-gist, so it has the same key.",
+  "verified": true
+ },
+ "geologist|AA L AH JH IH S T": {
+  "word": "geologist",
+  "verdict": "rhyme",
+  "reading": "JH IY0 AA1 L AH0 JH IH0 S T",
+  "confidence": "high",
+  "why": "Stress on -ol- followed by -o-gist, so it has the same key.",
+  "verified": true
+ },
+ "hematologist|AA L AH JH IH S T": {
+  "word": "hematologist",
+  "verdict": "rhyme",
+  "reading": "HH IY2 M AH0 T AA1 L AH0 JH IH0 S T",
+  "confidence": "high",
+  "why": "Stress on -tol- followed by -o-gist, so it has the same key.",
+  "verified": true
+ },
+ "mycologist|AA L AH JH IH S T": {
+  "word": "mycologist",
+  "verdict": "rhyme",
+  "reading": "M AY0 K AA1 L AH0 JH IH0 S T",
+  "confidence": "high",
+  "why": "Stress on -col- followed by -o-gist, so it has the same key.",
+  "verified": true
+ },
+ "philologist|AA L AH JH IH S T": {
+  "word": "philologist",
+  "verdict": "rhyme",
+  "reading": "F AH0 L AA1 L AH0 JH AH0 S T",
+  "confidence": "high",
+  "why": "Stressed -ol- followed by -ogist matches the key AA1 L AH0 JH AH0 S T.",
+  "verified": true
+ },
+ "psychologist|AA L AH JH IH S T": {
+  "word": "psychologist",
+  "verdict": "rhyme",
+  "reading": "S AY0 K AA1 L AH0 JH AH0 S T",
+  "confidence": "high",
+  "why": "Stress falls on -chol-, followed by -ogist, the same key as the seed.",
+  "verified": true
+ },
+ "terminologist|AA L AH JH IH S T": {
+  "word": "terminologist",
+  "verdict": "rhyme",
+  "reading": "T ER2 M AH0 N AA1 L AH0 JH AH0 S T",
+  "confidence": "high",
+  "why": "Stressed -nol- followed by -ogist matches the seed's key.",
+  "verified": true
+ },
+ "theologist|AA L AH JH IH S T": {
+  "word": "theologist",
+  "verdict": "rhyme",
+  "reading": "TH IY0 AA1 L AH0 JH IH0 S T",
+  "confidence": "medium",
+  "why": "Stress on -ol- then -ogist, with weak ih/uh read as the same, matches the seed.",
+  "verified": true
+ },
+ "zoologist|AA L AH JH IH S T": {
+  "word": "zoologist",
+  "verdict": "rhyme",
+  "reading": "Z UW0 AA1 L AH0 JH IH0 S T",
+  "confidence": "high",
+  "why": "Stress on -ol- then -ogist, with weak ih/uh read as the same, matches the seed.",
+  "verified": true
+ },
+ "father|AA P ER": {
+  "word": "father",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "The key AA1 DH ER0 has DH where grasshopper's key AA2 P ER0 has P."
+ },
+ "holler|AA P ER": {
+  "word": "holler",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "The key AA1 L ER0 has L where the seed's key has P."
+ },
+ "knocker|AA P ER": {
+  "word": "knocker",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "The key AA1 K ER0 has K where the seed's key has P."
+ },
+ "rocker|AA P ER": {
+  "word": "rocker",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Key is AA-K-ER, but grasshopper's is AA-P-ER, so the consonant differs."
+ },
+ "water|AA P ER": {
+  "word": "water",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Key is AO-T-ER (or flapped D), which differs from AA-P-ER in the consonant."
+ },
+ "abiotic|AA T IH K": {
+  "word": "abiotic",
+  "verdict": "rhyme",
+  "reading": "EY2 B AY0 AA1 T IH0 K",
+  "confidence": "high",
+  "why": "Stress falls on the AA before T-IH-K, which is the same key as idiotic.",
+  "verified": true
+ },
+ "athletic|AA T IH K": {
+  "word": "athletic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is EH, not AA."
+ },
+ "emphatic|AA T IH K": {
+  "word": "emphatic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is AE, not AA."
+ },
+ "frantic|AA T IH K": {
+  "word": "frantic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is AE plus N, not AA-T."
+ },
+ "romantic|AA T IH K": {
+  "word": "romantic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is AE plus N-T, not AA-T."
+ },
+ "static|AA T IH K": {
+  "word": "static",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is AE, not AA."
+ },
+ "epigraph|AE F": {
+  "word": "epigraph",
+  "verdict": "rhyme",
+  "reading": "EH1 P AH0 G R AE2 F",
+  "confidence": "high",
+  "why": "The last stressed syllable (secondary stress) is AE2 F, the same rime as calf.",
+  "verified": true
+ },
+ "ashram|AE M": {
+  "word": "ashram",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "medium",
+  "why": "The rime is AE SH R AH0 M, with extra sounds after the vowel, so it doesn't match bam's AE M."
+ },
+ "dander|AE N D ER": {
+  "word": "dander",
+  "verdict": "rhyme",
+  "reading": "D AE1 N D ER0",
+  "confidence": "high",
+  "why": "The rime AE1 N D ER0 is identical to commander's.",
+  "verified": true
+ },
+ "dusts|AH T S": {
+  "word": "dusts",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "The rime AH S T S has different consonants after the vowel than klutz's AH T S."
+ },
+ "lored|AO R D": {
+  "word": "lored",
+  "verdict": "rhyme",
+  "reading": "L AO1 R D",
+  "confidence": "high",
+  "why": "It is a homophone of lord, and landlord ends in AO2 R D.",
+  "verified": true
+ },
+ "snored|AO R D": {
+  "word": "snored",
+  "verdict": "rhyme",
+  "reading": "S N AO1 R D",
+  "confidence": "high",
+  "why": "The rime AO R D matches the secondary-stressed end of landlord.",
+  "verified": true
+ },
+ "towed|AO R D": {
+  "word": "towed",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "The rime OW D has no r, so it differs from AO R D."
+ },
+ "unmoored|AO R D": {
+  "word": "unmoored",
+  "verdict": "rhyme",
+  "reading": "AH0 N M AO1 R D",
+  "confidence": "medium",
+  "why": "Moored is commonly said with AO R D like lord, so it matches landlord's rime.",
+  "verified": true
+ },
+ "gorse|AO R S": {
+  "word": "gorse",
+  "verdict": "rhyme",
+  "reading": "G AO1 R S",
+  "confidence": "high",
+  "why": "Same vowel and final consonants as horse (AO R S).",
+  "verified": true
+ },
+ "coincided|AY D IH D": {
+  "word": "coincided",
+  "verdict": "rhyme",
+  "reading": "K OW2 IH0 N S AY1 D IH0 D",
+  "confidence": "high",
+  "why": "Stress falls on AY followed by D IH D, the same key as lopsided's final AY D IH D.",
+  "verified": true
+ },
+ "elided|AY D IH D": {
+  "word": "elided",
+  "verdict": "rhyme",
+  "reading": "IH0 L AY1 D IH0 D",
+  "confidence": "high",
+  "why": "Stressed AY followed by D IH D matches lopsided's key.",
+  "verified": true
+ },
+ "shaded|AY D IH D": {
+  "word": "shaded",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its stressed vowel is EY, not AY, so the key differs."
+ },
+ "waded|AY D IH D": {
+  "word": "waded",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its stressed vowel is EY, not AY, so the key differs."
+ },
+ "dialed|AY L D": {
+  "word": "dialed",
+  "verdict": "rhyme",
+  "reading": "D AY1 L D",
+  "confidence": "high",
+  "why": "After AY, weak 'ul' and plain l are read as the same, so dialed matches wild's key AY L D.",
+  "verified": true
+ },
+ "recompiled|AY L D": {
+  "word": "recompiled",
+  "verdict": "rhyme",
+  "reading": "R IY2 K AH0 M P AY1 L D",
+  "confidence": "high",
+  "why": "It ends in stressed AY L D, the same key as wild.",
+  "verified": true
+ },
+ "resigner|AY N ER": {
+  "word": "resigner",
+  "verdict": "rhyme",
+  "reading": "R IH0 Z AY1 N ER0",
+  "confidence": "high",
+  "why": "Stressed AY N ER matches diner's key.",
+  "verified": true
+ },
+ "undersigner|AY N ER": {
+  "word": "undersigner",
+  "verdict": "rhyme",
+  "reading": "AH1 N D ER0 S AY2 N ER0",
+  "confidence": "high",
+  "why": "Secondary stress on -sign- gives the key AY N ER, the same as diner.",
+  "verified": true
+ },
+ "upwelling|EH L IH NG": {
+  "word": "upwelling",
+  "verdict": "rhyme",
+  "reading": "AH1 P W EH2 L IH0 NG",
+  "confidence": "high",
+  "why": "The key EH L IH NG matches storytelling, whose -telling carries secondary stress.",
+  "verified": true
+ },
+ "blessed|EH P T": {
+  "word": "blessed",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its key is EH S T, but slept has EH P T."
+ },
+ "averred|EH R D": {
+  "word": "averred",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its key is ER D (stressed ER), but laird has EH R D."
+ },
+ "blurred|EH R D": {
+  "word": "blurred",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its key is ER D, but laird has EH R D."
+ },
+ "furred|EH R D": {
+  "word": "furred",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its key is ER D, but laird has EH R D."
+ },
+ "herd|EH R D": {
+  "word": "herd",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its key is ER D, but laird has EH R D."
+ },
+ "reshared|EH R D": {
+  "word": "reshared",
+  "verdict": "rhyme",
+  "reading": "R IY0 SH EH1 R D",
+  "confidence": "high",
+  "why": "Its stressed syllable is EH R D, the same as laird.",
+  "verified": true
+ },
+ "unheard|EH R D": {
+  "word": "unheard",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "'Unheard' has the vowel ER (HH ER1 D), but 'laird' has EH + R (L EH1 R D), so the rimes differ."
+ },
+ "lairs|EH R Z": {
+  "word": "lairs",
+  "verdict": "rhyme",
+  "reading": "L EH1 R Z",
+  "confidence": "high",
+  "why": "'Housewares' ends in a secondary-stressed EH2 R Z, so its Rhyme Key is EH-R-Z, the same as 'lairs'.",
+  "verified": true
+ },
+ "barer|EY ER": {
+  "word": "barer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "'Barer' has the key EH1 R ER0, with an extra syllable, so it matches neither EY1 ER0 nor EH1 R for 'mayor'."
+ },
+ "darer|EY ER": {
+  "word": "darer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "'Darer' has the key EH1 R ER0, with an extra syllable, so it matches neither EY1 ER0 nor EH1 R for 'mayor'."
+ },
+ "obeyer|EY ER": {
+  "word": "obeyer",
+  "verdict": "rhyme",
+  "reading": "OW0 B EY1 ER0",
+  "confidence": "high",
+  "why": "Stress falls on EY1 and is followed by ER0, the same key as 'mayor' (M EY1 ER0).",
+  "verified": true
+ },
+ "relayer|EY ER": {
+  "word": "relayer",
+  "verdict": "rhyme",
+  "reading": "R IY0 L EY1 ER0",
+  "confidence": "high",
+  "why": "Stress falls on EY1 and is followed by ER0, the same key as 'mayor' (M EY1 ER0).",
+  "verified": true
+ },
+ "swayer|EY ER": {
+  "word": "swayer",
+  "verdict": "rhyme",
+  "reading": "S W EY1 ER0",
+  "confidence": "high",
+  "why": "Stress falls on EY1 and is followed by ER0, the same key as 'mayor' (M EY1 ER0).",
+  "verified": true
+ },
+ "flaying|EY IH NG": {
+  "word": "flaying",
+  "verdict": "rhyme",
+  "reading": "F L EY1 IH0 NG",
+  "confidence": "high",
+  "why": "'Taxpaying' ends in a secondary-stressed EY2 IH0 NG, which is the same key as 'flaying'.",
+  "verified": true
+ },
+ "stages|EY JH": {
+  "word": "stages",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its Rhyme Key is EY-JH-IH-Z, which adds a syllable and a final Z that \"cage\" (EY-JH) doesn't have."
+ },
+ "crake|EY K": {
+  "word": "crake",
+  "verdict": "rhyme",
+  "reading": "K R EY1 K",
+  "confidence": "high",
+  "why": "The Rhyme Key is EY-K, the same as \"fake\".",
+  "verified": true
+ },
+ "pain|EY M": {
+  "word": "pain",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in EY-N, while \"blame\" ends in EY-M."
+ },
+ "pane|EY M": {
+  "word": "pane",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in EY-N, while \"blame\" ends in EY-M."
+ },
+ "wane|EY M": {
+  "word": "wane",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in EY-N, while \"blame\" ends in EY-M."
+ },
+ "coxswain|EY N": {
+  "word": "coxswain",
+  "verdict": "rhyme",
+  "reading": "K AA1 K S W EY2 N",
+  "confidence": "medium",
+  "why": "The spelling pronunciation gives the last syllable secondary stress with EY-N, matching \"gain\" like a compound.",
+  "verified": true
+ },
+ "recane|EY N": {
+  "word": "recane",
+  "verdict": "rhyme",
+  "reading": "R IY0 K EY1 N",
+  "confidence": "high",
+  "why": "The last syllable is stressed EY-N, the same as \"gain\".",
+  "verified": true
+ },
+ "enlace|EY S": {
+  "word": "enlace",
+  "verdict": "rhyme",
+  "reading": "EH0 N L EY1 S",
+  "confidence": "high",
+  "why": "The last syllable is stressed EY-S, the same as \"base\".",
+  "verified": true
+ },
+ "clique|IH K": {
+  "word": "clique",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "medium",
+  "why": "General American says it with the long ee vowel (K L IY1 K), not the short i of trick."
+ },
+ "creek|IH K": {
+  "word": "creek",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "medium",
+  "why": "It has the ee vowel (K R IY1 K); the 'crick' reading is regional, so it doesn't count."
+ },
+ "magic|IH K": {
+  "word": "magic",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Only the unstressed last syllable matches; the stressed vowel is AE, so the Rhyme Key is different."
+ },
+ "rin|IH N": {
+  "word": "rin",
+  "verdict": "rhyme",
+  "reading": "R IH1 N",
+  "confidence": "high",
+  "why": "It has the same rime IH1 N as win.",
+  "verified": true
+ },
+ "sculpin|IH N": {
+  "word": "sculpin",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on the first syllable (AH1 L P IH0 N), so the Rhyme Key is ulpin, not in."
+ },
+ "tannin|IH N": {
+  "word": "tannin",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on the first syllable (AE1 N IH0 N), so the Rhyme Key is annin, not in."
+ },
+ "skinflint|IH N T": {
+  "word": "skinflint",
+  "verdict": "rhyme",
+  "reading": "S K IH1 N F L IH2 N T",
+  "confidence": "high",
+  "why": "The compound's last part, flint, keeps secondary stress, giving the rime IH2 N T like sprint.",
+  "verified": true
+ },
+ "skint|IH N T": {
+  "word": "skint",
+  "verdict": "rhyme",
+  "reading": "S K IH1 N T",
+  "confidence": "high",
+  "why": "It has the same rime IH1 N T as sprint.",
+  "verified": true
+ },
+ "spearmint|IH N T": {
+  "word": "spearmint",
+  "verdict": "rhyme",
+  "reading": "S P IH1 R M IH2 N T",
+  "confidence": "high",
+  "why": "The secondary-stressed 'mint' gives the Rhyme Key IH-N-T, the same as 'sprint'.",
+  "verified": true
+ },
+ "appear|IH R D": {
+  "word": "appear",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in IH1 R with no D, but 'beard' needs IH-R-D."
+ },
+ "cheer|IH R D": {
+  "word": "cheer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It lacks the final D of 'beard'."
+ },
+ "engineer|IH R D": {
+  "word": "engineer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It ends in IH1 R with no D, so it doesn't match 'beard'."
+ },
+ "nuzzled|IH R D": {
+  "word": "nuzzled",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Its stressed vowel is AH, followed by Z-AH-L-D, which is nothing like IH-R-D."
+ },
+ "queer|IH R D": {
+  "word": "queer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "It lacks the final D of 'beard'."
+ },
+ "cubistic|IH S T IH K": {
+  "word": "cubistic",
+  "verdict": "rhyme",
+  "reading": "K Y UW0 B IH1 S T IH0 K",
+  "confidence": "high",
+  "why": "The stress falls on IH, followed by S-T-IH0-K, the same as 'idealistic'.",
+  "verified": true
+ },
+ "touristic|IH S T IH K": {
+  "word": "touristic",
+  "verdict": "rhyme",
+  "reading": "T UH0 R IH1 S T IH0 K",
+  "confidence": "high",
+  "why": "The stress falls on IH, followed by S-T-IH0-K, the same as 'idealistic'.",
+  "verified": true
+ },
+ "abolish|IH SH": {
+  "word": "abolish",
+  "verdict": "rhyme",
+  "reading": "AH0 B AA1 L IH0 SH",
+  "why": "Primary stress is on 'bol' (AA1 L IH SH), not on 'ish', so the last stressed rime is 'alish', which differs from 'ish'.",
+  "verified": false
+ },
+ "boorish|IH SH": {
+  "word": "boorish",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "why": "Stressed vowel is UH/UR in 'boor', so the Rhyme Key is 'ur-ish', not 'ish'."
+ },
+ "devilish|IH SH": {
+  "word": "devilish",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "why": "Stress is on 'dev', so the Rhyme Key is 'ev-il-ish', not 'ish'."
+ },
+ "extinguish|IH SH": {
+  "word": "extinguish",
+  "verdict": "rhyme",
+  "reading": "EH0 K S T IH1 NG G W IH2 SH",
+  "why": "Secondary stress on the final 'wish' gives an IH2 SH Rhyme Key matching 'dish'.",
+  "verified": true
+ },
+ "foolish|IH SH": {
+  "word": "foolish",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "why": "Stress is on 'fool' (UW1 L IH0 SH), so the Rhyme Key is 'oo-lish', not 'ish'."
+ },
+ "perish|IH SH": {
+  "word": "perish",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "why": "Stress is on 'per' (EH1 R IH0 SH), so the Rhyme Key is 'er-ish', not 'ish'."
+ },
+ "roguish|IH SH": {
+  "word": "roguish",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "why": "Stress is on 'rogue' (OW1 G IH0 SH), so the Rhyme Key is 'oh-gish', not 'ish'."
+ },
+ "waspish|IH SH": {
+  "word": "waspish",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "why": "Stress is on 'wasp' (AA1 S P IH0 SH), so the Rhyme Key is 'ospish', not 'ish'."
+ },
+ "jitter|IH T ER": {
+  "word": "jitter",
+  "verdict": "rhyme",
+  "reading": "JH IH1 T ER0",
+  "confidence": "high",
+  "why": "Same stressed rime IH-T-ER as litter.",
+  "verified": true
+ },
+ "beader|IY D ER": {
+  "word": "beader",
+  "verdict": "rhyme",
+  "reading": "B IY1 D ER0",
+  "confidence": "low",
+  "why": "Seed's key is IY2 D ER0; beader has stressed IY then D ER0, matching.",
+  "verified": true
+ },
+ "needer|IY D ER": {
+  "word": "needer",
+  "verdict": "rhyme",
+  "reading": "N IY1 D ER0",
+  "confidence": "low",
+  "why": "Stressed IY + D ER0 matches cheerleader's IY-D-ER key.",
+  "verified": true
+ },
+ "seismometer|IY T ER": {
+  "word": "seismometer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed rime is AA-M-IH-T-ER (seis-MOM-eter), but centimeter's key is EH1 N T AH0 M IY2 T ER0... actually its last stress is IY2 T ER0, which seismometer lacks."
+ },
+ "spectrometer|IY T ER": {
+  "word": "spectrometer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress falls on AA (-trom-), not IY-T-ER, so the keys differ."
+ },
+ "speedometer|IY T ER": {
+  "word": "speedometer",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Last stress is on AA (-dom-), so the key is AA-M-IH-T-ER, not IY-T-ER."
+ },
+ "pulchritude|UW D": {
+  "word": "pulchritude",
+  "verdict": "rhyme",
+  "reading": "P AH1 L K R IH0 T UW2 D",
+  "confidence": "high",
+  "why": "Secondary stress on UW-D matches exclude's key UW-D.",
+  "verified": true
+ },
+ "gruel|UW L": {
+  "word": "gruel",
+  "verdict": "rhyme",
+  "reading": "G R UW1 L",
+  "confidence": "medium",
+  "why": "Buhl is said BUW-L ('bool'), and gruel's UW + L matches, with a weak ul reading also allowed as the same.",
+  "verified": true
+ },
+ "dragoon|UW N": {
+  "word": "dragoon",
+  "verdict": "rhyme",
+  "reading": "D R AH0 G UW1 N",
+  "confidence": "high",
+  "why": "Final stressed syllable is UW1 N, the same Rhyme Key as noon.",
+  "verified": true
+ },
+ "supe|UW P": {
+  "word": "supe",
+  "verdict": "rhyme",
+  "reading": "S UW1 P",
+  "confidence": "high",
+  "why": "S UW1 P has the same Rhyme Key UW-P as group.",
+  "verified": true
+ },
+ "elute|UW T": {
+  "word": "elute",
+  "verdict": "rhyme",
+  "reading": "IH0 L UW1 T",
+  "confidence": "high",
+  "why": "Stress falls on the final UW1 T, matching shoot.",
+  "verified": true
+ },
+ "bijoux|UW Z": {
+  "word": "bijoux",
+  "verdict": "rhyme",
+  "reading": "B IY1 ZH UW1 Z",
+  "confidence": "medium",
+  "why": "Plural of bijou is said with a final Z after UW, matching booze.",
+  "verified": true
+ },
+ "construes|UW Z": {
+  "word": "construes",
+  "verdict": "rhyme",
+  "reading": "K AH0 N S T R UW1 Z",
+  "confidence": "high",
+  "why": "Ends in stressed UW1 Z like booze.",
+  "verified": true
+ },
+ "costumes|UW Z": {
+  "word": "costumes",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Rime is UW-M-Z, not UW-Z."
+ },
+ "emus|UW Z": {
+  "word": "emus",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress is on IY1, ending M AH0 S."
+ },
+ "ragouts|UW Z": {
+  "word": "ragouts",
+  "verdict": "rhyme",
+  "reading": "R AE0 G UW1 Z",
+  "confidence": "high",
+  "why": "The t is silent, so it ends in stressed UW1 Z like booze.",
+  "verified": true
+ },
+ "slews|UW Z": {
+  "word": "slews",
+  "verdict": "rhyme",
+  "reading": "S L UW1 Z",
+  "confidence": "high",
+  "why": "Same stressed UW + Z as booze.",
+  "verified": true
+ },
+ "suppose|UW Z": {
+  "word": "suppose",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is OW, not UW."
+ },
+ "those|UW Z": {
+  "word": "those",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "OW Z differs from UW Z."
+ },
+ "tutus|UW Z": {
+  "word": "tutus",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed UW is followed by an extra syllable (T UW Z), so the key is longer than booze's."
+ },
+ "virtues|UW Z": {
+  "word": "virtues",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stress falls on ER, and the final UW Z is unstressed."
+ },
+ "obtrusion|UW ZH AH N": {
+  "word": "obtrusion",
+  "verdict": "rhyme",
+  "reading": "AH0 B T R UW1 ZH AH0 N",
+  "confidence": "high",
+  "why": "Stressed UW followed by ZH AH N, matching delusion.",
+  "verified": true
+ },
+ "persuasion|UW ZH AH N": {
+  "word": "persuasion",
+  "verdict": "no-rhyme",
+  "reading": null,
+  "confidence": "high",
+  "why": "Stressed vowel is EY (as in 'pay'), not UW."
+ },
+ "suffusion|UW ZH AH N": {
+  "word": "suffusion",
+  "verdict": "rhyme",
+  "reading": "S AH0 F Y UW1 ZH AH0 N",
+  "confidence": "high",
+  "why": "Stressed UW followed by ZH AH N, matching delusion.",
+  "verified": true
+ }
+}

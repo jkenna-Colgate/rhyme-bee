@@ -116,7 +116,8 @@ const JOIN: Record<string, string> = { "AA IH": "AY", "AA UH": "AW", "EY IH": "E
 function ipaToSounds(ipa: string): string[] | null {
   const out: string[] = [];
   let glided = false;
-  for (const raw of ipa.trim().split(" ")) {
+  // One entry in nine writes an affricate as two segments with no tie bar (`mycologist` as d, ʒ).
+  for (const raw of ipa.trim().replace(/d ʒ/g, "d͡ʒ").replace(/t ʃ/g, "t͡ʃ").split(" ")) {
     const syllabic = raw.includes("̩");
     const seg = raw.replace(/[ː̯̩ʰ̃˞]/g, "");
     if (!seg) continue;

@@ -3,12 +3,17 @@
  * environment assembled from named parts, so each part can be switched off and
  * its effect on agreement with the labels measured.
  *
- *   npx tsx scripts/judge.prototype/judge.ts <set> [--env engine,family,relatives,wikipron,shots] [--model sonnet] [--limit N] [--dry]
+ *   npx tsx scripts/judge.prototype/judge.ts <set> [--env engine,family,relatives,wikipron,shots] [--rules 2] [--model sonnet] [--limit N] [--dry]
  *
  * <set> is heldout-2 or batch-N (a JSON file beside this one, each pair carrying
  * the rules' own decision). The judge is asked about Points only: is this pair
  * a Rhyme, given the right reading. Its instructions are the rules of #232, the
  * same ones the labels follow. It is never asked about a Weak Rhyme.
+ *
+ * --rules picks the wording of those instructions. 1 is the wording both
+ * baselines ran on and is never edited, so they stay in the cache. 2 adds what
+ * batch-2's misses showed was missing: the l readings, and which second
+ * readings of a word count.
  *
  * Rulings are written to rulings/<set>.<env>.<model>.json and scored against
  * labels/<set>.rules.json (what the rules decided) and labels/<set>.labels.json
@@ -40,7 +45,9 @@ const argv = process.argv.slice(2);
 const flag = (name: string) => { const i = argv.indexOf(`--${name}`); return i < 0 ? undefined : argv[i + 1]; };
 const set = argv[0]!;
 const env = new Set((flag("env") ?? "").split(",").filter(Boolean) as Part[]);
-const envName = PARTS.filter((p) => env.has(p)).join("+") || "bare";
+const rulesVersion = Number(flag("rules") ?? 1);
+if (rulesVersion !== 1 && rulesVersion !== 2) throw new Error("--rules is 1 or 2");
+const envName = (PARTS.filter((p) => env.has(p)).join("+") || "bare") + (rulesVersion > 1 ? `.rules-${rulesVersion}` : "");
 const model = flag("model") ?? "sonnet";
 const limit = Number(flag("limit") ?? Infinity);
 const dry = argv.includes("--dry");
@@ -103,7 +110,7 @@ if (env.has("wikipron")) {
 
 // ---- the prompt ------------------------------------------------------------
 
-const RULES = `You are ruling on Candidates for Rhyming Bee, a daily word game. The player is given a Seed Word and types words that rhyme with it. Each Candidate below is a word a player typed that the game did not score. Every Candidate is on the game's word list, so do not rule on whether it is a word, and do not rule on how well known it is. Rule on one thing: is the pair a Rhyme? A Rhyme is what scores.
+const RULES_1 = `You are ruling on Candidates for Rhyming Bee, a daily word game. The player is given a Seed Word and types words that rhyme with it. Each Candidate below is a word a player typed that the game did not score. Every Candidate is on the game's word list, so do not rule on whether it is a word, and do not rule on how well known it is. Rule on one thing: is the pair a Rhyme? A Rhyme is what scores.
 
 The game adjudicates in merged General American (cot and caught are the same vowel). It is generous about stress and strict about sound.
 
@@ -125,6 +132,19 @@ A Rhyme holds in both directions. If the Candidate is a Rhyme for the Seed Word,
 Rule each Candidate as exactly one of:
 - "rhyme": give the reading that makes it one, in ARPAbet with stress digits. The reading must put stress 1 or 2 on the first vowel of the Seed Word's Rhyme Key and no stressed vowel after it.
 - "no-rhyme": however General American says the word, it does not have the Seed Word's Rhyme Key.`;
+
+/** Each change is a sentence put into wording 1, so the two can be read against each other. The examples are in no set. */
+const RULES_2 = [
+  // `dialed` for `wild`: the judge counted a syllable the game does not.
+  ['except for the r reading below.', 'except for the r and l readings below.'],
+  ['"higher" for "fire", "flower" for "hour".', '"higher" for "fire", "flower" for "hour".\n- After "eye", "oh", "oo", "ow" or "oy" (AY, OW, UW, AW, OY), a weak "ul" (AH0 L) and plain l are read as each other, and so are their -s and -ed forms: "trial" for "file", "jewel" for "rule", "towels" for "howls".'],
+  // `clique` and `creek` for `trick`: a second reading was missed with no dictionary and over-trusted with one.
+  ['one way that fits is enough.', 'one way that fits is enough. That way must be one heard across General American: "route" is said to rhyme with "boot" and with "out", and both count. A reading that belongs to one region does not count ("wash" said with an r, "greasy" said with a z), even where a dictionary lists it.'],
+].reduce((text, [from, to]) => {
+  if (!text.includes(from!)) throw new Error(`wording 1 no longer holds: ${from}`);
+  return text.replace(from!, to!);
+}, RULES_1);
+const RULES = rulesVersion === 2 ? RULES_2 : RULES_1;
 
 const REPLY = `Reply with only a JSON array, one object per Candidate in the order given:
 [{"word": "...", "verdict": "rhyme" | "no-rhyme", "reading": "ARPAbet or null", "confidence": "high" | "medium" | "low", "why": "one short sentence"}]`;
@@ -173,14 +193,30 @@ const promptFor = (batch: Pair[]) => {
   return [RULES, "", "Candidates:", ...batch.map((p) => describe(p, ids)), "", REPLY].join("\n");
 };
 
+/**
+ * The judge sometimes writes an array, takes it back in a sentence and writes the
+ * whole array again (one call in 16 on batch-2). The last array that parses is
+ * the ruling; with none, every pair in the call is scored as no ruling.
+ */
+function lastArray(raw: string): Ruling[] {
+  const end = raw.lastIndexOf("]");
+  for (let at = raw.lastIndexOf("[", end); at >= 0; at = raw.lastIndexOf("[", at - 1)) {
+    try { const got = JSON.parse(raw.slice(at, end + 1)); if (Array.isArray(got)) return got; } catch { /* an earlier bracket may open it */ }
+    if (at === 0) break;
+  }
+  return [];
+}
+
+/** A Rhyme Key holds the merged vowel, and the judge often writes the unmerged one (`AO1 L` for `awl` on the key `AA L`). */
+const merged = (reading: string[]) => reading.map((x, i) => (/^AO\d?$/.test(x) && reading[i + 1] !== "R" ? x.replace("AO", "AA") : x));
+
 async function ruleBatch(batch: Pair[]): Promise<[string, Ruling][]> {
   const raw = await callModel(promptFor(batch));
-  let parsed: Ruling[] = [];
-  try { parsed = JSON.parse(raw.slice(raw.indexOf("["), raw.lastIndexOf("]") + 1)); } catch { /* scored as no ruling */ }
+  const parsed = lastArray(raw);
   return batch.map((p, i) => {
     const r = parsed[i] ?? { verdict: "no-ruling", reading: null, confidence: "low", why: "unparseable reply" };
     // The one mechanical check: a "rhyme" has to come with a reading that reaches the key under the rules.
-    if (r.verdict === "rhyme") r.verified = !!r.reading && ruleKeys(p.word, [r.reading.trim().toUpperCase().split(/\s+/)]).has(canon(p.rhymeKey));
+    if (r.verdict === "rhyme") r.verified = !!r.reading && ruleKeys(p.word, [merged(r.reading.trim().toUpperCase().split(/\s+/))]).has(canon(p.rhymeKey));
     return [p.id, r];
   });
 }
@@ -220,6 +256,9 @@ if (scored.length) {
   const hit = (p: Pair) => rulings[p.id]!.verdict === truth.get(p.id)!.label;
   const agree = (ps: Pair[]) => `${ps.filter(hit).length}/${ps.length}`;
   console.log("agreement:", agree(scored));
+  // The gate: a "rhyme" whose reading does not reach the key writes no correction, so the pair stays not a Rhyme.
+  const gated = (p: Pair) => (rulings[p.id]!.verified === false ? "no-rhyme" : rulings[p.id]!.verdict) === truth.get(p.id)!.label;
+  console.log(`  counting a rhyme only when its reading verifies: ${scored.filter(gated).length}/${scored.length}`);
   for (const from of ["rules", "maintainer"] as const) console.log(`  labelled by the ${from}: ${agree(scored.filter((p) => truth.get(p.id)!.from === from))}`);
   for (const kind of new Set(scored.map((p) => p.kind))) console.log(`  ${kind}: ${agree(scored.filter((p) => p.kind === kind))}`);
   for (const c of ["high", "medium", "low"]) console.log(`  confidence ${c}: ${agree(scored.filter((p) => rulings[p.id]!.confidence === c))}`);
