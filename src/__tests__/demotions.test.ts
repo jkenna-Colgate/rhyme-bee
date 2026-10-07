@@ -3,7 +3,7 @@
  * (ADR-0011, amended): the upstream word list carries surnames and placenames,
  * and a word it wrongly calls a word is corrected here rather than by hand in an
  * uncommitted file. A name that rhymes must be told it is a name — a silent
- * refusal reads as a bug (CONTEXT.md), and being served `algiers` as an Answer
+ * refusal reads as a bug (GLOSSARY.md), and being served `algiers` as an Answer
  * reads as a worse one.
  */
 

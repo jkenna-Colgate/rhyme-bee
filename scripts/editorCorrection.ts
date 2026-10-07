@@ -216,7 +216,7 @@ export async function applyCorrection(
  * done. **Join** is every reading the engine holds followed by the proposal, so
  * the parser's existing alternate-pronunciation merge puts all of them back into
  * one set — the word is then accepted on either pronunciation, because a
- * Submission rhymes if any of its Rhyme Keys matches (CONTEXT.md, **Rhyme**).
+ * Submission rhymes if any of its Rhyme Keys matches (GLOSSARY.md, **Rhyme**).
  *
  * A proposal the engine already holds is written once rather than twice. A
  * duplicate line is inert to the parser, but it is a line a later reader has to
@@ -286,7 +286,7 @@ function readDay(openIndex: () => RhymeIndex, schedule: Schedule, date: string):
  * `moved` is the whole question. It is true when any of the three figures
  * changed *or* when the corrected word entered or left the day's lists — the
  * second is not implied by the first, because a Bonus Word arriving moves no
- * figure at all (Bonus Words are not counted, CONTEXT.md) and is still the word
+ * figure at all (Bonus Words are not counted, GLOSSARY.md) and is still the word
  * appearing on a Puzzle it was not on.
  *
  * The day's identity comes from the **schedule** rather than from either

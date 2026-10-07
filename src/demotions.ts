@@ -18,7 +18,7 @@
  *
  * The second column is the `RejectionReason` the player will actually receive,
  * so the file reads as the verdict it causes. A name that rhymes must be told it
- * is a name (CONTEXT.md); calling an abbreviation somebody's name would be its
+ * is a name (GLOSSARY.md); calling an abbreviation somebody's name would be its
  * own small lie.
  *
  * The list is *hand-curated and bounded* — the words a human looked at, not a

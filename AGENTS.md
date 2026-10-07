@@ -21,7 +21,7 @@ carries its own package.
 The vocabulary below is authoritative — use these terms exactly, and prefer
 them over the synonyms each entry marks as _Avoid_.
 
-@CONTEXT.md
+@GLOSSARY.md
 
 Decisions already made live in `docs/adr/`. ADR-0001 and ADR-0003 in particular
 were reversed mid-design — read the rejected options before proposing
@@ -46,8 +46,8 @@ the dangerous direction to be wrong in. The real suite is 85 files.
 Sessions here run out of room on tool output, not on documentation. Four rules,
 in order of what actually costs:
 
-- **Never `Read` `CLAUDE.md`, `AGENTS.md`, or `CONTEXT.md`** — they are already
-  in context via the imports above. Re-reading `CONTEXT.md` costs more than
+- **Never `Read` `CLAUDE.md`, `AGENTS.md`, or `GLOSSARY.md`** — they are already
+  in context via the imports above. Re-reading `GLOSSARY.md` costs more than
   every ADR put together.
 - **Browser work gets its own session.** Screenshots are the single largest
   consumer; a browser QA pass will not leave room for implementation. Capture
@@ -76,4 +76,4 @@ The five canonical role names are used verbatim. See `docs/agents/triage-labels.
 
 ### Domain docs
 
-Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.

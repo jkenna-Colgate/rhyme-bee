@@ -42,7 +42,7 @@ day is an edit.
 
 ## The banded deal
 
-`CONTEXT.md` requires a Puzzle's Difficulty to ramp monotonically **within** a
+`GLOSSARY.md` requires a Puzzle's Difficulty to ramp monotonically **within** a
 week, Monday easiest to Sunday hardest, and says nothing about across weeks.
 294 candidates is 42 × 7 exactly.
 
@@ -89,7 +89,7 @@ them apart.
   content). All three are superseded by the review.
 - **#89's first cause survives, and is not a curation issue.** `heinz`,
   `versailles`, `algiers`, `marx`, `rhodes`, `schwarz` hold **wordhood**, so they
-  are accepted as *Answers* — and CONTEXT.md says a Proper Noun is never valid,
+  are accepted as *Answers* — and GLOSSARY.md says a Proper Noun is never valid,
   however well it rhymes. That is an adjudication defect (the class of #51,
   `troy`), fixed in `data/names.txt`. Scope it to the names that measurement
   found, not to making the filter correct; the second reading is an unbounded

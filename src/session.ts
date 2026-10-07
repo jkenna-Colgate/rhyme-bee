@@ -1,6 +1,6 @@
 /**
  * The Session + scoring layer: a pure functional core over `RhymeIndex`. A
- * Session is one player's play-through of a Puzzle (CONTEXT.md); this module
+ * Session is one player's play-through of a Puzzle (GLOSSARY.md); this module
  * gives the engine a memory of one in progress — which words a player has found —
  * and derives Score, Rank, progress, and a final result from that memory. It
  * introduces no seam below the index (it reuses `adjudicate`, `buildPuzzle` and
@@ -65,7 +65,7 @@ export interface PuzzleContext {
  * derived on demand.
  *
  * `ended` is the whole of "the game is finished": it is set by `endSession` when
- * the player takes the Reveal (CONTEXT.md), and it makes `applySubmission`
+ * the player takes the Reveal (GLOSSARY.md), and it makes `applySubmission`
  * decline before it ever adjudicates. Being over is a property of the Session,
  * not of the word submitted, so it deliberately stays out of the rejection
  * vocabulary.
@@ -98,7 +98,7 @@ export interface Progress {
 }
 
 /**
- * Where a Session stands as a whole (CONTEXT.md). Derived, never stored —
+ * Where a Session stands as a whole (GLOSSARY.md). Derived, never stored —
  * `PlayState` keeps the finds and the `ended` flag, and this reads them.
  *
  * `complete` means every Answer is found, whether or not the player has since
@@ -108,7 +108,7 @@ export interface Progress {
  * including a fresh Session on a Puzzle with no Answers at all — nobody has
  * completed anything there.
  *
- * Bonus Words never enter it. They are celebrated, not counted (CONTEXT.md), so
+ * Bonus Words never enter it. They are celebrated, not counted (GLOSSARY.md), so
  * collecting one after the last Answer leaves the outcome exactly where it was.
  */
 export type SessionOutcome = "in-progress" | "complete" | "given-up";
@@ -289,7 +289,7 @@ export function missedBonusWords(context: PuzzleContext, state: PlayState): Puzz
 }
 
 /**
- * End the Session — what taking the Reveal does to play-state (CONTEXT.md). The
+ * End the Session — what taking the Reveal does to play-state (GLOSSARY.md). The
  * finds are kept exactly as they are, so Score, Rank and progress freeze at the
  * values they already held and the Reveal can show the misses beside them; only
  * further Submissions are shut off. Idempotent: an already-ended state is
@@ -328,7 +328,7 @@ export function toResult(
 // --- The Session facade --------------------------------------------------------
 
 /**
- * A Session (CONTEXT.md): one player's play-through of a Puzzle, as one value.
+ * A Session (GLOSSARY.md): one player's play-through of a Puzzle, as one value.
  * It bundles the immutable `PuzzleContext` and the current `PlayState` — the pair
  * every accessor above threads — and exposes `score()` / `rank()` / `progress()`
  * / `missedAnswers()` / `missedBonusWords()` / `submit()` / `end()` /

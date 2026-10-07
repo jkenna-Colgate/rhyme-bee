@@ -59,7 +59,7 @@
  *
  * The two sentences a failure can produce name the **supplement-candidate**
  * endpoint, which is what the path is and what the queue is called. `Appeal` is
- * pinned to a player's report about a Submission the game rejected (CONTEXT.md);
+ * pinned to a player's report about a Submission the game rejected (GLOSSARY.md);
  * the editor's typed word is an *add*, adjudicated against nothing, so telling
  * them "the Appeal endpoint answered 400" would hand them a word for an act
  * they did not perform. `APPEAL_PATH` keeps the player's name because the path

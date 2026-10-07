@@ -19,7 +19,7 @@ including the ones that were made, shipped, and then reversed.
 
 ## Start here
 
-- **[CONTEXT.md](./CONTEXT.md)**: the glossary. Seed Word, Rhyme Key, Answer,
+- **[GLOSSARY.md](./GLOSSARY.md)**: the glossary. Seed Word, Rhyme Key, Answer,
   Bonus Word, Session, Rank. Each entry carries an _Avoid_ list, which is the
   half that does the work.
 - **[docs/adr/](./docs/adr/)**: the decisions, and why the obvious alternatives

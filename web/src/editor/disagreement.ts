@@ -13,7 +13,7 @@
  * list in the next window, believes the word rhymes anyway.
  *
  * That belief is the whole of what this module carries, and it carries it as a
- * **Candidate**: the report, never the fix (CONTEXT.md). Nothing here proposes a
+ * **Candidate**: the report, never the fix (GLOSSARY.md). Nothing here proposes a
  * reading, and no pronunciation correction is offered anywhere in this flow.
  * Contradicting a source that spoke is a different act from filling a gap where
  * the sources are silent, with different stakes and its own evidence

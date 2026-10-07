@@ -37,7 +37,7 @@ function context(overrides: {
   return { pronunciations, words, names, derivation };
 }
 
-// "EY T" — the Rhyme Key CONTEXT.md itself uses for "ate": both "gate" (a
+// "EY T" — the Rhyme Key GLOSSARY.md itself uses for "ate": both "gate" (a
 // direct reading) and "ate" (the tail of a compound split below) read on it.
 const TARGET: RhymeKey = "EY T";
 const AIM: AddTarget = { target: TARGET, provenance: "test" };

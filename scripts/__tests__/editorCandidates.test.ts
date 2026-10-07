@@ -330,7 +330,7 @@ describe("the ruling a Candidate's evidence asks for", () => {
   it("is a name when the word is in the names data, however well it rhymes", () => {
     // `stockholm` is given a reading that rhymes on the target *and* wordhood,
     // which is the shape the demotion list exists for: the engine accepts it
-    // today, and a name is never valid (CONTEXT.md).
+    // today, and a name is never valid (GLOSSARY.md).
     const read = only(
       readCandidateQueue(
         [candidate("stockholm", "docked", DOCKED, { reason: "does-not-rhyme" })],

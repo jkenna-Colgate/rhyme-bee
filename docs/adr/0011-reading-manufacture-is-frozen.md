@@ -139,7 +139,7 @@ Attempting #90 against those two files surfaced this immediately, along with the
 reason the correction is needed at all: the wordhood gate tests `words` **before**
 `names`, so a word in both upstream lists is served to the player as an ordinary
 Answer. `heinz`, `marx`, `rhodes`, `troy` and `kate` are all in both today —
-`kate` being CONTEXT.md's own illustration of a Proper Noun, and `ate` the
+`kate` being GLOSSARY.md's own illustration of a Proper Noun, and `ate` the
 Tutorial's Seed.
 
 The fourth site is **`data/demotions.txt`** (`src/demotions.ts`, stage 0 of the

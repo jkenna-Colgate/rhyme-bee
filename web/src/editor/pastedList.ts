@@ -148,7 +148,7 @@ export type ReadsElsewhereWord = RespelledWord;
  *
  * Because it would be claiming something untrue. `WordWithoutReading`,
  * `ReadsElsewhereWord` and `DemotableWord` each name a property the word itself
- * carries, in the way `CONTEXT.md` says a **Tier** is carried — every rhyming
+ * carries, in the way `GLOSSARY.md` says a **Tier** is carried — every rhyming
  * word with wordhood holds one whether or not anybody submits it. Nothing here
  * is like that. Paste one list for `idiotic` and `chaotic` is an omission; paste
  * a list that happens to include it and, same **Puzzle** and same **Rhyme Key**,
