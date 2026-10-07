@@ -105,7 +105,7 @@ describe("a demotion takes the word out of the day", () => {
   /**
    * A demoted **Bonus Word** leaves the day too, but the figures are measured
    * over the Answers alone — Bonus Words are celebrated and never counted
-   * (CONTEXT.md) — so the Answer count, the maximum Score and the Difficulty are
+   * (GLOSSARY.md) — so the Answer count, the maximum Score and the Difficulty are
    * untouched. Asserted against a rebuild rather than reasoned about, because
    * "nothing moved" is exactly the claim that is easy to be wrong about.
    */

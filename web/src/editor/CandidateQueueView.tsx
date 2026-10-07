@@ -125,7 +125,7 @@ export function CandidateQueueView({
 
           {/* The second section, under the Candidates and inside the same
               panel: it is part of the Candidate Queue rather than a screen of
-              its own (CONTEXT.md), and it is a shorter list about the tool's own
+              its own (GLOSSARY.md), and it is a shorter list about the tool's own
               failures rather than about what players sent. */}
           <DeferredReadingsView section={deferredReadings(queue)} acts={acts} />
         </>

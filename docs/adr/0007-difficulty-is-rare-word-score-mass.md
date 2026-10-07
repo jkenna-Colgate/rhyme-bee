@@ -96,7 +96,7 @@ deliberately if the flat ramp feels wrong in play, not smuggled in now.
   so once play reveals the real distribution, the buckets are frozen into **fixed
   absolute Difficulty thresholds** in the scheduler, so a Saturday is a Saturday
   forever.
-- **Difficulty is now ubiquitous language.** Added to the CONTEXT.md glossary.
+- **Difficulty is now ubiquitous language.** Added to GLOSSARY.md.
 
 ## Deferred / rejected for v1
 

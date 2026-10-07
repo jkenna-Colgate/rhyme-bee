@@ -380,7 +380,7 @@ export class RhymeIndex {
     }
 
     // Wordhood and names are decided independently of rhyme: a name is never
-    // valid however well it rhymes (CONTEXT.md), and a non-word is a typo.
+    // valid however well it rhymes (GLOSSARY.md), and a non-word is a typo.
     if (!this.#data.words.has(word)) {
       if (this.#data.names.has(word)) {
         return { outcome: "rejected", reason: "proper-noun" };

@@ -654,7 +654,7 @@ function VerdictMenu({
  * be a confirmation step, and a confirmation step is exactly what the reason
  * already is. The reason cannot be defaulted either, because that column *is*
  * the rejection the player receives — a name that rhymes must be told it is a
- * name (CONTEXT.md), and calling an abbreviation somebody's name would be its
+ * name (GLOSSARY.md), and calling an abbreviation somebody's name would be its
  * own small lie.
  *
  * There is deliberately **no un-demote**, here or anywhere in the tool. Undoing

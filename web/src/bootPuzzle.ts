@@ -41,7 +41,7 @@ export interface OpeningPuzzle {
   seed: SeedWord;
 }
 
-/** The Tutorial, the first-run Puzzle, is always seeded with `ate` (CONTEXT.md). */
+/** The Tutorial, the first-run Puzzle, is always seeded with `ate` (GLOSSARY.md). */
 const TUTORIAL_SEED = "ate";
 
 /**
@@ -64,7 +64,7 @@ export const TUTORIAL_ENABLED = false;
  */
 export const SCHEDULE: Schedule | null = parseSchedule(scheduleArtifact);
 
-/** The Tutorial: seeded with `ate`, no date, not persisted (CONTEXT.md). */
+/** The Tutorial: seeded with `ate`, no date, not persisted (GLOSSARY.md). */
 export function tutorialPuzzle(index: RhymeIndex): OpeningPuzzle {
   return { kind: "tutorial", date: null, seed: index.pinSeed(TUTORIAL_SEED) };
 }
@@ -140,7 +140,7 @@ export function openingPuzzle(
   // has to land before the first real Puzzle. It carries no date, so it is
   // *unpersisted* — never filed under the day, and the player still meets
   // today's Puzzle after it. Not unscored: Score and Rank render on the
-  // Tutorial exactly as they do on a scheduled Puzzle, though CONTEXT.md calls
+  // Tutorial exactly as they do on a scheduled Puzzle, though GLOSSARY.md calls
   // the Tutorial unscored. Whether the code or the glossary should give way is
   // #125 — dormant while the constant is off, since this branch cannot be
   // taken.

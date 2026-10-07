@@ -2,7 +2,7 @@
  * The schedule: which Seed Word runs on which date, dealt once from the curated
  * pool and thereafter fixed (ADR-0012).
  *
- * CONTEXT.md requires Difficulty to ramp monotonically *within* a week, Monday
+ * GLOSSARY.md requires Difficulty to ramp monotonically *within* a week, Monday
  * easiest to Sunday hardest, and says nothing about across weeks. The deal
  * satisfies the first without introducing the second: sort the pool by
  * Difficulty, cut it into seven contiguous bands, and let the easiest band

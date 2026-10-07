@@ -132,8 +132,8 @@ collapse, perhaps, relapse`), `IH P S` (`eclipse, ellipse, apocalypse`).
   keats, algiers, versailles`) are proper nouns slipping past the names filter.
   Tightening that filter pushes those keys into the clean pure-shadow bucket and is
   worth doing, but is orthogonal to this decision.
-- **`Shadow key` / native content join the ubiquitous language.** Added to the
-  CONTEXT.md glossary.
+- **`Shadow key` / native content join the ubiquitous language.** Added to
+  GLOSSARY.md.
 
 ## Deferred / rejected
 

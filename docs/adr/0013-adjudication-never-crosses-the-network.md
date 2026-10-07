@@ -100,7 +100,7 @@ brotli to matter, and awkward precisely because the artifact is not in git.
 
 ## Consequences
 
-- **The Reveal is a convention, not an enforcement.** CONTEXT.md defines the
+- **The Reveal is a convention, not an enforcement.** GLOSSARY.md defines the
   Reveal as a give-up gate whose whole purpose is that Rank stays honest — and
   the entire answer set is in the player's browser, readable from developer
   tools. This is knowingly accepted for a friends-and-family playtest. The

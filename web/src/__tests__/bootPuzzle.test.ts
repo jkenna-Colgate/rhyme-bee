@@ -65,7 +65,7 @@ const mismatchedSchedule = parseSchedule({
 }) as Schedule;
 
 describe("tutorialPuzzle", () => {
-  it("is always the Tutorial, seeded with ate, no date (CONTEXT.md)", () => {
+  it("is always the Tutorial, seeded with ate, no date (GLOSSARY.md)", () => {
     expect(tutorialPuzzle(index)).toEqual({
       kind: "tutorial",
       date: null,

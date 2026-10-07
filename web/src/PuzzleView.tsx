@@ -459,7 +459,7 @@ function CompletionOverlay({
 // --- The Reveal: confirmation, ended notice, and the missed lists (#62) --------
 
 /**
- * The give-up gate. A Reveal ends the Session and cannot be undone (CONTEXT.md),
+ * The give-up gate. A Reveal ends the Session and cannot be undone (GLOSSARY.md),
  * so it is never one click away: this modal asks first, and says what it costs —
  * how many Answers are still out there to find. Cancelling touches nothing.
  *
