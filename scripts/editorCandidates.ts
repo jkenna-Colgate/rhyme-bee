@@ -52,7 +52,7 @@
  *
  * The Candidate Queue is defined as the outstanding Candidates *and*, as a
  * second section, the readings the add path asked an agent for and did not get
- * (CONTEXT.md, #181). So the readout carries both, and the one endpoint that
+ * (GLOSSARY.md, #181). So the readout carries both, and the one endpoint that
  * already answers with the whole queue answers with the whole queue. What that
  * section *is* stays in `./editorDeferred.ts` — a different file, a different
  * state union and a different act — and this module neither parses it nor
@@ -101,7 +101,7 @@ export interface CandidateIdentity {
  * - **declined** — a standing Decline names this word *and* this key. The
  *   editor has already ruled; the queue stops presenting it.
  * - **is-a-name** — the word is in the names data. Never valid, however well it
- *   rhymes (CONTEXT.md), so the ruling it wants is the existing demote gesture
+ *   rhymes (GLOSSARY.md), so the ruling it wants is the existing demote gesture
  *   and not a reading.
  * - **needs-correction** — the engine holds a reading of its own for this word
  *   and that reading does not reach the target. A correction, which is slice 3.
@@ -292,7 +292,7 @@ export function readCandidateQueue(
  * player went on being refused it.
  *
  * A name is excluded from that test rather than ordered around it. A name is
- * never valid however well it rhymes (CONTEXT.md), which is `resolveAddOutcome`'s
+ * never valid however well it rhymes (GLOSSARY.md), which is `resolveAddOutcome`'s
  * own first branch (`scripts/editorAdd.ts`) and the same rule for the same
  * reason, so a Candidate whose word is a name is never *resolved* by rhyming —
  * that is what keeps the case the demotion list exists for, a word carrying both

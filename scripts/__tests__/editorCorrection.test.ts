@@ -280,7 +280,7 @@ describe("what counts as a day having moved", () => {
   });
 
   it("moves when the word arrives as a Bonus Word, which moves no figure at all", () => {
-    // Bonus Words are celebrated and not counted (CONTEXT.md), so `facts` is
+    // Bonus Words are celebrated and not counted (GLOSSARY.md), so `facts` is
     // identical either side. The word is still on a Puzzle it was not on, which
     // is exactly the change a figures-only comparison would report as silence.
     const before = dayReadout({ facts, answers: ["late"], bonusWords: [] });

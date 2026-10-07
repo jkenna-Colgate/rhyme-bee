@@ -97,7 +97,7 @@ for a genuine correction — an upstream stress that is simply wrong — and wro
 for a word with two legitimate pronunciations, where the new reading should stand
 *alongside*. `tear` has both /ɪr/ and /ɛr/, and a correction made for one
 accent's sake must not take the other away from the player who has it
-(CONTEXT.md, **Rhyme**: a Submission rhymes if *any* of its Rhyme Keys matches).
+(GLOSSARY.md, **Rhyme**: a Submission rhymes if *any* of its Rhyme Keys matches).
 
 The supplement can already express this and never has. The CMUdict parser merges
 alternate-pronunciation entries into one set, and adjudication already accepts a
@@ -161,5 +161,5 @@ human override rather than a rule.
   browser covers the pass.
 - **`Decline` and `reject` are distinct terms.** The engine *rejects* a
   Submission mid-play from index state; an editor *declines* a Candidate
-  afterwards by changing that state. CONTEXT.md carries both, so they cannot
+  afterwards by changing that state. GLOSSARY.md carries both, so they cannot
   collapse in the tool's copy.

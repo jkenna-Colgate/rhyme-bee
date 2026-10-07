@@ -27,7 +27,7 @@
  * in a judging pass, and nothing else on this screen can hold it: an add wrote
  * nothing, a Tier verdict is about a word that is already in the Puzzle, and a
  * demotion takes wordhood away rather than granting a reading. So the click
- * records a **Candidate** — the report, never the fix (CONTEXT.md) — into the
+ * records a **Candidate** — the report, never the fix (GLOSSARY.md) — into the
  * queue that already exists for exactly this claim.
  *
  * No pronunciation is offered, proposed or accepted anywhere here, and the

@@ -8,7 +8,7 @@
 #   - `proper-noun`      the word is a name. It loses wordhood and joins the
 #                        names list, so it is rejected AS a name: `Kate`
 #                        obviously rhymes with `ate` and a silent refusal reads
-#                        as a bug (CONTEXT.md).
+#                        as a bug (GLOSSARY.md).
 #   - `not-a-known-word` the word is junk with wordhood — an abbreviation, a
 #                        misspelling, a Latin fragment. It loses wordhood and is
 #                        rejected as a non-word. It is NOT called a name.
@@ -29,7 +29,7 @@
 # --- Proper nouns (#51, #90) ---
 
 # The canonical example, and the worst of them: the Tutorial is seeded `ate`, so
-# a first-run player could submit `Kate` — CONTEXT.md's own illustration of a
+# a first-run player could submit `Kate` — GLOSSARY.md's own illustration of a
 # Proper Noun — and be told it is a valid rhyme.
 kate proper-noun
 troy proper-noun          # #51, reported from play against the `oy` Seed

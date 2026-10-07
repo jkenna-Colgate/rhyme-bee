@@ -13,7 +13,7 @@ Word prevalence measures the proportion of people who report *knowing* a word �
 - **Verify before building on it.** Two things are unconfirmed: (a) the licence — academic norms use is not a commercial licence, and this matters if the game earns money; (b) that `defenestrate` actually scores high and `objurgate` low. Both are cheap checks and both are load-bearing.
 - **The dataset is lemmas** — 61,858 against CMUdict's 134,000 entries. `gate` is present, `gates` is not. Lemmatisation before lookup is mandatory; without it, "absent from the prevalence data" would misfile every inflected form of every common word as an obscure Bonus Word.
 - Prevalence sorts the tiers automatically, but a light human pass over each curated puzzle catches the handful the data gets wrong.
-- Proper nouns are excluded entirely rather than tiered — see CONTEXT.md. CMUdict was built for speech recognition on news audio and is full of surnames; without a second word list, a player typing `Kate` would earn a rare-word bonus.
+- Proper nouns are excluded entirely rather than tiered — see GLOSSARY.md. CMUdict was built for speech recognition on news audio and is full of surnames; without a second word list, a player typing `Kate` would earn a rare-word bonus.
 
 ## Resolution (2026-07-22)
 
