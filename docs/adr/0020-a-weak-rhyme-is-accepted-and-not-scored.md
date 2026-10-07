@@ -137,3 +137,116 @@ Appeals or Session Records showing that players treat an unscored acceptance as
 a refusal, or a judge accurate enough on stress to separate the strong pairs
 from the weak ones, in which case the strong ones can be Answers and the rest
 can go back to being rejected.
+
+## Amendment (2026-10-07): the test holds in either order, and is narrower
+
+Settled in
+[Which rhymes score, which are accepted without scoring, and which are rejected?](https://github.com/jkenna-Colgate/rhyme-bee/issues/232).
+The verdict stands: a Weak Rhyme is accepted, scores nothing, and is shown as a
+Bonus Word with no label. **The test under it is replaced, and the replacement
+is provisional.** Still decided and not built.
+
+### The test now
+
+The third condition of "The test" above is replaced. A Submission is a Weak
+Rhyme when it passes the ordinary gates, is not a Rhyme on any reading, and:
+
+- the last syllable of the Submission and the last syllable of the Seed Word
+  have the same rime;
+- that syllable is stressed in one of the two words and unstressed in the other;
+- the shared rime is a vowel that is actually said, and at least one consonant
+  after it.
+
+"There are no exceptions by vowel" and "the test can only pass when the Seed
+Word's Rhyme Key is a single syllable" are both withdrawn.
+
+**Either order.** The maintainer ruled that if one word guessed for another gets
+a verdict, the second guessed for the first gets the same one. So `trick` is a
+Weak Rhyme for `magic`, which the old test rejected because the Rhyme Key of
+`magic` is two syllables. A Weak Rhyme is symmetric and stops there. It does not
+have the substitution property a Rhyme has (ADR-0001, amended the same day):
+`magic` and `academic` are both Weak Rhymes for `trick` and not for each other,
+and two words that match only on unstressed endings (`magic` for `attic`,
+`commander` for `boulder`) stay rejected.
+
+**A vowel that is actually said.** The weak `AH0` directly before `L`, `M` or
+`N` drops out when the word is said (`delusion` is "zh'n", and the engine
+already holds that reading). What is left to share is a consonant and no vowel.
+
+**At least one consonant after it.** Without stress, one shared sound is too
+little: `fur` and `boulder` share "er", `tree` and `facility` share "ee".
+
+The maintainer's rulings by name, each in either order:
+
+| Pair | Verdict | Why |
+|---|---|---|
+| `idiotic` / `trick` | Weak Rhyme | "ih" and `k` |
+| `bishop` / `makeup` | Weak Rhyme | "uh" and `p` |
+| `delusion` / `sun` | rejected | the vowel drops |
+| `boulder` / `fur` | rejected | a vowel alone |
+| `facility` / `tree` | rejected | a vowel alone |
+
+### What it moves
+
+Answer-band words over the scheduled Seed Words. The first column is the 17,149
+words the table under "What the engine was rejecting" counts; the second is new.
+
+| Shared last syllable | Short Seed Word, long Submission | Long Seed Word, short Submission |
+|---|---|---|
+| Accepted: a vowel and a consonant | 10,858 on 49 Seeds | 1,215 on 28 Seeds |
+| Rejected: a vowel alone | 3,696 on 3 Seeds | 4,389 on 39 Seeds |
+| Rejected: the vowel drops | 2,595 on 2 Seeds | 573 on 23 Seeds |
+
+So about 6,300 words this ADR accepted are rejected again, among them every
+"-er" word for `blur` and `abbreviation` for `one`. What stays accepted is
+mostly endings: `wing` 4,715, `messieurs` 1,649, `grid` 1,470, `trick` 710,
+`hut` 328.
+
+Of the ten pairs said aloud for this ADR, the new test rejects one, `muffin` for
+`one`, which was heard as weak then. It still accepts `chocolate` for `hut`.
+
+### Why provisional, and why that is safe
+
+"Why no rule draws the line" was met again. Three lines were tried in one
+sitting, and for each one words landed on both sides for the maintainer. This
+test matches the five pairs ruled by name and will be wrong about some endings.
+It is kept because nothing else reads the line it draws:
+
+- It sits between "accepted without Points" and "rejected". Score, Rank and
+  Difficulty do not move wherever it falls.
+- The Playability Bar does not read it. Trust is about an obvious rhyme being
+  rejected, and No False Accepts is about what is scored.
+- The engine works a Weak Rhyme out from the readings. **No judge is asked about
+  one, and no label is written for one.** Unstressed endings were the judge's
+  worst kind, so this is the dependency that had to be cut.
+- A Weak Rhyme is computed when it is submitted. Moving the line is one test,
+  with no schedule, Rhyme Index or stored Score behind it.
+
+**A known fault of this line.** The same ticket ruled weak "ih" and weak "uh"
+one sound inside a scoring Rhyme (ADR-0011, amended the same day). This test
+still reads the weak vowel as the dictionary wrote it, so `aspirin` for `win` is
+a Weak Rhyme and `muffin` for `win` is not. That turns on the dictionary's
+symbol. An earlier ruling on the ticket had accepted `muffin` for `win` by
+swapping the two weak vowels here; it is withdrawn, because the swap is also
+what lets `abbreviation` in for `win`, 8,197 words on 35 Seed Words. A word
+people do say with "ih" is corrected by a reading of its own.
+
+### "Missing stress marks", narrowed
+
+The consequence above called `heretic`, `limerick` and `maverick` data errors.
+That is now three cases:
+
+- A compound missing a mark (`drumstick`, `carsick`) is a missing reading, and
+  it scores once the mark is there.
+- `limerick` and `pyramid` are less settled.
+- Words shaped like `heretic`, `maverick`, `lunatic` and `synonym` are **not
+  ruled**. Each keeps the mark the engine holds and no judge is asked about it,
+  until
+  [On a weak-vowel Seed Word, where do Points stop?](https://github.com/jkenna-Colgate/rhyme-bee/issues/233)
+  settles it.
+
+### What would reopen the test
+
+Session Records, which keep every rejection, showing which unstressed endings
+players actually submit. That is evidence no ear in this repository has
+supplied.

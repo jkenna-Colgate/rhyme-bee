@@ -40,3 +40,56 @@ those words end in `AH0 T`, so what it admits is `chocolate` for `hut`. The
 option was right to be rejected, and the example was a spelling match where the
 option is a sound match. `chocolate` is not a Rhyme for `ate` and not a Weak
 Rhyme for it either.
+
+## Amendment (2026-10-07)
+
+**The rule is restated in the words for the parts of a syllable, and it gains a
+property it always had and never named.** Settled in
+[Which rhymes score, which are accepted without scoring, and which are rejected?](https://github.com/jkenna-Colgate/rhyme-bee/issues/232).
+
+A syllable's **rime** is its vowel (the nucleus) and the consonants after it
+(the coda). The consonants before the vowel are the onset. In those words:
+
+> A Submission is a Rhyme when it has a stressed syllable, main or secondary,
+> whose rime and every syllable after it are identical to the Seed Word's Rhyme
+> Key. The onset is ignored.
+
+This is the same rule. What the restatement settles:
+
+- **Secondary stress scores with no difference,** in Points or on screen, and
+  gets no name of its own. 3,490 of the 10,982 scheduled Answers (32%) rhyme
+  only on a secondary stress, so the game rests on it.
+- **Identity needs no clause.** Because the onset is ignored, a homophone scores
+  and so does the Seed Word as the last part of a longer word (`copycat` for
+  `cat`). A Seed Word whose Answers are mostly of that kind (`ship`, 62 of 100)
+  is a matter of Seed choice.
+- **Strict about sound.** A nucleus or a coda that differs is not a Rhyme, a
+  one-sound difference included: `pollution` for `delusion`, `time` for `fine`,
+  `cat` for `map`. What is elsewhere called an imperfect rhyme is no rhyme here,
+  and there is no "almost identical". The game is generous about stress and
+  strict about sound.
+- **The borrowed words stop there.** Onset, rime, nucleus, coda and stressed
+  syllable are used. Perfect rhyme, imperfect rhyme, masculine, feminine and
+  dactylic are not: the game's line does not follow theirs.
+
+**Rhyme has the substitution property.** Make any Answer the Seed Word, and the
+Puzzle holds the same words. It follows from "two words rhyme when they share a
+Rhyme Key", and it is now a requirement and not a by-product:
+
+- No rule may decide a Rhyme by testing a pair in one direction. A change is
+  admissible only as a change to how a word is read, which then follows the word
+  into every Puzzle it is in. This is the reason behind ADR-0010's "it changes
+  the reading, not the test".
+- A rule that appends a reading has to run both ways, or the two words it joins
+  rhyme in one order only.
+- A Seed Word has to be pinned to a Rhyme Key its Answers share. A day pinned to
+  a key its own family has left
+  ([#151](https://github.com/jkenna-Colgate/rhyme-bee/issues/151)) breaks the
+  property as well as the day.
+
+A Weak Rhyme (ADR-0020) does not have the property and is not asked to. It holds
+in either order and no more.
+
+Two changes to how words are read were ruled in the same ticket and are recorded
+in [ADR-0011](./0011-reading-manufacture-is-frozen.md)'s amendment of this date.
+Neither changes this rule.
