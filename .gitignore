@@ -2,8 +2,8 @@
 .vscode/
 .idea/
 
-# Vendored agent skills — installed via `npx skills`, restorable from
-# skills-lock.json. Symlinked, so committing them breaks on Windows anyway.
+# Agent skill folders and local Claude Code state. Skills are installed per
+# user, not vendored here: a copy is symlinked, which breaks on Windows.
 .agents/
 .claude/
 
