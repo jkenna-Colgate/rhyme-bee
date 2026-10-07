@@ -151,7 +151,7 @@ function callModel(text: string): Promise<string> {
   const path = resolve(cacheDir, `${model}.${createHash("sha1").update(text).digest("hex").slice(0, 16)}.json`);
   if (existsSync(path)) return Promise.resolve(JSON.parse(readFileSync(path, "utf8")).result);
   return new Promise((done, fail) => {
-    // cwd outside the repo so the judge never loads CLAUDE.md, CONTEXT.md or the data.
+    // cwd outside the repo so the judge never loads CLAUDE.md, GLOSSARY.md or the data.
     const child = spawn("claude", ["-p", "--model", model, "--output-format", "json"], { shell: true, cwd: tmpdir() });
     let out = "", err = "";
     child.stdout.on("data", (d) => (out += d));
