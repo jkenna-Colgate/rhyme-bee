@@ -20,7 +20,7 @@ import { decide, substitutionBreaks, type Decision } from "./rules.ts";
 const here = import.meta.dirname;
 const load = <T>(p: string): T => JSON.parse(readFileSync(resolve(here, p), "utf8"));
 const taken = new Set(load<Pair[]>("batch-1.json").map((p) => p.id));
-const root = resolve(import.meta.dirname, "../..");
+const root = process.env.RHYME_BEE_ROOT ?? resolve(import.meta.dirname, "../..");
 const manifest = JSON.parse(readFileSync(resolve(root, "dist-data/index.manifest.json"), "utf8"));
 const index = deserialise(JSON.parse(readFileSync(resolve(root, "dist-data", manifest.index), "utf8")));
 const lex = { ...pinnedEvidenceContext(), known: (w: string) => index.tierOf(w).tier === "answer" };

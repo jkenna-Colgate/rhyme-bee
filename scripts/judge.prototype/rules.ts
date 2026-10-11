@@ -15,7 +15,7 @@ import { resolve } from "node:path";
 import { bareSound, isVowel, isVowelSound, rhymeKeyOf, stressOf, type Pronunciation, type RhymeKey } from "../../src/phonology.ts";
 import type { Pair } from "./pool.ts";
 
-const root = resolve(import.meta.dirname, "../..");
+const root = process.env.RHYME_BEE_ROOT ?? resolve(import.meta.dirname, "../..");
 
 // ---- the two Normalisations and the hand-written readings ------------------
 

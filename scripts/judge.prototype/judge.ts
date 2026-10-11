@@ -3,7 +3,7 @@
  * environment assembled from named parts, so each part can be switched off and
  * its effect on agreement with the labels measured.
  *
- *   npx tsx scripts/judge.prototype/judge.ts <set> [--env engine,family,relatives,wikipron,shots] [--rules 2] [--model sonnet] [--limit N] [--dry]
+ *   npx tsx scripts/judge.prototype/judge.ts <set> [--env engine,family,relatives,wikipron,shots] [--rules 2] [--model sonnet] [--limit N] [--run N] [--dry]
  *
  * <set> is heldout-2 or batch-N (a JSON file beside this one, each pair carrying
  * the rules' own decision). The judge is asked about Points only: is this pair
@@ -31,7 +31,7 @@ import type { Pair } from "./pool.ts";
 import { canon, ruleKeys, substitutionBreaks, type Decision } from "./rules.ts";
 
 const here = import.meta.dirname;
-const root = resolve(here, "../..");
+const root = process.env.RHYME_BEE_ROOT ?? resolve(here, "../..");
 const cacheDir = resolve(root, ".scratch/judge/calls");
 mkdirSync(cacheDir, { recursive: true });
 mkdirSync(resolve(here, "rulings"), { recursive: true });
@@ -51,6 +51,9 @@ const envName = (PARTS.filter((p) => env.has(p)).join("+") || "bare") + (rulesVe
 const model = flag("model") ?? "sonnet";
 const limit = Number(flag("limit") ?? Infinity);
 const dry = argv.includes("--dry");
+// A repeat of the same prompt. Run 1 is the cache as #231 left it; a later run has its own cache entry and rulings file (#238).
+const run = Number(flag("run") ?? 1);
+const runName = run > 1 ? `.run-${run}` : "";
 const BATCH = 8;
 
 const load = <T>(p: string): T => JSON.parse(readFileSync(resolve(here, p), "utf8"));
@@ -170,7 +173,7 @@ function describe(p: Pair, batchIds: Set<string>): string {
 interface Ruling { verdict: string; reading: string | null; confidence: string; why: string; verified?: boolean }
 
 function callModel(text: string): Promise<string> {
-  const path = resolve(cacheDir, `${model}.${createHash("sha1").update(text).digest("hex").slice(0, 16)}.json`);
+  const path = resolve(cacheDir, `${model}.${createHash("sha1").update(text).digest("hex").slice(0, 16)}${runName}.json`);
   if (existsSync(path)) return Promise.resolve(JSON.parse(readFileSync(path, "utf8")).result);
   return new Promise((done, fail) => {
     // cwd outside the repo so the judge never loads CLAUDE.md, GLOSSARY.md or the data.
@@ -237,11 +240,11 @@ for (const p of ordered) {
   const last = batches[batches.length - 1];
   if (last && last.length < BATCH) last.push(p); else batches.push([p]);
 }
-process.stderr.write(`${set} / ${envName} / ${model}: ${pairs.length} pairs in ${batches.length} calls `);
+process.stderr.write(`${set} / ${envName}${runName} / ${model}: ${pairs.length} pairs in ${batches.length} calls `);
 if (dry) { console.log(`\n${promptFor(batches[0]!)}`); process.exit(0); }
 const rulings = Object.fromEntries((await inParallel(batches.map((b) => () => ruleBatch(b)), 4)).flat());
 process.stderr.write("\n");
-writeFileSync(resolve(here, "rulings", `${set}.${envName}.${model}.json`), JSON.stringify(rulings, null, 1));
+writeFileSync(resolve(here, "rulings", `${set}.${envName}${runName}.${model}.json`), JSON.stringify(rulings, null, 1));
 
 // ---- score -----------------------------------------------------------------
 

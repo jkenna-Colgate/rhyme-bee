@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>PROTOTYPE judge labels: fresh-1</title>
+<style>
+  body { font: 17px/1.5 system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+  h1 { font-size: 1.1rem; margin: 0; } .intro { color: #555; font-size: .9rem; }
+  .rule { background: #f6f6f6; border-radius: 8px; padding: .8rem 1rem; font-size: .9rem; margin: 1rem 0; }
+  .rule li { margin: .2rem 0; }
+  .card { border: 1px solid #ccc; border-radius: 10px; padding: 1.5rem; margin: 1.2rem 0; }
+  .pair { font-size: 1.7rem; line-height: 1.35; } .pair b { color: #7a3ff2; } .say { color: #777; font-size: 1rem; }
+  .why { margin: .8rem 0 1rem; color: #444; font-size: .92rem; }
+  button { font: inherit; padding: .5rem .9rem; margin: .25rem 0; border: 1px solid #999; border-radius: 8px; background: #fff; cursor: pointer; display: block; width: 100%; text-align: left; }
+  button small { display: block; color: #666; } button.on { background: #7a3ff2; color: #fff; border-color: #7a3ff2; } button.on small { color: #e6dcff; }
+  .nav button { display: inline-block; width: auto; font-size: .85rem; margin-right: .3rem; }
+  kbd { font-size: .75rem; border: 1px solid #aaa; border-radius: 4px; padding: 0 .3rem; margin-right: .4rem; }
+  .state { font-size: .88rem; color: #555; }
+  table { border-collapse: collapse; font-size: .82rem; } td { padding: 0 .6rem 0 0; }
+</style>
+<h1>PROTOTYPE (#231): the pairs the rules could not decide, set <code>fresh-1</code></h1>
+<p class="intro">198 pairs are in this set. The rules labelled 128 of them with nobody's ear. These 70 are left, each because a fact about how a word is said is missing. No judge ruling is shown.</p>
+<div class="rule">
+  <b>The one question: is the pair a Rhyme?</b> A Rhyme is what scores Points.
+  <ul>
+    <li>One word has a stressed syllable, main or secondary, whose vowel and everything after it are identical to the other word's from its last stressed vowel on. The consonants before the vowel are ignored.</li>
+    <li>One differing sound is no Rhyme. An extra or missing syllable is no Rhyme.</li>
+    <li>A match on an unstressed last syllable is no Rhyme. Whether it is accepted without Points is not asked here.</li>
+    <li>Counted as the same: weak "ih" and weak "uh" after the stressed vowel; "er" and plain r after "eye", "ow" or "oy".</li>
+    <li>A compound keeps a stress on its last part (<code>carsick</code>, <code>drumstick</code>).</li>
+  </ul>
+  Each card shows the pair both ways and takes one ruling for both. Whether the word deserves to be an Answer or a Bonus Word is not asked.
+</div>
+<p class="intro">Keys: 1, 2 or 3 to rule, Enter to skip forward, Backspace to go back.</p>
+<div class="state" id="progress"></div>
+<div class="card" id="card"></div>
+<div class="nav"><button id="back">Back</button><button id="next">Next</button><button id="export">Export labels</button></div>
+<h1 style="margin-top:1.5rem">Rulings so far</h1>
+<div class="state" id="tally"></div>
+<table id="log"></table>
+<script>
+const SET = "fresh-1";
+const ITEMS = [{"id":"bidets|AE M Z","word":"bidets","seed":"mesdames","say":"may-DA-mz","why":"no reading on file; Wiktionary has no entry"},{"id":"kiter|AY T ER","word":"kiter","seed":"typewriter","say":"TEYE-preye-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"mythology|AA L AH JH IY","word":"mythology","seed":"astrology","say":"uh-STRAH-luh-jee","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"hearing|IH R IH NG","word":"hearing","seed":"bioengineering","say":"beye-oh-eh-njuh-NIH-rih-ng","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"pickaxe|AE K S","word":"pickaxe","seed":"wax","say":"WA-ks","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"sonneteer|IH R","word":"sonneteer","seed":"engineer","say":"EH-njuh-nih-r","why":"no reading on file; Wiktionary has no entry"},{"id":"oratorial|AO R IY AH L","word":"oratorial","seed":"tutorial","say":"too-TAW-ree-uh-l","why":"no reading on file; Wiktionary has no entry"},{"id":"reality|AE L AH T IY","word":"reality","seed":"hospitality","say":"hah-spuh-TA-luh-tee","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"gazer|AY Z ER","word":"gazer","seed":"synthesizer","say":"SIH-nthuh-seye-zur","why":"no reading on file; Wiktionary has no entry"},{"id":"rescinder|EH N D ER","word":"rescinder","seed":"tender","say":"TEH-ndur","why":"no reading on file; Wiktionary has no entry"},{"id":"unlearns|ER N Z","word":"unlearns","seed":"tern","say":"TUR-nz","why":"no reading on file; Wiktionary has no entry"},{"id":"possibility|IH L AH T IY","word":"possibility","seed":"utility","say":"yoo-TIH-luh-tee","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"leering|IH R IH NG","word":"leering","seed":"bioengineering","say":"beye-oh-eh-njuh-NIH-rih-ng","why":"no reading on file; Wiktionary has no entry"},{"id":"selector|EH K T ER","word":"selector","seed":"inspector","say":"ih-NSPEH-ktur","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"actuality|AE L AH T IY","word":"actuality","seed":"hospitality","say":"hah-spuh-TA-luh-tee","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"earring|IH NG","word":"earring","seed":"wing","say":"WIH-ng","why":"the dictionary marks no stress on the last syllable, and the spelling splits as ear + ring: a compound missing a mark is a missing reading"},{"id":"jocose|OW S","word":"jocose","seed":"glucose","say":"GLOO-koh-s","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"jacker|AE K ER","word":"jacker","seed":"tracker","say":"TRA-kur","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"mesmerizer|AY Z ER","word":"mesmerizer","seed":"synthesizer","say":"SIH-nthuh-seye-zur","why":"no reading on file; Wiktionary has no entry"},{"id":"gazer|EY N ER","word":"gazer","seed":"trainer","say":"TRAY-nur","why":"no reading on file; Wiktionary has no entry"},{"id":"bonbons|AA N Z","word":"bonbons","seed":"bronze","say":"BRAH-nz","why":"no reading on file; Wiktionary has no entry"},{"id":"freebooter|UW T ER","word":"freebooter","seed":"computer","say":"kuh-MPYOO-tur","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"vended|EH N D IH D","word":"vended","seed":"splendid","say":"SPLEH-ndih-d","why":"no reading on file; Wiktionary has no entry"},{"id":"charioteer|IH R","word":"charioteer","seed":"engineer","say":"EH-njuh-nih-r","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"beignets|AE M Z","word":"beignets","seed":"mesdames","say":"may-DA-mz","why":"no reading on file; Wiktionary has no entry"},{"id":"probability|IH L AH T IY","word":"probability","seed":"utility","say":"yoo-TIH-luh-tee","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"reprehend|EH N D","word":"reprehend","seed":"depend","say":"dih-PEH-nd","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"moronic|AA N IH K","word":"moronic","seed":"chronic","say":"KRAH-nih-k","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"armorial|AO R IY AH L","word":"armorial","seed":"tutorial","say":"too-TAW-ree-uh-l","why":"no reading on file; Wiktionary has no entry"},{"id":"screwer|UW T ER","word":"screwer","seed":"computer","say":"kuh-MPYOO-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"reduct|AH K T","word":"reduct","seed":"obstruct","say":"uh-BSTRUH-kt","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"mayhaps|AE P S","word":"mayhaps","seed":"collapse","say":"kuh-LA-ps","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"reshowing|OW IH NG","word":"reshowing","seed":"ongoing","say":"AH-ngoh-ih-ng","why":"no reading on file; Wiktionary has no entry"},{"id":"unmaking|EY K IH NG","word":"unmaking","seed":"breathtaking","say":"BREH-thtay-kih-ng","why":"no reading on file; Wiktionary has no entry"},{"id":"liberality|AE L AH T IY","word":"liberality","seed":"hospitality","say":"hah-spuh-TA-luh-tee","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"unended|EH N D IH D","word":"unended","seed":"splendid","say":"SPLEH-ndih-d","why":"no reading on file; Wiktionary has no entry"},{"id":"prizer|AY Z ER","word":"prizer","seed":"synthesizer","say":"SIH-nthuh-seye-zur","why":"no reading on file; Wiktionary has no entry"},{"id":"trawls|AA L Z","word":"trawls","seed":"schmalz","say":"SHMAH-lz","why":"no reading on file; Wiktionary has no entry"},{"id":"verbose|OW S","word":"verbose","seed":"glucose","say":"GLOO-koh-s","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"slaker|EY K ER","word":"slaker","seed":"maker","say":"MAY-kur","why":"no reading on file; Wiktionary has no entry"},{"id":"upchuck|AH K","word":"upchuck","seed":"suck","say":"SUH-k","why":"no reading on file; Wiktionary has no entry"},{"id":"trow|AW","word":"trow","seed":"eyebrow","say":"EYE-brow","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"mow|AW","word":"mow","seed":"eyebrow","say":"EYE-brow","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"bisect|EH K T","word":"bisect","seed":"retrospect","say":"REH-truh-speh-kt","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"cruder|UW T ER","word":"cruder","seed":"computer","say":"kuh-MPYOO-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"phrenology|AA L AH JH IY","word":"phrenology","seed":"astrology","say":"uh-STRAH-luh-jee","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"anthropoid|OY D","word":"anthropoid","seed":"steroid","say":"stur-OY-d","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"squaws|AA Z","word":"squaws","seed":"cause","say":"KAH-z","why":"no reading on file; Wiktionary has no entry"},{"id":"purgatorial|AO R IY AH L","word":"purgatorial","seed":"tutorial","say":"too-TAW-ree-uh-l","why":"no reading on file; Wiktionary has no entry"},{"id":"irresolution|UW SH AH N","word":"irresolution","seed":"constitution","say":"kah-nstuh-TOO-shuh-n","why":"no reading on file; Wiktionary has no entry"},{"id":"twits|IH T S","word":"twits","seed":"blitz","say":"BLIH-ts","why":"no reading on file; Wiktionary has no entry"},{"id":"spatially|EH N SH AH L IY","word":"spatially","seed":"essentially","say":"eh-SEH-nshuh-lee","why":"no reading on file; Wiktionary has no entry"},{"id":"miaow|AW","word":"miaow","seed":"eyebrow","say":"EYE-brow","why":"no reading on file; Wiktionary has no entry"},{"id":"poor|UH R","word":"poor","seed":"cure","say":"KYUU-r","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"smiter|AY T ER","word":"smiter","seed":"typewriter","say":"TEYE-preye-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"fluter|UW T ER","word":"fluter","seed":"computer","say":"kuh-MPYOO-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"bipod|AA D","word":"bipod","seed":"tripod","say":"TREYE-pah-d","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"triter|AY T ER","word":"triter","seed":"typewriter","say":"TEYE-preye-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"likability|IH L AH T IY","word":"likability","seed":"utility","say":"yoo-TIH-luh-tee","why":"no reading on file; Wiktionary has no entry"},{"id":"sensuality|AE L AH T IY","word":"sensuality","seed":"hospitality","say":"hah-spuh-TA-luh-tee","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"product|AH K T","word":"product","seed":"obstruct","say":"uh-BSTRUH-kt","why":"the dictionary marks no stress on the last syllable, and the spelling splits as pro + duct: a compound missing a mark is a missing reading"},{"id":"locution|UW SH AH N","word":"locution","seed":"constitution","say":"kah-nstuh-TOO-shuh-n","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"rhomboid|OY D","word":"rhomboid","seed":"steroid","say":"stur-OY-d","why":"no reading on file; Wiktionary has no entry"},{"id":"saluter|UW T ER","word":"saluter","seed":"computer","say":"kuh-MPYOO-tur","why":"no reading on file; Wiktionary has no entry"},{"id":"mowing|OW IH NG","word":"mowing","seed":"ongoing","say":"AH-ngoh-ih-ng","why":"the engine's reading does not reach the key, and Wiktionary's ends in its sounds"},{"id":"eclair|EH R","word":"eclair","seed":"air","say":"EH-r","why":"no reading on file; Wiktionary has no entry"},{"id":"colones|OW N Z","word":"colones","seed":"crossbones","say":"KRAH-sboh-nz","why":"no reading on file; Wiktionary has no entry"},{"id":"inquisitorial|AO R IY AH L","word":"inquisitorial","seed":"tutorial","say":"too-TAW-ree-uh-l","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"accessorial|AO R IY AH L","word":"accessorial","seed":"tutorial","say":"too-TAW-ree-uh-l","why":"no reading on file; Wiktionary ends in the key's sounds and does not mark stress"},{"id":"caker|EY K ER","word":"caker","seed":"maker","say":"MAY-kur","why":"no reading on file; Wiktionary has no entry"}];
+const KEY = "PROTOTYPE-judge-labels-" + SET;
+const OPTIONS = [
+  ["rhyme", "Rhyme", "Scores Points, in both directions."],
+  ["no-rhyme", "Not a Rhyme", "No Points in either direction. It may still be accepted without Points; the engine works that out."],
+  ["out", "Leave it out", "I do not know how the word is said, or it is the lunatic shape. No label is written and no judge is scored on it."],
+];
+let labels = JSON.parse(localStorage.getItem(KEY) || "{}");
+let at = Math.max(0, ITEMS.findIndex((it) => !labels[it.id]));
+if (ITEMS.every((it) => labels[it.id])) at = ITEMS.length - 1;
+
+function rule(label) {
+  labels[ITEMS[at].id] = label;
+  localStorage.setItem(KEY, JSON.stringify(labels));
+  if (at < ITEMS.length - 1) at++;
+  render();
+}
+function render() {
+  const it = ITEMS[at], done = ITEMS.filter((x) => labels[x.id]).length;
+  document.getElementById("progress").textContent = "Pair " + (at + 1) + " of " + ITEMS.length + ". Ruled: " + done + (done === ITEMS.length ? ". All done: press Export labels." : "");
+  document.getElementById("card").innerHTML =
+    '<div class="pair">' + it.word + ' <span class="say">for</span> <b>' + it.seed + '</b> <span class="say">' + (it.say ? "(" + it.say + ")" : "") + "</span><br>" +
+    "<b>" + it.seed + '</b> <span class="say">for</span> ' + it.word + "</div>" +
+    '<div class="why">Why the rules stopped: ' + it.why + ".</div>" +
+    OPTIONS.map(([v, text, causes], i) => '<button data-v="' + v + '" class="' + (labels[it.id] === v ? "on" : "") + '"><kbd>' + (i + 1) + "</kbd>" + text + "<small>" + causes + "</small></button>").join("");
+  document.querySelectorAll("#card button").forEach((b) => (b.onclick = () => rule(b.dataset.v)));
+  const tally = {};
+  Object.values(labels).forEach((l) => (tally[l] = (tally[l] || 0) + 1));
+  document.getElementById("tally").textContent = Object.entries(tally).map(([l, n]) => l + " " + n).join(", ") || "none yet";
+  document.getElementById("log").innerHTML = ITEMS.filter((x) => labels[x.id]).slice(-12).reverse()
+    .map((x) => "<tr><td>" + x.word + " for " + x.seed + ", " + x.seed + " for " + x.word + "</td><td><b>" + labels[x.id] + "</b></td></tr>").join("");
+}
+document.getElementById("back").onclick = () => { at = Math.max(0, at - 1); render(); };
+document.getElementById("next").onclick = () => { at = Math.min(ITEMS.length - 1, at + 1); render(); };
+document.getElementById("export").onclick = () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(labels, null, 1)], { type: "application/json" }));
+  a.download = SET + ".labels.json";
+  a.click();
+};
+document.onkeydown = (e) => {
+  const n = Number(e.key);
+  if (n >= 1 && n <= OPTIONS.length) rule(OPTIONS[n - 1][0]);
+  else if (e.key === "Enter") document.getElementById("next").click();
+  else if (e.key === "Backspace") document.getElementById("back").click();
+};
+render();
+</script>

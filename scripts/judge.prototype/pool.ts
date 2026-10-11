@@ -19,7 +19,7 @@ import { parseTierOverrides } from "../../src/tierOverride.ts";
 import { pinnedEvidenceContext } from "../editorAdd.ts";
 
 const here = import.meta.dirname;
-const root = resolve(here, "../..");
+const root = process.env.RHYME_BEE_ROOT ?? resolve(here, "../..");
 const read = (p: string) => readFileSync(resolve(root, p), "utf8");
 const lines = (p: string) => new Set(read(p).split(/\r?\n/).map((w) => w.trim().toLowerCase()).filter(Boolean));
 

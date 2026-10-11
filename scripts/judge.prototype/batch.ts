@@ -23,7 +23,7 @@ import type { Pair } from "./pool.ts";
 import { decide, substitutionBreaks, type Decision } from "./rules.ts";
 
 const here = import.meta.dirname;
-const root = resolve(here, "../..");
+const root = process.env.RHYME_BEE_ROOT ?? resolve(here, "../..");
 const n = Number(process.argv[2]);
 if (!(n >= 2)) throw new Error("usage: batch.ts <N, 2 or more> [--write]");
 const out = resolve(here, `batch-${n}.json`);

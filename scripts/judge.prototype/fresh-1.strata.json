@@ -1,0 +1,19 @@
+{
+ "seedsRun": 104,
+ "every": {
+  "has-reading/no-rhyme": 1168,
+  "has-reading/ask": 32,
+  "has-reading/rhyme": 35,
+  "no-reading/ask": 138,
+  "no-reading/rhyme": 152,
+  "no-reading/no-rhyme": 49
+ },
+ "drawn": {
+  "no-reading/no-rhyme": 48,
+  "no-reading/ask": 55,
+  "no-reading/rhyme": 30,
+  "has-reading/ask": 15,
+  "has-reading/rhyme": 15,
+  "has-reading/no-rhyme": 35
+ }
+}
