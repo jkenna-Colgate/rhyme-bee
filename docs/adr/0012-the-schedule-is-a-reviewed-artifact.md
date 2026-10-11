@@ -109,3 +109,74 @@ them apart.
 - **ADR-0004's widen-the-band lever is untouched.** At 42 weeks the library is
   under ten months, so the run ends before a repeat is needed. Widening to
   [10, 120] remains pre-approved if a second year is wanted.
+
+## Amendment, 2026-10-11: the Schedule is a loop
+
+The Consequences above say the run ends before a repeat is needed, and hold
+widening the band in reserve for a second year. Both are reversed. The game is to
+run with nobody attending it (#218), so the Schedule cannot end, and Free Play is
+never the plan for a date. Decided in #228.
+
+**The Schedule loops, and nothing deals it again.** A date past the last
+scheduled one shows the Seed Word played one lap earlier. The client works that
+out from the date, as it does today. No job runs and no further file is
+generated.
+
+**The first loop is the last 259 days of the schedule as reviewed**: 37 whole
+weeks, 2026-08-04 to 2027-04-19. Tuesday 2027-04-20 shows the Seed Word of
+Tuesday 2026-08-04. The schedule is 260 days, one over a whole number of weeks,
+so `lopsided` (2026-08-03) is left out and held as a spare.
+
+**A lap is a whole number of weeks.** That keeps the banded deal true with nobody
+checking it: a Seed Word returns on the weekday it was dealt to, so
+`Mon < Tue < … < Sun` holds on every lap for the reason it held on the first.
+
+**One place per Seed Word, and one per Rhyme Key.** `sentimental` was dealt twice
+(2026-08-17 and 2026-11-11) because it has readings on two Rhyme Keys and led
+both families. The second day takes `kennel`.
+
+**The Schedule grows by whole weeks.** New Seed Words are read once, as this ADR
+requires, go through a Batch
+([ADR-0021](./0021-the-unattended-loop-calls-a-model-in-one-place.md)), and are
+dealt among themselves into weeks of seven by the banded deal. A new week goes
+anywhere after the week in progress. Weeks behind it are untouched and weeks
+ahead of it slide later by seven days, so a place already given keeps its weekday
+and comes round no sooner. Fewer than seven wait as spares. For that to hold, the
+Schedule records the date the lap in progress began, and adding weeks moves that
+date to the start of the current lap. A loop held only as a list and a length
+would move every future date when the length changed.
+
+**A Seed Word that no longer pins is repaired at the build, in order.** First the
+same word on its current Rhyme Key (the one with the most Answers that the
+Schedule does not already hold). Then the family's lead word. Failing both, the
+day is Free Play and is counted against Continuity. The repair is written to the
+schedule file, which stays the one place a date is pinned. This narrows "a
+rebuild cannot reshuffle the calendar" above: a rebuild may re-pin one day, and
+only a day that would otherwise have no Puzzle.
+
+### Rejected
+
+**Re-deal each lap, by a scheduled job or pre-generated for years.** A shuffle
+can place a Seed Word late in one lap and early in the next, so the gap needs a
+rule and a check of its own. The loop gets the gap and the ramp by construction.
+A job must also be alive when the lap ends, and GitHub switches off a scheduled
+workflow in a public repository after 60 days without activity.
+
+**Grow the pool until a lap is a year.** The effort began by asking for a year
+between repeats. Nothing measured depends on a year: the gap has to outlast a
+player's memory of the Answers and give Session Records time to move Tiers, and
+eight and a half months does both. A lap of 371 days needed about 113 more Seed
+Words from the [10, 120] band, which is a read of 277 unvetted candidates and
+about four more Batches, for Puzzles of 10 to 19 Answers. Widening stays
+available as growth, taken when the maintainer wants more Puzzles. The Schedule
+continuing does not wait on it.
+
+**A bench of spare Seed Words for a day that cannot be repaired.** With nobody
+attending, a whole family vanishes only through a change to Normalisation, and
+[ADR-0011](./0011-reading-manufacture-is-frozen.md) holds those for the
+maintainer.
+
+**Re-band each lap as Difficulty drifts.** Tier moves and added readings change a
+Puzzle's Difficulty between laps, so a Sunday can come to play like a Thursday.
+Moving it is a re-deal. The drift is accepted on the terms this ADR already set
+for the first lap: after review, band membership is advisory.
