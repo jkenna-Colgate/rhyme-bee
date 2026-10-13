@@ -40,6 +40,15 @@ const pairs = load<Cut[]>(`${set}.json`).filter((p) => p.rule.verdict !== "out" 
 const truth = new Map<string, { label: Label; from: "rules" | "maintainer" }>();
 for (const [id, l] of Object.entries(labelsIn(`${set}.rules.json`))) if (isLabel(l)) truth.set(id, { label: l, from: "rules" });
 for (const [id, l] of Object.entries(labelsIn(`${set}.labels.json`))) if (isLabel(l)) truth.set(id, { label: l, from: "maintainer" });
+// A second look (recheck.ts) replaces the label it was taken on. Where the maintainer left the pair out the second
+// time, a label of their own is withdrawn, and so is a rules label the judge disputes; the dictionary may supply one.
+const was = existsSync(resolve(here, `${set}-recheck.was.json`)) ? load<Record<string, { disputed: boolean }>>(`${set}-recheck.was.json`) : {};
+let relabelled = 0, withdrawn = 0;
+for (const [id, l] of Object.entries(labelsIn(`${set}-recheck.labels.json`))) {
+  const old = truth.get(id);
+  if (isLabel(l)) { if (old?.label !== l) relabelled++; truth.set(id, { label: l, from: "maintainer" }); }
+  else if (l === "out" && (old?.from === "maintainer" || was[id]?.disputed)) { truth.delete(id); withdrawn++; }
+}
 /** Kept out of `truth`, so no figure mixes a dictionary label with the maintainer's unless it says so. */
 const dictionary = new Map<string, Label>();
 for (const [id, { label: l }] of Object.entries(labelsIn(`${set}.dictionary.json`) as unknown as Record<string, { label: string }>)) if (isLabel(l) && !truth.has(id)) dictionary.set(id, l);
@@ -58,6 +67,8 @@ const pct = (a: number, b: number) => (b ? `${a}/${b} (${((100 * a) / b).toFixed
 const upper = (n: number) => (n ? `${(100 * (1 - 0.05 ** (1 / n))).toFixed(1)}%` : "n/a");
 
 console.log(`# ${set}: ${pairs.length} pairs, ${pairs.filter((p) => truth.has(p.id)).length} with a label${dictionary.size ? ` and ${pairs.filter((p) => dictionary.has(p.id)).length} more from the dictionary` : ""}, runs ${runs.join(", ")}`);
+
+if (relabelled || withdrawn) console.log(`  the second look changed ${relabelled} labels and withdrew ${withdrawn}`);
 
 // ---- 1. agreement, run by run ---------------------------------------------
 console.log("\n## Agreement with the labels, by run (a rhyme counts only when its reading verifies)");

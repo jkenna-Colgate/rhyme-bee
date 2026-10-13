@@ -1,15 +1,87 @@
 {
- "bidets|AE M Z": { "label": "no-rhyme", "mw": "bidet bi-ˈdā", "why": "ends \"DAYZ\"; the key is \"AMZ\"" },
- "beignets|AE M Z": { "label": "no-rhyme", "mw": "beignet ˌben-ˈyā", "why": "ends \"YAYZ\"; the key is \"AMZ\"" },
- "kiter|AY T ER": { "label": "rhyme", "mw": "kiter ˈkītə(r)", "why": "\"KY-tur\" against the \"RY-tur\" of typewriter" },
- "oratorial|AO R IY AH L": { "label": "rhyme", "mw": "oratorial ¦ȯrə¦tōrēəl, -tȯr-", "why": "\"TOR-ee-ul\", as tutorial" },
- "armorial|AO R IY AH L": { "label": "rhyme", "mw": "armorial är-ˈmȯr-ē-əl", "why": "\"MOR-ee-ul\", as tutorial" },
- "purgatorial|AO R IY AH L": { "label": "rhyme", "mw": "purgatorial ˌpər-gə-ˈtȯr-ē-əl", "why": "\"TOR-ee-ul\", as tutorial" },
- "jocose|OW S": { "label": "rhyme", "mw": "jocose jō-ˈkōs", "why": "ends \"KOHS\" with an s, where the engine reads a z" },
- "liberality|AE L AH T IY": { "label": "rhyme", "mw": "liberality ˌli-bə-ˈra-lə-tē", "why": "\"RA-luh-tee\", as hospitality" },
- "trawls|AA L Z": { "label": "rhyme", "mw": "trawl ˈtrȯl, plural trawls", "why": "\"TRAWLZ\", and the cot-caught merger makes it \"TRAHLZ\"" },
- "slaker|EY K ER": { "label": "rhyme", "mw": "slake ˈslāk; slaker -kə(r)", "why": "\"SLAY-kur\", as maker" },
- "irresolution|UW SH AH N": { "label": "rhyme", "mw": "resolution ˌre-zə-ˈlü-shən; irresolution is given as the prefix on it", "why": "\"LOO-shun\", as constitution" },
- "miaow|AW": { "label": "rhyme", "mw": "miaow is the British spelling of meow, mē-ˈau̇", "why": "ends \"OW\", as eyebrow" },
- "colones|OW N Z": { "label": "no-rhyme", "mw": "colón kə-ˈlōn, plural colones kə-ˈlō-ˌnās", "why": "this spelling ends \"nayss\"; the key is \"OHNZ\"" }
+ "bidets|AE M Z": {
+  "label": "no-rhyme",
+  "mw": "bidet bi-ˈdā",
+  "why": "ends \"DAYZ\"; the key is \"AMZ\""
+ },
+ "beignets|AE M Z": {
+  "label": "no-rhyme",
+  "mw": "beignet ˌben-ˈyā",
+  "why": "ends \"YAYZ\"; the key is \"AMZ\""
+ },
+ "kiter|AY T ER": {
+  "label": "rhyme",
+  "mw": "kiter ˈkītə(r)",
+  "why": "\"KY-tur\" against the \"RY-tur\" of typewriter"
+ },
+ "oratorial|AO R IY AH L": {
+  "label": "rhyme",
+  "mw": "oratorial ¦ȯrə¦tōrēəl, -tȯr-",
+  "why": "\"TOR-ee-ul\", as tutorial"
+ },
+ "armorial|AO R IY AH L": {
+  "label": "rhyme",
+  "mw": "armorial är-ˈmȯr-ē-əl",
+  "why": "\"MOR-ee-ul\", as tutorial"
+ },
+ "purgatorial|AO R IY AH L": {
+  "label": "rhyme",
+  "mw": "purgatorial ˌpər-gə-ˈtȯr-ē-əl",
+  "why": "\"TOR-ee-ul\", as tutorial"
+ },
+ "jocose|OW S": {
+  "label": "rhyme",
+  "mw": "jocose jō-ˈkōs",
+  "why": "ends \"KOHS\" with an s, where the engine reads a z"
+ },
+ "liberality|AE L AH T IY": {
+  "label": "rhyme",
+  "mw": "liberality ˌli-bə-ˈra-lə-tē",
+  "why": "\"RA-luh-tee\", as hospitality"
+ },
+ "trawls|AA L Z": {
+  "label": "rhyme",
+  "mw": "trawl ˈtrȯl, plural trawls",
+  "why": "\"TRAWLZ\", and the cot-caught merger makes it \"TRAHLZ\""
+ },
+ "slaker|EY K ER": {
+  "label": "rhyme",
+  "mw": "slake ˈslāk; slaker -kə(r)",
+  "why": "\"SLAY-kur\", as maker"
+ },
+ "irresolution|UW SH AH N": {
+  "label": "rhyme",
+  "mw": "resolution ˌre-zə-ˈlü-shən; irresolution is given as the prefix on it",
+  "why": "\"LOO-shun\", as constitution"
+ },
+ "miaow|AW": {
+  "label": "rhyme",
+  "mw": "miaow is the British spelling of meow, mē-ˈau̇",
+  "why": "ends \"OW\", as eyebrow"
+ },
+ "colones|OW N Z": {
+  "label": "no-rhyme",
+  "mw": "colón kə-ˈlōn, plural colones kə-ˈlō-ˌnās",
+  "why": "this spelling ends \"nayss\"; the key is \"OHNZ\""
+ },
+ "valise|IY S": {
+  "label": "rhyme",
+  "mw": "valise və-ˈlēs",
+  "why": "\"vuh-LEESS\", as police; left out on the second look"
+ },
+ "naker|EY K ER": {
+  "label": "rhyme",
+  "mw": "naker ˈnākə(r)",
+  "why": "\"NAY-kur\", as maker; left out on the second look"
+ },
+ "trow|AW": {
+  "label": "no-rhyme",
+  "mw": "trow ˈtrō",
+  "why": "\"TROH\"; the key is \"OW\" as in brow; left out on the second look"
+ },
+ "triter|AY T ER": {
+  "label": "rhyme",
+  "mw": "trite ˈtrīt; triter",
+  "why": "\"TRY-tur\", as the \"RY-tur\" of typewriter; left out on the second look"
+ }
 }
