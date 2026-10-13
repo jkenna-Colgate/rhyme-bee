@@ -1,0 +1,182 @@
+{
+ "codpiece|IY S": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "tomorrowing|OW IH NG": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 0,
+  "disputed": true
+ },
+ "mown|OW N Z": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 0,
+  "disputed": false
+ },
+ "swag|AE G": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "valise|IY S": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "peering|IH R IH NG": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "product|AH K T": {
+  "label": "no-rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 0,
+  "disputed": false
+ },
+ "humility|IH L AH T IY": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "sonneteer|IH R": {
+  "label": "rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "unended|EH N D IH D": {
+  "label": "rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "gazer|EY N ER": {
+  "label": "no-rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 0,
+  "disputed": false
+ },
+ "privateer|IH R": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "trow|AW": {
+  "label": "rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 0,
+  "disputed": true
+ },
+ "triter|AY T ER": {
+  "label": "rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "twit|IH T": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "headpiece|IY S": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "personality|AE L AH T IY": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "spatially|EH N SH AH L IY": {
+  "label": "rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 0,
+  "disputed": true
+ },
+ "refilling|IH L IH NG": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "bonbons|AA N Z": {
+  "label": "no-rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "clinks|IH NG K S": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "verbose|OW S": {
+  "label": "no-rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "buccaneering|IH R IH NG": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "naker|EY K ER": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "reappearing|IH R IH NG": {
+  "label": "rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": false
+ },
+ "cruder|UW T ER": {
+  "label": "rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 0,
+  "disputed": true
+ },
+ "pedigreed|IY D": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "poor|UH R": {
+  "label": "no-rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ },
+ "gazer|AY Z ER": {
+  "label": "no-rhyme",
+  "from": "maintainer",
+  "runsThatSaidRhyme": 0,
+  "disputed": false
+ },
+ "scrag|AE G": {
+  "label": "no-rhyme",
+  "from": "rules",
+  "runsThatSaidRhyme": 5,
+  "disputed": true
+ }
+}

@@ -1,0 +1,796 @@
+[
+ {
+  "id": "codpiece|IY S",
+  "word": "codpiece",
+  "seedWord": "police",
+  "rhymeKey": "IY S",
+  "seedReading": "P AH0 L IY1 S",
+  "seedRespelling": "puh-LEE-s",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "K AA1 D P IY2 S",
+    "head": "cod",
+    "tail": "piece"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "tomorrowing|OW IH NG",
+  "word": "tomorrowing",
+  "seedWord": "ongoing",
+  "rhymeKey": "OW IH NG",
+  "seedReading": "AA1 N G OW2 IH0 NG",
+  "seedRespelling": "AH-ngoh-ih-ng",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "tomorrow",
+     "readings": [
+      "T AH0 M AA1 R OW2",
+      "T UW0 M AA1 R OW2"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "mown|OW N Z",
+  "word": "mown",
+  "seedWord": "crossbones",
+  "rhymeKey": "OW N Z",
+  "seedReading": "K R AA1 S B OW2 N Z",
+  "seedRespelling": "KRAH-sboh-nz",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "swag|AE G",
+  "word": "swag",
+  "seedWord": "rag",
+  "rhymeKey": "AE G",
+  "seedReading": "R AE1 G",
+  "seedRespelling": "RA-g",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "EH1 S W AE2 G",
+    "head": "s",
+    "tail": "wag"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "valise|IY S",
+  "word": "valise",
+  "seedWord": "police",
+  "rhymeKey": "IY S",
+  "seedReading": "P AH0 L IY1 S",
+  "seedRespelling": "puh-LEE-s",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "peering|IH R IH NG",
+  "word": "peering",
+  "seedWord": "bioengineering",
+  "rhymeKey": "IH R IH NG",
+  "seedReading": "B AY2 OW0 EH2 N JH AH0 N IH1 R IH0 NG",
+  "seedRespelling": "beye-oh-eh-njuh-NIH-rih-ng",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P IY1 R IH0 NG",
+     "key": "IY R IH NG",
+     "respelling": "PEE-rih-ng"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "product|AH K T",
+  "word": "product",
+  "seedWord": "obstruct",
+  "rhymeKey": "AH K T",
+  "seedReading": "AH0 B S T R AH1 K T",
+  "seedRespelling": "uh-BSTRUH-kt",
+  "kind": "stress",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P R AA1 D AH0 K T",
+     "key": "AA D AH K T",
+     "respelling": "PRAH-duh-kt"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "humility|IH L AH T IY",
+  "word": "humility",
+  "seedWord": "utility",
+  "rhymeKey": "IH L AH T IY",
+  "seedReading": "Y UW0 T IH1 L AH0 T IY0",
+  "seedRespelling": "yoo-TIH-luh-tee",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "HH Y UW0 M IH1 L IH0 T IY0",
+     "key": "IH L IH T IY",
+     "respelling": "hyoo-MIH-lih-tee"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "sonneteer|IH R",
+  "word": "sonneteer",
+  "seedWord": "engineer",
+  "rhymeKey": "IH R",
+  "seedReading": "EH1 N JH AH0 N IH1 R",
+  "seedRespelling": "EH-njuh-nih-r",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "S AA1 N T IH2 R",
+    "head": "sonne",
+    "tail": "teer"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "unended|EH N D IH D",
+  "word": "unended",
+  "seedWord": "splendid",
+  "rhymeKey": "EH N D IH D",
+  "seedReading": "S P L EH1 N D IH0 D",
+  "seedRespelling": "SPLEH-ndih-d",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "AH1 N EH2 N D IH0 D",
+    "head": "un",
+    "tail": "ended"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "gazer|EY N ER",
+  "word": "gazer",
+  "seedWord": "trainer",
+  "rhymeKey": "EY N ER",
+  "seedReading": "T R EY1 N ER0",
+  "seedRespelling": "TRAY-nur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "privateer|IH R",
+  "word": "privateer",
+  "seedWord": "engineer",
+  "rhymeKey": "IH R",
+  "seedReading": "EH1 N JH AH0 N IH1 R",
+  "seedRespelling": "EH-njuh-nih-r",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "trow|AW",
+  "word": "trow",
+  "seedWord": "eyebrow",
+  "rhymeKey": "AW",
+  "seedReading": "AY1 B R AW2",
+  "seedRespelling": "EYE-brow",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "T R OW1",
+     "key": "OW",
+     "respelling": "TROH"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "triter|AY T ER",
+  "word": "triter",
+  "seedWord": "typewriter",
+  "rhymeKey": "AY T ER",
+  "seedReading": "T AY1 P R AY2 T ER0",
+  "seedRespelling": "TEYE-preye-tur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "T IY1 R AY2 T ER0",
+    "head": "t",
+    "tail": "riter"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "twit|IH T",
+  "word": "twit",
+  "seedWord": "quit",
+  "rhymeKey": "IH T",
+  "seedReading": "K W IH1 T",
+  "seedRespelling": "KWIH-t",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "T IY1 W IH2 T",
+    "head": "t",
+    "tail": "wit"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "headpiece|IY S",
+  "word": "headpiece",
+  "seedWord": "police",
+  "rhymeKey": "IY S",
+  "seedReading": "P AH0 L IY1 S",
+  "seedRespelling": "puh-LEE-s",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "HH EH1 D P IY2 S",
+    "head": "head",
+    "tail": "piece"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "personality|AE L AH T IY",
+  "word": "personality",
+  "seedWord": "hospitality",
+  "rhymeKey": "AE L AH T IY",
+  "seedReading": "HH AA2 S P AH0 T AE1 L AH0 T IY0",
+  "seedRespelling": "hah-spuh-TA-luh-tee",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P ER2 S AH0 N AE1 L IH0 T IY0",
+     "key": "AE L IH T IY",
+     "respelling": "pur-suh-NA-lih-tee"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "spatially|EH N SH AH L IY",
+  "word": "spatially",
+  "seedWord": "essentially",
+  "rhymeKey": "EH N SH AH L IY",
+  "seedReading": "EH0 S EH1 N SH AH0 L IY0",
+  "seedRespelling": "eh-SEH-nshuh-lee",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "refilling|IH L IH NG",
+  "word": "refilling",
+  "seedWord": "schilling",
+  "rhymeKey": "IH L IH NG",
+  "seedReading": "SH IH1 L IH0 NG",
+  "seedRespelling": "SHIH-lih-ng",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "refill",
+     "readings": [
+      "R IY1 F IH0 L",
+      "R IY0 F IH1 L"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "R EY1 F IH2 L IH0 NG",
+    "head": "re",
+    "tail": "filling"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "bonbons|AA N Z",
+  "word": "bonbons",
+  "seedWord": "bronze",
+  "rhymeKey": "AA N Z",
+  "seedReading": "B R AA1 N Z",
+  "seedRespelling": "BRAH-nz",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "clinks|IH NG K S",
+  "word": "clinks",
+  "seedWord": "sphinx",
+  "rhymeKey": "IH NG K S",
+  "seedReading": "S F IH1 NG K S",
+  "seedRespelling": "SFIH-ngks",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "clink",
+     "readings": [
+      "K L IH1 NG K"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "S IY1 L IH2 NG K S",
+    "head": "c",
+    "tail": "links"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "verbose|OW S",
+  "word": "verbose",
+  "seedWord": "glucose",
+  "rhymeKey": "OW S",
+  "seedReading": "G L UW1 K OW2 S",
+  "seedRespelling": "GLOO-koh-s",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "buccaneering|IH R IH NG",
+  "word": "buccaneering",
+  "seedWord": "bioengineering",
+  "rhymeKey": "IH R IH NG",
+  "seedReading": "B AY2 OW0 EH2 N JH AH0 N IH1 R IH0 NG",
+  "seedRespelling": "beye-oh-eh-njuh-NIH-rih-ng",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "buccaneer",
+     "readings": [
+      "B AH2 K AH0 N IY1 R"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "naker|EY K ER",
+  "word": "naker",
+  "seedWord": "maker",
+  "rhymeKey": "EY K ER",
+  "seedReading": "M EY1 K ER0",
+  "seedRespelling": "MAY-kur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "EH1 N EY2 K ER0",
+    "head": "n",
+    "tail": "aker"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "reappearing|IH R IH NG",
+  "word": "reappearing",
+  "seedWord": "bioengineering",
+  "rhymeKey": "IH R IH NG",
+  "seedReading": "B AY2 OW0 EH2 N JH AH0 N IH1 R IH0 NG",
+  "seedRespelling": "beye-oh-eh-njuh-NIH-rih-ng",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "reappear",
+     "readings": [
+      "R IY2 AH0 P IH1 R"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": {
+    "phonemes": "R EY1 AH0 P IH2 R IH0 NG",
+    "head": "re",
+    "tail": "appearing"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "cruder|UW T ER",
+  "word": "cruder",
+  "seedWord": "computer",
+  "rhymeKey": "UW T ER",
+  "seedReading": "K AH0 M P Y UW1 T ER0",
+  "seedRespelling": "kuh-MPYOO-tur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "pedigreed|IY D",
+  "word": "pedigreed",
+  "seedWord": "succeed",
+  "rhymeKey": "IY D",
+  "seedReading": "S AH0 K S IY1 D",
+  "seedRespelling": "suh-KSEE-d",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [
+    {
+     "word": "pedigree",
+     "readings": [
+      "P EH1 D AH0 G R IY0"
+     ],
+     "rhymes": false
+    }
+   ],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "poor|UH R",
+  "word": "poor",
+  "seedWord": "cure",
+  "rhymeKey": "UH R",
+  "seedReading": "K Y UH1 R",
+  "seedRespelling": "KYUU-r",
+  "kind": "wrong-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [
+    {
+     "phonemes": "P UW1 R",
+     "key": "UW R",
+     "respelling": "POO-r"
+    }
+   ],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "gazer|AY Z ER",
+  "word": "gazer",
+  "seedWord": "synthesizer",
+  "rhymeKey": "AY Z ER",
+  "seedReading": "S IH1 N TH AH0 S AY2 Z ER0",
+  "seedRespelling": "SIH-nthuh-seye-zur",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": null
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ },
+ {
+  "id": "scrag|AE G",
+  "word": "scrag",
+  "seedWord": "rag",
+  "rhymeKey": "AE G",
+  "seedReading": "R AE1 G",
+  "seedRespelling": "RA-g",
+  "kind": "no-reading",
+  "source": "synthetic",
+  "producedBy": 1,
+  "evidence": {
+   "isWord": true,
+   "isName": false,
+   "readings": [],
+   "relatives": [],
+   "composed": {
+    "phonemes": "EH1 S K R AE2 G",
+    "head": "s",
+    "tail": "crag"
+   }
+  },
+  "rule": {
+   "verdict": "ask",
+   "why": "A second look at a pair that already has a label. Nothing about that label is shown."
+  }
+ }
+]
