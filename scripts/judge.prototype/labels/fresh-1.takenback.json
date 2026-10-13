@@ -1,0 +1,12 @@
+{
+ "verbose|OW S": {
+  "label": "rhyme",
+  "was": "no-rhyme",
+  "why": "taken back by the maintainer on 2026-10-13, after seeing that the judge ruled Rhyme and that the dictionary marks a secondary stress on the last syllable of glucose. Not a blind ruling."
+ },
+ "pedigreed|IY D": {
+  "label": "rhyme",
+  "was": "no-rhyme",
+  "why": "taken back by the maintainer on 2026-10-13, after seeing that the judge ruled Rhyme and that Merriam-Webster marks a secondary stress on the last syllable of pedigree. Not a blind ruling."
+ }
+}

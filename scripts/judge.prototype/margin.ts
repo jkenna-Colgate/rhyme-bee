@@ -49,6 +49,9 @@ for (const [id, l] of Object.entries(labelsIn(`${set}-recheck.labels.json`))) {
   if (isLabel(l)) { if (old?.label !== l) relabelled++; truth.set(id, { label: l, from: "maintainer" }); }
   else if (l === "out" && (old?.from === "maintainer" || was[id]?.disputed)) { truth.delete(id); withdrawn++; }
 }
+// Rulings the maintainer took back in conversation, having seen the judge's side. Not blind, so the count is printed.
+let takenBack = 0;
+for (const [id, { label: l }] of Object.entries(labelsIn(`${set}.takenback.json`) as unknown as Record<string, { label: string }>)) if (isLabel(l)) { truth.set(id, { label: l, from: "maintainer" }); takenBack++; }
 /** Kept out of `truth`, so no figure mixes a dictionary label with the maintainer's unless it says so. */
 const dictionary = new Map<string, Label>();
 for (const [id, { label: l }] of Object.entries(labelsIn(`${set}.dictionary.json`) as unknown as Record<string, { label: string }>)) if (isLabel(l) && !truth.has(id)) dictionary.set(id, l);
@@ -69,6 +72,7 @@ const upper = (n: number) => (n ? `${(100 * (1 - 0.05 ** (1 / n))).toFixed(1)}%`
 console.log(`# ${set}: ${pairs.length} pairs, ${pairs.filter((p) => truth.has(p.id)).length} with a label${dictionary.size ? ` and ${pairs.filter((p) => dictionary.has(p.id)).length} more from the dictionary` : ""}, runs ${runs.join(", ")}`);
 
 if (relabelled || withdrawn) console.log(`  the second look changed ${relabelled} labels and withdrew ${withdrawn}`);
+if (takenBack) console.log(`  ${takenBack} rulings were taken back after the judge's side was seen; without that file the figures are the blind ones`);
 
 // ---- 1. agreement, run by run ---------------------------------------------
 console.log("\n## Agreement with the labels, by run (a rhyme counts only when its reading verifies)");
