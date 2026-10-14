@@ -252,3 +252,87 @@ reach measured, error rate stated, guardrails intact.
 
 The header in `data/supplement.dict` that says "three normalisation rules" is
 corrected when the rules are built.
+
+## Amendment, 2026-10-14: the Judge writes readings with nobody reviewing them
+
+Settled in
+[How do a judge's corrections land with nobody reviewing them?](https://github.com/jkenna-Colgate/rhyme-bee/issues/238).
+The supplement was written by hand, and ADR-0009 made it a human override for
+that reason. It now has a second author: the Judge (GLOSSARY.md), in a Batch
+or in the Appeals job ([ADR-0021](./0021-the-unattended-loop-calls-a-model-in-one-place.md)),
+with nobody reading the line before it lands. The freeze is untouched. A line
+the Judge writes is data about one word, global like every other correction,
+and no rule.
+
+### The one write it makes
+
+The Judge writes a reading only on a **Missing Reading**: the word has no
+reading at all, the Judge rules it a Rhyme at high confidence, the reading it
+gives reaches the Rhyme Key under the engine's own rule, and a separate
+question finds it a word rather than a name or a non-word. Nothing else it
+rules writes a reading. An **Overrule** of a reading the engine has, and a
+Missing Reading at medium confidence, are listed as Unconfirmed Rhymes, a
+committed list keyed on the word and the Rhyme Key together (ADR-0017's
+amendment says what each ruling does). Every write is listed in the run report.
+
+Because the word had no reading, the write never has to choose between joining
+and replacing (ADR-0017). That choice stays with the editor.
+
+### The margin
+
+Measured on two labelled sets of about 200 pairs each: five runs of `heldout-2`
+and five of a fresh set cut on Rhyme Keys the Judge had never seen.
+
+- **About 145 distinct pairs were written across both sets, and none is wrong**
+  on the labels as they stand. That bounds the true rate near 2%.
+- **On the maintainer's blind labels, 10 of 335 written pair-runs were wrong**,
+  1.7% at the real mix. They were two pairs, `verbose` for `glucose` and
+  `pedigreed` for `succeed`, both resting on a secondary stress the dictionary
+  marks, and the maintainer took both rulings back after seeing the Judge's.
+  They are counted apart for that reason.
+- **The Judge's misses are systematic, not noisy.** 3 of 196 pairs flip across
+  five runs, and it refuses `cruder` for `computer` in every one. Repeating a
+  run cannot catch a systematic miss.
+
+### Rejected
+
+**Every run must agree.** It removed no wrong accept on either set and cost 9
+right ones. Five runs of one model share its blind spots.
+
+**A second model must agree.** It is the only check that answers a systematic
+miss, and nothing measured is left for it to catch. The Appeals job runs one
+fixed model on the maintainer's subscription, another Claude model likely
+shares the first one's blind spots, and a model from elsewhere needs a key and a
+margin of its own.
+
+**Keep hard pairs out by a condition on secondary stress.** 30 of the 77 pairs
+one run writes rest on a secondary stress, and all 30 are real Rhymes. A
+condition aimed at two pairs is fitted to this data and not to the game.
+
+**Let the rules decide without a model.** The prototype's hand-written rules
+called 85 pairs a Rhyme and none is known wrong, which still allows a rate near
+3.5%. Their "no Rhyme" was wrong on 7 of 47 pairs with no reading. The Judge
+rules on every Candidate, which is how the margin above was measured, and the
+rules remain a labelling tool.
+
+**Write nothing unattended.** Every Missing Reading would wait as an Unconfirmed
+Rhyme. A missing reading is the commonest Trust failure players meet
+([#222](https://github.com/jkenna-Colgate/rhyme-bee/issues/222)), and this would
+leave every one of them unscored until an Editor's Pass.
+
+**Mark a reading in the supplement as unconfirmed.** A Tier belongs to a word,
+so the mark would have to live on one reading and reach adjudication as "no
+Points on this Rhyme Key only". The committed list of word and Rhyme Key pairs
+does the same with no change to how readings are read.
+
+**Ask about wordhood inside the rhyme question.** A third verdict in the same
+prompt caught the names, and the Judge grew less sure of real Rhymes: on one
+run of each set the real Rhymes it did not write rose from 3 to 7 per run to 11,
+and from 2 to 4 to 6. Asked apart, the rhyme prompt stays the one measured.
+
+### The Demotion list does not gain an author
+
+The Judge never writes a Demotion. A word it finds to be a name or a non-word,
+at any confidence, writes nothing and waits for the editor as a suggested
+Demotion carrying its reason. The list stays hand-curated and bounded by
+measurement, as the first amendment requires.
