@@ -330,9 +330,18 @@ prompt caught the names, and the Judge grew less sure of real Rhymes: on one
 run of each set the real Rhymes it did not write rose from 3 to 7 per run to 11,
 and from 2 to 4 to 6. Asked apart, the rhyme prompt stays the one measured.
 
-### The Demotion list does not gain an author
+### A Candidate never makes a Demotion
 
-The Judge never writes a Demotion. A word it finds to be a name or a non-word,
-at any confidence, writes nothing and waits for the editor as a suggested
-Demotion carrying its reason. The list stays hand-curated and bounded by
-measurement, as the first amendment requires.
+The Judge writes no Demotion from a Candidate. A word it finds to be a name or
+a non-word, at any confidence, writes nothing and waits for the editor as a
+suggested Demotion carrying its reason. The list stays hand-curated and bounded
+by measurement, as the first amendment requires.
+
+### What this does not settle
+
+Everything above is about Candidates: words a player or a Synthetic Player
+submitted that the game did not score. A doubtful Answer, a word the game
+already scores that may be a name or may not rhyme, is found by hunting No
+False Accepts, and whether a Demotion or a replacing correction may land on it
+unattended is still open on
+[#218](https://github.com/jkenna-Colgate/rhyme-bee/issues/218).
