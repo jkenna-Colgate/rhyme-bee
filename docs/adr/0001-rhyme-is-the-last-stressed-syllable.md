@@ -93,3 +93,31 @@ in either order and no more.
 Two changes to how words are read were ruled in the same ticket and are recorded
 in [ADR-0011](./0011-reading-manufacture-is-frozen.md)'s amendment of this date.
 Neither changes this rule.
+
+## Amendment (2026-10-14)
+
+**The substitution property binds every correction, not only readings.**
+([#236](https://github.com/jkenna-Colgate/rhyme-bee/issues/236)) A correction
+attaches to a word, or to a word on one Rhyme Key. It never attaches to a pair
+of words, a Seed Word, a date or a single Puzzle. A reading follows its word
+into every Puzzle; a Tier verdict (`data/tier-overrides.csv`) and a Demotion name
+the word alone; a Decline and an Unconfirmed Rhyme name the word and the Rhyme
+Key, so they hold on every day that key is played, whichever Seed Word stands
+for it.
+
+The reason is the Schedule's repair (ADR-0012, amended): a Seed Word that no
+longer pins can be replaced by its family's lead word, and the player gets the
+same Puzzle only because Rhyme has this property. A correction written against
+the Seed Word `trick`, or against its date, is lost the day `stick` stands in
+for it, or on the next lap.
+
+Every correction written today already meets this. The route by which a breach
+could arrive is the Tier move made from Session Records (an Answer nobody found
+becomes a Bonus Word): a Session Record describes one day, so the natural way to
+build that job is to write per day. It must write per word.
+
+This is not a part of the Playability Bar. The bar's parts are outcomes held
+within a margin; this holds exactly, by construction, and constrains which
+levers may be used rather than what a player sees. It covers scoring only:
+what is accepted without Points (a Weak Rhyme, an Unconfirmed Rhyme across
+Rhyme Keys) is exempt, as above and in ADR-0020.
