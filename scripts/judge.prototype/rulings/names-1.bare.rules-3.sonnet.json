@@ -1,0 +1,269 @@
+{
+ "oct|AA K T": {
+  "word": "oct",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "It is an abbreviation (October, octal), not an English word."
+ },
+ "nepal|AA L": {
+  "word": "nepal",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is only a place name."
+ },
+ "mark|AA R K": {
+  "word": "mark",
+  "verdict": "rhyme",
+  "reading": "M AA1 R K",
+  "confidence": "high",
+  "why": "It has the same rime as 'park', AA1 R K.",
+  "verified": true
+ },
+ "arx|AA R K S": {
+  "word": "arx",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "It is a Latin term or fragment, not an English word."
+ },
+ "marx|AA R K S": {
+  "word": "marx",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "It is a surname (Karl Marx), not a common word."
+ },
+ "jack|AE K": {
+  "word": "jack",
+  "verdict": "rhyme",
+  "reading": "JH AE1 K",
+  "confidence": "high",
+  "why": "It has the same rime as 'back', AE1 K.",
+  "verified": true
+ },
+ "franz|AE N T S": {
+  "word": "franz",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "It is only a personal name."
+ },
+ "frank|AE NG K": {
+  "word": "frank",
+  "verdict": "rhyme",
+  "reading": "F R AE1 NG K",
+  "confidence": "high",
+  "why": "It has the same rime as 'bank', AE1 NG K.",
+  "verified": true
+ },
+ "pat|AE T": {
+  "word": "pat",
+  "verdict": "rhyme",
+  "reading": "P AE1 T",
+  "confidence": "high",
+  "why": "Same rime AE1 T as hat.",
+  "verified": true
+ },
+ "batz|AE T S": {
+  "word": "batz",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Not an English word, only a surname or misspelling."
+ },
+ "storting|AO R T IH NG": {
+  "word": "storting",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Norwegian parliament name, a foreign word that is not English."
+ },
+ "schwarz|AO R T S": {
+  "word": "schwarz",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "A German surname, not an English word."
+ },
+ "azores|AO R Z": {
+  "word": "azores",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "A place name, not a common word."
+ },
+ "versailles|AY": {
+  "word": "versailles",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "A place name, not a common word."
+ },
+ "heinz|AY N Z": {
+  "word": "heinz",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "A brand and surname, not a common word."
+ },
+ "schelling|EH L IH NG": {
+  "word": "schelling",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "A surname (the philosopher), not a common English word."
+ },
+ "fels|EH L Z": {
+  "word": "fels",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Only a name or German word for rock; the English plural is spelled 'fells'."
+ },
+ "ers|ER Z": {
+  "word": "ers",
+  "verdict": "rhyme",
+  "reading": "ER1 Z",
+  "confidence": "medium",
+  "why": "'Ers' is a word (bitter vetch), said like 'errs', with the same key as 'furs'.",
+  "verified": true
+ },
+ "ray|EY": {
+  "word": "ray",
+  "verdict": "rhyme",
+  "reading": "R EY1",
+  "confidence": "high",
+  "why": "Same EY rime as 'day'.",
+  "verified": true
+ },
+ "grace|EY S": {
+  "word": "grace",
+  "verdict": "rhyme",
+  "reading": "G R EY1 S",
+  "confidence": "high",
+  "why": "Same EY S rime as 'face'.",
+  "verified": true
+ },
+ "kate|EY T": {
+  "word": "kate",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Only a personal name, not a common English word."
+ },
+ "rick|IH K": {
+  "word": "rick",
+  "verdict": "rhyme",
+  "reading": "R IH1 K",
+  "confidence": "high",
+  "why": "'Rick' (a haystack) shares the IH K rime with 'trick'.",
+  "verified": true
+ },
+ "bill|IH L": {
+  "word": "bill",
+  "verdict": "rhyme",
+  "reading": "B IH1 L",
+  "confidence": "high",
+  "why": "Same IH L rime as 'hill'.",
+  "verified": true
+ },
+ "will|IH L": {
+  "word": "will",
+  "verdict": "rhyme",
+  "reading": "W IH1 L",
+  "confidence": "high",
+  "why": "Same IH L rime as 'still'.",
+  "verified": true
+ },
+ "sheard|IH R D": {
+  "word": "sheard",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Surname/misspelling; not an English word (sheared would be spelled differently)."
+ },
+ "algiers|IH R Z": {
+  "word": "algiers",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "Name of a city, not an English common word."
+ },
+ "kish|IH SH": {
+  "word": "kish",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Only a name (ancient city, given name) or a fragment, not a standard English word."
+ },
+ "lish|IH SH": {
+  "word": "lish",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "A fragment or slang form, not a standard English word."
+ },
+ "preceeding|IY D IH NG": {
+  "word": "preceeding",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "Misspelling of 'preceding'."
+ },
+ "niels|IY L Z": {
+  "word": "niels",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "high",
+  "why": "A personal name (Niels), not an English word."
+ },
+ "hiems|IY M Z": {
+  "word": "hiems",
+  "verdict": "not-a-word",
+  "reading": null,
+  "confidence": "medium",
+  "why": "Latin word for winter, not an English word."
+ },
+ "rhodes|OW D Z": {
+  "word": "rhodes",
+  "verdict": "rhyme",
+  "reading": "R OW1 D Z",
+  "confidence": "medium",
+  "why": "Also a common noun in 'Rhodes scholar' and a homophone of 'roads', so it matches the Rhyme Key OWDZ.",
+  "verified": true
+ },
+ "rose|OW Z": {
+  "word": "rose",
+  "verdict": "rhyme",
+  "reading": "R OW1 Z",
+  "confidence": "high",
+  "why": "Same rime OW-Z as nose.",
+  "verified": true
+ },
+ "troy|OY": {
+  "word": "troy",
+  "verdict": "rhyme",
+  "reading": "T R OY1",
+  "confidence": "medium",
+  "why": "Troy is also a common word (troy weight) and has the rime OY like boy.",
+  "verified": true
+ },
+ "sue|UW": {
+  "word": "sue",
+  "verdict": "rhyme",
+  "reading": "S UW1",
+  "confidence": "high",
+  "why": "Same rime UW as blue.",
+  "verified": true
+ },
+ "june|UW N": {
+  "word": "june",
+  "verdict": "rhyme",
+  "reading": "JH UW1 N",
+  "confidence": "high",
+  "why": "Same rime UW-N as moon.",
+  "verified": true
+ }
+}

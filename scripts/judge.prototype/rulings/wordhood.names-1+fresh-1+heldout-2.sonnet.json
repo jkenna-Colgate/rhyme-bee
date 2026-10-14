@@ -1,0 +1,2588 @@
+{
+ "clocker": {
+  "word": "clocker",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "A clocker is one who clocks, such as a timer of races; it is listed in dictionaries."
+ },
+ "clownish": {
+  "word": "clownish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard adjective meaning like a clown."
+ },
+ "codpiece": {
+  "word": "codpiece",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A pouch at the front of men's breeches."
+ },
+ "cohesion": {
+  "word": "cohesion",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "coincidental": {
+  "word": "coincidental",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English adjective."
+ },
+ "colones": {
+  "word": "colones",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Plural of colon, the Costa Rican and Salvadoran currency (colón)."
+ },
+ "comfit": {
+  "word": "comfit",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A sweet consisting of a nut or seed coated in sugar."
+ },
+ "complain": {
+  "word": "complain",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English verb."
+ },
+ "compulsory": {
+  "word": "compulsory",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English adjective."
+ },
+ "concurred": {
+  "word": "concurred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of concur."
+ },
+ "connection": {
+  "word": "connection",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "consorts": {
+  "word": "consorts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun or verb form of consort."
+ },
+ "conversation": {
+  "word": "conversation",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "convulse": {
+  "word": "convulse",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English verb."
+ },
+ "coos": {
+  "word": "coos",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun or verb form of coo."
+ },
+ "cored": {
+  "word": "cored",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of core."
+ },
+ "cosmologist": {
+  "word": "cosmologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A person who studies cosmology."
+ },
+ "cottage": {
+  "word": "cottage",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "coverlet": {
+  "word": "coverlet",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A bed covering."
+ },
+ "cowpox": {
+  "word": "cowpox",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A viral disease of cattle."
+ },
+ "bruiser": {
+  "word": "bruiser",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A bruiser is a tough, burly person or fighter."
+ },
+ "brutes": {
+  "word": "brutes",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'brute'."
+ },
+ "buccaneering": {
+  "word": "buccaneering",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of 'buccaneer', also an adjective/noun."
+ },
+ "busted": {
+  "word": "busted",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense/adjective of 'bust'."
+ },
+ "busts": {
+  "word": "busts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural/third-person form of 'bust'."
+ },
+ "butternut": {
+  "word": "butternut",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A tree and its nut; also butternut squash."
+ },
+ "cabin": {
+  "word": "cabin",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "cakemaker": {
+  "word": "cakemaker",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Transparent compound of 'cake' and 'maker'."
+ },
+ "caker": {
+  "word": "caker",
+  "verdict": "not-a-word",
+  "confidence": "low",
+  "why": "Not a standard dictionary word; an uncommon agent-noun formation from 'cake'."
+ },
+ "calligraphy": {
+  "word": "calligraphy",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "The art of decorative handwriting."
+ },
+ "caulked": {
+  "word": "caulked",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'caulk'."
+ },
+ "charioteer": {
+  "word": "charioteer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A person who drives a chariot."
+ },
+ "cheroot": {
+  "word": "cheroot",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A cigar with open ends."
+ },
+ "chestnuts": {
+  "word": "chestnuts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'chestnut'."
+ },
+ "chickenpox": {
+  "word": "chickenpox",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A contagious viral disease."
+ },
+ "chocks": {
+  "word": "chocks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'chock', a wedge or block."
+ },
+ "choker": {
+  "word": "choker",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A close-fitting necklace, or one who chokes."
+ },
+ "chooser": {
+  "word": "chooser",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A person who chooses."
+ },
+ "clear": {
+  "word": "clear",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective/verb."
+ },
+ "clinks": {
+  "word": "clinks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural/third-person form of 'clink'."
+ },
+ "accessibility": {
+  "word": "accessibility",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "accessorial": {
+  "word": "accessorial",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Rare adjective meaning relating to an accessory."
+ },
+ "acid": {
+  "word": "acid",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun/adjective."
+ },
+ "actuality": {
+  "word": "actuality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "adhesion": {
+  "word": "adhesion",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "ahem": {
+  "word": "ahem",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English interjection."
+ },
+ "aided": {
+  "word": "aided",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of aid."
+ },
+ "airsick": {
+  "word": "airsick",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective."
+ },
+ "algiers": {
+  "word": "algiers",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "Capital city of Algeria."
+ },
+ "amniotic": {
+  "word": "amniotic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective relating to the amnion."
+ },
+ "anemometer": {
+  "word": "anemometer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Instrument measuring wind speed."
+ },
+ "anguish": {
+  "word": "anguish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun/verb."
+ },
+ "anthropoid": {
+  "word": "anthropoid",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective/noun for ape-like."
+ },
+ "armorial": {
+  "word": "armorial",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective relating to heraldic arms."
+ },
+ "arx": {
+  "word": "arx",
+  "verdict": "not-a-word",
+  "confidence": "medium",
+  "why": "Latin for citadel; not an English word (abbreviation/fragment)."
+ },
+ "atmosphere": {
+  "word": "atmosphere",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "attends": {
+  "word": "attends",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of attend."
+ },
+ "attrition": {
+  "word": "attrition",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "auctioneer": {
+  "word": "auctioneer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "audiologist": {
+  "word": "audiologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "azores": {
+  "word": "azores",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "The Azores is a Portuguese island group, a place name."
+ },
+ "bamboozles": {
+  "word": "bamboozles",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of the verb 'bamboozle'."
+ },
+ "batz": {
+  "word": "batz",
+  "verdict": "not-a-word",
+  "confidence": "medium",
+  "why": "Not a standard English word; a surname or slang spelling."
+ },
+ "beauts": {
+  "word": "beauts",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Plural of 'beaut', an informal Australian/NZ word for something excellent."
+ },
+ "beignets": {
+  "word": "beignets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'beignet', a fried pastry."
+ },
+ "belaying": {
+  "word": "belaying",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of 'belay', a climbing and sailing term."
+ },
+ "besets": {
+  "word": "besets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of the verb 'beset'."
+ },
+ "besmirched": {
+  "word": "besmirched",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'besmirch'."
+ },
+ "bidets": {
+  "word": "bidets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'bidet'."
+ },
+ "biggin": {
+  "word": "biggin",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "A 'biggin' is a child's cap or a coffee pot; listed in dictionaries."
+ },
+ "bill": {
+  "word": "bill",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun and verb, also a name."
+ },
+ "bipod": {
+  "word": "bipod",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A two-legged support for a rifle or camera."
+ },
+ "bisect": {
+  "word": "bisect",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A verb meaning to divide into two parts."
+ },
+ "bitt": {
+  "word": "bitt",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A post on a ship's deck for securing cables."
+ },
+ "bluet": {
+  "word": "bluet",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A small blue flower or a type of damselfly."
+ },
+ "blunts": {
+  "word": "blunts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun or verb form of 'blunt'."
+ },
+ "bonbons": {
+  "word": "bonbons",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'bonbon', a sweet."
+ },
+ "borrowing": {
+  "word": "borrowing",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of 'borrow' and a noun."
+ },
+ "braided": {
+  "word": "braided",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense or adjective of 'braid'."
+ },
+ "bream": {
+  "word": "bream",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A freshwater fish."
+ },
+ "crewed": {
+  "word": "crewed",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'crew', a regular verb form."
+ },
+ "crocked": {
+  "word": "crocked",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Informal adjective meaning drunk or broken down."
+ },
+ "crocks": {
+  "word": "crocks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'crock', an earthenware pot."
+ },
+ "crossbreed": {
+  "word": "crossbreed",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun and verb for hybridizing."
+ },
+ "crosscut": {
+  "word": "crosscut",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English word, as in a crosscut saw."
+ },
+ "crosscuts": {
+  "word": "crosscuts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun or third-person verb form of 'crosscut'."
+ },
+ "cruder": {
+  "word": "cruder",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Comparative of 'crude'."
+ },
+ "crusader": {
+  "word": "crusader",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for one who joins a crusade or campaigns."
+ },
+ "crusty": {
+  "word": "crusty",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard adjective meaning having a crust or gruff."
+ },
+ "crypt": {
+  "word": "crypt",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for an underground chamber."
+ },
+ "cryptography": {
+  "word": "cryptography",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for the study of codes."
+ },
+ "curd": {
+  "word": "curd",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for coagulated milk."
+ },
+ "decimeter": {
+  "word": "decimeter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "American spelling of a metric unit of length."
+ },
+ "decision": {
+  "word": "decision",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "deer": {
+  "word": "deer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun for the animal."
+ },
+ "defraying": {
+  "word": "defraying",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of 'defray'."
+ },
+ "defrocked": {
+  "word": "defrocked",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'defrock', to remove from clerical office."
+ },
+ "demotic": {
+  "word": "demotic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective meaning popular or colloquial; also an Egyptian script."
+ },
+ "deports": {
+  "word": "deports",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person singular of 'deport'."
+ },
+ "derrick": {
+  "word": "derrick",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for a hoisting crane or oil-well tower, though also a given name."
+ },
+ "diameter": {
+  "word": "diameter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun in geometry."
+ },
+ "disport": {
+  "word": "disport",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Real English verb meaning to amuse oneself."
+ },
+ "dit": {
+  "word": "dit",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Morse code short signal; also a dialect/Scots word, listed in dictionaries."
+ },
+ "doctor": {
+  "word": "doctor",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun and verb."
+ },
+ "doer": {
+  "word": "doer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Regular English noun for one who does."
+ },
+ "dogfighting": {
+  "word": "dogfighting",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun/gerund of dogfight."
+ },
+ "dollar": {
+  "word": "dollar",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun for currency."
+ },
+ "earring": {
+  "word": "earring",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "eclair": {
+  "word": "eclair",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English word for the pastry, borrowed from French."
+ },
+ "effusion": {
+  "word": "effusion",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "egyptologist": {
+  "word": "egyptologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun for a student of Egyptology."
+ },
+ "elusion": {
+  "word": "elusion",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Rare but valid English noun meaning an escape or evasion."
+ },
+ "encored": {
+  "word": "encored",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of the verb encore."
+ },
+ "entity": {
+  "word": "entity",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "entrain": {
+  "word": "entrain",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Real English verb."
+ },
+ "ers": {
+  "word": "ers",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Ers is a valid dictionary word, a bitter vetch plant (ervil)."
+ },
+ "evolution": {
+  "word": "evolution",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "expends": {
+  "word": "expends",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person singular of expend."
+ },
+ "eyes": {
+  "word": "eyes",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of eye, also a verb form."
+ },
+ "facility": {
+  "word": "facility",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "faddish": {
+  "word": "faddish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard adjective meaning characterized by fads."
+ },
+ "faired": {
+  "word": "faired",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of the verb 'fare' or 'fair' (to streamline)."
+ },
+ "fatality": {
+  "word": "fatality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun meaning a death."
+ },
+ "fels": {
+  "word": "fels",
+  "verdict": "not-a-word",
+  "confidence": "medium",
+  "why": "Not a standard English word; German for rock, or a fragment (Fels is a surname)."
+ },
+ "filmography": {
+  "word": "filmography",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun for a list of films by a person."
+ },
+ "flavor": {
+  "word": "flavor",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun (American spelling)."
+ },
+ "flits": {
+  "word": "flits",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of the verb 'flit' or plural of the noun."
+ },
+ "fluter": {
+  "word": "fluter",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Rare word for a flute player or one who makes flutes/grooves."
+ },
+ "foots": {
+  "word": "foots",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Verb form of 'foot' (to foot the bill)."
+ },
+ "formality": {
+  "word": "formality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun meaning a conventional requirement."
+ },
+ "frank": {
+  "word": "frank",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common adjective, noun and verb, also a name."
+ },
+ "franz": {
+  "word": "franz",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "A German given name, not an English word."
+ },
+ "freebooter": {
+  "word": "freebooter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for a pirate or plunderer."
+ },
+ "frug": {
+  "word": "frug",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A 1960s dance, listed in dictionaries."
+ },
+ "funning": {
+  "word": "funning",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of the verb 'fun' (to joke)."
+ },
+ "futurologist": {
+  "word": "futurologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun for a person who studies or predicts the future."
+ },
+ "galoot": {
+  "word": "galoot",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Informal noun for a clumsy or awkward person."
+ },
+ "gazer": {
+  "word": "gazer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun for one who gazes."
+ },
+ "girlish": {
+  "word": "girlish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Adjective meaning like a girl."
+ },
+ "globetrotter": {
+  "word": "globetrotter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun for a person who travels widely."
+ },
+ "glug": {
+  "word": "glug",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A real English word meaning to gurgle or the sound of pouring liquid."
+ },
+ "gobstopper": {
+  "word": "gobstopper",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A large hard sweet; standard British English noun."
+ },
+ "grace": {
+  "word": "grace",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun that is also a name."
+ },
+ "graded": {
+  "word": "graded",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense/participle of grade."
+ },
+ "grandeur": {
+  "word": "grandeur",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for splendor."
+ },
+ "harmonica": {
+  "word": "harmonica",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A musical instrument."
+ },
+ "hatbox": {
+  "word": "hatbox",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Compound noun for a box for hats."
+ },
+ "headpiece": {
+  "word": "headpiece",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for headgear or a decorative piece."
+ },
+ "hearing": {
+  "word": "hearing",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun and -ing form of hear."
+ },
+ "heinz": {
+  "word": "heinz",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "A surname and brand (Heinz ketchup) and not a common noun."
+ },
+ "hellish": {
+  "word": "hellish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard adjective meaning like hell."
+ },
+ "hemlocks": {
+  "word": "hemlocks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of hemlock, a plant or tree."
+ },
+ "hiems": {
+  "word": "hiems",
+  "verdict": "not-a-word",
+  "confidence": "medium",
+  "why": "Latin for winter or a Shakespearean character name, not an English word in common use."
+ },
+ "historical": {
+  "word": "historical",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English adjective."
+ },
+ "holography": {
+  "word": "holography",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "The science or technique of making holograms."
+ },
+ "hospitality": {
+  "word": "hospitality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "humility": {
+  "word": "humility",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "hunts": {
+  "word": "hunts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun or third-person verb form of hunt."
+ },
+ "hydrologist": {
+  "word": "hydrologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A scientist who studies water."
+ },
+ "impish": {
+  "word": "impish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard adjective meaning mischievous."
+ },
+ "kiter": {
+  "word": "kiter",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "One who kites, e.g. a check kiter or kite flyer; listed in dictionaries."
+ },
+ "leer": {
+  "word": "leer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English verb/noun meaning a sly or lewd look."
+ },
+ "leering": {
+  "word": "leering",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of leer."
+ },
+ "legislation": {
+  "word": "legislation",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun for laws."
+ },
+ "liberality": {
+  "word": "liberality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun meaning generosity or broadmindedness."
+ },
+ "likability": {
+  "word": "likability",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun for the quality of being likable."
+ },
+ "lish": {
+  "word": "lish",
+  "verdict": "word",
+  "confidence": "low",
+  "why": "Dialect/Collins Scrabble word meaning agile or supple, though obscure."
+ },
+ "lockbox": {
+  "word": "lockbox",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Compound noun for a secure box."
+ },
+ "locust": {
+  "word": "locust",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for the insect or a tree."
+ },
+ "locution": {
+  "word": "locution",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun for a word or phrase style."
+ },
+ "lowball": {
+  "word": "lowball",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common verb/noun meaning to make a deliberately low offer."
+ },
+ "lumpish": {
+  "word": "lumpish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Adjective meaning lumpy or dull."
+ },
+ "lusty": {
+  "word": "lusty",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common adjective meaning vigorous or lustful."
+ },
+ "mage": {
+  "word": "mage",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun for a magician or wizard."
+ },
+ "main": {
+  "word": "main",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English word."
+ },
+ "mark": {
+  "word": "mark",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun and verb, also a name."
+ },
+ "marx": {
+  "word": "marx",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "Surname of Karl or Groucho Marx; not a common noun."
+ },
+ "mayhaps": {
+  "word": "mayhaps",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Archaic/dialect adverb meaning perhaps."
+ },
+ "melodic": {
+  "word": "melodic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common adjective relating to melody."
+ },
+ "mends": {
+  "word": "mends",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of mend, or plural noun."
+ },
+ "mental": {
+  "word": "mental",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "mesmerizer": {
+  "word": "mesmerizer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Regular agent noun from mesmerize."
+ },
+ "mews": {
+  "word": "mews",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for a row of stables or a lane; also cat sound."
+ },
+ "miaow": {
+  "word": "miaow",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "British variant spelling of meow."
+ },
+ "micrometer": {
+  "word": "micrometer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Measuring instrument or unit of length."
+ },
+ "mimic": {
+  "word": "mimic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English verb and noun."
+ },
+ "minute": {
+  "word": "minute",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun and adjective."
+ },
+ "mislaying": {
+  "word": "mislaying",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of mislay."
+ },
+ "mixologist": {
+  "word": "mixologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for a skilled bartender."
+ },
+ "mopper": {
+  "word": "mopper",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Regular agent noun from mop, one who mops."
+ },
+ "moronic": {
+  "word": "moronic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective from moron."
+ },
+ "mortality": {
+  "word": "mortality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "mow": {
+  "word": "mow",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English verb."
+ },
+ "mowing": {
+  "word": "mowing",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of mow."
+ },
+ "mown": {
+  "word": "mown",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past participle of mow."
+ },
+ "mudding": {
+  "word": "mudding",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "-ing form of mud, as in off-road mudding."
+ },
+ "mythologist": {
+  "word": "mythologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "One who studies mythology."
+ },
+ "mythology": {
+  "word": "mythology",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "nailer": {
+  "word": "nailer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "One who nails, or a nail gun."
+ },
+ "naker": {
+  "word": "naker",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Archaic English word for a kettledrum."
+ },
+ "improves": {
+  "word": "improves",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person singular of 'improve'."
+ },
+ "incurred": {
+  "word": "incurred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'incur'."
+ },
+ "inferred": {
+  "word": "inferred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'infer'."
+ },
+ "ingrain": {
+  "word": "ingrain",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English verb meaning to firmly fix a habit or belief."
+ },
+ "inquisitorial": {
+  "word": "inquisitorial",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective relating to an inquisitor or inquisition."
+ },
+ "intentional": {
+  "word": "intentional",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "interred": {
+  "word": "interred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'inter' (to bury)."
+ },
+ "inveighing": {
+  "word": "inveighing",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of 'inveigh'."
+ },
+ "irresolution": {
+  "word": "irresolution",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun meaning indecision."
+ },
+ "irrigates": {
+  "word": "irrigates",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person singular of 'irrigate'."
+ },
+ "isopropanol": {
+  "word": "isopropanol",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Chemical term for isopropyl alcohol, found in dictionaries."
+ },
+ "jack": {
+  "word": "jack",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun and verb (lifting device, playing card), also a name."
+ },
+ "jacker": {
+  "word": "jacker",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Agent noun from 'jack' (one who jacks, as in carjacker); listed in some word lists."
+ },
+ "jocose": {
+  "word": "jocose",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Rare English adjective meaning playful or humorous."
+ },
+ "juicer": {
+  "word": "juicer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for a device that extracts juice."
+ },
+ "june": {
+  "word": "june",
+  "verdict": "name",
+  "confidence": "medium",
+  "why": "Month name and given name; not a common-noun word in lowercase usage (though 'June' is a month)."
+ },
+ "kate": {
+  "word": "kate",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "Given name only; no common-noun English sense."
+ },
+ "kazoos": {
+  "word": "kazoos",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'kazoo'."
+ },
+ "kinging": {
+  "word": "kinging",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "-ing form of verb 'king' (to make or act as king, or crown a checker)."
+ },
+ "kish": {
+  "word": "kish",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Dictionary term for graphite separated from molten iron in steelmaking; also a place name."
+ },
+ "napkin": {
+  "word": "napkin",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun for a table cloth used at meals."
+ },
+ "nares": {
+  "word": "nares",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Anatomical term, plural of naris (nostrils)."
+ },
+ "nepal": {
+  "word": "nepal",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "Country name, a proper noun only."
+ },
+ "nephrologist": {
+  "word": "nephrologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A kidney specialist; standard medical term."
+ },
+ "neurologist": {
+  "word": "neurologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A specialist in nervous system disorders."
+ },
+ "niels": {
+  "word": "niels",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "Given name (Niels Bohr); not a standard English word."
+ },
+ "nihilistic": {
+  "word": "nihilistic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Adjective form of nihilism."
+ },
+ "nitwits": {
+  "word": "nitwits",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of nitwit, a foolish person."
+ },
+ "noisemaker": {
+  "word": "noisemaker",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Compound noun for a device that makes noise."
+ },
+ "normality": {
+  "word": "normality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun meaning the state of being normal."
+ },
+ "occlude": {
+  "word": "occlude",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Verb meaning to block or obstruct."
+ },
+ "ocean": {
+  "word": "ocean",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for a large body of sea."
+ },
+ "oct": {
+  "word": "oct",
+  "verdict": "not-a-word",
+  "confidence": "high",
+  "why": "Abbreviation for October or a prefix fragment."
+ },
+ "okaying": {
+  "word": "okaying",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "-ing form of the verb okay, meaning to approve."
+ },
+ "oratorial": {
+  "word": "oratorial",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Rare adjective meaning relating to oratory or an orator."
+ },
+ "orchid": {
+  "word": "orchid",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for a flowering plant."
+ },
+ "overheard": {
+  "word": "overheard",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of overhear."
+ },
+ "oxen": {
+  "word": "oxen",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of ox."
+ },
+ "pacer": {
+  "word": "pacer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun for one who sets the pace or paces."
+ },
+ "panda": {
+  "word": "panda",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for the bear-like animal."
+ },
+ "poor": {
+  "word": "poor",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "possibility": {
+  "word": "possibility",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "praiser": {
+  "word": "praiser",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Regular agent noun from 'praise'; listed in dictionaries."
+ },
+ "preceeding": {
+  "word": "preceeding",
+  "verdict": "not-a-word",
+  "confidence": "high",
+  "why": "Common misspelling of 'preceding'."
+ },
+ "presence": {
+  "word": "presence",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "principality": {
+  "word": "principality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for a territory ruled by a prince."
+ },
+ "privateer": {
+  "word": "privateer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for an armed private ship or its captain."
+ },
+ "prizefighter": {
+  "word": "prizefighter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English compound for a professional boxer."
+ },
+ "prizer": {
+  "word": "prizer",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Regular agent noun from 'prize', listed in dictionaries."
+ },
+ "probability": {
+  "word": "probability",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "product": {
+  "word": "product",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "provision": {
+  "word": "provision",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun and verb."
+ },
+ "purgatorial": {
+  "word": "purgatorial",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective meaning relating to purgatory."
+ },
+ "put": {
+  "word": "put",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English verb."
+ },
+ "quaalude": {
+  "word": "quaalude",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Dictionary-listed noun for methaqualone, originally a brand name now generic."
+ },
+ "rapport": {
+  "word": "rapport",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun borrowed from French and fully established."
+ },
+ "rationality": {
+  "word": "rationality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "raw": {
+  "word": "raw",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "ray": {
+  "word": "ray",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun (beam of light, fish); also a name."
+ },
+ "reality": {
+  "word": "reality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "parallelogram": {
+  "word": "parallelogram",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A geometric quadrilateral with two pairs of parallel sides."
+ },
+ "parquets": {
+  "word": "parquets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of parquet, a flooring of wooden blocks."
+ },
+ "pat": {
+  "word": "pat",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English word meaning to tap gently; also a name, but a word."
+ },
+ "peashooter": {
+  "word": "peashooter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A toy tube for blowing dried peas; a compound word."
+ },
+ "pedigreed": {
+  "word": "pedigreed",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Adjective meaning having a recorded pedigree."
+ },
+ "peering": {
+  "word": "peering",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of peer."
+ },
+ "pepped": {
+  "word": "pepped",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of pep, as in 'pepped up'."
+ },
+ "perfusion": {
+  "word": "perfusion",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Medical term for passing fluid through tissue or organs."
+ },
+ "personality": {
+  "word": "personality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for a person's character."
+ },
+ "persuaded": {
+  "word": "persuaded",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of persuade."
+ },
+ "persuader": {
+  "word": "persuader",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "One who persuades; regular agent noun."
+ },
+ "photometer": {
+  "word": "photometer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Instrument that measures light intensity."
+ },
+ "phrenology": {
+  "word": "phrenology",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "The pseudoscience of reading skull shapes."
+ },
+ "pickaxe": {
+  "word": "pickaxe",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A tool with a pointed head for breaking ground."
+ },
+ "pics": {
+  "word": "pics",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Informal plural of pic, short for picture, found in dictionaries."
+ },
+ "picture": {
+  "word": "picture",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun and verb."
+ },
+ "pish": {
+  "word": "pish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Interjection expressing contempt; also a verb in dictionaries."
+ },
+ "placeholder": {
+  "word": "placeholder",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Something that holds a place for something else."
+ },
+ "plaice": {
+  "word": "plaice",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A European flatfish."
+ },
+ "plausibility": {
+  "word": "plausibility",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun for the quality of being plausible."
+ },
+ "reappearing": {
+  "word": "reappearing",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of reappear."
+ },
+ "rear": {
+  "word": "rear",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English word."
+ },
+ "rebuts": {
+  "word": "rebuts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of rebut."
+ },
+ "reclusion": {
+  "word": "reclusion",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Rare noun meaning seclusion, in dictionaries."
+ },
+ "recurred": {
+  "word": "recurred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of recur."
+ },
+ "reduct": {
+  "word": "reduct",
+  "verdict": "not-a-word",
+  "confidence": "medium",
+  "why": "Not a standard English word; at most a rare back-formation from reduction."
+ },
+ "refilling": {
+  "word": "refilling",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of refill."
+ },
+ "regimental": {
+  "word": "regimental",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Adjective relating to a regiment."
+ },
+ "regressed": {
+  "word": "regressed",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of regress."
+ },
+ "reign": {
+  "word": "reign",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English word."
+ },
+ "reprehend": {
+  "word": "reprehend",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Archaic verb meaning to reprove, in dictionaries."
+ },
+ "rereads": {
+  "word": "rereads",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of reread."
+ },
+ "rescinder": {
+  "word": "rescinder",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Agent noun of rescind, listed in Scrabble dictionaries."
+ },
+ "reshowing": {
+  "word": "reshowing",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of reshow."
+ },
+ "resin": {
+  "word": "resin",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English word."
+ },
+ "rhodes": {
+  "word": "rhodes",
+  "verdict": "name",
+  "confidence": "medium",
+  "why": "Island and surname; not a common noun (Rhodes scholar is a proper compound)."
+ },
+ "rhomboid": {
+  "word": "rhomboid",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Geometric term."
+ },
+ "rick": {
+  "word": "rick",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A stack of hay, also a verb meaning to wrench; also a name."
+ },
+ "ricochets": {
+  "word": "ricochets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural/third-person form of ricochet."
+ },
+ "rose": {
+  "word": "rose",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Flower and past tense of rise; also a name."
+ },
+ "runts": {
+  "word": "runts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'runt', a small or undersized animal or person."
+ },
+ "rusts": {
+  "word": "rusts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun / third-person verb form of 'rust'."
+ },
+ "sachets": {
+  "word": "sachets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'sachet', a small packet."
+ },
+ "sagacity": {
+  "word": "sagacity",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun meaning wisdom or keen judgment."
+ },
+ "saluter": {
+  "word": "saluter",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Regular agent noun of 'salute', one who salutes."
+ },
+ "sane": {
+  "word": "sane",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective meaning mentally sound."
+ },
+ "sawhorse": {
+  "word": "sawhorse",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Compound noun for a frame used to support wood being sawn."
+ },
+ "schelling": {
+  "word": "schelling",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "Surname (Thomas Schelling, F.W.J. Schelling), not an English word."
+ },
+ "schwarz": {
+  "word": "schwarz",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "German surname/word for 'black'; not an English word."
+ },
+ "scrag": {
+  "word": "scrag",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English word for a scrawny person/animal or the neck of mutton; also a verb."
+ },
+ "screwer": {
+  "word": "screwer",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Regular agent noun from 'screw', one who screws."
+ },
+ "scruff": {
+  "word": "scruff",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for the back of the neck, or a scruffy person."
+ },
+ "scudding": {
+  "word": "scudding",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Present participle of 'scud', to move swiftly."
+ },
+ "seawall": {
+  "word": "seawall",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Compound noun for a wall built to prevent coastal erosion."
+ },
+ "seismologist": {
+  "word": "seismologist",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Scientist who studies earthquakes."
+ },
+ "selector": {
+  "word": "selector",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun for one who or that which selects."
+ },
+ "sensuality": {
+  "word": "sensuality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun for the quality of being sensual."
+ },
+ "sewn": {
+  "word": "sewn",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past participle of 'sew'."
+ },
+ "sexuality": {
+  "word": "sexuality",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English noun."
+ },
+ "shamrocks": {
+  "word": "shamrocks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'shamrock', a three-leaved clover."
+ },
+ "sorbets": {
+  "word": "sorbets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of sorbet, a frozen dessert."
+ },
+ "sorry": {
+  "word": "sorry",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "soups": {
+  "word": "soups",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of soup."
+ },
+ "souvenir": {
+  "word": "souvenir",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for a keepsake."
+ },
+ "sparer": {
+  "word": "sparer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Comparative of spare, or one who spares."
+ },
+ "spatially": {
+  "word": "spatially",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Adverb of spatial."
+ },
+ "spear": {
+  "word": "spear",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun and verb."
+ },
+ "spiled": {
+  "word": "spiled",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Past tense of spile, to put a spout or plug in."
+ },
+ "spirits": {
+  "word": "spirits",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of spirit."
+ },
+ "splaying": {
+  "word": "splaying",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of splay."
+ },
+ "spudding": {
+  "word": "spudding",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of spud, e.g. spudding a well."
+ },
+ "spurred": {
+  "word": "spurred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of spur."
+ },
+ "squatter": {
+  "word": "squatter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "One who squats; also comparative of squat."
+ },
+ "squaws": {
+  "word": "squaws",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Plural of squaw, an English word though offensive."
+ },
+ "squeamish": {
+  "word": "squeamish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "stability": {
+  "word": "stability",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "starboard": {
+  "word": "starboard",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Nautical term for the right side of a ship."
+ },
+ "starer": {
+  "word": "starer",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "One who stares; valid agent noun."
+ },
+ "stenography": {
+  "word": "stenography",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Shorthand writing."
+ },
+ "sterol": {
+  "word": "sterol",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Class of organic compounds."
+ },
+ "shaper": {
+  "word": "shaper",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "One who shapes; a standard English agent noun and a machine tool."
+ },
+ "sheard": {
+  "word": "sheard",
+  "verdict": "not-a-word",
+  "confidence": "medium",
+  "why": "Not a standard English word; a surname or misspelling of 'sheared'."
+ },
+ "sheepish": {
+  "word": "sheepish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common adjective meaning embarrassed."
+ },
+ "shoos": {
+  "word": "shoos",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of the verb 'shoo'."
+ },
+ "shortage": {
+  "word": "shortage",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for a lack of something."
+ },
+ "shunts": {
+  "word": "shunts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun or verb form of 'shunt'."
+ },
+ "shutterbug": {
+  "word": "shutterbug",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Informal term for an avid photographer."
+ },
+ "sideboard": {
+  "word": "sideboard",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A piece of dining room furniture."
+ },
+ "slaker": {
+  "word": "slaker",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "One who slakes; a regular agent noun of 'slake'."
+ },
+ "slurred": {
+  "word": "slurred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense/adjective of 'slur'."
+ },
+ "smear": {
+  "word": "smear",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common verb and noun."
+ },
+ "smiter": {
+  "word": "smiter",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "One who smites; a regular agent noun, rare."
+ },
+ "smocks": {
+  "word": "smocks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'smock' or verb form."
+ },
+ "sneer": {
+  "word": "sneer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common verb and noun."
+ },
+ "snick": {
+  "word": "snick",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A small cut or click; valid English word."
+ },
+ "snowdrop": {
+  "word": "snowdrop",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A flowering plant."
+ },
+ "sojourns": {
+  "word": "sojourns",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural/verb form of 'sojourn'."
+ },
+ "sonar": {
+  "word": "sonar",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Underwater detection system; common noun."
+ },
+ "sonneteer": {
+  "word": "sonneteer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A writer of sonnets."
+ },
+ "sopper": {
+  "word": "sopper",
+  "verdict": "word",
+  "confidence": "low",
+  "why": "Rare agent noun of 'sop', one who soaks up; listed in dictionaries."
+ },
+ "stirred": {
+  "word": "stirred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of stir."
+ },
+ "storage": {
+  "word": "storage",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "storting": {
+  "word": "storting",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Storting is the Norwegian parliament, listed in English dictionaries as a common noun (also lowercase)."
+ },
+ "studding": {
+  "word": "studding",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun/-ing form of stud (framing studs, studding sail)."
+ },
+ "subdues": {
+  "word": "subdues",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of subdue."
+ },
+ "subscription": {
+  "word": "subscription",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "sue": {
+  "word": "sue",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Verb meaning to take legal action, also a name."
+ },
+ "swag": {
+  "word": "swag",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun meaning loot or promotional goods."
+ },
+ "swale": {
+  "word": "swale",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for a low, moist depression of land."
+ },
+ "syncs": {
+  "word": "syncs",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural/verb form of sync."
+ },
+ "synoptic": {
+  "word": "synoptic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English adjective meaning giving a general view."
+ },
+ "tableaus": {
+  "word": "tableaus",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Accepted English plural of tableau."
+ },
+ "tares": {
+  "word": "tares",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of tare (weed; weight allowance)."
+ },
+ "tempest": {
+  "word": "tempest",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for a violent storm."
+ },
+ "thudding": {
+  "word": "thudding",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "-ing form of thud."
+ },
+ "tiebreaker": {
+  "word": "tiebreaker",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English compound noun."
+ },
+ "tier": {
+  "word": "tier",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun for a level or row."
+ },
+ "toadstool": {
+  "word": "toadstool",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "English noun for a poisonous mushroom."
+ },
+ "tomorrowing": {
+  "word": "tomorrowing",
+  "verdict": "not-a-word",
+  "confidence": "medium",
+  "why": "Tomorrow is not a verb; this is not an established English form."
+ },
+ "traded": {
+  "word": "traded",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of trade."
+ },
+ "trader": {
+  "word": "trader",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun meaning one who trades."
+ },
+ "tradition": {
+  "word": "tradition",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun."
+ },
+ "traumatic": {
+  "word": "traumatic",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "trawls": {
+  "word": "trawls",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun/verb form of trawl."
+ },
+ "triter": {
+  "word": "triter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Comparative form of trite."
+ },
+ "trouper": {
+  "word": "trouper",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun for a theatrical performer or reliable person."
+ },
+ "trow": {
+  "word": "trow",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Archaic verb meaning to believe or think."
+ },
+ "troy": {
+  "word": "troy",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common word for the troy weight system; also a name."
+ },
+ "trusts": {
+  "word": "trusts",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural noun/verb form of trust."
+ },
+ "tuition": {
+  "word": "tuition",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun for teaching or fees."
+ },
+ "twit": {
+  "word": "twit",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English noun meaning a foolish person."
+ },
+ "twits": {
+  "word": "twits",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of twit."
+ },
+ "unblocks": {
+  "word": "unblocks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of unblock."
+ },
+ "uncompiled": {
+  "word": "uncompiled",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Regular un- prefixed adjective from compile, used in computing."
+ },
+ "unconfessed": {
+  "word": "unconfessed",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard un- adjective meaning not confessed."
+ },
+ "unction": {
+  "word": "unction",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun meaning anointing or soothing manner."
+ },
+ "underliner": {
+  "word": "underliner",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Noun for something that underlines; regular agent formation."
+ },
+ "undeterred": {
+  "word": "undeterred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English adjective."
+ },
+ "undocks": {
+  "word": "undocks",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person form of undock."
+ },
+ "unended": {
+  "word": "unended",
+  "verdict": "word",
+  "confidence": "medium",
+  "why": "Un- prefixed adjective meaning not ended; listed in dictionaries."
+ },
+ "whir": {
+  "word": "whir",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard English word for a continuous buzzing sound."
+ },
+ "whirred": {
+  "word": "whirred",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of whir."
+ },
+ "whitish": {
+  "word": "whitish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard adjective meaning somewhat white."
+ },
+ "will": {
+  "word": "will",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English word, modal verb and noun, also a name."
+ },
+ "woodcut": {
+  "word": "woodcut",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A print made from a carved wooden block."
+ },
+ "wooer": {
+  "word": "wooer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "One who woos; regular agent noun of woo."
+ },
+ "word": {
+  "word": "word",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Basic English noun."
+ },
+ "workpiece": {
+  "word": "workpiece",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard compound noun for an item being worked on."
+ },
+ "yaws": {
+  "word": "yaws",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A tropical skin infection; also plural of yaw."
+ },
+ "year": {
+  "word": "year",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Basic English noun."
+ },
+ "zit": {
+  "word": "zit",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Informal word for a pimple."
+ },
+ "unlearns": {
+  "word": "unlearns",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Third-person singular of 'unlearn'."
+ },
+ "unmaking": {
+  "word": "unmaking",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Standard noun/gerund of 'unmake'."
+ },
+ "unrestored": {
+  "word": "unrestored",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Regular un- adjective meaning not restored."
+ },
+ "unscored": {
+  "word": "unscored",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Regular un- adjective meaning not scored."
+ },
+ "untame": {
+  "word": "untame",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Adjective meaning not tame."
+ },
+ "upchuck": {
+  "word": "upchuck",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Informal verb meaning to vomit."
+ },
+ "urchin": {
+  "word": "urchin",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun for a mischievous child or sea urchin."
+ },
+ "valets": {
+  "word": "valets",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'valet'."
+ },
+ "valise": {
+  "word": "valise",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "A small traveling bag."
+ },
+ "values": {
+  "word": "values",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Plural of 'value' or verb form."
+ },
+ "vanish": {
+  "word": "vanish",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common English verb."
+ },
+ "vend": {
+  "word": "vend",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Verb meaning to sell."
+ },
+ "vended": {
+  "word": "vended",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'vend'."
+ },
+ "verbose": {
+  "word": "verbose",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common adjective meaning wordy."
+ },
+ "versailles": {
+  "word": "versailles",
+  "verdict": "name",
+  "confidence": "high",
+  "why": "The French palace and city; a proper noun only."
+ },
+ "virtuosity": {
+  "word": "virtuosity",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Noun meaning great skill."
+ },
+ "vulnerability": {
+  "word": "vulnerability",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Common noun from 'vulnerable'."
+ },
+ "wailer": {
+  "word": "wailer",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "One who wails; regular -er noun."
+ },
+ "weightlifter": {
+  "word": "weightlifter",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Compound noun for one who lifts weights."
+ },
+ "wended": {
+  "word": "wended",
+  "verdict": "word",
+  "confidence": "high",
+  "why": "Past tense of 'wend'."
+ }
+}

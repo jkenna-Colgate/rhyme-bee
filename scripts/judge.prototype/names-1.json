@@ -1,0 +1,362 @@
+[
+ {
+  "id": "kate|EY T",
+  "word": "kate",
+  "seedWord": "ate",
+  "rhymeKey": "EY T",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "troy|OY",
+  "word": "troy",
+  "seedWord": "boy",
+  "rhymeKey": "OY",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "heinz|AY N Z",
+  "word": "heinz",
+  "seedWord": "pines",
+  "rhymeKey": "AY N Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "marx|AA R K S",
+  "word": "marx",
+  "seedWord": "parks",
+  "rhymeKey": "AA R K S",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "niels|IY L Z",
+  "word": "niels",
+  "seedWord": "feels",
+  "rhymeKey": "IY L Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "schelling|EH L IH NG",
+  "word": "schelling",
+  "seedWord": "telling",
+  "rhymeKey": "EH L IH NG",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "batz|AE T S",
+  "word": "batz",
+  "seedWord": "hats",
+  "rhymeKey": "AE T S",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "sheard|IH R D",
+  "word": "sheard",
+  "seedWord": "beard",
+  "rhymeKey": "IH R D",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "fels|EH L Z",
+  "word": "fels",
+  "seedWord": "bells",
+  "rhymeKey": "EH L Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "franz|AE N T S",
+  "word": "franz",
+  "seedWord": "plants",
+  "rhymeKey": "AE N T S",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "schwarz|AO R T S",
+  "word": "schwarz",
+  "seedWord": "warts",
+  "rhymeKey": "AO R T S",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "algiers|IH R Z",
+  "word": "algiers",
+  "seedWord": "years",
+  "rhymeKey": "IH R Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "azores|AO R Z",
+  "word": "azores",
+  "seedWord": "doors",
+  "rhymeKey": "AO R Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "rhodes|OW D Z",
+  "word": "rhodes",
+  "seedWord": "roads",
+  "rhymeKey": "OW D Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "versailles|AY",
+  "word": "versailles",
+  "seedWord": "sky",
+  "rhymeKey": "AY",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "nepal|AA L",
+  "word": "nepal",
+  "seedWord": "ball",
+  "rhymeKey": "AA L",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "storting|AO R T IH NG",
+  "word": "storting",
+  "seedWord": "sporting",
+  "rhymeKey": "AO R T IH NG",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "arx|AA R K S",
+  "word": "arx",
+  "seedWord": "parks",
+  "rhymeKey": "AA R K S",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "ers|ER Z",
+  "word": "ers",
+  "seedWord": "furs",
+  "rhymeKey": "ER Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "oct|AA K T",
+  "word": "oct",
+  "seedWord": "knocked",
+  "rhymeKey": "AA K T",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "preceeding|IY D IH NG",
+  "word": "preceeding",
+  "seedWord": "leading",
+  "rhymeKey": "IY D IH NG",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "hiems|IY M Z",
+  "word": "hiems",
+  "seedWord": "dreams",
+  "rhymeKey": "IY M Z",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "lish|IH SH",
+  "word": "lish",
+  "seedWord": "fish",
+  "rhymeKey": "IH SH",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "kish|IH SH",
+  "word": "kish",
+  "seedWord": "dish",
+  "rhymeKey": "IH SH",
+  "label": "not-a-word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "sue|UW",
+  "word": "sue",
+  "seedWord": "blue",
+  "rhymeKey": "UW",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "bill|IH L",
+  "word": "bill",
+  "seedWord": "hill",
+  "rhymeKey": "IH L",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "mark|AA R K",
+  "word": "mark",
+  "seedWord": "park",
+  "rhymeKey": "AA R K",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "frank|AE NG K",
+  "word": "frank",
+  "seedWord": "bank",
+  "rhymeKey": "AE NG K",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "grace|EY S",
+  "word": "grace",
+  "seedWord": "face",
+  "rhymeKey": "EY S",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "rose|OW Z",
+  "word": "rose",
+  "seedWord": "nose",
+  "rhymeKey": "OW Z",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "pat|AE T",
+  "word": "pat",
+  "seedWord": "hat",
+  "rhymeKey": "AE T",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "will|IH L",
+  "word": "will",
+  "seedWord": "still",
+  "rhymeKey": "IH L",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "rick|IH K",
+  "word": "rick",
+  "seedWord": "trick",
+  "rhymeKey": "IH K",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "ray|EY",
+  "word": "ray",
+  "seedWord": "day",
+  "rhymeKey": "EY",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "jack|AE K",
+  "word": "jack",
+  "seedWord": "back",
+  "rhymeKey": "AE K",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ },
+ {
+  "id": "june|UW N",
+  "word": "june",
+  "seedWord": "moon",
+  "rhymeKey": "UW N",
+  "label": "word",
+  "rule": {
+   "verdict": "ask"
+  }
+ }
+]

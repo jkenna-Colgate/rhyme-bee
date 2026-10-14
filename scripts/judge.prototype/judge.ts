@@ -15,6 +15,9 @@
  * batch-2's misses showed was missing: the l readings, and which second
  * readings of a word count.
  *
+ * 3 adds a third verdict, "not-a-word", for a name or a non-word that is on the
+ * word list (#238). names-1 is the set that tests it.
+ *
  * Rulings are written to rulings/<set>.<env>.<model>.json and scored against
  * labels/<set>.rules.json (what the rules decided) and labels/<set>.labels.json
  * (what the maintainer ruled where they could not). Raw model output is cached
@@ -46,7 +49,7 @@ const flag = (name: string) => { const i = argv.indexOf(`--${name}`); return i <
 const set = argv[0]!;
 const env = new Set((flag("env") ?? "").split(",").filter(Boolean) as Part[]);
 const rulesVersion = Number(flag("rules") ?? 1);
-if (rulesVersion !== 1 && rulesVersion !== 2) throw new Error("--rules is 1 or 2");
+if (![1, 2, 3].includes(rulesVersion)) throw new Error("--rules is 1, 2 or 3");
 const envName = (PARTS.filter((p) => env.has(p)).join("+") || "bare") + (rulesVersion > 1 ? `.rules-${rulesVersion}` : "");
 const model = flag("model") ?? "sonnet";
 const limit = Number(flag("limit") ?? Infinity);
@@ -147,10 +150,21 @@ const RULES_2 = [
   if (!text.includes(from!)) throw new Error(`wording 1 no longer holds: ${from}`);
   return text.replace(from!, to!);
 }, RULES_1);
-const RULES = rulesVersion === 2 ? RULES_2 : RULES_1;
+/** Wording 2 with a third verdict: the word list holds some names and some non-words, and a Rhyme on one would score it (#238). */
+const RULES_3 = [
+  [`Every Candidate is on the game's word list, so do not rule on whether it is a word, and do not rule on how well known it is. Rule on one thing: is the pair a Rhyme?`,
+    `Every Candidate is on the game's word list, but the list holds some names and some strings that are not words, and the game never scores either. Do not rule on how well known a word is. Rule on two things: is the Candidate a word, and if it is, is the pair a Rhyme?`],
+  [`- "no-rhyme": however General American says the word, it does not have the Seed Word's Rhyme Key.`,
+    `- "no-rhyme": however General American says the word, it does not have the Seed Word's Rhyme Key.\n- "not-a-word": the Candidate is only a name (of a person, a place, a brand or the like), or is not an English word at all (an abbreviation, a misspelling, a fragment, a word from another language). Give a null reading. A word that is also a name is a word, so rule on its sound. Rule this whether or not the Candidate rhymes.`],
+].reduce((text, [from, to]) => {
+  if (!text.includes(from!)) throw new Error(`wording 2 no longer holds: ${from}`);
+  return text.replace(from!, to!);
+}, RULES_2);
+const RULES = [RULES_1, RULES_2, RULES_3][rulesVersion - 1]!;
 
+const VERDICTS = rulesVersion === 3 ? '"rhyme" | "no-rhyme" | "not-a-word"' : '"rhyme" | "no-rhyme"';
 const REPLY = `Reply with only a JSON array, one object per Candidate in the order given:
-[{"word": "...", "verdict": "rhyme" | "no-rhyme", "reading": "ARPAbet or null", "confidence": "high" | "medium" | "low", "why": "one short sentence"}]`;
+[{"word": "...", "verdict": ${VERDICTS}, "reading": "ARPAbet or null", "confidence": "high" | "medium" | "low", "why": "one short sentence"}]`;
 
 function describe(p: Pair, batchIds: Set<string>): string {
   const out = [`- "${p.word}" for the Seed Word "${p.seedWord}"`];
@@ -253,6 +267,15 @@ console.log(`\n## ${set} / ${envName} / ${model}: ${pairs.length} ruled, ${score
 const tallyV: Record<string, number> = {};
 for (const p of pairs) tallyV[rulings[p.id]!.verdict] = (tallyV[rulings[p.id]!.verdict] ?? 0) + 1;
 console.log("verdicts:", tallyV, "| rhyme without a verifying reading:", pairs.filter((p) => rulings[p.id]!.verified === false).length);
+const notWords = pairs.filter((p) => rulings[p.id]!.verdict === "not-a-word");
+if (rulesVersion === 3) console.log(`not-a-word (${notWords.length}): ${notWords.map((p) => `${p.word} (${rulings[p.id]!.confidence})`).join(", ") || "none"}`);
+// names-1 carries its own label: the verdict the judge should give on wordhood.
+const wordLabelled = pairs as (Pair & { label?: string })[];
+if (wordLabelled.some((p) => p.label)) for (const want of ["not-a-word", "word"]) {
+  const ps = wordLabelled.filter((p) => p.label === want), got = (p: Pair) => rulings[p.id]!.verdict === "not-a-word";
+  const miss = ps.filter((p) => got(p) !== (want === "not-a-word"));
+  console.log(`  ${want === "word" ? "words that are also names, left alone" : "names and non-words caught"}: ${ps.length - miss.length}/${ps.length}${miss.length ? `; missed ${miss.map((p) => `${p.word} (${rulings[p.id]!.verdict}: ${rulings[p.id]!.why})`).join("; ")}` : ""}`);
+}
 // The judge's own rulings must keep the substitution property too.
 console.log("substitution breaks in the judge's rulings:", substitutionBreaks(pairs.map((p) => ({ word: p.word, rhymeKey: p.rhymeKey, label: rulings[p.id]!.verdict }))));
 if (scored.length) {

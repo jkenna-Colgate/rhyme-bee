@@ -2,9 +2,10 @@
  * PROTOTYPE, throwaway (#238). States the judge's margin from repeat runs: how
  * often a ruling that would be written with nobody reviewing it is wrong.
  *
- *   npx tsx scripts/judge.prototype/margin.ts <set> <run> [<run> ...]
+ *   npx tsx scripts/judge.prototype/margin.ts <set> [--rules 3] <run> [<run> ...]
  *
- * Reads rulings/<set>.bare.rules-2[.run-N].sonnet.json, one per run, and the
+ * Reads rulings/<set>.bare.rules-2[.run-N].sonnet.json, one per run (rules-3 with
+ * --rules 3, the wording with the "not-a-word" verdict), and the
  * labels judge.ts scores against. Calls nothing.
  *
  * The safe slice is a ruling that would write a reading and score the word:
@@ -23,7 +24,10 @@ import { resolve } from "node:path";
 import type { Pair } from "./pool.ts";
 
 const here = import.meta.dirname;
-const [set, ...runArgs] = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const at = argv.indexOf("--rules");
+const rules = at < 0 ? 2 : Number(argv.splice(at, 2)[1]);
+const [set, ...runArgs] = argv;
 const runs = runArgs.map(Number);
 if (!set || !runs.length) throw new Error("usage: margin.ts <set> <run> [<run> ...]");
 
@@ -55,7 +59,7 @@ for (const [id, { label: l }] of Object.entries(labelsIn(`${set}.takenback.json`
 /** Kept out of `truth`, so no figure mixes a dictionary label with the maintainer's unless it says so. */
 const dictionary = new Map<string, Label>();
 for (const [id, { label: l }] of Object.entries(labelsIn(`${set}.dictionary.json`) as unknown as Record<string, { label: string }>)) if (isLabel(l) && !truth.has(id)) dictionary.set(id, l);
-const rulings = runs.map((n) => load<Record<string, Ruling>>(`rulings/${set}.bare.rules-2${n > 1 ? `.run-${n}` : ""}.sonnet.json`));
+const rulings = runs.map((n) => load<Record<string, Ruling>>(`rulings/${set}.bare.rules-${rules}${n > 1 ? `.run-${n}` : ""}.sonnet.json`));
 
 const N = runs.length;
 const of = (p: Pair) => rulings.map((r) => r[p.id]!);
