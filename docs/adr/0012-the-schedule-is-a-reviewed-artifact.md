@@ -180,3 +180,41 @@ maintainer.
 Puzzle's Difficulty between laps, so a Sunday can come to play like a Thursday.
 Moving it is a re-deal. The drift is accepted on the terms this ADR already set
 for the first lap: after review, band membership is advisory.
+
+## Amendment, 2026-10-14: a Seed Word is heard one way
+
+Settled in
+[How do a judge's corrections land with nobody reviewing them?](https://github.com/jkenna-Colgate/rhyme-bee/issues/238).
+
+**A word can be a Seed Word only if none of its other readings rhymes with a
+word its pinned reading does not.** Where a reading came from (the dictionary,
+the supplement, a Normalisation) does not matter. The Seed Word is spoken
+([ADR-0002](./0002-general-american-is-the-only-accent.md)) so that the player
+hunts on the reading the game adjudicates. A player who knows the other reading
+hunts on that one instead and is rejected for it. 14 scheduled Seed Words have
+more than one Rhyme Key, on 15 days.
+
+**It is checked when a Seed Word joins the Schedule, and once now, and not at
+every build.** It is also checked when the editor adds a reading to a scheduled
+Seed Word in the Editor's Pass. A Seed Word that fails gives its day to
+another by the repair order above, passing over the word that failed. The day
+keeps its Rhyme Key, so it goes to the family's lead word and keeps its Puzzle,
+or failing that is Free Play.
+
+**Seed Words and Unconfirmed Rhymes are kept apart.** A scheduled Seed Word is
+never listed as an Unconfirmed Rhyme for another Rhyme Key: the pair stays
+rejected and its Candidate waits for an Editor's Pass. A word listed as an
+Unconfirmed Rhyme cannot join the Schedule. So nothing swaps a Seed Word on the
+Judge's word alone. If the editor confirms the Judge's ruling, the reading is
+added in the ordinary way and the test above decides the day. The unattended
+loop cannot reach this case by itself: the Judge writes a reading only for a
+word with none, and a Seed Word always has one.
+
+### Rejected
+
+**List the Seed Word as an Unconfirmed Rhyme, and accept its family without
+Points on its own day.** A Rhyme holds both ways, so an Unconfirmed Rhyme on a
+Seed Word would make every word of the other family an accepted guess on that
+Seed Word's day. A wrong ruling by the Judge is the likelier case, and a real
+gap in the dictionary on a scheduled Seed Word should be rare once the Batches
+have run. Keeping them apart costs one word rejected on one day per lap.

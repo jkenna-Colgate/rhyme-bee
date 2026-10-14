@@ -163,3 +163,65 @@ human override rather than a rule.
   Submission mid-play from index state; an editor *declines* a Candidate
   afterwards by changing that state. GLOSSARY.md carries both, so they cannot
   collapse in the tool's copy.
+
+## Amendment, 2026-10-14: the Judge rules first, and the Editor's Pass rules on what it leaves
+
+Settled in
+[How do a judge's corrections land with nobody reviewing them?](https://github.com/jkenna-Colgate/rhyme-bee/issues/238).
+The title above no longer holds alone. The game is to run with nobody attending
+it (#218), so a Candidate is ruled on before any editor sees it, by the
+**Judge** (GLOSSARY.md), a model prompted to rule as an editor would. It rules
+in a Batch and in the Appeals job
+([ADR-0021](./0021-the-unattended-loop-calls-a-model-in-one-place.md)), by the
+same rules in both, and the run report lists every write. Only the Judge
+*judges*. The editor *rules*, and the glossary's Candidate entries now say so.
+
+### Each Candidate is ruled on once
+
+A Candidate the Judge has ruled on is never sent to it again. Only an Editor's
+Pass rules on it after that. The Judge's ruling on a pair is steady and not
+fixed, so a Candidate re-sent by a monthly job would get a fresh draw each month,
+and a pair rightly refused would in time be written on a ruling that came up
+once. `mow` for `eyebrow` is no Rhyme, and one run of five ruled it one.
+
+### What a Rhyme ruling does
+
+| The engine's reading | The Judge's confidence | What lands |
+|---|---|---|
+| none: a **Missing Reading**, the Judge's reading reaches the key | high | the reading is written ([ADR-0011](./0011-reading-manufacture-is-frozen.md), amended) |
+| none, the Judge's reading reaches the key | medium | an Unconfirmed Rhyme |
+| none, the Judge's reading misses the key | any | nothing |
+| one that misses the key: an **Overrule** | high | an Unconfirmed Rhyme |
+| one that misses the key | medium or low | nothing |
+
+Before anything lands, the Judge is asked apart whether the word is a word, a
+name or not a word. Anything but "word", at any confidence, lands nothing.
+
+"Nothing" means the Candidate waits for an Editor's Pass, as every Candidate did
+before. A reading the Judge writes resolves its Candidate by the derived rule
+above, with no further act. A no-Rhyme ruling writes nothing either: the
+Candidate waits, and Declining it is still the editor's act.
+
+### What the Editor's Pass gains
+
+- **Unconfirmed Rhymes to confirm or Decline.** Confirming one is the ordinary
+  add, after which the pair rhymes by itself and leaves the list. A Decline
+  takes it off the list, and the word gets the engine's own verdict on that
+  Rhyme Key again.
+- **Suggested Demotions.** A word the Judge found to be a name or a non-word
+  arrives with that reason. Writing the Demotion is the editor's act, so the
+  demotion list's remit does not widen.
+- **The Judge's ruling beside each Candidate it left**, so the editor reads the
+  Judge's reasons rather than ruling cold.
+
+The closed union of Candidate states grows by these three, and is still derived
+in one place.
+
+### What does not change
+
+- **Joining or replacing stays the editor's choice.** The Judge writes a reading
+  only for a word that has none, where there is nothing to replace.
+- **No Worker route writes to `data/`.** The Appeals job commits from a job, not
+  a route, and the dev-only structure of the editor's endpoints holds.
+- **[ADR-0013](./0013-adjudication-never-crosses-the-network.md) is untouched.**
+  The Judge rules after the fact and nothing is reported back to the player.
