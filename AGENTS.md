@@ -17,6 +17,7 @@ carries its own package.
 - `npm test` — run the suite
 - `npm run typecheck` — `tsc --noEmit`
 - `npm run build:index` — rebuild the Rhyme Index from `data/`
+- `npx tsx scripts/lookup.ts tear marx` or `--key "IH R"`: readings, Rhyme Keys, Tier and wordhood from the built index, or one key's family (PowerShell: `docs/powershell.md`)
 
 The vocabulary below is authoritative — use these terms exactly, and prefer
 them over the synonyms each entry marks as _Avoid_.
@@ -39,7 +40,15 @@ them.
 `vitest.config.ts` exists for one exclusion: `.claude/worktrees/`, where agent
 checkouts keep their own copy of every test file. Without it a bare `npm test`
 walks into them and reports several times the real suite — and passes, which is
-the dangerous direction to be wrong in. The real suite is 85 files.
+the dangerous direction to be wrong in. The real suite is 88 files.
+
+## Scratch scripts
+
+A throwaway script or measurement goes in `.scratch/<issue>/` (or
+`.scratch/no-issue/`), opening with a comment that says what it measures. Never
+in `dist-data/`, which is build output, and never named `*.test.ts`. `.scratch/`
+is gitignored, but the root `.ignore` lets `Grep` search it: search there before
+measuring anything again, because #241 redid a measurement `flap231.ts` had made.
 
 ## Context hygiene
 

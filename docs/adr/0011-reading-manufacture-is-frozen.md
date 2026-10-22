@@ -1,5 +1,7 @@
 # Reading manufacture is frozen; a correction lands in the data, not in a new rule
 
+**Status:** amended 2026-07-30, 2026-10-07, 2026-10-14 and 2026-10-16. Reading manufacture is still frozen, now at six normalisation rules (three built, three decided and not built) and thirty affix rules. A name or a non-word the word list holds is corrected by a Demotion in `data/demotions.txt`, not in `data/names.txt` or `data/words.txt`, and the Judge writes a reading unattended only for a Missing Reading, never a Demotion.
+
 The build manufactures readings in two stages — coverage derivation
 (`src/coverage.ts`, `src/affixes.ts`) composes a reading for a known word that
 has none, and normalisation (`src/normalise.ts`) rewrites readings into the
@@ -345,3 +347,72 @@ already scores that may be a name or may not rhyme, is found by hunting No
 False Accepts, and whether a Demotion or a replacing correction may land on it
 unattended is still open on
 [#218](https://github.com/jkenna-Colgate/rhyme-bee/issues/218).
+
+## Amendment, 2026-10-16: t and d are one sound before a weak vowel
+
+Settled in
+[Are t and d between vowels one sound in a scoring Rhyme?](https://github.com/jkenna-Colgate/rhyme-bee/issues/241).
+The freeze stands at **six normalisation rules** and thirty affix rules. The
+addition is decided and not built. The Rhyme rule is unchanged.
+
+### A t or d after a vowel or `r`, before a weak vowel, is one sound
+
+General American says both as the same quick tap, so `latter` and `ladder`,
+`metal` and `medal`, `computer` and `ruder` sound alike. The rule reads them
+as one sound wherever the tap falls inside a Rhyme Key: right after the
+stressed vowel (`heating` / `leading`), after `r` (`quarter` / `disorder`), and
+between two weak vowels (`charity` / `parody`). It never touches a t or d at
+the end of a word or before a stressed vowel, so `seat` / `seed`, `eight` /
+`aid` and `attack` / `adapt` stay apart.
+
+Two places are left out, because the sound there is not the tap:
+
+- **After "eye".** Many speakers say the vowel of `writer` differently from
+  the vowel of `rider`, so the contrast is heard and the replace test fails.
+  "Ow" was weighed the same way and joins (`shouted` / `crowded`).
+- **Before a syllabic n.** `button`, `written` and `curtains` are said with a
+  glottal stop, not a tap, so `button` / `sudden` stays apart.
+
+It **replaces**, so ADR-0010 admits it only if the contrast is unavailable to a
+General American listener and the guardrail set survives.
+
+- **The contrast.** The maintainer said fifteen pairs aloud, one per stressed
+  vowel (`nutty` / `buddy`, `eighty` / `lady`, `duty` / `moody`, `latter` /
+  `ladder` and the rest), and the boundary cases after `r` and between weak
+  vowels, and heard a rhyme in every one. The merged sound is respelled "d":
+  `water` is "WAH-der".
+- **Why not append.** An appended reading gives each affected word a second
+  Rhyme Key that rhymes where the first does not, so every affected Seed Word
+  fails to be heard one way. Thirteen scheduled days would stop pinning.
+- **Reach.** Measured on top of the weak "ih" / weak "uh" merge above, since
+  that is what it lands on: 297 groups of families join; 3,563 Answer-band
+  words gain rhymes; the largest family stays at 876. The biggest join is
+  `-ated` with `-aded` (457 Answers and 29). Thirteen scheduled Seed Words gain
+  Answers, most on `cheerleader` (21 to 47), `centimeter` (+21) and
+  `bloodletting` (+20). Leaving out "eye" costs about 360 Answers; leaving out
+  the syllabic n about 70.
+- **Guardrails.** The nine committed pairs still refuse, by the rule's shape
+  and by measurement. The build adds rows for what it must keep apart:
+  `seat` / `seed`, `eight` / `aid`, `attack` / `adapt`, `writer` / `rider`,
+  `button` / `sudden`.
+- **One pair of scheduled days becomes one Puzzle:** `centimeter` with
+  `cheerleader`. `centimeter` keeps its place, and `cheerleader`'s goes to a new
+  Seed Word through a Batch, with the two pairs from the merge above.
+
+The syllabic consonant rule's appended readings keep their t (`metal` read
+"met-l" stays apart from "med-l"). That costs nothing: the full readings
+carry the join.
+
+### The unfreeze clause was not met, again
+
+No Appeal on file (189 rows) is of this shape, and the Synthetic Player offered
+it three times in 225 runs (`ruder` for `computer`, `melodic` for `idiotic`,
+`tiding` for `songwriting`). The rule is admitted on the maintainer's ruling,
+for the reason given above: a class nobody Appeals still fails Trust for each
+player who meets it. The maintainer's ruling of `cruder` for `computer` is a
+Missing Reading as well: `cruder` has no reading, so the rule alone does not
+score it.
+
+The Judge is told every normalisation as a sound it must hear as one, since it
+refused `cruder` for `computer` in five runs of five on the Rhyme rule as
+written.
