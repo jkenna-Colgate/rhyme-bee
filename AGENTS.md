@@ -17,7 +17,7 @@ carries its own package.
 - `npm test` — run the suite
 - `npm run typecheck` — `tsc --noEmit`
 - `npm run build:index` — rebuild the Rhyme Index from `data/`
-- `npx tsx scripts/lookup.ts tear marx` or `--key "IH R"`: readings, Rhyme Keys, Tier and wordhood from the built index, or one key's family (tsx, not `npm run`, so PowerShell keeps the flags)
+- `npx tsx scripts/lookup.ts tear marx` or `--key "IH R"`: readings, Rhyme Keys, Tier and wordhood from the built index, or one key's family (PowerShell: `docs/powershell.md`)
 
 The vocabulary below is authoritative — use these terms exactly, and prefer
 them over the synonyms each entry marks as _Avoid_.

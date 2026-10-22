@@ -46,6 +46,14 @@ describe("classifyFrontier", () => {
     expect(frontier.takeable[0]).toEqual({ number: 243, type: "research", title: "Ticket 243" });
   });
 
+  it("calls a child with no wayfinder label, or one it does not know, unknown", () => {
+    const frontier = classifyFrontier(
+      [child(244, { labels: [{ name: "bug" }] }), child(245, { labels: [{ name: "wayfinder:spike" }] })],
+      {},
+    );
+    expect(frontier.takeable.map((t) => t.type)).toEqual(["unknown", "unknown"]);
+  });
+
   it("lists a child with an open blocker under blocked, naming the open blockers only", () => {
     const frontier = classifyFrontier(
       [child(233, { issue_dependencies_summary: { blocked_by: 1 } })],

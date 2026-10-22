@@ -10,6 +10,7 @@ import { respell } from "../src/respelling.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Tier } from "../src/verdict.ts";
 import type { DemotionReason } from "../src/demotions.ts";
+import type { DerivedWord } from "../src/coverage.ts";
 
 export const LOOKUP_HELP = `Look up words or a Rhyme Key in the built Rhyme Index (dist-data/).
 
@@ -23,7 +24,7 @@ export const LOOKUP_HELP = `Look up words or a Rhyme Key in the built Rhyme Inde
       ARPAbet as a word lookup prints it ("IH R"); stress digits and case are
       ignored, and the quotes may be dropped.
 
-Invoke through tsx, not npm run: PowerShell eats the bare -- separator.`;
+Invoke through tsx, not npm run; on PowerShell, see docs/powershell.md.`;
 
 export type LookupArgs =
   | { kind: "help" }
@@ -55,7 +56,7 @@ export function parseLookupArgs(argv: string[]): LookupArgs {
 export type ReadingSource =
   | { kind: "cmudict" }
   | { kind: "supplement" }
-  | { kind: "derived"; stem: string; rule: string }
+  | ({ kind: "derived" } & Pick<DerivedWord, "stem" | "rule">)
   | { kind: "normalisation" };
 
 export interface Reading {
@@ -69,8 +70,10 @@ export interface Reading {
 export interface WordLookup {
   word: string;
   readings: Reading[];
-  /** In the wordhood gate as built, so after any Demotion. */
+  /** In the upstream word list (`data/words.txt`), whatever any Demotion says. */
   inWordList: boolean;
+  /** Past the wordhood gate as built: after the Demotions and the supplement. */
+  hasWordhood: boolean;
   /** In the names data as built, so including a demoted name. */
   isName: boolean;
   demotion: DemotionReason | null;
@@ -121,7 +124,7 @@ export function formatWordLookup(lookup: WordLookup): string {
   ];
   // A Tier belongs to a word with wordhood; anything else is rejected before
   // its Tier is ever read, so printing one would claim a verdict nobody gets.
-  if (lookup.inWordList) {
+  if (lookup.hasWordhood) {
     const knownness = lookup.knownness === null ? "no knownness" : `knownness ${lookup.knownness}`;
     lines.push(`  Tier: ${TIER_NAME[lookup.tier]} (${knownness})`);
   }
@@ -147,11 +150,13 @@ export interface FamilyLookup {
 /**
  * What the build knew about where readings and wordhood came from, which the
  * serialised index does not keep: the committed supplement and Demotions, and
- * the derived-words report the build writes beside the index.
+ * the derived-words report the build writes beside the index, and the upstream
+ * word list before any Demotion took a word out of it.
  */
 export interface BuildProvenance {
+  wordList: ReadonlySet<string>;
   supplemented: ReadonlySet<string>;
-  derived: ReadonlyMap<string, { stem: string; rule: string }>;
+  derived: ReadonlyMap<string, Pick<DerivedWord, "stem" | "rule">>;
   demotions: ReadonlyMap<string, DemotionReason>;
 }
 
@@ -178,7 +183,8 @@ export function lookUpWord(index: RhymeIndex, word: string, provenance: BuildPro
       rhymeKey: rhymeKeyOf(pronunciation),
       source: generated ? { kind: "normalisation" } : base,
     })),
-    inWordList: index.hasWord(normalised),
+    inWordList: provenance.wordList.has(normalised),
+    hasWordhood: index.hasWord(normalised),
     isName: index.isName(normalised),
     demotion: provenance.demotions.get(normalised) ?? null,
     ...index.tierOf(normalised),

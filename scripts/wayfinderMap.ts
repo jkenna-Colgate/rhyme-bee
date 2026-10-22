@@ -23,15 +23,18 @@ export interface BlockerIssue {
   state: string;
 }
 
-export interface TakeableTicket {
-  number: number;
-  type: string;
-  title: string;
+const TICKET_TYPES = ["research", "prototype", "grilling", "task"] as const;
+
+/** A wayfinder ticket's kind, read off its label; `unknown` when no label names one. */
+export type TicketType = (typeof TICKET_TYPES)[number] | "unknown";
+
+export interface TakeableTicket extends Pick<MapChild, "number" | "title"> {
+  type: TicketType;
 }
 
 export interface BlockedTicket extends TakeableTicket {
   /** The blockers still open: the reason the ticket is not takeable. */
-  blockers: { number: number; title: string }[];
+  blockers: Pick<BlockerIssue, "number" | "title">[];
   assignees: string[];
 }
 
@@ -47,9 +50,12 @@ export interface Frontier {
 
 const TYPE_PREFIX = "wayfinder:";
 
-function ticketType(child: MapChild): string {
-  const label = child.labels.find((l) => l.name.startsWith(TYPE_PREFIX));
-  return label ? label.name.slice(TYPE_PREFIX.length) : "?";
+function ticketType(child: MapChild): TicketType {
+  for (const { name } of child.labels) {
+    const type = TICKET_TYPES.find((t) => name === TYPE_PREFIX + t);
+    if (type !== undefined) return type;
+  }
+  return "unknown";
 }
 
 /**
@@ -66,7 +72,7 @@ export function classifyFrontier(
   const frontier: Frontier = { takeable: [], blocked: [], claimed: [] };
   for (const child of children) {
     if (child.state !== "open") continue;
-    const base = { number: child.number, type: ticketType(child), title: child.title };
+    const base: TakeableTicket = { number: child.number, type: ticketType(child), title: child.title };
     const assignees = child.assignees.map((a) => a.login);
     const blockers = (blockersOf[child.number] ?? [])
       .filter((b) => b.state === "open")

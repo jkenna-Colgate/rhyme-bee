@@ -293,7 +293,7 @@ export class RhymeIndex {
   /**
    * Every reading the index holds for a surface form, in order, each marked if
    * normalisation appended it rather than any source transcribing it. Pinning
-   * reads the same mark (`#requireBaseKey`); `scripts/lookup.ts` shows it.
+   * reads the same mark (`#requireBaseKey`).
    */
   readingsOf(word: string): { pronunciation: Pronunciation; generated: boolean }[] {
     const prons = this.#data.pronunciations.get(normaliseWord(word)) ?? [];

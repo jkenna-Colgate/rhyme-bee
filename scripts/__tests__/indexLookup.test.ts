@@ -29,6 +29,7 @@ describe("lookUpWord", () => {
     { knownnessThreshold: 0.9 },
   );
   const provenance: BuildProvenance = {
+    wordList: new Set(["tear", "gruel", "gruels", "founds", "marx"]),
     supplemented: new Set(["onyx"]),
     derived: new Map([["gruels", { stem: "gruel", rule: "inflection:s" }]]),
     demotions: new Map([["marx", "proper-noun"]]),
@@ -38,7 +39,14 @@ describe("lookUpWord", () => {
     const tear = lookUpWord(index, "tear", provenance);
     expect(tear.readings.map((r) => r.rhymeKey)).toEqual(["EH R", "IH R"]);
     expect(tear.readings.map((r) => r.source)).toEqual([{ kind: "cmudict" }, { kind: "cmudict" }]);
-    expect(tear).toMatchObject({ inWordList: true, isName: false, demotion: null, tier: "answer", knownness: 0.99 });
+    expect(tear).toMatchObject({
+      inWordList: true,
+      hasWordhood: true,
+      isName: false,
+      demotion: null,
+      tier: "answer",
+      knownness: 0.99,
+    });
   });
 
   it("traces each reading to the supplement, a derivation or Normalisation", () => {
@@ -54,12 +62,18 @@ describe("lookUpWord", () => {
     ]);
   });
 
-  it("reports a Demotion and the names data", () => {
+  it("reports a demoted name as in the word list, the names data and the Demotions", () => {
     expect(lookUpWord(index, "marx", provenance)).toMatchObject({
-      inWordList: false,
+      inWordList: true,
+      hasWordhood: false,
       isName: true,
       demotion: "proper-noun",
     });
+  });
+
+  it("reads word-list membership off the word list, not off wordhood", () => {
+    // The supplement gives `onyx` wordhood the upstream word list never did.
+    expect(lookUpWord(index, "onyx", provenance)).toMatchObject({ inWordList: false, hasWordhood: true });
   });
 
   it("gives a word with no pronunciation no readings", () => {
@@ -132,6 +146,7 @@ const tear: WordLookup = {
     { pronunciation: ["T", "IH1", "R"], respelling: "TIHR", rhymeKey: "IH R", source: { kind: "cmudict" } },
   ],
   inWordList: true,
+  hasWordhood: true,
   isName: false,
   demotion: null,
   tier: "answer",
@@ -178,14 +193,15 @@ describe("formatWordLookup", () => {
       ...tear,
       word: "marx",
       readings: [{ pronunciation: ["M", "AA1", "R", "K", "S"], respelling: "MAHRKS", rhymeKey: "AA R K S", source: { kind: "cmudict" } }],
-      inWordList: false,
+      inWordList: true,
+      hasWordhood: false,
       isName: true,
       demotion: "proper-noun",
       tier: "bonus",
       knownness: null,
     });
     expect(out).toContain("demoted: yes (proper-noun)");
-    expect(out).toContain("word list: no");
+    expect(out).toContain("word list: yes");
     expect(out).toContain("names: yes");
     expect(out).not.toMatch(/Answer|Bonus Word/);
   });

@@ -1,9 +1,6 @@
 /**
- * The two wayfinder chores every session used to script by hand (#244):
- *
- *   npx tsx scripts/wayfinder.ts frontier 218
- *   npx tsx scripts/wayfinder.ts decide 218 --section "Decisions so far" --line "- [Title](url): gist"
- *   npx tsx scripts/wayfinder.ts decide 218 --section "Decisions so far" --line "..." --dry-run
+ * The two wayfinder chores every session used to script by hand (#244).
+ * `--help` prints the usage; for PowerShell, see `docs/powershell.md`.
  *
  * Frontier lists a map's takeable children in map order, then the blocked and
  * claimed ones with the reason each waits. Decide adds one line to the end of a
@@ -11,10 +8,7 @@
  * with LF endings; it writes nothing when the heading is missing or appears
  * twice. The same invocation runs from PowerShell and Git Bash: it calls `gh`
  * directly with no shell in between, and passes the body to `gh` on stdin, so
- * no temp file path is ever involved. Reach it through `npx tsx` rather than
- * `npm run`, which loses flags on PowerShell (see `play.ts`). Windows
- * PowerShell 5.1 drops a double quote inside an argument to a native program,
- * so a `--line` holding one is written there as `\"`.
+ * no temp file path is ever involved.
  *
  * The logic lives in `wayfinderMap.ts` and is tested there; this file is only
  * the `gh` adapter. `{owner}/{repo}` is filled in by `gh` from the checkout.
@@ -22,6 +16,7 @@
 import { spawnSync } from "node:child_process";
 import {
   parseWayfinderArgs,
+  USAGE,
   runDecide,
   runFrontier,
   type BlockerIssue,
@@ -55,16 +50,24 @@ const github: WayfinderGitHub = {
     return JSON.parse(gh(["api", `${ISSUES}/${issue}/dependencies/blocked_by?per_page=100`])) as BlockerIssue[];
   },
   issueBody(issue) {
-    return (JSON.parse(gh(["api", `${ISSUES}/${issue}`])) as { body: string | null }).body ?? "";
+    return bodyOf(gh(["api", `${ISSUES}/${issue}`]));
   },
   writeBody(issue, body) {
-    const stored = gh(
-      ["api", "--method", "PATCH", `${ISSUES}/${issue}`, "--input", "-"],
-      JSON.stringify({ body }),
+    return bodyOf(
+      gh(["api", "--method", "PATCH", `${ISSUES}/${issue}`, "--input", "-"], JSON.stringify({ body })),
     );
-    return (JSON.parse(stored) as { body: string | null }).body ?? "";
   },
 };
+
+/** The body of an issue as the API returns it, which is null for an empty one. */
+function bodyOf(issueJson: string): string {
+  return (JSON.parse(issueJson) as { body: string | null }).body ?? "";
+}
+
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(USAGE);
+  process.exit(0);
+}
 
 try {
   const args = parseWayfinderArgs(process.argv.slice(2));

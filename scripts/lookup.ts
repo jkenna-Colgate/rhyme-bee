@@ -1,12 +1,7 @@
 /**
  * Look up words or a Rhyme Key in the built Rhyme Index, so nobody writes a
- * throwaway script to ask what the index thinks of `tear` (#245).
- *
- *   npx tsx scripts/lookup.ts tear marx
- *   npx tsx scripts/lookup.ts --key "IH R"
- *
- * Through tsx rather than `npm run`, for the PowerShell separator problem
- * described at the top of `play.ts`. `--help` prints both forms.
+ * throwaway script to ask what the index thinks of `tear` (#245). `--help`
+ * prints its usage; for PowerShell, see `docs/powershell.md`.
  *
  * The imperative shell: it loads the index and what the build knew about where
  * readings came from, then hands both to `indexLookup.ts`, which is tested.
@@ -17,6 +12,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCmudict } from "../src/cmudict.ts";
 import { parseDemotions } from "../src/demotions.ts";
+import { parseWordList } from "../src/pipeline.ts";
 import type { DerivedWord } from "../src/coverage.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import { indexArtifactPath } from "./indexArtifact.ts";
@@ -64,6 +60,7 @@ function loadProvenance(): BuildProvenance {
   const derivedReport = read(resolve(distData, "derived-report.json"));
   const derived: DerivedWord[] = derivedReport === "" ? [] : JSON.parse(derivedReport);
   return {
+    wordList: parseWordList(read(resolve(root, "data", "words.txt"))),
     supplemented: new Set(parseCmudict(supplement).keys()),
     derived: new Map(derived.map(({ word, stem, rule }) => [word, { stem, rule }])),
     demotions: new Map(
