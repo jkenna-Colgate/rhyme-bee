@@ -1,5 +1,7 @@
 # A Seed Word must have native rhyme content, not be an inflection shadow of another Seed
 
+**Status:** amended 2026-07-30. A Shadow Key still cannot be a Seed Word, and *derived* now includes the configured derivational suffixes (`-ly`, `-ness`, `-er` and the rest) as well as inflections and prefixes. The build's detector does not count suffixes (Resolution 2026-08-06, #88 declined), so three suffix-only Shadow Keys stay scheduled as a known and accepted deviation.
+
 A Rhyme Key is eligible to be a **Seed Word** only if its family contains
 **native** words — words that are *not* a regular inflection (`-s/-es/-ed/-ing`)
 or affixed form (`un-/re-/out-/…`) of a word in another Rhyme Key. A key whose

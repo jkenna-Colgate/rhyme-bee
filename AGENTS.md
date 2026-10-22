@@ -40,7 +40,15 @@ them.
 `vitest.config.ts` exists for one exclusion: `.claude/worktrees/`, where agent
 checkouts keep their own copy of every test file. Without it a bare `npm test`
 walks into them and reports several times the real suite — and passes, which is
-the dangerous direction to be wrong in. The real suite is 86 files.
+the dangerous direction to be wrong in. The real suite is 88 files.
+
+## Scratch scripts
+
+A throwaway script or measurement goes in `.scratch/<issue>/` (or
+`.scratch/no-issue/`), opening with a comment that says what it measures. Never
+in `dist-data/`, which is build output, and never named `*.test.ts`. `.scratch/`
+is gitignored, but the root `.ignore` lets `Grep` search it: search there before
+measuring anything again, because #241 redid a measurement `flap231.ts` had made.
 
 ## Context hygiene
 
