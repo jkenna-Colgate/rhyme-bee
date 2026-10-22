@@ -285,6 +285,24 @@ export class RhymeIndex {
     return this.#data.words.has(normaliseWord(word));
   }
 
+  /** True if the surface form is in the names data, demoted names included. */
+  isName(word: string): boolean {
+    return this.#data.names.has(normaliseWord(word));
+  }
+
+  /**
+   * Every reading the index holds for a surface form, in order, each marked if
+   * normalisation appended it rather than any source transcribing it. Pinning
+   * reads the same mark (`#requireBaseKey`); `scripts/lookup.ts` shows it.
+   */
+  readingsOf(word: string): { pronunciation: Pronunciation; generated: boolean }[] {
+    const prons = this.#data.pronunciations.get(normaliseWord(word)) ?? [];
+    return prons.map((pronunciation, i) => ({
+      pronunciation,
+      generated: prons.slice(0, i).some((earlier) => isGeneratedVariantOf(pronunciation, earlier)),
+    }));
+  }
+
   /**
    * Every wordhood-valid surface form with its pronunciations — the words that
    * can appear in a Puzzle (names and non-words excluded). The single traversal
@@ -344,11 +362,8 @@ export class RhymeIndex {
    * guard against ever minting a word's first Rhyme Key, only an empirical one.
    */
   #requireBaseKey(word: string, rhymeKey: RhymeKey): void {
-    const prons = this.#data.pronunciations.get(normaliseWord(word)) ?? [];
-    const hasBaseReading = prons.some(
-      (pron, i) =>
-        rhymeKeyOf(pron) === rhymeKey &&
-        !prons.slice(0, i).some((earlier) => isGeneratedVariantOf(pron, earlier)),
+    const hasBaseReading = this.readingsOf(word).some(
+      ({ pronunciation, generated }) => !generated && rhymeKeyOf(pronunciation) === rhymeKey,
     );
     if (!hasBaseReading) {
       throw new Error(
