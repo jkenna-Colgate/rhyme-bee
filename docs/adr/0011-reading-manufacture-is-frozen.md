@@ -1,5 +1,7 @@
 # Reading manufacture is frozen; a correction lands in the data, not in a new rule
 
+**Status:** amended 2026-07-30, 2026-10-07, 2026-10-14 and 2026-10-16. Reading manufacture is still frozen, now at six normalisation rules (three built, three decided and not built) and thirty affix rules. A name or a non-word the word list holds is corrected by a Demotion in `data/demotions.txt`, not in `data/names.txt` or `data/words.txt`, and the Judge writes a reading unattended only for a Missing Reading, never a Demotion.
+
 The build manufactures readings in two stages — coverage derivation
 (`src/coverage.ts`, `src/affixes.ts`) composes a reading for a known word that
 has none, and normalisation (`src/normalise.ts`) rewrites readings into the

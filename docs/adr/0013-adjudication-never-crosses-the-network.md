@@ -1,5 +1,7 @@
 # Adjudication never crosses the network
 
+**Status:** amended 2026-10-01. Every verdict is still reached in the browser with no request in flight. A Daily Puzzle Session is now copied out afterwards as a Session Record (ADR-0019), so the Appeal is no longer the only sensor.
+
 The game ships as a static, client-side artifact. The shell fetches the built
 Rhyme Index once, rehydrates it, and every Submission after that is judged in the
 browser — instantly, offline, with no request in flight. Hosting is a CDN

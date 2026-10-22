@@ -1,5 +1,7 @@
 # Rhyme is defined as the last stressed syllable onward
 
+**Status:** amended 2026-07-29, 2026-10-03, 2026-10-07 and 2026-10-14. The rule stands: two words rhyme when they share a Rhyme Key, the rime of the last stressed syllable (primary or secondary) and every syllable after it, strict about sound. It is applied to normalised readings, a Weak Rhyme is accepted beside it without scoring, and the substitution property binds every reading and every correction, which attach to a word or a word on one Rhyme Key and never to a pair, a Seed Word or a date.
+
 Two words rhyme when the sounds from their **last stressed vowel** to the end of the word match, where the stress may be primary *or* secondary. This is looser than a poet's perfect rhyme, which requires primary stress. Spelling is irrelevant throughout: `eight` rhymes with `ate`, `chocolate` does not.
 
 ## Considered Options

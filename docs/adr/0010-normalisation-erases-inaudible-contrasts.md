@@ -1,5 +1,7 @@
 # The game does not adjudicate contrasts a General American listener cannot hear
 
+**Status:** amended 2026-07-30. The bar depends on the rule's shape: a Normalisation that replaces a reading is admissible only if the contrast it erases is inaudible to a General American listener, and one that appends a reading only if its reach over the playable lexicon is measured (net of data errors, ADR-0018) and its error rate stated. Either way the committed guardrail set must survive intact.
+
 CMUdict encodes contrasts at a finer resolution than the ear. Read literally, every sub-perceptual distinction is promoted to a confident binary verdict — which is why `talked` was rejected for `docked`, a difference the maintainer could not hear across repeated TTS replays. A **normalisation** stage therefore rewrites the stored pronunciations once, at index-build time, before any Rhyme Key is computed, erasing contrasts a General American listener cannot resolve.
 
 The Rhyme rule is unchanged. Rhyme is still the sounds from the last stressed vowel to the end of the word (ADR-0001); what changes is the reading that rule is applied to. This ADR amends ADR-0001's claim that the rule needs no interpretation layer, and amends ADR-0002 to say *which* General American the game speaks.

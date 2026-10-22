@@ -1,5 +1,7 @@
 # A committed pronunciation supplement is the permanent override layer
 
+**Status:** amended 2026-07-29, superseded in part 2026-08-11. `data/supplement.dict` is still the permanent override layer and the only one that grants wordhood, but it is no longer the only source of readings: coverage derivation composes them too, and the Bonus Word default covers hand-written entries only. A correction may join a word's readings as well as replace them (ADR-0017), and the Judge now writes lines here too, only for a Missing Reading (ADR-0011, amended 2026-10-14).
+
 The wordhood set (`data/words.txt`) and pronunciations (`data/cmudict.dict`) are uncommitted and regenerated from pinned upstream sources, so a hand-edit is wiped on the next `npm run build:index`. We add a small **committed** supplement, merged over the upstream inputs at index-build time, as the authoritative human override: it both **adds** missing words (each with a pronunciation) and **corrects** upstream pronunciations (primarily mis-marked stress). This supplement is treated as **permanent infrastructure, not a temporary patch** — any future pronunciation source will still get some words wrong, and the supplement is the ground-truth override that outlives whatever produces the base data.
 
 ## Why not a structural data overhaul instead
