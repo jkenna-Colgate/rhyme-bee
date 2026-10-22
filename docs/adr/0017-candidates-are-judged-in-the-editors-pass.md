@@ -1,5 +1,7 @@
 # Candidates are judged in the Editor's Pass, and a correction may join rather than replace
 
+**Status:** amended 2026-10-14. The Judge now rules on each Candidate once, first, in a Batch or the Appeals job: a high-confidence Missing Reading writes a reading, and a medium-confidence one or a high-confidence Overrule makes an Unconfirmed Rhyme. The Editor's Pass rules on whatever the Judge leaves, and joining or replacing a reading stays the editor's choice.
+
 _2026-08-11_
 
 The Candidate Queue becomes a surface inside the Editor's Pass, and the acts an

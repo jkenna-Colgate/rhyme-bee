@@ -1,5 +1,7 @@
 # General American is the only accent the game adjudicates in
 
+**Status:** amended 2026-07-29. The accent is merged General American: `AO` and `AA` are one vowel except before `R`, so `stock` rhymes with `stalk` and `ball` with `doll`, while `for` does not rhyme with `far`.
+
 Rhyme is not a property of a word pair; it is a property of a word pair **in an accent**. The game therefore commits to General American, sourced from CMUdict, and states so to the player. Verdicts that are wrong in other accents are an accepted cost.
 
 ## Why this is not neutral
