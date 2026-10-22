@@ -1,0 +1,5 @@
+# Read by ripgrep (and so the Grep tool), not by git. `.scratch/` stays
+# gitignored, so nothing in it is committed, but an earlier measurement there is
+# only reusable if a search can find it (#246). Everything else git ignores,
+# node_modules, dist-data and .claude/worktrees included, stays out of searches.
+!/.scratch/
