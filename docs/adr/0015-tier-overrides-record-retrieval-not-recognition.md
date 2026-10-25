@@ -158,3 +158,15 @@ other. 1,205 scheduled Answers rhyme on more than one Rhyme Key.
 **A move waits for the Judge.** It would also catch a wrong reading, but it
 adds a second use of the model to the loop and stops every move whenever the
 Appeals job stops.
+
+**A move to Bonus Word on only the Sessions that reached Laureate.** Raised in
+[What holds the Reachability floor with nobody there?](https://github.com/jkenna-Colgate/rhyme-bee/issues/251)
+as an answer to the stopped-early reason: a player who reached Laureate was
+plainly trying, so the Answers such players rarely find are ones few produce.
+As stated it still feeds itself, because Laureate is a share of the maximum
+Score the move lowers. Judging who reached Laureate against the Tiers without
+the job's own moves would make it slow itself down instead. Rejected for now
+as more than the evidence can carry: with a handful of players it would wait
+years for its first move, and it needs a guard against its own loop. It is the
+shape to start from if a move to Bonus Word is ever revisited, and Reachability
+stays measured and not held until then.
