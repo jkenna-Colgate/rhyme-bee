@@ -1,5 +1,7 @@
 # Tier overrides record retrieval, which prevalence cannot measure
 
+**Status:** amended 2026-10-25. The editor is no longer the only writer of Tier verdicts. With nobody ruling on it, the unattended loop moves a Bonus Word to Answer once Session Records show that enough players produce it, from a file of its own read over this one, and a verdict the editor locks beats it. Nothing but the editor moves a word to Bonus Word.
+
 A committed layer, `data/tier-overrides.csv`, lets the puzzles editor set any word's **Tier** by name, overriding the measured prevalence the split is otherwise drawn from ([ADR-0003](./0003-word-prevalence-not-corpus-frequency.md)). It is merged over the parsed prevalence map at index-build time, before `RhymeIndex#tier` reads it, so no adjudication code learns that overrides exist. Like the pronunciation supplement it is **permanent infrastructure, not a patch** ([ADR-0009](./0009-pronunciation-supplement-is-the-permanent-override-layer.md)): any prevalence source will get some words wrong for this game's purposes, because the game needs a quantity no such source measures.
 
 This is the mechanism ADR-0003 already called for — *"prevalence sorts the tiers automatically, but a light human pass over each curated puzzle catches the handful the data gets wrong"* — built at last, and narrowed. ADR-0003 gave that human pass two jobs: catching individual errors, and tuning the threshold. This ADR keeps the first and severs the second (see **The circularity this must never become**).
@@ -79,3 +81,80 @@ It is tempting, and wrong, to plot the prevalence of demoted words and slide the
 - **Blast radius is one day.** The shipped schedule uses 260 distinct Rhyme Keys across 260 days with no repeats, so an override touches at most one scheduled day per Rhyme Key of the word. Rechecking the affected days costs ~90 ms each; rechecking all 260 costs 23 s and stays a deliberate pre-ship action.
 
 - **Authoring is the Editor's Pass**, and this layer is what moves it to a browser: a Tier judgement is picking from a displayed list, which is the task a CLI is worst at, and this ADR makes that act routine. See [ADR-0016](./0016-the-editors-pass-is-a-browser-tool.md).
+
+## Amendment, 2026-10-25: Session Records move a word to Answer
+
+Settled in
+[Do a Tier move from Session Records and a No False Accepts correction land with nobody ruling on them?](https://github.com/jkenna-Colgate/rhyme-bee/issues/242).
+
+This ADR says nothing measures retrieval. Session Records do, for the words a
+Puzzle already holds: a word a player found is a word that player produced.
+They read in one direction only, and the unattended loop acts in that direction
+alone.
+
+**A Bonus Word moves to Answer when enough players produce it.** The job with
+no model in it ([ADR-0021](./0021-the-unattended-loop-calls-a-model-in-one-place.md))
+moves a word once there is 95% confidence that more than a set share of players
+find it. The share is a setting with no value claimed. The evidence is per word,
+pooled over every Session on every day the word is in and over every lap, and a
+find counts whether the word was an Answer or a Bonus Word when it was found.
+The move is a Tier verdict on the word, so it holds on every Rhyme Key the word
+rhymes on, as an override always has. It does not wait for a day to fail the
+Reachability floor and is not that floor's fix: a day under the floor is listed
+in the job's run report, and its levers (the Laureate line among them) are the
+maintainer's.
+
+**Nothing in the loop moves a word to Bonus Word.** A Session that never found a
+word may have stopped early, for a reason that has nothing to do with the word,
+and the record cannot tell the two apart. Moving such words would also feed
+itself: a smaller maximum Score brings Laureate sooner, players stop sooner,
+and the words they no longer reach look unknown in turn. A word leaves the
+Answers only by the editor's verdict, as before.
+
+**The job writes a file of its own, read over this one.** Prevalence, then the
+editor's verdicts, then the job's moves. The editor's verdicts are judgment and
+the job's are evidence, so the evidence wins. The editor can still overrule it
+by **locking** a verdict, which the job never overrides. With moves in one
+direction, a lock has one use: keeping a Bonus Word from becoming an Answer.
+The job never writes this file, so its header stays true.
+
+**Only a word with a prevalence row, and not in the names data, can move.**
+Players also type words to see what scores, so a high find share is evidence
+that a word is produced and not that it is a word. 2,596 of the 3,238 Bonus
+Words on the Schedule have no prevalence row, which is mostly why they are
+Bonus Words: a sample is names (`blayne`, `rudolf`), junk (`goen`, `woom`),
+misspellings (`opthalmology`) and a few real words (`unamended`). The real ones
+can still be moved by the editor. A word held back is listed in the run report,
+as is every move and every editor verdict a move overrode.
+
+The remaining risk is a known word on a wrong reading that many players type
+anyway. Nothing checks it, and a lock or a Demotion undoes it on a later visit.
+
+### Rejected
+
+**An Answer nobody found becomes a Bonus Word, on a day under the floor.** This
+was the Reachability floor's fix in
+[What number passes each part of the Playability Bar, and what measures it?](https://github.com/jkenna-Colgate/rhyme-bee/issues/225).
+Rejected for the two reasons above: a Session that stopped early reads as one
+that could not find the word, and the move shrinks Puzzles by feeding itself.
+That same decision's move to Answer, on a share of one day's Sessions, is
+replaced by the pooled evidence here.
+
+**Moves in both directions, kept from shrinking a Puzzle below the size band.**
+Bounds the shrinking without stopping it, so days drift toward the band's
+floor.
+
+**The editor's verdict beats the evidence.** The maintainer's ruling: the
+verdicts in this file were made by judgment alone, and evidence is stronger.
+
+**The newest row wins, whoever wrote it.** It looks like a way for the editor
+to correct the job, but the job's next run sees the same evidence and writes
+the move again, so the correction lasts a month.
+
+**Each day's evidence acts alone.** A word on two Rhyme Keys (`excuse` on the
+`booze` and `juice` days) would be moved by one day and moved back by the
+other. 1,205 scheduled Answers rhyme on more than one Rhyme Key.
+
+**A move waits for the Judge.** It would also catch a wrong reading, but it
+adds a second use of the model to the loop and stops every move whenever the
+Appeals job stops.
