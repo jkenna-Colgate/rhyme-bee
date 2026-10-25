@@ -5,7 +5,7 @@ A daily word puzzle in the spirit of NYT Spelling Bee, but the mechanic is sound
 ## Language
 
 **Seed Word**:
-The single word a Puzzle is built around, shown *and spoken* to the player at the start. Speaking it is not a convenience feature: the game adjudicates against a pronunciation, so that pronunciation is established out loud before play rather than discovered through rejection. That only works for a word heard one way, so a word can be a Seed Word only if none of its other pronunciations rhymes with a word the one it is pinned to does not.
+The single word a Puzzle is built around, shown *and spoken* to the player at the start. Speaking it is not a convenience feature: the game adjudicates against a pronunciation, so that pronunciation is established out loud before play rather than discovered through rejection. That only works for a word heard one way, so a word can be a Seed Word only if none of its other pronunciations rhymes with a word the one it is pinned to does not. And where its family has a native word to offer, a Seed Word carries the main stress on its Rhyme Key, so the rhyme the player hears is the one the Puzzle is about: the family of `cup` is shown as `cup` and not as `makeup`.
 _Avoid_: Prompt, target, clue, base word
 
 **Rhyme Key**:

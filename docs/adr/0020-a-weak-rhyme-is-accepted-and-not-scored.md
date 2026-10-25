@@ -1,6 +1,6 @@
 # A Weak Rhyme is accepted and not scored
 
-**Status:** amended 2026-10-07. A Weak Rhyme is accepted, scores nothing and is shown as a Bonus Word (decided, not built). The test under it is replaced and provisional: the two last syllables share a rime, stressed in one word and unstressed in the other, and that rime is a vowel actually said plus at least one consonant. It holds in either order and has no substitution property.
+**Status:** amended 2026-10-07 and 2026-10-25. A Weak Rhyme is accepted, scores nothing and is shown as a Bonus Word (decided, not built). The test under it is replaced and provisional: the two last syllables share a rime, stressed in one word and unstressed in the other, and that rime is a vowel actually said plus at least one consonant. It holds in either order and has no substitution property.
 
 A Submission that matches the Seed Word only on an unstressed final syllable
 (`magic` for `trick`, `abandoning` for `wing`) is no longer rejected. It is
@@ -247,8 +247,37 @@ That is now three cases:
   [On a weak-vowel Seed Word, where do Points stop?](https://github.com/jkenna-Colgate/rhyme-bee/issues/233)
   settles it.
 
+Ruled 2026-10-25: see the amendment below.
+
 ### What would reopen the test
 
 Session Records, which keep every rejection, showing which unstressed endings
 players actually submit. That is evidence no ear in this repository has
 supplied.
+
+## Amendment (2026-10-25): the disputed shape is ruled by heard stress
+
+[On a weak-vowel Seed Word, where do Points stop?](https://github.com/jkenna-Colgate/rhyme-bee/issues/233)
+ruled on the words left open above. A Submission earns Points when its last
+stressed syllable, main or secondary, has the Seed Word's Rhyme Key. That is
+ADR-0001's rule unchanged, so a beat heard on a weak last syllable is a stress,
+and a word whose reading lacks one is a missing reading.
+
+- **Said-back is not the test.** The ticket had briefly ruled that a word earns
+  Points only when, given it as the Seed Word, people say the short family back
+  (nobody given `magic` says `trick`). That ruling is withdrawn. The one tester
+  outside this repository said `lunatic` rhymes with `trick` and `synonym` with
+  `him`, and given `acronym` said `swim`, so for them the two tests agreed, and
+  the models' "no" was the text-only prompt that
+  [the instrument ticket](https://github.com/jkenna-Colgate/rhyme-bee/issues/235)
+  found unsteady. Said-back stays a way to *find* a missing beat.
+- **The shape is no longer kept from the Judge.** A Candidate shaped like
+  `heretic` is ruled like any other. The engine already holds a reading for such
+  a word, so the ruling is an Overrule and makes at most an Unconfirmed Rhyme
+  (ADR-0017, amended), which the player sees exactly as the Weak Rhyme it
+  replaces.
+- **Missing marks written by hand.** `heretic`, `limerick`, `pyramid` and the
+  unmarked compounds (`drumstick`, `carsick`, `catnip`) get a reading with the
+  mark, in the pronunciation supplement.
+- **What stays.** `magic`, `visited`, `finish` and `muffin` have no beat on the
+  last syllable and stay as this ADR and its first amendment place them.
