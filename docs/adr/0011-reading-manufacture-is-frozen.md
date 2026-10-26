@@ -416,3 +416,68 @@ score it.
 The Judge is told every normalisation as a sound it must hear as one, since it
 refused `cruder` for `computer` in five runs of five on the Rhyme rule as
 written.
+
+## Amendment, 2026-10-26: a vowel before `r` is written one way
+
+Settled in
+[Is a vowel before r one sound in a scoring Rhyme?](https://github.com/jkenna-Colgate/rhyme-bee/issues/254).
+The freeze stands at **seven normalisation rules** and thirty affix rules. The
+addition is decided and not built. The Rhyme rule is unchanged.
+
+### Stressed "ee", "ay", "oo" before `r` are read as "ih", "eh", "uu"; and "a" too, before `r` and a vowel
+
+CMUdict writes one General American sound two ways before `r`: `here` as "ee"
+and `near` as "ih", `poor` as "oo" and `tour` as "uu", `plowshare` as "ay" and
+`share` as "eh". Before `r` and a vowel it also leaves 65 Answer-band words
+(`barbaric`, `particularity`) on "a" after joining nearly all the rest to "eh"
+(`marry`, `merry` and `Mary` are already one). The rule reads each pair as one
+sound wherever the vowel is stressed: at the end of a word, before a
+consonant, and before a vowel (for "a", only before a vowel, so `car` and
+`care` stay apart): `here` / `near`, `hearing` / `cheering`, `engineered` /
+`beard`, `poor` / `tour`, `menswear` / `air`, `prairies` / `berries`,
+`barbaric` / `generic`. It also turns the stray readings into one respelling,
+so `here` and `beer` stop showing two ways.
+
+It **replaces**, so ADR-0010 admits it only if the contrast is unavailable to a
+General American listener and the guardrail set survives.
+
+- **The contrast.** None of the four is a contrast in General American: no
+  speaker tells "ee" + `r` from "ih" + `r`, or "oo" + `r` from "uu" + `r`.
+  CMUdict already writes `mirror` and `nearer` alike, which settles the vowel
+  before `r` and a vowel. The maintainer heard each pair as a rhyme, and
+  `sure` with `tour` once `sure` is said "shoor".
+- **Reach.** Measured on top of the decided weak "ih" / weak "uh" merge, the
+  "er" after "eye" rule and the t and d rule: 109 groups of families join;
+  869 Answer-band words gain rhymes; the largest family stays at 876. Eight
+  scheduled Seed Words gain Answers, most on `engineer` (+14: `here`, `hear`,
+  `tier`), `bioengineering` (+9: `hearing`, `peering`) and `cure` (+8: `poor`,
+  `amour`, `velour`). No two scheduled days become one Puzzle.
+- **Guardrails.** The nine committed pairs still refuse. The build adds rows
+  for the contrasts next to the merge: `here` / `hair`, `fear` / `fair`,
+  `fair` / `fur`, `poor` / `purr`, `tour` / `tar`.
+- **Readings it exposes.** Joining "oo" + `r` to `cure` would score three
+  wrong readings, corrected in `data/supplement.dict` rather than kept out of
+  the rule: `voyeur` and `raconteur` end in "er", and `doer` is two
+  syllables. `grandeur` stays: "GRAN-joor" rhymes with `cure`.
+
+### What was not made a rule
+
+**`poor` / `pour`**: "uu" + `r` against "or". General American speakers split
+this word by word (`poor` and `your` often join `pour`, `cure` and `tour`
+rarely do), and three Appeals on file are of this shape (`moored`, `toured`,
+`unmoored` for `landlord`). As a replacement it would make `cure` and `core`
+one Puzzle and add 104 Answers to `cure`; as an appended reading limited to
+words without a "y" sound it still gives 133 words a second Rhyme Key,
+`jury` for `category` among them. It stays word by word: such an Appeal is an
+Overrule, so the Judge makes at most an Unconfirmed Rhyme and the editor
+confirms one word at a time. `sure` said as "shore" is the same case. For
+the same reason `poor` / `pour` is not a guardrail row.
+
+### The unfreeze clause was not met, again
+
+No Appeal on file (189 rows) is of the merged shape; the three above are the
+unmerged one. The Synthetic Player produced 19 of the rescued words in 225
+runs, all rejected (`here`, `hear`, `tier` for `engineer`; `hearing`,
+`peering` for `bioengineering`; `engineered` for `beard`; `poor` for
+`cure`). The rule is admitted on the maintainer's ruling, as the t and d rule
+was.
