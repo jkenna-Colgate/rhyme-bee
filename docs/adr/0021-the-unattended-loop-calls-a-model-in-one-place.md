@@ -142,3 +142,28 @@ and the Playability Bar does not wait for it.
 Three things were not measured: how many calls the subscription allows in one
 sitting, what an Opus run costs, and whether a report commit counts as the
 repository activity GitHub's 60-day rule asks for.
+
+## Amendment (2026-10-26): how the jobs reach players
+
+Settled in
+[Where does the job with no model in it rebuild and deploy, when ADR-0013 keeps the index build off CI?](https://github.com/jkenna-Colgate/rhyme-bee/issues/255).
+Three consequences above change.
+
+- **[ADR-0013](./0013-adjudication-never-crosses-the-network.md) is amended,
+  not untouched.** Its verdicts still never cross the network. What changed is
+  that CI now builds the index from a private source mirror and deploys on every
+  push to main, so what the jobs write reaches players with nobody there.
+- **One scheduled workflow, made of separate commands.** Each run pulls and
+  judges Appeals, then runs the Tier moves, then commits the run report, then
+  calls the same deploy a push to main runs. The Appeals step may fail and the
+  rest still runs. Each command also runs by hand.
+- **Three secrets, not two:** the Claude token, the read-only R2 token (which
+  now also reads the source mirror), and a Cloudflare token scoped to deploying
+  the Worker. The last two are created with no expiry, so when the Claude token
+  runs out only the Appeals step stops.
+- **The 60-day rule is met two ways at once.** The run report is committed, and
+  each run also calls GitHub's enable-workflow API on itself, the method
+  keepalive projects use. Neither is documented to count. A throwaway public
+  repository with no other activity tests both, and nothing waits on its answer:
+  a job that stops leaves the game at the bar, and the deploy on push keeps
+  working.

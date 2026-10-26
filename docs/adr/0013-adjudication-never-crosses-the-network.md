@@ -1,6 +1,6 @@
 # Adjudication never crosses the network
 
-**Status:** amended 2026-10-01. Every verdict is still reached in the browser with no request in flight. A Daily Puzzle Session is now copied out afterwards as a Session Record (ADR-0019), so the Appeal is no longer the only sensor.
+**Status:** amended 2026-10-01 and 2026-10-26. Every verdict is still reached in the browser with no request in flight. A Daily Puzzle Session is now copied out afterwards as a Session Record (ADR-0019), so the Appeal is no longer the only sensor. The index is now built and deployed by CI from a private source mirror, on every push to main.
 
 The game ships as a static, client-side artifact. The shell fetches the built
 Rhyme Index once, rehydrates it, and every Submission after that is judged in the
@@ -174,3 +174,53 @@ Submissions never required judging them on a server: the record leaves on load
 and when the page is hidden, outside the loop, through a route that may fail
 freely like the other two. The two reversals that remain are a public launch and
 a cross-player comparison.
+
+## Amendment (2026-10-26): CI builds and deploys from a private mirror
+
+The decision stands: every verdict is reached in the browser with no request in
+flight. What changes is where the index is built. "Rebuilding the index in CI"
+was rejected above for two reasons, and the private source mirror this record
+named as the way off the maintainer's machine answers both. It was settled in
+[Where does the job with no model in it rebuild and deploy, when ADR-0013 keeps the index build off CI?](https://github.com/jkenna-Colgate/rhyme-bee/issues/255),
+one ticket of the effort to run the game unattended
+([#218](https://github.com/jkenna-Colgate/rhyme-bee/issues/218)).
+
+**The sources stay pinned.** The four source files git does not hold
+(`cmudict.dict`, `words.txt`, `names.txt`, `prevalence.csv`) are uploaded to the
+private R2 bucket, and their checksums are committed. CI fetches the files and
+refuses to build if one fails its checksum, so an upstream change cannot reach a
+verdict between two deploys. The laptop build makes the same check against its
+local copies, so both builders build from the same bytes. Changing a source is
+one command: it uploads the file and rewrites the checksum, and the commit is
+what ships it.
+
+**The prevalence norms are still not republished.** They sit in a private bucket
+and are never logged or uploaded as a workflow artifact.
+
+**Every push to main that passes the checks deploys** (continuous deployment).
+The checks are the index rebuild, which runs the Continuity repair, the test
+suite, both typechecks and the web build. A failure stops the deploy and the
+live game stays as it was. The unattended jobs reach players the same way: they
+commit, then call the same deploy. One path means the route the maintainer
+exercises by hand on every merge is the one the jobs use after they leave, so it
+has shipped many times before it first runs with nobody there. Main is kept
+shippable, and unfinished work waits behind a flag. There is no browser test: a
+rendering bug shows up while the maintainer is still here, and once they leave
+the code stops changing.
+
+**CI must match the laptop before it may deploy.** Once, at setup, CI and the
+laptop build the index from the same commit and the hashes must be equal. A
+change of builder must change no verdict, and nothing else would notice one that
+did.
+
+**The laptop deploy stays,** as a way to ship when Actions is down.
+
+**A switch was considered and rejected:** keeping the CI deploy off until the
+maintainer leaves. It would avoid shipping unfinished work merged to main, but
+the unattended deploy would then run for the first time after the maintainer
+left, which is the worst time to find a fault in it.
+
+**What remains of the consequences above:** the maintainer's machine is no
+longer the only build host, and the deploy is a push rather than a laptop
+command. The Cloudflare deploy token and the R2 read token are created with no
+expiry, so the Claude token is the only credential in the loop that runs out.
