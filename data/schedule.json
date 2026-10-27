@@ -1946,9 +1946,9 @@
       "weekday": "Sun",
       "week": 30,
       "seed": "storm",
-      "rhymeKey": "AO R AH M",
-      "answerCount": 36,
-      "difficulty": 0.1966
+      "rhymeKey": "AO R M",
+      "answerCount": 33,
+      "difficulty": 0.2096
     },
     {
       "date": "2027-03-01",
@@ -2009,9 +2009,9 @@
       "weekday": "Sun",
       "week": 31,
       "seed": "worn",
-      "rhymeKey": "AO R AH N",
-      "answerCount": 47,
-      "difficulty": 0.2733
+      "rhymeKey": "AO R N",
+      "answerCount": 45,
+      "difficulty": 0.2844
     },
     {
       "date": "2027-03-08",
@@ -2360,9 +2360,9 @@
       "weekday": "Thu",
       "week": 37,
       "seed": "curl",
-      "rhymeKey": "ER AH L",
-      "answerCount": 20,
-      "difficulty": 0.097
+      "rhymeKey": "ER L",
+      "answerCount": 14,
+      "difficulty": 0.1548
     },
     {
       "date": "2027-04-16",
