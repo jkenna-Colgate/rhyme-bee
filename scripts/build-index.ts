@@ -5,7 +5,9 @@
  *
  * Reads the raw inputs from `data/` (uncommitted — see .gitignore and
  * data/README.md), writes the built artifact and the dropped-words and
- * derived-words reports to `dist-data/`. Rebuilding from the same pinned inputs
+ * derived-words reports to `dist-data/`. It then runs the Continuity check over
+ * `data/schedule.json`, which is the one file in `data/` it may write: a day
+ * the check repairs is written back there (#256). Rebuilding from the same pinned inputs
  * yields the same verdicts (story 35); nothing here touches the network.
  *
  * The index itself is written content-addressed, as `index-<hash>.json` plus a
@@ -17,7 +19,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { manufactureIndexData } from "../src/manufacture.ts";
-import { serialise } from "../src/serialise.ts";
+import { checkContinuity, continuityLines } from "../src/continuity.ts";
+import { parseSchedule } from "../src/schedule.ts";
+import { deserialise, serialise } from "../src/serialise.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { checkTierSentinels } from "../src/tierOverride.ts";
 import { MANIFEST_FILENAME, writeIndexArtifact } from "./indexArtifact.ts";
@@ -86,10 +90,8 @@ const { data, demoted, derived, dropped, overridden } = manufactureIndexData({
 });
 
 mkdirSync(outDir, { recursive: true });
-const manifest = writeIndexArtifact(
-  outDir,
-  JSON.stringify(serialise(data, { knownnessThreshold: KNOWNNESS_THRESHOLD }, sources)),
-);
+const artifact = serialise(data, { knownnessThreshold: KNOWNNESS_THRESHOLD }, sources);
+const manifest = writeIndexArtifact(outDir, JSON.stringify(artifact));
 writeFileSync(resolve(outDir, "dropped-report.json"), JSON.stringify(dropped, null, 2));
 
 // Derived-words report (issue #76): every word coverage derivation gave a
@@ -121,3 +123,26 @@ console.log(
   `Tier-overrode ${overridden.length} words` +
     `${reversed.length > 0 ? ` (${reversed.length} reversed: ${reversed.map((o) => o.word).join(", ")})` : ""}.`,
 );
+
+// The Continuity check (#256): every place in the Schedule, past dates
+// included, because every place comes round again. A failing day is repaired
+// in `data/schedule.json` where it can be and counted as Free Play where it
+// cannot, and none of it blocks the build — the index above is already
+// written, and with nobody attending, a blocked build never unblocks. Run on
+// the index exactly as it ships, read back from the artifact's own shape.
+const schedulePath = resolve(dataDir, "schedule.json");
+try {
+  const raw = JSON.parse(readFileSync(schedulePath, "utf8")) as Record<string, unknown>;
+  const schedule = parseSchedule(raw);
+  if (schedule === null) {
+    console.log(`Continuity: ${schedulePath} is not a readable schedule; nothing checked.`);
+  } else {
+    const report = checkContinuity(schedule.days, deserialise(artifact));
+    if (report.repairs.length > 0) {
+      writeFileSync(schedulePath, `${JSON.stringify({ ...raw, days: report.days }, null, 2)}\n`);
+    }
+    for (const line of continuityLines(report)) console.log(line);
+  }
+} catch (error) {
+  console.log(`Continuity: the check could not run (${error instanceof Error ? error.message : String(error)}).`);
+}

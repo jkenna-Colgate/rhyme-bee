@@ -115,7 +115,7 @@ export interface CurationReport {
  * fix that but prefers `messed` to `best` and `crowned` to `round`, since an
  * inflected form can out-rank its own stem; native-first settles that.
  */
-function chooseRepresentative(words: string[], index: RhymeIndex): string {
+export function chooseRepresentative(words: string[], index: RhymeIndex): string {
   const rank = (word: string) => ({
     derived: index.derivation.isDerived(word) ? 1 : 0,
     ambiguous: index.isAmbiguous(word) ? 1 : 0,
