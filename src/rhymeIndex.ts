@@ -20,6 +20,7 @@ import {
   type RhymeKey,
 } from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
+import { BEFORE_R_MERGES, GLIDING_VOWELS, RHOTIC, TAP, WEAK_ER } from "./normalise.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
 import { schwaTwinOf } from "./schwaTwins.ts";
@@ -121,7 +122,7 @@ export interface RhymeIndexData {
    * reading a Weak Rhyme is worked out from; absent, a word reads the same both
    * ways. Optional, so data built without it reads every word as unchanged.
    */
-  writtenReadings?: Map<string, Pronunciation[]>;
+  unmergedReadings?: Map<string, Pronunciation[]>;
   /** Common English words, lower-cased. The wordhood gate; excludes names. */
   words: Set<string>;
   /** Lower-cased names, used only to label a rejection as a Proper Noun. */
@@ -169,15 +170,8 @@ function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunc
   const consonant = candidate.length - 2;
   return candidate
     .slice(0, -1)
-    .every((phoneme, i) => phoneme === earlier[i] || (i === consonant && phoneme === "T" && earlier[i] === "D"));
+    .every((phoneme, i) => phoneme === earlier[i] || (i === consonant && phoneme === "T" && earlier[i] === TAP));
 }
-
-/**
- * The vowel the `vowel-before-r` rule, which runs after stress promotion, writes
- * for a vowel promotion has just stressed before `r` (#263). "a" is never one:
- * promotion stresses only the last vowel, and "a" merges only before `r` and a vowel.
- */
-const PROMOTED_BEFORE_R: Record<string, string> = { IY: "IH", EY: "EH", UW: "UH" };
 
 /**
  * True if `candidate` is exactly `earlier` with one unstressed vowel promoted
@@ -201,8 +195,15 @@ function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronuncia
   if (stressOf(original) !== 0) return false;
   const promoted = withStress(original, 2);
   if (candidate[diffIndex] === promoted) return true;
-  const respelled = PROMOTED_BEFORE_R[bareSound(original)];
-  return respelled !== undefined && earlier[diffIndex + 1] === "R" && candidate[diffIndex] === withSound(promoted, respelled);
+  // The `vowel-before-r` rule runs after promotion and respells a vowel it has
+  // just stressed before `r` (#263). Its "a" never applies here: promotion
+  // stresses only the last vowel, and "a" merges only before `r` and a vowel.
+  const respelled = BEFORE_R_MERGES.get(bareSound(original));
+  return (
+    respelled !== undefined &&
+    earlier[diffIndex + 1] === RHOTIC &&
+    candidate[diffIndex] === withSound(promoted, respelled)
+  );
 }
 
 /**
@@ -220,9 +221,9 @@ function isGlideRVariantOf(candidate: Pronunciation, earlier: Pronunciation): bo
   if (diffs.length !== 1) return false;
   const i = diffs[0]!;
   const glide = earlier[i - 1];
-  if (glide === undefined || !["AY", "AW", "OY"].includes(bareSound(glide))) return false;
-  const pair = [earlier[i], candidate[i]].sort().join(" ");
-  return pair === "ER0 R";
+  if (glide === undefined || !GLIDING_VOWELS.has(bareSound(glide))) return false;
+  const [was, now] = [earlier[i], candidate[i]];
+  return (was === WEAK_ER && now === RHOTIC) || (was === RHOTIC && now === WEAK_ER);
 }
 
 /**
@@ -230,7 +231,10 @@ function isGlideRVariantOf(candidate: Pronunciation, earlier: Pronunciation): bo
  * normalisation appended alongside it, rather than one the pinned data ever
  * transcribed. The three shapes above are the whole of the frozen rule set that
  * appends (ADR-0011); the rules that replace (the cot-caught merger, the weak-
- * vowel merge, the tap) never grow a word's reading count, so they need no shape here.
+ * vowel merge, the tap, the vowel before `r`) never grow a word's reading count,
+ * so they need no shape here, only an allowance in a shape above where one runs
+ * after an appending rule and rewrites its variant differently (see `RULES` in
+ * src/normalise.ts).
  */
 function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   return (
@@ -358,9 +362,9 @@ export class RhymeIndex {
    * out from these, so `aspirin` for `win` keeps its written "ih". Every other
    * rule has run on them, so they differ from `readingsOf` only where that one did.
    */
-  writtenReadingsOf(word: string): Pronunciation[] {
+  unmergedReadingsOf(word: string): Pronunciation[] {
     const w = normaliseWord(word);
-    return this.#data.writtenReadings?.get(w) ?? this.#data.pronunciations.get(w) ?? [];
+    return this.#data.unmergedReadings?.get(w) ?? this.#data.pronunciations.get(w) ?? [];
   }
 
   /**

@@ -127,8 +127,8 @@ console.log(
 // The Continuity check (#256): every place in the Schedule, past dates
 // included, because every place comes round again. A failing day is repaired
 // in `data/schedule.json` where it can be and counted as Free Play where it
-// cannot, and none of it blocks the build — the index above is already
-// written, and with nobody attending, a blocked build never unblocks. Run on
+// cannot. None of it blocks the build: the index above is already written,
+// and with nobody attending, a blocked build never unblocks. Run on
 // the index exactly as it ships, read back from the artifact's own shape.
 const schedulePath = resolve(dataDir, "schedule.json");
 try {

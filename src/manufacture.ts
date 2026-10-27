@@ -122,9 +122,9 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   // The readings a Weak Rhyme is worked out from are kept beside them, for the
   // words that hold wordhood: a Weak Rhyme is tested only on a Submission that
   // has already passed the wordhood gate, so nothing else would ever read one.
-  const written = new Map<string, Pronunciation[]>();
-  applyNormalisation({ pronunciations, writtenReadings: written });
-  const writtenReadings = new Map([...written].filter(([word]) => words.has(word)));
+  const unmerged = new Map<string, Pronunciation[]>();
+  applyNormalisation({ pronunciations, unmergedReadings: unmerged });
+  const unmergedReadings = new Map([...unmerged].filter(([word]) => words.has(word)));
 
   // 5. The Retrieval override layer (ADR-0015), merged over the finished
   // prevalence map before any Tier is read — so no adjudication code learns
@@ -145,7 +145,7 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   dropped.sort((a, b) => a.word.localeCompare(b.word));
 
   return {
-    data: { pronunciations, writtenReadings, words, names, prevalence },
+    data: { pronunciations, unmergedReadings, words, names, prevalence },
     demoted,
     derived,
     dropped,

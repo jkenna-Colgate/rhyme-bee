@@ -223,13 +223,13 @@ describe("the weak vowel a Weak Rhyme reads is the one the dictionary wrote (#26
 
   it("keeps the written ih of `aspirin` and `magic`, where a Rhyme reads uh", () => {
     expect(index.rhymeKeysOf("magic")).toEqual(["AE JH AH K"]);
-    expect(index.writtenReadingsOf("magic")).toEqual([["M", "AE1", "JH", "IH0", "K"]]);
-    expect(index.writtenReadingsOf("aspirin")).toEqual([["AE1", "S", "P", "R", "IH0", "N"]]);
+    expect(index.unmergedReadingsOf("magic")).toEqual([["M", "AE1", "JH", "IH0", "K"]]);
+    expect(index.unmergedReadingsOf("aspirin")).toEqual([["AE1", "S", "P", "R", "IH0", "N"]]);
   });
 
   it("gives a word the merge never touched its ordinary readings", () => {
-    expect(index.writtenReadingsOf("trick")).toEqual([["T", "R", "IH1", "K"]]);
-    expect(index.writtenReadingsOf("muffin")).toEqual(index.readingsOf("muffin").map((r) => r.pronunciation));
+    expect(index.unmergedReadingsOf("trick")).toEqual([["T", "R", "IH1", "K"]]);
+    expect(index.unmergedReadingsOf("muffin")).toEqual(index.readingsOf("muffin").map((r) => r.pronunciation));
   });
 });
 

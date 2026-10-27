@@ -68,6 +68,20 @@ export function withStress(phoneme: Phoneme, stress: 0 | 1 | 2): Phoneme {
   return bareSound(phoneme) + String(stress);
 }
 
+/** True for a vowel carrying primary or secondary stress, either of which can open a Rhyme Key. */
+export function isStressed(phoneme: Phoneme): boolean {
+  const stress = stressOf(phoneme);
+  return stress === 1 || stress === 2;
+}
+
+/** The index of the vowel that opens the reading's Rhyme Key, or null if it has none. */
+export function lastStressedIndex(pronunciation: Pronunciation): number | null {
+  for (let i = pronunciation.length - 1; i >= 0; i--) {
+    if (isStressed(pronunciation[i]!)) return i;
+  }
+  return null;
+}
+
 /**
  * The Rhyme Key of a single pronunciation: scan back to the last vowel marked
  * primary or secondary, then take every phoneme from there to the end with
@@ -75,15 +89,8 @@ export function withStress(phoneme: Phoneme, stress: 0 | 1 | 2): Phoneme {
  * vowel (e.g. a bare function word), which cannot anchor a rhyme.
  */
 export function rhymeKeyOf(pronunciation: Pronunciation): RhymeKey | null {
-  let start = -1;
-  for (let i = pronunciation.length - 1; i >= 0; i--) {
-    const stress = stressOf(pronunciation[i]!);
-    if (stress === 1 || stress === 2) {
-      start = i;
-      break;
-    }
-  }
-  if (start === -1) return null;
+  const start = lastStressedIndex(pronunciation);
+  if (start === null) return null;
   return pronunciation
     .slice(start)
     .map(bareSound)

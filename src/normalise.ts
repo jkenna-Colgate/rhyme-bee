@@ -40,11 +40,25 @@
  * `src/__tests__/normalisation-guardrails.test.ts` survives intact (ADR-0010). A
  * rule may replace a reading or append a variant alongside it; which it does is
  * a decision recorded with the rule.
+ *
+ * Where it sits in `RULES` is part of the decision too, and the order and the
+ * reason for each place are written once, at `RULES`. Two things decide a
+ * place. A rule that reads the stress digits sees different readings before and
+ * after stress promotion, so its place relative to promotion is chosen, and an
+ * append rule must run where its reach was measured. And the index tells an
+ * appended reading from a transcribed one only by its shape
+ * (`isGeneratedVariantOf` in src/rhymeIndex.ts): a replacing rule that runs
+ * after an appending one rewrites the variant as well as the reading it came
+ * from, and if the two are rewritten differently that recogniser has to be
+ * taught the difference, or the variant is taken for a transcribed reading and
+ * a Seed Word can be pinned to it.
  */
 
 import {
   bareSound,
+  isStressed,
   isVowel,
+  lastStressedIndex,
   rhymeKeyOf,
   stressOf,
   withSound,
@@ -62,12 +76,12 @@ export interface NormalisationTarget {
   /** Surface form -> its pronunciations (mutated in place). */
   pronunciations: Map<string, Pronunciation[]>;
   /**
-   * Filled by this stage, if given: surface form -> its readings after every
-   * rule but the `scoringOnly` ones, for each word those rules changed. It is
+   * Filled by this stage, if given: surface form -> its readings unmerged, after
+   * every rule but the `scoringOnly` ones, for each word those rules changed. It is
    * the reading a Weak Rhyme is worked out from (ADR-0020), which has to see the
    * weak vowel the dictionary wrote. A word absent here reads the same both ways.
    */
-  writtenReadings?: Map<string, Pronunciation[]>;
+  unmergedReadings?: Map<string, Pronunciation[]>;
 }
 
 export interface NormalisationRule {
@@ -76,8 +90,8 @@ export interface NormalisationRule {
   /**
    * True for a rule that decides a Rhyme but must not reach the reading a Weak
    * Rhyme is worked out from (ADR-0020). The stage runs every rule for the
-   * reading the index holds, and every rule but these for the written reading
-   * it keeps beside it (`NormalisationTarget.writtenReadings`).
+   * reading the index holds, and every rule but these for the unmerged reading
+   * it keeps beside it (`NormalisationTarget.unmergedReadings`).
    */
   scoringOnly?: boolean;
   /** Rewrite one word's readings — replacing them, or appending variants. */
@@ -86,7 +100,7 @@ export interface NormalisationRule {
 
 const CAUGHT_VOWEL = "AO";
 const COT_VOWEL = "AA";
-const RHOTIC = "R";
+export const RHOTIC = "R";
 
 /**
  * Rule 1 — the cot–caught merger, the vowel of *merged* General American.
@@ -466,15 +480,15 @@ const WEAK_IH = "IH";
  *
  * Only the Rhyme Key is touched. A weak vowel before the stressed one is no part
  * of any Rhyme, so `facility` keeps its first "uh" and `direction` its first
- * "ih". The position is read off the stress digits, which is why this runs
- * before stress promotion: a promoted variant must be a promotion of the merged
- * reading, or the index could no longer tell the variant was appended.
+ * "ih". The position is read off the stress digits, which is what fixes its
+ * place in the order (explained at `RULES`).
  *
  * **It must not reach the reading a Weak Rhyme is worked out from.** A Weak
  * Rhyme (ADR-0020, as narrowed on #232) sees the weak vowel the dictionary
  * wrote: `aspirin` for `win` is accepted and `muffin` is not. So this rule is
- * `scoringOnly`, and the stage keeps each reading it changed as written in
- * `NormalisationTarget.writtenReadings`, served by `RhymeIndex.writtenReadingsOf`.
+ * `scoringOnly`, and the stage keeps each reading it changed, unmerged, in
+ * `NormalisationTarget.unmergedReadings`, served by
+ * `RhymeIndex.unmergedReadingsOf`.
  */
 const weakVowelMerge: NormalisationRule = {
   name: "weak-vowel-merge",
@@ -492,18 +506,9 @@ function mergeWeakVowels(reading: Pronunciation): Pronunciation {
   );
 }
 
-/** The index of the vowel that opens the reading's Rhyme Key, or null if it has none. */
-function lastStressedIndex(reading: Pronunciation): number | null {
-  for (let i = reading.length - 1; i >= 0; i--) {
-    const stress = stressOf(reading[i]!);
-    if (stress === 1 || stress === 2) return i;
-  }
-  return null;
-}
-
 /** The two consonants General American says as one tap, and the one it is written as. */
 const TAP_SPELLINGS = new Set(["T", "D"]);
-const TAP = "D";
+export const TAP = "D";
 /** The vowel whose length is heard before t and d, so neither is tapped after it. */
 const RAISED_GLIDE = "AY";
 /** The weak vowels a syllabic n is written with. */
@@ -532,13 +537,11 @@ const SYLLABIC_N_VOWELS = new Set([SCHWA, WEAK_IH]);
  * would give each affected word a second Rhyme Key that rhymes where the first
  * does not, and thirteen scheduled Seed Words would stop being heard one way.
  *
- * It runs after the syllabic consonant rule, whose appended reading keeps its t
- * (`metal` read "met-l"), which is harmless because the full reading carries the
- * join; `isSyllabicConsonantVariantOf` in src/rhymeIndex.ts allows for it. It
- * runs before stress promotion, so a promoted variant is a promotion of the
- * tapped reading and the index still recognises it as appended. A Weak Rhyme
- * sees it too: the tap always opens the syllable after it, so it is never in the
- * last syllable's rime a Weak Rhyme compares.
+ * The syllabic consonant rule's appended reading keeps its t (`metal` read
+ * "met-l"), which is harmless because the full reading carries the join; its
+ * place in the order is explained at `RULES`. A Weak Rhyme sees it too: the
+ * tap always opens the syllable after it, so it is never in the last
+ * syllable's rime a Weak Rhyme compares.
  */
 const tap: NormalisationRule = {
   name: "tap",
@@ -572,8 +575,8 @@ function opensSyllabicN(reading: Pronunciation, i: number): boolean {
 }
 
 /** The vowels that end in a glide, after which "er" and plain `r` are one sound. */
-const GLIDING_VOWELS = new Set(["AY", "AW", "OY"]);
-const WEAK_ER = "ER0";
+export const GLIDING_VOWELS = new Set(["AY", "AW", "OY"]);
+export const WEAK_ER = "ER0";
 
 /**
  * Rule 5: after "eye", "ow" or "oy", "er" and plain `r` are read as each other
@@ -595,20 +598,18 @@ const WEAK_ER = "ER0";
  * gains `AY1 R IY0` and `expiry` (`AY1 R IY0`) gains `AY1 ER0 IY0`, and each
  * scores for the other whichever is the Seed Word. The reverse direction before
  * a vowel adds no pair of rhyming words: `virus` gains `AY ER AH S`, whose
- * family is the `AY R AH S` family it already rhymes with. The variant sits only on the Rhyme Key's opening vowel; a glide
- * earlier in the word is no part of any Rhyme.
+ * family is the `AY R AH S` family it already rhymes with. The variant sits
+ * only on the Rhyme Key's opening vowel; a glide earlier in the word is no part
+ * of any Rhyme.
  *
  * Nothing but those three vowels: `player` and `lower` keep clear of `hair` and
  * `lore`. Nor the `l` that would be its other half (`serial` for `meal`), which
  * the ADR decided not to write.
  *
- * Runs last, after stress promotion, because promotion can make the glide the
- * Rhyme Key's opening vowel: `vampire` is written `AY0 R`, is promoted to
- * `AY2 R`, and only then gains `AY2 ER0` and the `purifier` family. Promotion
- * has nothing to act on in a variant this rule makes, whose last vowel is the
- * stressed glide or `ER0`, so nothing is lost by the order. The index recognises the variant by shape (`isGlideRVariantOf` in
+ * The index recognises the variant by shape (`isGlideRVariantOf` in
  * src/rhymeIndex.ts), so a word the dictionary writes both ways (`fire`) pins
  * only on its first reading. Both keys are one Puzzle, so that costs nothing.
+ * Its place in the order (last) is explained at `RULES`.
  */
 const glideR: NormalisationRule = {
   name: "glide-r",
@@ -633,7 +634,7 @@ function glideRVariantsOf(reading: Pronunciation): Pronunciation[] {
 }
 
 /** The stressed vowels before `r` that are written the way the second of each pair is. */
-const BEFORE_R_MERGES = new Map([
+export const BEFORE_R_MERGES = new Map([
   ["IY", "IH"],
   ["EY", "EH"],
   ["UW", "UH"],
@@ -658,10 +659,9 @@ const BEFORE_R_VOWEL_MERGES = new Map([["AE", "EH"]]);
  * in General American, so `cure` and `core` stay two Puzzles.
  *
  * It **replaces**, so the respelling shows one vowel and `here` and `beer` stop
- * showing two ways. It runs after stress promotion, because promotion can make
- * the vowel before `r` stressed: `graybeard`'s `IY0 R D` is promoted to
- * `IY2 R D` and only then joins `beard`. `isStressPromotionVariantOf` in
- * src/rhymeIndex.ts allows for the respelled vowel. A Weak Rhyme sees it too:
+ * showing two ways, and it reaches a vowel stress promotion has just stressed
+ * (`graybeard`'s `IY0 R D`, promoted to `IY2 R D`, joins `beard`); its place
+ * in the order is explained at `RULES`. A Weak Rhyme sees it too:
  * the contrast is no more audible to a Weak Rhyme than to a Rhyme.
  */
 const vowelBeforeR: NormalisationRule = {
@@ -671,8 +671,7 @@ const vowelBeforeR: NormalisationRule = {
 
 function mergeVowelsBeforeR(reading: Pronunciation): Pronunciation {
   return reading.map((phoneme, i) => {
-    const stress = stressOf(phoneme);
-    if ((stress !== 1 && stress !== 2) || reading[i + 1] !== RHOTIC) return phoneme;
+    if (!isStressed(phoneme) || reading[i + 1] !== RHOTIC) return phoneme;
     const sound = bareSound(phoneme);
     const merged = BEFORE_R_MERGES.get(sound);
     if (merged !== undefined) return withSound(phoneme, merged);
@@ -683,7 +682,37 @@ function mergeVowelsBeforeR(reading: Pronunciation): Pronunciation {
   });
 }
 
-/** Every rule, in application order. Dropping one here disables it wholesale. */
+/**
+ * Every rule, in application order. Dropping one here disables it wholesale.
+ *
+ * The number in each rule's docblock is the order the rules were adopted
+ * (ADR-0010, then ADR-0011's amendments), not the order they run in. They run:
+ *
+ *  1. `cotCaughtMerger` (replaces), first, so every later rule sees one
+ *     low-back vowel.
+ *  2. `syllabicConsonant` (appends).
+ *  3. `weakVowelMerge` (replaces). After the syllabic rule, and it rewrites a
+ *     syllabic variant exactly as it rewrites the reading the variant came
+ *     from, so `isSyllabicConsonantVariantOf` still matches the pair. Before
+ *     stress promotion, because it finds the Rhyme Key by the stress digits and
+ *     a promoted variant must be a promotion of the merged reading, or
+ *     `isStressPromotionVariantOf` could not tell it was appended.
+ *  4. `tap` (replaces). After the syllabic rule, whose variant leaves its t with
+ *     no vowel after it and so untapped: `isSyllabicConsonantVariantOf` allows a
+ *     `T` in the variant against a `D` in the full reading. Before stress
+ *     promotion, for the weak-vowel merge's reason.
+ *  5. `stressPromotion` (appends).
+ *  6. `vowelBeforeR` (replaces). After stress promotion, because promotion can
+ *     stress the vowel before `r` (`graybeard`'s `IY0 R D` becomes `IY2 R D` and
+ *     only then joins `beard`): `isStressPromotionVariantOf` allows the
+ *     respelled vowel.
+ *  7. `glideR` (appends), last, after stress promotion, because promotion can
+ *     make the glide the Rhyme Key's opening vowel: `vampire` is written
+ *     `AY0 R`, is promoted to `AY2 R`, and only then gains `AY2 ER0` and the
+ *     `purifier` family. Promotion has nothing to act on in a variant this rule
+ *     makes, whose last vowel is the stressed glide or `ER0`, and
+ *     `vowelBeforeR` never touches the three glides, so nothing is lost.
+ */
 const RULES: readonly NormalisationRule[] = [
   cotCaughtMerger,
   syllabicConsonant,
@@ -717,7 +746,7 @@ function normaliseReadings(
 }
 
 /** Every rule a Weak Rhyme's reading goes through: all but the scoring-only ones. */
-const WRITTEN_RULES = RULES.filter((rule) => !rule.scoringOnly);
+const UNMERGED_RULES = RULES.filter((rule) => !rule.scoringOnly);
 
 /** True if two lists of readings are the same readings in the same order. */
 function sameReadings(a: readonly Pronunciation[], b: readonly Pronunciation[]): boolean {
@@ -731,9 +760,9 @@ function sameReadings(a: readonly Pronunciation[], b: readonly Pronunciation[]):
 export function applyNormalisation(target: NormalisationTarget): void {
   for (const [word, readings] of target.pronunciations) {
     const normalised = normaliseReadings(readings);
-    if (target.writtenReadings) {
-      const written = normaliseReadings(readings, WRITTEN_RULES);
-      if (!sameReadings(written, normalised)) target.writtenReadings.set(word, written);
+    if (target.unmergedReadings) {
+      const unmerged = normaliseReadings(readings, UNMERGED_RULES);
+      if (!sameReadings(unmerged, normalised)) target.unmergedReadings.set(word, unmerged);
     }
     target.pronunciations.set(word, normalised);
   }

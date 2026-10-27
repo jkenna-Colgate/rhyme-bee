@@ -136,7 +136,9 @@ describe("normalisation guardrails", () => {
 
   for (const { seed, submission, claim } of rows) {
     it(`${seed} + ${submission} -> does-not-rhyme (${claim})`, () => {
-      for (const pinned of seedsOf(seed)) {
+      const seeds = seedsOf(seed);
+      expect(seeds, `${seed} pins on no Rhyme Key, so the row would pass vacuously`).not.toEqual([]);
+      for (const pinned of seeds) {
         expect(index.adjudicate(pinned, submission)).toMatchObject({
           outcome: "rejected",
           reason: "does-not-rhyme",
