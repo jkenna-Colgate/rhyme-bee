@@ -110,9 +110,9 @@
       "weekday": "Sat",
       "week": 1,
       "seed": "centimeter",
-      "rhymeKey": "IY T ER",
-      "answerCount": 25,
-      "difficulty": 0.159
+      "rhymeKey": "IY D ER",
+      "answerCount": 46,
+      "difficulty": 0.1602
     },
     {
       "date": "2026-08-09",
@@ -1586,9 +1586,9 @@
       "weekday": "Tue",
       "week": 25,
       "seed": "utility",
-      "rhymeKey": "IH L AH T IY",
-      "answerCount": 39,
-      "difficulty": 0.0487
+      "rhymeKey": "IH L AH D IY",
+      "answerCount": 102,
+      "difficulty": 0.0361
     },
     {
       "date": "2027-01-20",
@@ -1919,9 +1919,9 @@
       "weekday": "Thu",
       "week": 30,
       "seed": "personality",
-      "rhymeKey": "AE L IH T IY",
-      "answerCount": 37,
-      "difficulty": 0.0882
+      "rhymeKey": "AE L AH D IY",
+      "answerCount": 76,
+      "difficulty": 0.0874
     },
     {
       "date": "2027-02-26",
