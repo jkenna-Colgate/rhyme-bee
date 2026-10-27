@@ -118,14 +118,18 @@ describe("a word-final vowel is never promoted", () => {
     });
   });
 
-  it("leaves no single-phoneme Rhyme Key in the index but the legitimate `AY`", () => {
+  it("leaves no single-phoneme Rhyme Key in the index but the legitimate `AY` and `ER`", () => {
     // The regression that pins the blow-up. Its signature is a bare-vowel key
     // swallowing a whole ending, so assert the shape directly: every
-    // single-phoneme key in the index, and who is in it.
-    const single = [...familiesOf(makeTestIndex())].filter(([key]) => !key.includes(" "));
+    // single-phoneme key in the index, and who is in it. `ER` is `fur`, a
+    // stressed word-final vowel the glide-before-r guardrails (#261) brought in.
+    const single = new Map(
+      [...familiesOf(makeTestIndex())].filter(([key]) => !key.includes(" ")),
+    );
 
-    expect(single.map(([key]) => key)).toEqual(["AY"]);
-    expect(single[0]?.[1].slice().sort()).toEqual(["buy", "eye", "high"]);
+    expect([...single.keys()].sort()).toEqual(["AY", "ER"]);
+    expect(single.get("AY")?.slice().sort()).toEqual(["buy", "eye", "high"]);
+    expect(single.get("ER")).toEqual(["fur"]);
   });
 
   it("keeps every family far below the scale the unconstrained rule reached", () => {

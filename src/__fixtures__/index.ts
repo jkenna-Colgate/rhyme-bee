@@ -69,6 +69,9 @@ const words = new Set<string>([
   // participle, or it rhymes with `justly`.
   "cuss", "cussed", "cussedly", "justly",
   "yodel", "yodeler", "yodeller",
+  // The glide-before-r guardrails (#261): `fire` against `far` (above) and
+  // `fur`, and `player` / `lower` against `hair` / `lore`.
+  "fire", "fur", "player", "hair", "lower", "lore",
 ]);
 
 /** Names, used only to label a rejection as a Proper Noun. */
@@ -117,6 +120,8 @@ const prevalence = new Map<string, number>([
   // Stress promotion (issue #73), all common enough to tier as Answers.
   ["module", 2.3], ["happy", 2.5], ["smelly", 2.2],
   ["high", 2.5], ["buy", 2.5], ["eye", 2.5], ["arrows", 2.4], ["nose", 2.5],
+  // The glide-before-r guardrails (#261).
+  ["fire", 2.5], ["fur", 2.4], ["player", 2.5], ["hair", 2.5], ["lower", 2.4], ["lore", 2.0],
 ]);
 
 export const KNOWNNESS_THRESHOLD = 1.0;

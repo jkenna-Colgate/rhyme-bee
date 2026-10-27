@@ -231,3 +231,59 @@ describe("the weak vowel a Weak Rhyme reads is the one the dictionary wrote (#26
     expect(index.writtenReadingsOf("muffin")).toEqual(index.readingsOf("muffin").map((r) => r.pronunciation));
   });
 });
+
+describe("after eye, ow or oy, er and plain r read as each other (#261)", () => {
+  // Readings exactly as the source dictionary writes them: `fire`, `hour` and
+  // `flour` both ways, `higher` and `power` with "er" only, and `expire` and
+  // `dower` with plain r only (ADR-0011, amendment of 2026-10-07).
+  const index = makeTestIndex({
+    pronunciations: [
+      ["fire", [["F", "AY1", "ER0"], ["F", "AY1", "R"]]],
+      ["higher", [["HH", "AY1", "ER0"]]],
+      ["expire", [["IH0", "K", "S", "P", "AY1", "R"]]],
+      ["hour", [["AW1", "ER0"], ["AW1", "R"]]],
+      ["flour", [["F", "L", "AW1", "ER0"], ["F", "L", "AW1", "R"]]],
+      ["power", [["P", "AW1", "ER0"]]],
+      ["dower", [["D", "AW1", "R"]]],
+      ["virus", [["V", "AY1", "R", "AH0", "S"]]],
+      ["vampire", [["V", "AE1", "M", "P", "AY0", "R"]]],
+    ],
+    words: ["fire", "higher", "expire", "hour", "flour", "power", "dower", "virus", "vampire"],
+    prevalence: [
+      ["fire", 2.5], ["higher", 2.5], ["expire", 2.3], ["hour", 2.5],
+      ["flour", 2.4], ["power", 2.5], ["dower", 1.2], ["virus", 2.5], ["vampire", 2.3],
+    ],
+  });
+
+  it("rhymes `higher` with `fire`, in both orders", () => {
+    expect(index.adjudicate(index.pinSeed("higher", "AY ER"), "fire").outcome).toBe("answer");
+    expect(index.adjudicate(index.pinSeed("fire", "AY ER"), "higher").outcome).toBe("answer");
+  });
+
+  it("rhymes `expire`, written with plain r only, with `higher`, written with er only", () => {
+    expect(index.adjudicate(index.pinSeed("expire", "AY R"), "higher").outcome).toBe("answer");
+    expect(index.adjudicate(index.pinSeed("higher", "AY ER"), "expire").outcome).toBe("answer");
+  });
+
+  it("rhymes `vampire`, whose unstressed eye a Rhyme hears stressed, with `higher`", () => {
+    expect(index.adjudicate(index.pinSeed("higher", "AY ER"), "vampire").outcome).toBe("answer");
+  });
+
+  it("rhymes `hour`, `flour` and `power` with one another, and `dower` with all three", () => {
+    for (const seed of ["hour", "flour", "power"]) {
+      const pinned = index.pinSeed(seed, "AW ER");
+      for (const word of ["hour", "flour", "power", "dower"].filter((w) => w !== seed)) {
+        expect(index.adjudicate(pinned, word).outcome, `${word} for ${seed}`).toBe("answer");
+      }
+    }
+    expect(index.adjudicate(index.pinSeed("dower", "AW R"), "power").outcome).toBe("answer");
+  });
+
+  it("pins `power` only on the reading the dictionary wrote", () => {
+    expect(() => index.pinSeed("power", "AW R")).toThrow(/generated variant/);
+  });
+
+  it("leaves an r that opens the next syllable alone", () => {
+    expect(index.rhymeKeysOf("virus")).toEqual(["AY R AH S"]);
+  });
+});

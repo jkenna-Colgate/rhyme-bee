@@ -501,12 +501,71 @@ function lastStressedIndex(reading: Pronunciation): number | null {
   return null;
 }
 
+/** The vowels that end in a glide, after which "er" and plain `r` are one sound. */
+const GLIDING_VOWELS = new Set(["AY", "AW", "OY"]);
+const WEAK_ER = "ER0";
+
+/**
+ * Rule 5: after "eye", "ow" or "oy", "er" and plain `r` are read as each other
+ * (ADR-0011, amendment of 2026-10-07; #261).
+ *
+ * General American says `fire` and `hour` with one syllable or two, and the
+ * source dictionary writes `fire`, `hour` and `flour` both ways, but `expire`
+ * with plain `r` only and `higher` with "er" only, so `higher` did not rhyme
+ * with `expire`. Where the stressed vowel that opens a reading's Rhyme Key is
+ * `AY`, `AW` or `OY`, an `ER0` straight after it gains a reading with `R`, and
+ * an `R` straight after it gains one with `ER0`, unless a vowel follows the `R`,
+ * which then opens the next syllable (`virus`). The reach, the error rate and
+ * the guardrails are the ADR's.
+ *
+ * It **appends**, in both directions, so the dictionary's reading survives first
+ * and untouched, and Rhyme keeps the substitution property: every word in the
+ * `AY ER` family is in the `AY R` family and the reverse, so either key is the
+ * same Puzzle. The variant sits only on the Rhyme Key's opening vowel; a glide
+ * earlier in the word is no part of any Rhyme.
+ *
+ * Nothing but those three vowels: `player` and `lower` keep clear of `hair` and
+ * `lore`. Nor the `l` that would be its other half (`serial` for `meal`), which
+ * the ADR decided not to write.
+ *
+ * Runs last, after stress promotion, because promotion can make the glide the
+ * Rhyme Key's opening vowel: `vampire` is written `AY0 R`, is promoted to
+ * `AY2 R`, and only then gains `AY2 ER0` and the `purifier` family. Promotion
+ * has nothing to act on in a variant this rule makes, whose last vowel is the
+ * stressed glide or `ER0`, so nothing is lost by the order. The index recognises the variant by shape (`isGlideRVariantOf` in
+ * src/rhymeIndex.ts), so a word the dictionary writes both ways (`fire`) pins
+ * only on its first reading. Both keys are one Puzzle, so that costs nothing.
+ */
+const glideR: NormalisationRule = {
+  name: "glide-r",
+  apply: (readings) => [...readings, ...readings.flatMap(glideRVariantsOf)],
+};
+
+/** The reading with its post-glide "er" and `r` swapped, or none if it has neither. */
+function glideRVariantsOf(reading: Pronunciation): Pronunciation[] {
+  const stressed = lastStressedIndex(reading);
+  if (stressed === null) return [];
+  if (!GLIDING_VOWELS.has(bareSound(reading[stressed]!))) return [];
+
+  const next = reading[stressed + 1];
+  const after = reading[stressed + 2];
+  let swapped: string;
+  if (next === WEAK_ER) swapped = RHOTIC;
+  else if (next === RHOTIC && (after === undefined || !isVowel(after))) swapped = WEAK_ER;
+  else return [];
+
+  const variant = [...reading];
+  variant[stressed + 1] = swapped;
+  return [variant];
+}
+
 /** Every rule, in application order. Dropping one here disables it wholesale. */
 const RULES: readonly NormalisationRule[] = [
   cotCaughtMerger,
   syllabicConsonant,
   weakVowelMerge,
   stressPromotion,
+  glideR,
 ];
 
 /**

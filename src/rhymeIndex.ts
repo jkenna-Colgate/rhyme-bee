@@ -186,16 +186,37 @@ function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronuncia
 }
 
 /**
+ * True if `candidate` is exactly `earlier` with the "er" (`ER0`) straight after
+ * an `AY`, `AW` or `OY` read as plain `R`, or that `R` read as `ER0`, and
+ * nothing else changed: the shape `src/normalise.ts`'s `glide-r` rule appends
+ * (`power`'s `P AW1 ER0` gains `P AW1 R`). Looser than the rule, like the
+ * syllabic check above: a word the dictionary writes both ways (`fire`) has
+ * its second reading taken for generated, which refuses a pin the data would
+ * have allowed and never permits one it would have refused.
+ */
+function isGlideRVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  if (candidate.length !== earlier.length) return false;
+  const diffs = earlier.flatMap((phoneme, i) => (candidate[i] === phoneme ? [] : [i]));
+  if (diffs.length !== 1) return false;
+  const i = diffs[0]!;
+  const glide = earlier[i - 1];
+  if (glide === undefined || !["AY", "AW", "OY"].includes(bareSound(glide))) return false;
+  const pair = [earlier[i], candidate[i]].sort().join(" ");
+  return pair === "ER0 R";
+}
+
+/**
  * True if `candidate` is a generated variant of `earlier` — a reading
  * normalisation appended alongside it, rather than one the pinned data ever
- * transcribed. The two shapes above are the whole of the frozen rule set that
- * appends (ADR-0011); the rule that replaces (the cot-caught merger) never
- * grows a word's reading count, so it needs no shape here.
+ * transcribed. The three shapes above are the whole of the frozen rule set that
+ * appends (ADR-0011); the rules that replace (the cot-caught merger, the weak-
+ * vowel merge) never grow a word's reading count, so they need no shape here.
  */
 function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   return (
     isSyllabicConsonantVariantOf(candidate, earlier) ||
-    isStressPromotionVariantOf(candidate, earlier)
+    isStressPromotionVariantOf(candidate, earlier) ||
+    isGlideRVariantOf(candidate, earlier)
   );
 }
 

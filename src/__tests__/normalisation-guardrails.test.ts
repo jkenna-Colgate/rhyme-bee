@@ -15,6 +15,9 @@
  *   - the pre-rhotic group guards the cot–caught merger's one exclusion. Most
  *     `AO` tokens in the playable lexicon sit before `R`, so merging them too
  *     would roughly double the `far` family — ADR-0010 carries the measurement.
+ *   - the glide-before-r group guards the limits of the rule that reads "er" and
+ *     plain `r` as each other after "eye", "ow" or "oy" (ADR-0011, amendment of
+ *     2026-10-07): it reaches no other vowel, and no `r` that is not after one.
  *
  * A row here failing is not a broken test. It is a normalisation that has
  * overreached, and the rule goes, not the row.
@@ -22,6 +25,8 @@
 
 import { describe, expect, it } from "vitest";
 import { makeTestIndex } from "../__fixtures__/index.ts";
+import { rhymeKeyOf } from "../phonology.ts";
+import type { SeedWord } from "../rhymeIndex.ts";
 
 const index = makeTestIndex();
 
@@ -45,7 +50,27 @@ const guardrails: Guardrail[] = [
   { seed: "far", submission: "for", claim: "pre-rhotic AO is not merged" },
   { seed: "barn", submission: "born", claim: "pre-rhotic AO is not merged" },
   { seed: "card", submission: "cord", claim: "pre-rhotic AO is not merged" },
+  // ADR-0011, amendment of 2026-10-07: "er" and `r` are one sound only after
+  // "eye", "ow" or "oy". The vowel before them still decides the Rhyme.
+  { seed: "fire", submission: "far", claim: "the glide is not the vowel of far" },
+  { seed: "fire", submission: "fur", claim: "the glide is not the vowel of fur" },
+  { seed: "player", submission: "hair", claim: "er after long a is not plain r" },
+  { seed: "lower", submission: "lore", claim: "er after long o is not plain r" },
 ];
+
+/**
+ * The word pinned on every Rhyme Key a reading the dictionary wrote gives it, so
+ * a word written two ways (`fire`) is held to the row on both.
+ */
+function seedsOf(word: string): SeedWord[] {
+  const keys = new Set(
+    index
+      .readingsOf(word)
+      .filter(({ generated }) => !generated)
+      .map(({ pronunciation }) => rhymeKeyOf(pronunciation)),
+  );
+  return [...keys].filter((key) => key !== null).map((key) => index.pinSeed(word, key));
+}
 
 describe("normalisation guardrails", () => {
   // Each pair is asserted both ways round, as its own `it`, so a regression
@@ -57,10 +82,12 @@ describe("normalisation guardrails", () => {
 
   for (const { seed, submission, claim } of rows) {
     it(`${seed} + ${submission} -> does-not-rhyme (${claim})`, () => {
-      expect(index.adjudicate(index.pinSeed(seed), submission)).toMatchObject({
-        outcome: "rejected",
-        reason: "does-not-rhyme",
-      });
+      for (const pinned of seedsOf(seed)) {
+        expect(index.adjudicate(pinned, submission)).toMatchObject({
+          outcome: "rejected",
+          reason: "does-not-rhyme",
+        });
+      }
     });
   }
 });
