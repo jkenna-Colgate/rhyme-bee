@@ -78,7 +78,9 @@ export type DropReason =
   | "above-band"
   | "accent-unstable"
   | "blocked"
-  | "shadow-key";
+  | "shadow-key"
+  /** Every member is an Unconfirmed Rhyme somewhere, so none may be the Seed Word. */
+  | "unconfirmed-rhyme";
 
 export interface DroppedEntry {
   rhymeKey: RhymeKey;
@@ -118,7 +120,10 @@ export interface CurationReport {
  * Ahead of all of it, a word listed as an Unconfirmed Rhyme on any key is never
  * picked while the family has another (ADR-0012 amended): Seed Words and
  * Unconfirmed Rhymes are kept apart, so nothing swaps a Seed Word on the
- * Judge's word alone.
+ * Judge's word alone. It is ranked last rather than removed because every
+ * family needs a name in the curation report; a family whose name is still a
+ * listed word is then never a candidate (`curate`) and never a repair's Seed
+ * Word (`src/continuity.ts`).
  */
 export function chooseRepresentative(words: string[], index: RhymeIndex): string {
   const rank = (word: string) => ({
@@ -250,7 +255,11 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
     histogram.set(family.answerCount, (histogram.get(family.answerCount) ?? 0) + 1);
 
     const note = blocked.get(representative);
-    if (note !== undefined) {
+    if (index.isUnconfirmedRhyme(representative)) {
+      // The representative ranks a listed word last, so it is one only when the
+      // whole family is listed, and a listed word never becomes a Seed Word.
+      dropped.push({ rhymeKey, representative, reason: "unconfirmed-rhyme" });
+    } else if (note !== undefined) {
       dropped.push({ rhymeKey, representative, reason: "blocked", note });
     } else if (accentUnstable.has(rhymeKey)) {
       dropped.push({ rhymeKey, representative, reason: "accent-unstable" });

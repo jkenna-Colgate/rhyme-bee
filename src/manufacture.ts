@@ -165,10 +165,13 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   // every reading stage is what lets it drop a line whose word now rhymes on
   // its key by itself, which is what confirming the line by the ordinary add
   // does. See src/unconfirmedRhymes.ts.
-  const unconfirmed = applyUnconfirmedRhymes(
-    inputs.unconfirmedRhymes,
-    (word, rhymeKey) => words.has(word) && matchingPronunciation(rhymeKey, pronunciations.get(word) ?? []) !== null,
-  );
+  // A Demotion outranks a line: the editor ruled on the word, the Judge only
+  // on the word aimed at one key.
+  const unconfirmed = applyUnconfirmedRhymes(inputs.unconfirmedRhymes, {
+    rhymesByItself: (word, rhymeKey) =>
+      words.has(word) && matchingPronunciation(rhymeKey, pronunciations.get(word) ?? []) !== null,
+    demotedWords: new Set(demoted.map((d) => d.word)),
+  });
   const unconfirmedRhymes = unconfirmedKeysByWord(unconfirmed.kept);
 
   return {

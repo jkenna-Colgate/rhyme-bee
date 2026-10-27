@@ -15,7 +15,8 @@
 # Bonus Word, it holds no Tier, and it is never in the Reveal. It is not a
 # reading and not a Tier, so it holds on every day that key is played and on no
 # other key. The Rhyme Key runs to the end of the line, because a key contains
-# spaces.
+# spaces. A word demotions.txt names is rejected with its Demotion's reason even
+# when listed here: a Demotion is the editor's ruling and a line is the Judge's.
 #
 # The Editor's Pass confirms a line by the ordinary add (a reading in
 # supplement.dict), after which the build drops it as stale and says so, or

@@ -10,7 +10,9 @@
 
 import { describe, expect, it } from "vitest";
 import { makeTestIndex } from "../__fixtures__/index.ts";
-import { chooseRepresentative } from "../curation.ts";
+import { checkContinuity } from "../continuity.ts";
+import { chooseRepresentative, curate } from "../curation.ts";
+import type { ScheduleDay } from "../schedule.ts";
 import { manufactureIndexData } from "../manufacture.ts";
 import { deserialise, serialise } from "../serialise.ts";
 import {
@@ -83,6 +85,23 @@ describe("an Unconfirmed Rhyme, played", () => {
     expect(result.verdict).toMatchObject({ outcome: "rejected", reason: "proper-noun" });
   });
 
+  it("gives way to a Demotion, whose reason the player receives", () => {
+    // A Demotion is the editor's ruling and a line is the Judge's.
+    const junk = makeTestIndex({ demotions: "hat not-a-known-word\n", unconfirmedRhymes: line({}) });
+    expect(junk.adjudicate(junk.pinSeed("ate"), "hat")).toMatchObject({ reason: "not-a-known-word" });
+
+    const name = makeTestIndex({ demotions: "hat proper-noun\n", unconfirmedRhymes: line({}) });
+    expect(name.adjudicate(name.pinSeed("ate"), "hat")).toMatchObject({ reason: "proper-noun" });
+  });
+
+  it("accepts a word outside the word list that no Demotion names", () => {
+    // `zate` has no wordhood and no reading: a Missing Reading the Judge
+    // vouched for as a word.
+    const { result } = play("ate", "zate", line({ word: "zate", ruling: "missing-reading", confidence: "medium" }));
+
+    expect(result.verdict.outcome).toBe("unconfirmed");
+  });
+
   it("leaves a word that rhymes on its key by itself with its own Tier", () => {
     const { result } = play("ate", "eight", line({ word: "eight" }));
 
@@ -101,12 +120,16 @@ describe("an Unconfirmed Rhyme, played", () => {
 
 describe("the Unconfirmed Rhyme list, at index build", () => {
   function build(list: string) {
+    return buildWith("", list);
+  }
+
+  function buildWith(demotions: string, list: string) {
     return manufactureIndexData({
       cmudict: "ATE  EY1 T\nEIGHT  EY1 T\nHAT  HH AE1 T",
       words: "ate\neight\nhat",
       names: "",
       prevalence: "Word,Prevalence",
-      demotions: "",
+      demotions,
       supplement: "",
       tierOverrides: "",
       unconfirmedRhymes: list,
@@ -121,6 +144,13 @@ describe("the Unconfirmed Rhyme list, at index build", () => {
     expect(unconfirmed.stale.map((entry) => entry.word)).toEqual(["eight"]);
     expect(unconfirmed.kept.map((entry) => entry.word)).toEqual(["hat"]);
     expect([...(data.unconfirmedRhymes ?? new Map()).keys()]).toEqual(["hat"]);
+  });
+
+  it("drops a line whose word a Demotion names, and says so", () => {
+    const { unconfirmed } = buildWith("hat not-a-known-word\n", line({}) + line({ word: "ate", rhymeKey: "AE T" }));
+
+    expect(unconfirmed.demoted.map((entry) => entry.word)).toEqual(["hat"]);
+    expect(unconfirmed.kept.map((entry) => entry.word)).toEqual(["ate"]);
   });
 
   it("drops a line that does not read, and names it", () => {
@@ -159,6 +189,33 @@ describe("Seed Words and Unconfirmed Rhymes, kept apart", () => {
     // `ate` listed for `hat`'s key loses its family's Seed Word to the next best.
     const listed = makeTestIndex({ unconfirmedRhymes: line({ word: "ate", rhymeKey: "AE T" }) });
     expect(chooseRepresentative(family, listed)).toBe("late");
+  });
+
+  it("is never a Seed Word curation offers, even when its family has no other", () => {
+    // `hat` is the whole of the fixture's `AE T` family.
+    const sizeBand = { min: 0, max: 1000 };
+    expect(curate(makeTestIndex(), { sizeBand }).candidates.map((f) => f.rhymeKey)).toContain("AE T");
+
+    const listed = curate(makeTestIndex({ unconfirmedRhymes: line({}) }), { sizeBand });
+    expect(listed.candidates.map((f) => f.rhymeKey)).not.toContain("AE T");
+    expect(listed.dropped).toContainEqual({ rhymeKey: "AE T", representative: "hat", reason: "unconfirmed-rhyme" });
+  });
+
+  it("is never the word a Schedule repair swaps in", () => {
+    const lost: ScheduleDay = {
+      date: "2026-11-04",
+      weekday: "Wed",
+      week: 1,
+      seed: "hatish",
+      rhymeKey: "AE T",
+      answerCount: 0,
+      difficulty: 0,
+    };
+    expect(checkContinuity([lost], makeTestIndex()).days[0]!.seed).toBe("hat");
+
+    const report = checkContinuity([lost], makeTestIndex({ unconfirmedRhymes: line({}) }));
+    expect(report.days[0]!.seed).not.toBe("hat");
+    expect(report.freePlay.map((d) => d.date)).toEqual(["2026-11-04"]);
   });
 
   it("reports nothing when no scheduled Seed Word is listed", () => {

@@ -120,26 +120,42 @@ export interface AppliedUnconfirmedRhymes {
    * with nothing to do; the build drops it rather than let it outlive its use.
    */
   stale: UnconfirmedRhyme[];
+  /**
+   * Lines whose word `data/demotions.txt` names, for either reason. A Demotion
+   * is the editor's ruling and a line is the Judge's, so the Demotion wins and
+   * the player receives its reason, as if the line were not there.
+   */
+  demoted: UnconfirmedRhyme[];
   /** Lines that did not read, as written. */
   malformed: string[];
 }
 
+/** What the build knows that decides whether a line still stands. */
+export interface UnconfirmedRhymeContext {
+  /** The index's own rhyme rule over the built data, so it is never restated. */
+  rhymesByItself: (word: string, rhymeKey: RhymeKey) => boolean;
+  /** Every word the demotion list names. */
+  demotedWords: ReadonlySet<string>;
+}
+
 /**
- * Apply the list over finished readings: parse it and set aside every line
- * `rhymesByItself` says is stale. The predicate is the index's own rhyme rule
- * over the built data, handed in so this module never has to restate it.
+ * Apply the list over finished readings: parse it, then set aside every line a
+ * Demotion overrules and every line that has gone stale.
  */
 export function applyUnconfirmedRhymes(
   text: string,
-  rhymesByItself: (word: string, rhymeKey: RhymeKey) => boolean,
+  { rhymesByItself, demotedWords }: UnconfirmedRhymeContext,
 ): AppliedUnconfirmedRhymes {
   const { entries, malformed } = parseUnconfirmedRhymes(text);
   const kept: UnconfirmedRhyme[] = [];
   const stale: UnconfirmedRhyme[] = [];
+  const demoted: UnconfirmedRhyme[] = [];
   for (const entry of entries) {
-    (rhymesByItself(entry.word, entry.rhymeKey) ? stale : kept).push(entry);
+    if (demotedWords.has(entry.word)) demoted.push(entry);
+    else if (rhymesByItself(entry.word, entry.rhymeKey)) stale.push(entry);
+    else kept.push(entry);
   }
-  return { kept, stale, malformed };
+  return { kept, stale, demoted, malformed };
 }
 
 /** Word to the Rhyme Keys it is listed for: the shape adjudication reads. */

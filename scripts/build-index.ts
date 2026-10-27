@@ -131,6 +131,7 @@ console.log(
 console.log(
   `Unconfirmed Rhymes: ${unconfirmed.kept.length} standing` +
     `${unconfirmed.stale.length > 0 ? `; ${unconfirmed.stale.length} stale, dropped because they now rhyme by themselves: ${unconfirmed.stale.map((u) => `${u.word} on ${u.rhymeKey}`).join(", ")}` : ""}` +
+    `${unconfirmed.demoted.length > 0 ? `; ${unconfirmed.demoted.length} overruled by a Demotion: ${unconfirmed.demoted.map((u) => `${u.word} on ${u.rhymeKey}`).join(", ")}` : ""}` +
     `${unconfirmed.malformed.length > 0 ? `; ${unconfirmed.malformed.length} unreadable, ignored: ${unconfirmed.malformed.join(" | ")}` : ""}.`,
 );
 
