@@ -246,13 +246,15 @@ describe("after eye, ow or oy, er and plain r read as each other (#261)", () => 
       ["flour", [["F", "L", "AW1", "ER0"], ["F", "L", "AW1", "R"]]],
       ["power", [["P", "AW1", "ER0"]]],
       ["dower", [["D", "AW1", "R"]]],
-      ["virus", [["V", "AY1", "R", "AH0", "S"]]],
       ["vampire", [["V", "AE1", "M", "P", "AY0", "R"]]],
+      ["fiery", [["F", "AY1", "ER0", "IY0"]]],
+      ["expiry", [["EH2", "K", "S", "P", "AY1", "R", "IY0"]]],
     ],
-    words: ["fire", "higher", "expire", "hour", "flour", "power", "dower", "virus", "vampire"],
+    words: ["fire", "higher", "expire", "hour", "flour", "power", "dower", "vampire", "fiery", "expiry"],
     prevalence: [
       ["fire", 2.5], ["higher", 2.5], ["expire", 2.3], ["hour", 2.5],
-      ["flour", 2.4], ["power", 2.5], ["dower", 1.2], ["virus", 2.5], ["vampire", 2.3],
+      ["flour", 2.4], ["power", 2.5], ["dower", 1.2], ["vampire", 2.3],
+      ["fiery", 2.4], ["expiry", 2.3],
     ],
   });
 
@@ -280,12 +282,13 @@ describe("after eye, ow or oy, er and plain r read as each other (#261)", () => 
     expect(index.adjudicate(index.pinSeed("dower", "AW R"), "power").outcome).toBe("answer");
   });
 
-  it("pins `power` only on the reading the dictionary wrote", () => {
-    expect(() => index.pinSeed("power", "AW R")).toThrow(/generated variant/);
+  it("rhymes `fiery` with `expiry` in both orders, where a vowel follows the er or the r", () => {
+    expect(index.adjudicate(index.pinSeed("expiry", "AY R IY"), "fiery").outcome).toBe("answer");
+    expect(index.adjudicate(index.pinSeed("fiery", "AY ER IY"), "expiry").outcome).toBe("answer");
   });
 
-  it("leaves an r that opens the next syllable alone", () => {
-    expect(index.rhymeKeysOf("virus")).toEqual(["AY R AH S"]);
+  it("pins `power` only on the reading the dictionary wrote", () => {
+    expect(() => index.pinSeed("power", "AW R")).toThrow(/generated variant/);
   });
 });
 

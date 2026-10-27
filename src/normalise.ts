@@ -584,14 +584,18 @@ const WEAK_ER = "ER0";
  * with plain `r` only and `higher` with "er" only, so `higher` did not rhyme
  * with `expire`. Where the stressed vowel that opens a reading's Rhyme Key is
  * `AY`, `AW` or `OY`, an `ER0` straight after it gains a reading with `R`, and
- * an `R` straight after it gains one with `ER0`, unless a vowel follows the `R`,
- * which then opens the next syllable (`virus`). The reach, the error rate and
+ * an `R` straight after it gains one with `ER0`. The reach, the error rate and
  * the guardrails are the ADR's.
  *
  * It **appends**, in both directions, so the dictionary's reading survives first
  * and untouched, and Rhyme keeps the substitution property: every word in the
  * `AY ER` family is in the `AY R` family and the reverse, so either key is the
- * same Puzzle. The variant sits only on the Rhyme Key's opening vowel; a glide
+ * same Puzzle. That holds only if the two directions act on the same words, so
+ * neither skips an `r` or "er" that a vowel follows: `fiery` (`AY1 ER0 IY0`)
+ * gains `AY1 R IY0` and `expiry` (`AY1 R IY0`) gains `AY1 ER0 IY0`, and each
+ * scores for the other whichever is the Seed Word. The reverse direction before
+ * a vowel adds no pair of rhyming words: `virus` gains `AY ER AH S`, whose
+ * family is the `AY R AH S` family it already rhymes with. The variant sits only on the Rhyme Key's opening vowel; a glide
  * earlier in the word is no part of any Rhyme.
  *
  * Nothing but those three vowels: `player` and `lower` keep clear of `hair` and
@@ -618,10 +622,9 @@ function glideRVariantsOf(reading: Pronunciation): Pronunciation[] {
   if (!GLIDING_VOWELS.has(bareSound(reading[stressed]!))) return [];
 
   const next = reading[stressed + 1];
-  const after = reading[stressed + 2];
   let swapped: string;
   if (next === WEAK_ER) swapped = RHOTIC;
-  else if (next === RHOTIC && (after === undefined || !isVowel(after))) swapped = WEAK_ER;
+  else if (next === RHOTIC) swapped = WEAK_ER;
   else return [];
 
   const variant = [...reading];
