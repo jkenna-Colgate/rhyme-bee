@@ -26,4 +26,10 @@ describe("serialise / deserialise", () => {
       );
     },
   );
+
+  it("keeps the weak vowels a Weak Rhyme reads (#260)", () => {
+    // `abolish` is written "ih" in its last syllable, and a Rhyme reads "uh" there.
+    expect(roundTripped.unmergedReadingsOf("abolish")).toEqual([["AH0", "B", "AA1", "L", "IH0", "SH"]]);
+    expect(roundTripped.rhymeKeysOf("abolish")).toEqual(["AA L AH SH"]);
+  });
 });

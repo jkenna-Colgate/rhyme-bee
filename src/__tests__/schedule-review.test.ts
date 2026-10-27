@@ -245,14 +245,15 @@ describe("the drift check", () => {
     }
   });
 
-  it("holds every committed day inside the bands it was dealt from", () => {
-    // Nothing has been rebuilt since the deal, so every day agrees with itself.
-    // This is the baseline the check is read against: a report on a fresh clone
-    // should be empty, and anything in it is a real change.
+  it("holds every committed day inside the bands it was dealt from, except the ones a repair moved out", () => {
+    // This is the baseline the check is read against: anything new in it is a
+    // real change. The Continuity repair (#256) re-records a repaired day's
+    // figures without recomputing the band, so a day it moved can sit outside.
+    // curl (2027-04-15) went from 20 Answers to 14 when its family split.
     const drifted = schedule.days
       .filter((day) => checkDayDrift(day, asRecorded(day), bands).drifted)
       .map((day) => day.date);
-    expect(drifted).toEqual([]);
+    expect(drifted).toEqual(["2027-04-15"]);
   });
 
   it("constrains only the size band when the artifact records no weekday for it", () => {

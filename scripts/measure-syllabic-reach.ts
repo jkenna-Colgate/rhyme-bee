@@ -110,7 +110,11 @@ if (serialise(check) !== serialise(data.pronunciations)) {
   process.exit(1);
 }
 
-const playable = (word: string) => data.words.has(word) && !data.names.has(word);
+/**
+ * The game's own wordhood gate: the word list alone. A word that is in the
+ * names data as well (`rider`, `petal`, `kitty`) is still playable (#262).
+ */
+const playable = (word: string) => data.words.has(word);
 
 /** Every playable word's Rhyme Keys, and every key's members. */
 const keysOf = new Map<string, Set<string>>();

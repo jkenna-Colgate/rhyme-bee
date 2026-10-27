@@ -50,9 +50,9 @@
  */
 
 import {
+  isStressed,
   isVowel,
   rhymeKeyOf,
-  stressOf,
   type Phoneme,
   type Pronunciation,
 } from "./phonology.ts";
@@ -324,11 +324,6 @@ function stressShape(reading: Pronunciation): string {
     .map((phoneme, i) => (isStressed(phoneme) ? String(vowels.length - i) : ""))
     .filter((mark) => mark !== "")
     .join(",");
-}
-
-function isStressed(phoneme: Phoneme): boolean {
-  const stress = stressOf(phoneme);
-  return stress === 1 || stress === 2;
 }
 
 /**

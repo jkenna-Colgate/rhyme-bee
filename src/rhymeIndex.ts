@@ -14,11 +14,13 @@ import {
   bareSound,
   rhymeKeyOf,
   stressOf,
+  withSound,
   withStress,
   type Pronunciation,
   type RhymeKey,
 } from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
+import { BEFORE_R_MERGES, GLIDING_VOWELS, RHOTIC, TAP, WEAK_ER } from "./normalise.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
 import { schwaTwinOf } from "./schwaTwins.ts";
@@ -114,6 +116,13 @@ export interface Puzzle {
 export interface RhymeIndexData {
   /** Surface form -> its pronunciations (from CMUdict). */
   pronunciations: Map<string, Pronunciation[]>;
+  /**
+   * Surface form -> its readings with the weak vowels the dictionary wrote, for
+   * each word a scoring-only Normalisation changed (`src/normalise.ts`). The
+   * reading a Weak Rhyme is worked out from; absent, a word reads the same both
+   * ways. Optional, so data built without it reads every word as unchanged.
+   */
+  unmergedReadings?: Map<string, Pronunciation[]>;
   /** Common English words, lower-cased. The wordhood gate; excludes names. */
   words: Set<string>;
   /** Lower-cased names, used only to label a rejection as a Proper Noun. */
@@ -155,15 +164,23 @@ function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunc
   if (schwa === undefined || sonorant === undefined) return false;
   if (bareSound(schwa) !== "AH" || stressOf(schwa) !== 0) return false;
   if (candidate.at(-1) !== sonorant) return false;
-  return candidate.slice(0, -1).every((phoneme, i) => phoneme === earlier[i]);
+  // The `tap` rule, which runs after this one, reads a t before the schwa as d
+  // in the full reading and leaves the variant's t, with no vowel after it, as
+  // written (`metal`'s `M EH1 D AH0 L` beside `M EH1 T L`; #262).
+  const consonant = candidate.length - 2;
+  return candidate
+    .slice(0, -1)
+    .every((phoneme, i) => phoneme === earlier[i] || (i === consonant && phoneme === "T" && earlier[i] === TAP));
 }
 
 /**
  * True if `candidate` is exactly `earlier` with one unstressed vowel promoted
  * to secondary stress and nothing else changed — the shape `src/normalise.ts`'s
  * `stress-promotion` rule appends (`module`'s `M AA1 JH UW0 L` gains
- * `M AA1 JH UW2 L`). See `isSyllabicConsonantVariantOf` for why shape, not a
- * schema field, is what pinning reads.
+ * `M AA1 JH UW2 L`). A promoted vowel before `r` may also be respelled by the
+ * `vowel-before-r` rule (`graybeard`'s `IY0 R D` gains `IH2 R D`). See
+ * `isSyllabicConsonantVariantOf` for why shape, not a schema field, is what
+ * pinning reads.
  */
 function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   if (candidate.length !== earlier.length) return false;
@@ -175,20 +192,55 @@ function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronuncia
   }
   if (diffIndex === -1) return false; // identical readings, not a variant
   const original = earlier[diffIndex]!;
-  return stressOf(original) === 0 && candidate[diffIndex] === withStress(original, 2);
+  if (stressOf(original) !== 0) return false;
+  const promoted = withStress(original, 2);
+  if (candidate[diffIndex] === promoted) return true;
+  // The `vowel-before-r` rule runs after promotion and respells a vowel it has
+  // just stressed before `r` (#263). Its "a" never applies here: promotion
+  // stresses only the last vowel, and "a" merges only before `r` and a vowel.
+  const respelled = BEFORE_R_MERGES.get(bareSound(original));
+  return (
+    respelled !== undefined &&
+    earlier[diffIndex + 1] === RHOTIC &&
+    candidate[diffIndex] === withSound(promoted, respelled)
+  );
+}
+
+/**
+ * True if `candidate` is exactly `earlier` with the "er" (`ER0`) straight after
+ * an `AY`, `AW` or `OY` read as plain `R`, or that `R` read as `ER0`, and
+ * nothing else changed: the shape `src/normalise.ts`'s `glide-r` rule appends
+ * (`power`'s `P AW1 ER0` gains `P AW1 R`). Looser than the rule, like the
+ * syllabic check above: a word the dictionary writes both ways (`fire`) has
+ * its second reading taken for generated, which refuses a pin the data would
+ * have allowed and never permits one it would have refused.
+ */
+function isGlideRVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  if (candidate.length !== earlier.length) return false;
+  const diffs = earlier.flatMap((phoneme, i) => (candidate[i] === phoneme ? [] : [i]));
+  if (diffs.length !== 1) return false;
+  const i = diffs[0]!;
+  const glide = earlier[i - 1];
+  if (glide === undefined || !GLIDING_VOWELS.has(bareSound(glide))) return false;
+  const [was, now] = [earlier[i], candidate[i]];
+  return (was === WEAK_ER && now === RHOTIC) || (was === RHOTIC && now === WEAK_ER);
 }
 
 /**
  * True if `candidate` is a generated variant of `earlier` — a reading
  * normalisation appended alongside it, rather than one the pinned data ever
- * transcribed. The two shapes above are the whole of the frozen rule set that
- * appends (ADR-0011); the rule that replaces (the cot-caught merger) never
- * grows a word's reading count, so it needs no shape here.
+ * transcribed. The three shapes above are the whole of the frozen rule set that
+ * appends (ADR-0011); the rules that replace (the cot-caught merger, the weak-
+ * vowel merge, the tap, the vowel before `r`) never grow a word's reading count,
+ * so they need no shape here, only an allowance in a shape above where one runs
+ * after an appending rule and rewrites its variant differently (see `RULES` in
+ * src/normalise.ts).
  */
 function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   return (
     isSyllabicConsonantVariantOf(candidate, earlier) ||
-    isStressPromotionVariantOf(candidate, earlier)
+    isStressPromotionVariantOf(candidate, earlier) ||
+    isGlideRVariantOf(candidate, earlier)
   );
 }
 
@@ -301,6 +353,18 @@ export class RhymeIndex {
       pronunciation,
       generated: prons.slice(0, i).some((earlier) => isGeneratedVariantOf(pronunciation, earlier)),
     }));
+  }
+
+  /**
+   * Every reading of a surface form with each weak vowel as the dictionary wrote
+   * it, before the Normalisation that reads weak "ih" and weak "uh" as one sound
+   * (#260). A Rhyme is decided on `readingsOf`; a Weak Rhyme (ADR-0020) is worked
+   * out from these, so `aspirin` for `win` keeps its written "ih". Every other
+   * rule has run on them, so they differ from `readingsOf` only where that one did.
+   */
+  unmergedReadingsOf(word: string): Pronunciation[] {
+    const w = normaliseWord(word);
+    return this.#data.unmergedReadings?.get(w) ?? this.#data.pronunciations.get(w) ?? [];
   }
 
   /**

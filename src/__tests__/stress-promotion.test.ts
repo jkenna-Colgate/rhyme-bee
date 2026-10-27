@@ -102,7 +102,8 @@ describe("a word-final vowel is never promoted", () => {
     ]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("arrow")).toEqual([["AE1", "R", "OW0"]]);
+    // One reading, no variant. Its "a" before r and a vowel is written "eh" (#263).
+    expect(data.pronunciations.get("arrow")).toEqual([["EH1", "R", "OW0"]]);
     expect(data.pronunciations.get("menu")).toEqual([["M", "EH1", "N", "Y", "UW0"]]);
     expect(data.pronunciations.get("viceroy")).toEqual([["V", "AY1", "S", "R", "OY0"]]);
   });
@@ -118,14 +119,18 @@ describe("a word-final vowel is never promoted", () => {
     });
   });
 
-  it("leaves no single-phoneme Rhyme Key in the index but the legitimate `AY`", () => {
+  it("leaves no single-phoneme Rhyme Key in the index but the legitimate `AY` and `ER`", () => {
     // The regression that pins the blow-up. Its signature is a bare-vowel key
     // swallowing a whole ending, so assert the shape directly: every
-    // single-phoneme key in the index, and who is in it.
-    const single = [...familiesOf(makeTestIndex())].filter(([key]) => !key.includes(" "));
+    // single-phoneme key in the index, and who is in it. `ER` is `fur`, a
+    // stressed word-final vowel the glide-before-r guardrails (#261) brought in.
+    const single = new Map(
+      [...familiesOf(makeTestIndex())].filter(([key]) => !key.includes(" ")),
+    );
 
-    expect(single.map(([key]) => key)).toEqual(["AY"]);
-    expect(single[0]?.[1].slice().sort()).toEqual(["buy", "eye", "high"]);
+    expect([...single.keys()].sort()).toEqual(["AY", "ER"]);
+    expect(single.get("AY")?.slice().sort()).toEqual(["buy", "eye", "high"]);
+    expect(single.get("ER")).toEqual(["fur"]);
   });
 
   it("keeps every family far below the scale the unconstrained rule reached", () => {
@@ -192,8 +197,10 @@ describe("a reducible vowel is never promoted", () => {
     expect(data.pronunciations.get("accurate")).toEqual([
       ["AE1", "K", "Y", "ER0", "AH0", "T"],
     ]);
+    // Its written "ih" is read as "uh" by the weak-vowel merge (#260), and
+    // still carries no stress.
     expect(data.pronunciations.get("forfeit")).toEqual([
-      ["F", "AO1", "R", "F", "IH0", "T"],
+      ["F", "AO1", "R", "F", "AH0", "T"],
     ]);
   });
 });
@@ -209,7 +216,8 @@ describe("a lone inflectional coda does not close a syllable", () => {
     const data = target([["arrows", [["AE1", "R", "OW0", "Z"]]]]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("arrows")).toEqual([["AE1", "R", "OW0", "Z"]]);
+    // One reading, no variant. Its "a" before r and a vowel is written "eh" (#263).
+    expect(data.pronunciations.get("arrows")).toEqual([["EH1", "R", "OW0", "Z"]]);
   });
 
   it("does not let `cities` rhyme with `bees`, nor `married` with `deed`", () => {
@@ -219,7 +227,8 @@ describe("a lone inflectional coda does not close a syllable", () => {
     ]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("cities")).toEqual([["S", "IH1", "T", "IY0", "Z"]]);
+    // One reading, unpromoted; its t is the tap (#262), read as d.
+    expect(data.pronunciations.get("cities")).toEqual([["S", "IH1", "D", "IY0", "Z"]]);
     expect(data.pronunciations.get("married")).toEqual([["M", "EH1", "R", "IY0", "D"]]);
   });
 

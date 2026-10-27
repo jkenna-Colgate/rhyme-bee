@@ -1,6 +1,6 @@
 # The schedule is a reviewed artifact, not an automated eligibility gate
 
-**Status:** amended 2026-10-11 and 2026-10-14. The Schedule is still read by a person rather than gated, but it no longer ends: it is a loop dealt once in whole weeks, grows by new weeks put through a Batch, and repairs a day whose Seed Word no longer pins (the same word on its current Rhyme Key, then the family's lead word, then Free Play). A Seed Word must be heard one way, and is never an Unconfirmed Rhyme. The Consequences about the run ending are reversed.
+**Status:** amended 2026-10-11, 2026-10-14 and 2026-10-27. The Schedule is still read by a person rather than gated, but it no longer ends: it is a loop dealt once in whole weeks, grows by new weeks put through a Batch, and repairs a day whose Seed Word no longer pins (the same word on its current Rhyme Key, then the family's lead word, then Free Play only when nothing pins, even onto a place another day holds). A Seed Word must be heard one way, and is never an Unconfirmed Rhyme. The Consequences about the run ending are reversed.
 
 Seed eligibility has been built as a stack of automated gates: a size band
 ([ADR-0004](./0004-puzzles-are-bounded-by-seed-curation.md)), a distinctness gate
@@ -220,3 +220,39 @@ Seed Word would make every word of the other family an accepted guess on that
 Seed Word's day. A wrong ruling by the Judge is the likelier case, and a real
 gap in the dictionary on a scheduled Seed Word should be rare once the Batches
 have run. Keeping them apart costs one word rejected on one day per lap.
+
+## Amendment, 2026-10-27: Continuity is held, the one-place rule is reported
+
+Ruled by the maintainer while building
+[#256](https://github.com/jkenna-Colgate/rhyme-bee/issues/256).
+
+**A repair never sends a day to Free Play because its landing place is held.**
+#228 and #256 said that if re-pinning would land on a Rhyme Key the Schedule
+already holds, the repair goes to the next step, and the 2026-10-11 amendment
+above ranks a Seed Word's keys among those "the Schedule does not already
+hold". That made the one-place rule outrank Continuity, which is backwards: the
+Playability Bar holds Continuity exactly, and a collision costs a Puzzle coming
+round early, not a date with no Puzzle at all. The steps keep their order, and
+a candidate that collides with no other day is still preferred. When every
+candidate that pins collides, the first is taken anyway. A day is Free Play
+only when nothing pins.
+
+**The one-place check compares Puzzles, not only strings.** Two days collide if
+they share a Seed Word, a Rhyme Key, or a Puzzle with the same Answers. An
+appending Normalisation can file one family under two key spellings
+(`purifier` on `AY ER`, `expire` on `AY R`), and a check on strings alone
+reports nothing. Each collision says which of the three it is.
+
+The case that forced it: the Normalisations merged pairs of scheduled days into
+one Puzzle, so one day of each pair (`utility`, `personality`, `centimeter`)
+fell to Free Play, the one-place check reported nothing, and which day lost its
+place was an accident of Schedule order. `centimeter` was the one this ADR says
+keeps its place. Now both days pin, the check reports the pair, and choosing
+which day keeps the place and filling the other is its own build (#265), which
+a person decides rather than the order of a loop.
+
+### Rejected
+
+**Keep the fall-through and let #265 fill the Free Play day.** It hides the
+collision from the one check that exists to find it, and leaves the choice of
+which day keeps its place to the accident above.

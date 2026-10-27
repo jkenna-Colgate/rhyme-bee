@@ -298,7 +298,8 @@ describe("assembling a context from the pinned inputs", () => {
     });
     const evidence = gatherEvidence("watergruel", "UW L", ctx);
 
-    expect(evidence.composed?.phonemes).toEqual(["W", "AA1", "T", "ER0", "G", "R", "UW2", "L"]);
+    // `water` arrives normalised: the merged vowel, and its t read as d (#262).
+    expect(evidence.composed?.phonemes).toEqual(["W", "AA1", "D", "ER0", "G", "R", "UW2", "L"]);
     expect(evidence.composed?.tail.phonemes).toEqual(["G", "R", "UW1", "L"]);
   });
 

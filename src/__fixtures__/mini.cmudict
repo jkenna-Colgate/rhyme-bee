@@ -97,3 +97,14 @@ BUY  B AY1
 EYE  AY1
 ARROWS  AE1 R OW0 Z
 NOSE  N OW1 Z
+;;; After "eye", "ow" or "oy", "er" and plain R read as each other (#261). These
+;;; are the guardrails the ADR checked by hand: the rule stops at those three
+;;; vowels and at R, so `fire` keeps clear of `far` and `fur`, and `player` and
+;;; `lower` (a long vowel that is none of the three) keep clear of `hair` and `lore`.
+FIRE  F AY1 ER0
+FIRE(1)  F AY1 R
+FUR  F ER1
+PLAYER  P L EY1 ER0
+HAIR  HH EH1 R
+LOWER  L OW1 ER0
+LORE  L AO1 R

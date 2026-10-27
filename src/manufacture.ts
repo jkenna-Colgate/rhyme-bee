@@ -35,6 +35,7 @@ import { parseCmudict } from "./cmudict.ts";
 import { applyCoverage, type DerivedWord } from "./coverage.ts";
 import { applyDemotions, type AppliedDemotion } from "./demotions.ts";
 import { applyNormalisation } from "./normalise.ts";
+import type { Pronunciation } from "./phonology.ts";
 import { parsePrevalenceCsv, parseWordList } from "./pipeline.ts";
 import type { RhymeIndexData } from "./rhymeIndex.ts";
 import { applySupplement } from "./supplement.ts";
@@ -118,7 +119,12 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   // 4. The accent specification (ADR-0010), applied to every reading before any
   // Rhyme Key is computed. So a hand-authored or derived reading is an input to
   // the accent rather than an exemption from it. See src/normalise.ts.
-  applyNormalisation({ pronunciations });
+  // The readings a Weak Rhyme is worked out from are kept beside them, for the
+  // words that hold wordhood: a Weak Rhyme is tested only on a Submission that
+  // has already passed the wordhood gate, so nothing else would ever read one.
+  const unmerged = new Map<string, Pronunciation[]>();
+  applyNormalisation({ pronunciations, unmergedReadings: unmerged });
+  const unmergedReadings = new Map([...unmerged].filter(([word]) => words.has(word)));
 
   // 5. The Retrieval override layer (ADR-0015), merged over the finished
   // prevalence map before any Tier is read — so no adjudication code learns
@@ -138,5 +144,11 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   }
   dropped.sort((a, b) => a.word.localeCompare(b.word));
 
-  return { data: { pronunciations, words, names, prevalence }, demoted, derived, dropped, overridden };
+  return {
+    data: { pronunciations, unmergedReadings, words, names, prevalence },
+    demoted,
+    derived,
+    dropped,
+    overridden,
+  };
 }
