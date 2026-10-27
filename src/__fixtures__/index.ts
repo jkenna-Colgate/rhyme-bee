@@ -151,6 +151,8 @@ export interface TestInputs {
   supplement?: string;
   /** The Retrieval override layer (ADR-0015) this build runs. Likewise. */
   tierOverrides?: string;
+  /** The Unconfirmed Rhyme list (#259) this build runs. Likewise. */
+  unconfirmedRhymes?: string;
   /** The tier cutoff, for a test that needs to move it. */
   knownnessThreshold?: number;
 }
@@ -168,6 +170,7 @@ function testSlice(inputs: TestInputs): FixtureSlice {
     demotions: inputs.demotions,
     supplement: inputs.supplement,
     tierOverrides: inputs.tierOverrides,
+    unconfirmedRhymes: inputs.unconfirmedRhymes,
   };
 }
 

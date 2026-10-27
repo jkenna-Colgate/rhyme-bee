@@ -112,7 +112,12 @@ export function checkContinuity(days: readonly ScheduleDay[], index: RhymeIndex)
         seed: chooseRepresentative(f.members.map((m) => m.word), index),
         rhymeKey: f.rhymeKey,
       })),
-    ].filter((c) => pinFailure(index, c.seed, c.rhymeKey) === null);
+    ]
+      // A lead word that is an Unconfirmed Rhyme cannot join the Schedule
+      // (ADR-0012 amended). Step 1 keeps the day's own Seed Word, which the
+      // build reports instead if it is listed.
+      .filter((c) => c.step === 1 || !index.isUnconfirmedRhyme(c.seed))
+      .filter((c) => pinFailure(index, c.seed, c.rhymeKey) === null);
 
     // The one-place rule is reported and never blocks (ADR-0012, 2026-10-27):
     // the steps keep their order and a candidate that shares no Seed Word,

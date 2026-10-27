@@ -36,6 +36,9 @@ desktop.ini
 # derived, a Decline is the one thing written — so a copy on one machine would
 # lose every ruling the next clone made again.
 !/data/declines.txt
+# The Unconfirmed Rhymes the Judge writes (#259, ADR-0017). Authored, like the
+# demotion list, so kept for its reason: the next clone could not derive it.
+!/data/unconfirmed-rhymes.txt
 # The Editor's Pass defers what it cannot compose a reading for. Unlike the
 # Appeal candidates queue beside it, which is pulled down from R2 and can be
 # pulled again, this is the only record that a miss happened — it is the work
