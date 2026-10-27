@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { isAccepted } from "../verdict.ts";
+import { isTiered } from "../verdict.ts";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 
 const index = makeTestIndex();
@@ -87,7 +87,7 @@ describe("asymmetric matching", () => {
     const verdict = index.adjudicate(index.pinSeed("bed"), "read");
     expect(verdict.outcome).toBe("answer");
     // The reported reading is R EH1 D, the one that matched — not R IY1 D.
-    if (isAccepted(verdict)) expect(verdict.pronunciation).toEqual(["R", "EH1", "D"]);
+    if (isTiered(verdict)) expect(verdict.pronunciation).toEqual(["R", "EH1", "D"]);
   });
 
   it("honours both readings of the same spelling in different Puzzles", () => {
@@ -95,7 +95,7 @@ describe("asymmetric matching", () => {
     const forCare = index.adjudicate(index.pinSeed("care"), "tear");
     expect(forBeer.outcome).toBe("answer");
     expect(forCare.outcome).toBe("answer");
-    if (isAccepted(forBeer)) expect(forBeer.pronunciation).toEqual(["T", "IH1", "R"]);
-    if (isAccepted(forCare)) expect(forCare.pronunciation).toEqual(["T", "EH1", "R"]);
+    if (isTiered(forBeer)) expect(forBeer.pronunciation).toEqual(["T", "IH1", "R"]);
+    if (isTiered(forCare)) expect(forCare.pronunciation).toEqual(["T", "EH1", "R"]);
   });
 });

@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import { applyNormalisation } from "../normalise.ts";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 import { rhymeKeyOf, type Pronunciation } from "../phonology.ts";
-import { isAccepted } from "../verdict.ts";
+import { isAccepted, isTiered } from "../verdict.ts";
 
 function target(entries: [string, Pronunciation[]][] = []) {
   return { pronunciations: new Map(entries) };
@@ -125,7 +125,7 @@ describe("a normalised respelling", () => {
     for (const submission of ["talked", "walked", "balked", "stalked", "hawked"]) {
       const verdict = index.adjudicate(docked, submission);
       expect(isAccepted(verdict)).toBe(true);
-      if (isAccepted(verdict)) {
+      if (isTiered(verdict)) {
         expect(verdict.respelling.toLowerCase()).toContain(tail);
       }
     }

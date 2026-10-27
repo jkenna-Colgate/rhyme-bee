@@ -114,9 +114,15 @@ export interface CurationReport {
  * length-first rule selects for exactly the wrong thing. Knownness alone would
  * fix that but prefers `messed` to `best` and `crowned` to `round`, since an
  * inflected form can out-rank its own stem; native-first settles that.
+ *
+ * Ahead of all of it, a word listed as an Unconfirmed Rhyme on any key is never
+ * picked while the family has another (ADR-0012 amended): Seed Words and
+ * Unconfirmed Rhymes are kept apart, so nothing swaps a Seed Word on the
+ * Judge's word alone.
  */
 export function chooseRepresentative(words: string[], index: RhymeIndex): string {
   const rank = (word: string) => ({
+    unconfirmed: index.isUnconfirmedRhyme(word) ? 1 : 0,
     derived: index.derivation.isDerived(word) ? 1 : 0,
     ambiguous: index.isAmbiguous(word) ? 1 : 0,
     // Absent from the prevalence norms sorts last, not first.
@@ -126,6 +132,7 @@ export function chooseRepresentative(words: string[], index: RhymeIndex): string
     const rankA = rank(a);
     const rankB = rank(b);
     return (
+      rankA.unconfirmed - rankB.unconfirmed ||
       rankA.derived - rankB.derived ||
       rankA.ambiguous - rankB.ambiguous ||
       rankB.knownness - rankA.knownness ||

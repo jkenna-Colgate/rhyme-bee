@@ -1,0 +1,23 @@
+# Committed Unconfirmed Rhymes: words the Judge ruled a Rhyme on one Rhyme Key
+# that nobody has confirmed yet (GLOSSARY.md, ADR-0017 and ADR-0011, both
+# amended 2026-10-14).
+#
+# `<word> <writer> <ruling> <confidence> <rhyme key>`, `#` comments, merged by
+# `npm run build:index` after every reading stage. Written by the Judge's
+# landing step (#266), one line per Candidate it rules this way.
+#
+#   - `missing-reading`  the game held no reading for the word, and the Judge's
+#                        reading reaches the key at medium confidence.
+#   - `overrule`         the game held a reading that misses the key, and the
+#                        Judge heard another at high confidence.
+#
+# A listed word is accepted on its Rhyme Key WITHOUT Points: the player sees a
+# Bonus Word, it holds no Tier, and it is never in the Reveal. It is not a
+# reading and not a Tier, so it holds on every day that key is played and on no
+# other key. The Rhyme Key runs to the end of the line, because a key contains
+# spaces.
+#
+# The Editor's Pass confirms a line by the ordinary add (a reading in
+# supplement.dict), after which the build drops it as stale and says so, or
+# Declines it. A scheduled Seed Word is never listed, and the build reports one
+# that is.

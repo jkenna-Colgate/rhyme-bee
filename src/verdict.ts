@@ -63,7 +63,8 @@ export function tierFor(knownness: number, knownnessThreshold: number): Tier {
   return knownness >= knownnessThreshold ? "answer" : "bonus";
 }
 
-export interface AcceptedVerdict {
+/** A Submission that rhymes and is a word: it holds a Tier. */
+export interface TieredVerdict {
   outcome: Tier;
   /** The pronunciation whose Rhyme Key matched the Seed Word. */
   pronunciation: Pronunciation;
@@ -74,6 +75,22 @@ export interface AcceptedVerdict {
   /** Word-prevalence score, or null when the word is absent from the data. */
   knownness: number | null;
 }
+
+/**
+ * An Unconfirmed Rhyme (GLOSSARY.md): a word listed for the Seed Word's Rhyme
+ * Key in `data/unconfirmed-rhymes.txt` that does not rhyme there by itself. It
+ * is accepted without Points and holds no Tier, so it carries no knownness, and
+ * no pronunciation either: on a Missing Reading the game has none. A client
+ * shows it exactly as a Bonus Word.
+ */
+export interface UnconfirmedVerdict {
+  outcome: "unconfirmed";
+  /** Letter count of the surface form, as a Tiered verdict reports it. */
+  length: number;
+}
+
+/** Every verdict that accepts the Submission. */
+export type AcceptedVerdict = TieredVerdict | UnconfirmedVerdict;
 
 export interface RejectedVerdict {
   outcome: "rejected";
@@ -91,4 +108,9 @@ export type Verdict = AcceptedVerdict | RejectedVerdict;
 
 export function isAccepted(verdict: Verdict): verdict is AcceptedVerdict {
   return verdict.outcome !== "rejected";
+}
+
+/** True for an accepted word that holds a Tier, and so reports its reading. */
+export function isTiered(verdict: Verdict): verdict is TieredVerdict {
+  return verdict.outcome === "answer" || verdict.outcome === "bonus";
 }

@@ -25,6 +25,7 @@ export interface FixtureSlice {
   demotions?: string;
   supplement?: string;
   tierOverrides?: string;
+  unconfirmedRhymes?: string;
 }
 
 /** Readings to CMUdict text: `WORD  P1 P2`, alternates as `WORD(n)`. */
@@ -63,6 +64,7 @@ function toPinnedInputs(slice: FixtureSlice): PinnedInputs {
     demotions: slice.demotions ?? "",
     supplement: slice.supplement ?? "",
     tierOverrides: slice.tierOverrides ?? "",
+    unconfirmedRhymes: slice.unconfirmedRhymes ?? "",
   };
 }
 

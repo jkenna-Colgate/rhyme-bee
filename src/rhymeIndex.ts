@@ -129,6 +129,12 @@ export interface RhymeIndexData {
   names: Set<string>;
   /** Lemma -> word-prevalence score (knownness). */
   prevalence: Map<string, number>;
+  /**
+   * Word -> the Rhyme Keys it is an Unconfirmed Rhyme on, from
+   * `data/unconfirmed-rhymes.txt` (`src/unconfirmedRhymes.ts`). Optional, so
+   * data built without it lists nothing.
+   */
+  unconfirmedRhymes?: Map<string, RhymeKey[]>;
 }
 
 export interface RhymeIndexConfig {
@@ -292,6 +298,25 @@ function mergeSchwaTwins(raw: Map<RhymeKey, RhymeFamily>): Map<RhymeKey, RhymeFa
     });
   }
   return merged;
+}
+
+/**
+ * The reading of `prons` that rhymes on `seedKey`, or null: the rule behind
+ * `RhymeIndex#matchingPronunciation`, which documents it. Exported so the build
+ * can ask whether an Unconfirmed Rhyme has come to rhyme by itself
+ * (`src/manufacture.ts`) on the very rule adjudication applies.
+ */
+export function matchingPronunciation(seedKey: RhymeKey, prons: Pronunciation[]): Pronunciation | null {
+  for (const pron of prons) {
+    if (rhymeKeyOf(pron) === seedKey) return pron;
+  }
+  const twin = schwaTwinOf(seedKey);
+  if (twin !== null) {
+    for (const pron of prons) {
+      if (rhymeKeyOf(pron) === twin) return pron;
+    }
+  }
+  return null;
 }
 
 export class RhymeIndex {
@@ -458,6 +483,34 @@ export class RhymeIndex {
       return { outcome: "rejected", reason: "already-submitted" };
     }
 
+    // An Unconfirmed Rhyme turns exactly two rejections into an acceptance
+    // without Points: a word the Judge ruled a Rhyme on this key, whose reading
+    // misses it (an Overrule) or which has none (a Missing Reading). A Proper
+    // Noun stays one, and a word that rhymes here by itself keeps its Tier.
+    const verdict = this.#adjudicateWord(seed, word);
+    if (
+      verdict.outcome === "rejected" &&
+      (verdict.reason === "does-not-rhyme" || verdict.reason === "not-a-known-word") &&
+      this.isUnconfirmedRhyme(word, seed.rhymeKey)
+    ) {
+      return { outcome: "unconfirmed", length: word.length };
+    }
+    return verdict;
+  }
+
+  /**
+   * True if the word is listed as an Unconfirmed Rhyme on `rhymeKey`, or on any
+   * Rhyme Key when none is given: curation asks the second, so that a listed
+   * word never becomes a Seed Word (ADR-0012 amended).
+   */
+  isUnconfirmedRhyme(word: string, rhymeKey?: RhymeKey): boolean {
+    const keys = this.#data.unconfirmedRhymes?.get(normaliseWord(word));
+    if (keys === undefined) return false;
+    return rhymeKey === undefined ? keys.length > 0 : keys.includes(rhymeKey);
+  }
+
+  /** The verdict on a well-formed new Submission, by wordhood and sound alone. */
+  #adjudicateWord(seed: SeedWord, word: string): Verdict {
     // Wordhood and names are decided independently of rhyme: a name is never
     // valid however well it rhymes (GLOSSARY.md), and a non-word is a typo.
     if (!this.#data.words.has(word)) {
@@ -633,16 +686,7 @@ export class RhymeIndex {
     seedKey: RhymeKey,
     prons: Pronunciation[],
   ): Pronunciation | null {
-    for (const pron of prons) {
-      if (rhymeKeyOf(pron) === seedKey) return pron;
-    }
-    const twin = schwaTwinOf(seedKey);
-    if (twin !== null) {
-      for (const pron of prons) {
-        if (rhymeKeyOf(pron) === twin) return pron;
-      }
-    }
-    return null;
+    return matchingPronunciation(seedKey, prons);
   }
 
   /**

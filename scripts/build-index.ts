@@ -24,6 +24,7 @@ import { parseSchedule } from "../src/schedule.ts";
 import { deserialise, serialise } from "../src/serialise.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { checkTierSentinels } from "../src/tierOverride.ts";
+import { listedSeedWords } from "../src/unconfirmedRhymes.ts";
 import { MANIFEST_FILENAME, writeIndexArtifact } from "./indexArtifact.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -79,7 +80,7 @@ const sources = JSON.parse(read("sources.json")) as Record<string, string>;
 // coverage, normalisation, the Retrieval override layer — so the script cannot
 // run them out of turn, twice, or not at all. Its job from here is files in,
 // files out. See src/manufacture.ts.
-const { data, demoted, derived, dropped, overridden } = manufactureIndexData({
+const { data, demoted, derived, dropped, overridden, unconfirmed } = manufactureIndexData({
   cmudict: read("cmudict.dict"),
   words: read("words.txt"),
   names: read("names.txt"),
@@ -87,6 +88,7 @@ const { data, demoted, derived, dropped, overridden } = manufactureIndexData({
   demotions: read("demotions.txt"),
   supplement: read("supplement.dict"),
   tierOverrides: readOptional("tier-overrides.csv"),
+  unconfirmedRhymes: read("unconfirmed-rhymes.txt"),
 });
 
 mkdirSync(outDir, { recursive: true });
@@ -124,6 +126,14 @@ console.log(
     `${reversed.length > 0 ? ` (${reversed.length} reversed: ${reversed.map((o) => o.word).join(", ")})` : ""}.`,
 );
 
+// The Unconfirmed Rhyme list (#259). It is written by a job, so a line that
+// stopped mattering or never read is named here rather than left to pile up.
+console.log(
+  `Unconfirmed Rhymes: ${unconfirmed.kept.length} standing` +
+    `${unconfirmed.stale.length > 0 ? `; ${unconfirmed.stale.length} stale, dropped because they now rhyme by themselves: ${unconfirmed.stale.map((u) => `${u.word} on ${u.rhymeKey}`).join(", ")}` : ""}` +
+    `${unconfirmed.malformed.length > 0 ? `; ${unconfirmed.malformed.length} unreadable, ignored: ${unconfirmed.malformed.join(" | ")}` : ""}.`,
+);
+
 // The Continuity check (#256): every place in the Schedule, past dates
 // included, because every place comes round again. A failing day is repaired
 // in `data/schedule.json` where it can be and counted as Free Play where it
@@ -142,6 +152,16 @@ try {
       writeFileSync(schedulePath, `${JSON.stringify({ ...raw, days: report.days }, null, 2)}\n`);
     }
     for (const line of continuityLines(report)) console.log(line);
+
+    // Seed Words and Unconfirmed Rhymes are kept apart (ADR-0012 amended). A
+    // listed Seed Word is reported, not repaired: which side gives way is the
+    // editor's ruling.
+    for (const { date, seed, listedFor } of listedSeedWords(report.days, unconfirmed.kept)) {
+      console.log(
+        `Unconfirmed Rhymes: ${date}'s Seed Word "${seed}" is listed for ${listedFor.join(", ")}; ` +
+          `a Seed Word must not be one. Confirm or Decline the line in an Editor's Pass.`,
+      );
+    }
   }
 } catch (error) {
   console.log(`Continuity: the check could not run (${error instanceof Error ? error.message : String(error)}).`);

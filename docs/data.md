@@ -107,6 +107,7 @@ ordinary pronunciations.
 | `sources.json` | `{ "<name>": "<version/url>" }` | pinned provenance |
 | `supplement.dict` | CMUdict text, `#` comments | **committed** human adds + stress corrections (ADR-0009) |
 | `demotions.txt` | `<word> <reason>`, `#` comments | **committed** human wordhood corrections (#90) |
+| `unconfirmed-rhymes.txt` | `<word> <writer> <ruling> <confidence> <rhyme key>`, `#` comments | **committed** Unconfirmed Rhymes the Judge writes, accepted without Points on their key (#259) |
 
 `words.txt` is the wordhood authority and must exclude proper nouns, so CMUdict's
 surnames do not leak in (ADR-0003). `names.txt` only affects the *reason* a

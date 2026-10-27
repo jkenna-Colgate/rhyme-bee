@@ -20,6 +20,10 @@
  * ADR-0015 never asked for and the Tier layer must not cause. Last, it only
  * ever touches a map nothing downstream in *this* function reads again.
  *
+ * The Unconfirmed Rhyme list (#259) is read after all of them. It is neither a
+ * reading nor a Tier, and it needs the finished readings to tell which of its
+ * lines now rhyme by themselves.
+ *
  * That order used to live in comments in the build script, with each stage
  * taking a mutable target it would happily accept twice or out of turn. Here it
  * is expressed once, inside one call, and cannot be spelled wrongly from
@@ -37,9 +41,14 @@ import { applyDemotions, type AppliedDemotion } from "./demotions.ts";
 import { applyNormalisation } from "./normalise.ts";
 import type { Pronunciation } from "./phonology.ts";
 import { parsePrevalenceCsv, parseWordList } from "./pipeline.ts";
-import type { RhymeIndexData } from "./rhymeIndex.ts";
+import { matchingPronunciation, type RhymeIndexData } from "./rhymeIndex.ts";
 import { applySupplement } from "./supplement.ts";
 import { applyTierOverrides, type AppliedTierOverride } from "./tierOverride.ts";
+import {
+  applyUnconfirmedRhymes,
+  unconfirmedKeysByWord,
+  type AppliedUnconfirmedRhymes,
+} from "./unconfirmedRhymes.ts";
 
 /**
  * The pinned inputs, as text, exactly as they sit in `data/`. Text rather than
@@ -65,6 +74,11 @@ export interface PinnedInputs {
    * the same way it treats an empty demotion list, not as an error.
    */
   tierOverrides: string;
+  /**
+   * The committed Unconfirmed Rhyme list (#259): words the Judge ruled a Rhyme
+   * on one Rhyme Key, accepted there without Points. Empty text lists nothing.
+   */
+  unconfirmedRhymes: string;
 }
 
 /** A CMUdict surface form that will never be a valid Submission, and why. */
@@ -90,6 +104,8 @@ export interface ManufacturedIndex {
   dropped: DroppedWord[];
   /** Every word the Retrieval override layer patched (ADR-0015). */
   overridden: AppliedTierOverride[];
+  /** The Unconfirmed Rhyme list as applied, with what it dropped (#259). */
+  unconfirmed: AppliedUnconfirmedRhymes;
 }
 
 export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
@@ -144,11 +160,23 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   }
   dropped.sort((a, b) => a.word.localeCompare(b.word));
 
+  // 6. The Unconfirmed Rhyme list (#259), read against the finished readings:
+  // it is no reading and no Tier, so nothing above reads it. Running after
+  // every reading stage is what lets it drop a line whose word now rhymes on
+  // its key by itself, which is what confirming the line by the ordinary add
+  // does. See src/unconfirmedRhymes.ts.
+  const unconfirmed = applyUnconfirmedRhymes(
+    inputs.unconfirmedRhymes,
+    (word, rhymeKey) => words.has(word) && matchingPronunciation(rhymeKey, pronunciations.get(word) ?? []) !== null,
+  );
+  const unconfirmedRhymes = unconfirmedKeysByWord(unconfirmed.kept);
+
   return {
-    data: { pronunciations, unmergedReadings, words, names, prevalence },
+    data: { pronunciations, unmergedReadings, words, names, prevalence, unconfirmedRhymes },
     demoted,
     derived,
     dropped,
     overridden,
+    unconfirmed,
   };
 }

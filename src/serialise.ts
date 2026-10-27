@@ -5,7 +5,7 @@
  * JSON, so they are stored as arrays and rehydrated here.
  */
 
-import type { Pronunciation } from "./phonology.ts";
+import type { Pronunciation, RhymeKey } from "./phonology.ts";
 import {
   RhymeIndex,
   type RhymeIndexConfig,
@@ -21,6 +21,8 @@ export interface SerialisedIndex {
   words: string[];
   names: string[];
   prevalence: [string, number][];
+  /** Absent from an artifact built before #259, which lists no Unconfirmed Rhyme. */
+  unconfirmedRhymes?: [string, RhymeKey[]][];
   config: RhymeIndexConfig;
 }
 
@@ -36,6 +38,7 @@ export function serialise(
     words: [...data.words],
     names: [...data.names],
     prevalence: [...data.prevalence.entries()],
+    unconfirmedRhymes: [...(data.unconfirmedRhymes ?? new Map()).entries()],
     config,
   };
 }
@@ -47,6 +50,7 @@ export function deserialise(artifact: SerialisedIndex): RhymeIndex {
     words: new Set(artifact.words),
     names: new Set(artifact.names),
     prevalence: new Map(artifact.prevalence),
+    unconfirmedRhymes: new Map(artifact.unconfirmedRhymes ?? []),
   };
   return new RhymeIndex(data, artifact.config);
 }
