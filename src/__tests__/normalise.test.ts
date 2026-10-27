@@ -11,7 +11,7 @@
 import { describe, expect, it } from "vitest";
 import { applyNormalisation } from "../normalise.ts";
 import { makeTestIndex } from "../__fixtures__/index.ts";
-import type { Pronunciation } from "../phonology.ts";
+import { rhymeKeyOf, type Pronunciation } from "../phonology.ts";
 import { isAccepted } from "../verdict.ts";
 
 function target(entries: [string, Pronunciation[]][] = []) {
@@ -183,7 +183,8 @@ describe("weak ih and weak uh after the stressed vowel are one sound (#260)", ()
 
   it("hears `annotated` one way, so it pins with no key given", () => {
     // Its two readings were two Rhyme Keys apart only on the weak vowel written.
-    expect(index.rhymeKeysOf("annotated")).toEqual(["EY T AH D"]);
+    // The t is tapped as well (#262).
+    expect(index.rhymeKeysOf("annotated")).toEqual(["EY D AH D"]);
     expect(index.adjudicate(index.pinSeed("annotated"), "abated").outcome).toBe("answer");
   });
 
@@ -285,5 +286,87 @@ describe("after eye, ow or oy, er and plain r read as each other (#261)", () => 
 
   it("leaves an r that opens the next syllable alone", () => {
     expect(index.rhymeKeysOf("virus")).toEqual(["AY R AH S"]);
+  });
+});
+
+describe("t and d after a vowel or r, before a weak vowel, are one sound (#262)", () => {
+  // Readings exactly as the source dictionary writes them (ADR-0011, amendment
+  // of 2026-10-16). General American says the t and the d as the same tap.
+  const index = makeTestIndex({
+    pronunciations: [
+      ["latter", [["L", "AE1", "T", "ER0"]]],
+      ["ladder", [["L", "AE1", "D", "ER0"]]],
+      ["metal", [["M", "EH1", "T", "AH0", "L"]]],
+      ["medal", [["M", "EH1", "D", "AH0", "L"]]],
+      ["computer", [["K", "AH0", "M", "P", "Y", "UW1", "T", "ER0"]]],
+      ["ruder", [["R", "UW1", "D", "ER0"]]],
+      ["quarter", [["K", "W", "AO1", "R", "T", "ER0"]]],
+      ["disorder", [["D", "IH0", "S", "AO1", "R", "D", "ER0"]]],
+      ["charity", [["CH", "EH1", "R", "IH0", "T", "IY0"]]],
+      ["parody", [["P", "EH1", "R", "AH0", "D", "IY0"]]],
+      ["shouted", [["SH", "AW1", "T", "IH0", "D"]]],
+      ["crowded", [["K", "R", "AW1", "D", "AH0", "D"], ["K", "R", "AW1", "D", "IH0", "D"]]],
+      ["fighting", [["F", "AY1", "T", "IH0", "NG"]]],
+      ["deciding", [["D", "IH2", "S", "AY1", "D", "IH0", "NG"]]],
+      ["written", [["R", "IH1", "T", "AH0", "N"]]],
+      ["hidden", [["HH", "IH1", "D", "AH0", "N"]]],
+      ["curtains", [["K", "ER1", "T", "AH0", "N", "Z"]]],
+      ["burdens", [["B", "ER1", "D", "AH0", "N", "Z"]]],
+      ["water", [["W", "AO1", "T", "ER0"]]],
+    ],
+    words: [
+      "latter", "ladder", "metal", "medal", "computer", "ruder", "quarter", "disorder",
+      "charity", "parody", "shouted", "crowded", "fighting", "deciding", "written",
+      "hidden", "curtains", "burdens", "water",
+    ],
+    prevalence: [
+      ["latter", 2.2], ["ladder", 2.5], ["metal", 2.5], ["medal", 2.4], ["computer", 2.5],
+      ["ruder", 2.0], ["quarter", 2.5], ["disorder", 2.3], ["charity", 2.5], ["parody", 2.2],
+      ["shouted", 2.4], ["crowded", 2.4], ["fighting", 2.5], ["deciding", 2.4],
+      ["written", 2.5], ["hidden", 2.5], ["curtains", 2.4], ["burdens", 2.2], ["water", 2.5],
+    ],
+  });
+
+  /**
+   * The word pinned on the Rhyme Key of the reading the dictionary wrote. A word
+   * ending in a syllabic n or l also holds the syllabic rule's reading, so it
+   * cannot pin with no key given.
+   */
+  const pin = (word: string) =>
+    index.pinSeed(word, rhymeKeyOf(index.readingsOf(word)[0]!.pronunciation)!);
+
+  it("rhymes `latter` with `ladder`, in both orders", () => {
+    expect(index.adjudicate(pin("latter"), "ladder").outcome).toBe("answer");
+    expect(index.adjudicate(pin("ladder"), "latter").outcome).toBe("answer");
+  });
+
+  it.each([
+    ["metal", "medal"],
+    ["computer", "ruder"],
+    ["quarter", "disorder"],
+    ["charity", "parody"],
+    ["shouted", "crowded"],
+  ])("rhymes %j with %j, in both orders", (a, b) => {
+    expect(index.adjudicate(pin(a), b).outcome).toBe("answer");
+    expect(index.adjudicate(pin(b), a).outcome).toBe("answer");
+  });
+
+  it.each([
+    ["fighting", "deciding"],
+    ["written", "hidden"],
+    ["curtains", "burdens"],
+  ])("keeps %j apart from %j, where the t is not a tap", (a, b) => {
+    expect(index.adjudicate(pin(a), b)).toMatchObject({ outcome: "rejected", reason: "does-not-rhyme" });
+    expect(index.adjudicate(pin(b), a)).toMatchObject({ outcome: "rejected", reason: "does-not-rhyme" });
+  });
+
+  it("respells the tap as d", () => {
+    // An unstressed "er" respells as "ur": the ticket's "WAH-der" is this.
+    expect(index.buildPuzzle(pin("water")).seedRespelling).toBe("WAH-dur");
+  });
+
+  it("hears `metal` one way, though its syllabic reading keeps its t", () => {
+    expect(index.rhymeKeysOf("metal")).toEqual(["EH D AH L", "EH T L"]);
+    expect(() => index.pinSeed("metal", "EH T L")).toThrow(/generated variant/);
   });
 });

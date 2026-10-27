@@ -501,6 +501,76 @@ function lastStressedIndex(reading: Pronunciation): number | null {
   return null;
 }
 
+/** The two consonants General American says as one tap, and the one it is written as. */
+const TAP_SPELLINGS = new Set(["T", "D"]);
+const TAP = "D";
+/** The vowel whose length is heard before t and d, so neither is tapped after it. */
+const RAISED_GLIDE = "AY";
+/** The weak vowels a syllabic n is written with. */
+const SYLLABIC_N_VOWELS = new Set([SCHWA, WEAK_IH]);
+
+/**
+ * Rule 6: a t or d after a vowel or `r`, before a weak vowel, is one sound
+ * (ADR-0011, amendment of 2026-10-16; #262).
+ *
+ * General American says both as the same quick tap, so `latter` and `ladder`,
+ * `metal` and `medal`, `computer` and `ruder` sound alike, and so do `quarter`
+ * and `disorder` after `r`, and `charity` and `parody` between two weak vowels.
+ * Inside a reading's Rhyme Key, a `T` or `D` with a vowel or `R` before it and a
+ * vowel after it is read as `D`. Every vowel after the one that opens the key is
+ * unstressed, so the shape alone keeps a t or d at the end of a word or before a
+ * stressed vowel as written: `seat` / `seed`, `eight` / `aid`, `attack` / `adapt`.
+ * The contrast, the reach and the guardrails are the ADR's.
+ *
+ * Two places are left out, because the sound there is not the tap. After "eye",
+ * where many speakers say the vowel of `writer` differently from the vowel of
+ * `rider`; "ow" joins (`shouted` / `crowded`). And before a syllabic n, said
+ * with a glottal stop: `button` / `sudden`, `curtains` / `burdens`.
+ *
+ * It **replaces**, and the tap is written `D`, so the respelling says "d"
+ * (`water` is "WAH-dur"), after the `talked` / `docked` precedent. Appending
+ * would give each affected word a second Rhyme Key that rhymes where the first
+ * does not, and thirteen scheduled Seed Words would stop being heard one way.
+ *
+ * It runs after the syllabic consonant rule, whose appended reading keeps its t
+ * (`metal` read "met-l"), which is harmless because the full reading carries the
+ * join; `isSyllabicConsonantVariantOf` in src/rhymeIndex.ts allows for it. It
+ * runs before stress promotion, so a promoted variant is a promotion of the
+ * tapped reading and the index still recognises it as appended. A Weak Rhyme
+ * sees it too: the tap always opens the syllable after it, so it is never in the
+ * last syllable's rime a Weak Rhyme compares.
+ */
+const tap: NormalisationRule = {
+  name: "tap",
+  apply: (readings) => readings.map(tapReading),
+};
+
+function tapReading(reading: Pronunciation): Pronunciation {
+  const stressed = lastStressedIndex(reading);
+  if (stressed === null) return reading;
+  return reading.map((phoneme, i) => {
+    if (i <= stressed || !TAP_SPELLINGS.has(phoneme)) return phoneme;
+    const before = reading[i - 1]!;
+    const after = reading[i + 1];
+    if (!isVowel(before) && before !== RHOTIC) return phoneme;
+    if (bareSound(before) === RAISED_GLIDE) return phoneme;
+    if (after === undefined || !isVowel(after)) return phoneme;
+    if (opensSyllabicN(reading, i + 1)) return phoneme;
+    return TAP;
+  });
+}
+
+/**
+ * True if the weak vowel at `i` is the schwa of a syllabic n: an `AH0` or `IH0`
+ * followed by `N` and then no vowel (`button`, `curtains`, `mutant`).
+ */
+function opensSyllabicN(reading: Pronunciation, i: number): boolean {
+  if (!SYLLABIC_N_VOWELS.has(bareSound(reading[i]!))) return false;
+  if (reading[i + 1] !== "N") return false;
+  const next = reading[i + 2];
+  return next === undefined || !isVowel(next);
+}
+
 /** The vowels that end in a glide, after which "er" and plain `r` are one sound. */
 const GLIDING_VOWELS = new Set(["AY", "AW", "OY"]);
 const WEAK_ER = "ER0";
@@ -564,6 +634,7 @@ const RULES: readonly NormalisationRule[] = [
   cotCaughtMerger,
   syllabicConsonant,
   weakVowelMerge,
+  tap,
   stressPromotion,
   glideR,
 ];

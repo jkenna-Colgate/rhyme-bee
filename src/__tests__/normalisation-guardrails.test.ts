@@ -18,6 +18,9 @@
  *   - the glide-before-r group guards the limits of the rule that reads "er" and
  *     plain `r` as each other after "eye", "ow" or "oy" (ADR-0011, amendment of
  *     2026-10-07): it reaches no other vowel, and no `r` that is not after one.
+ *   - the t-and-d group guards the places the rule reading t and d as one sound
+ *     before a weak vowel (ADR-0011, amendment of 2026-10-16) leaves out: the end
+ *     of a word, before a stressed vowel, after "eye", before a syllabic n.
  *
  * A row here failing is not a broken test. It is a normalisation that has
  * overreached, and the rule goes, not the row.
@@ -28,7 +31,28 @@ import { makeTestIndex } from "../__fixtures__/index.ts";
 import { rhymeKeyOf } from "../phonology.ts";
 import type { SeedWord } from "../rhymeIndex.ts";
 
-const index = makeTestIndex();
+// The t-and-d rows' words (#262), as the source dictionary writes them, with
+// `eight` from the fixture against `aid`. They are given here rather than in the
+// shared fixture, where `seed` would join `read`'s one-word family that the
+// curation suite counts on.
+const index = makeTestIndex({
+  pronunciations: [
+    ["seat", [["S", "IY1", "T"]]],
+    ["seed", [["S", "IY1", "D"]]],
+    ["aid", [["EY1", "D"]]],
+    ["attack", [["AH0", "T", "AE1", "K"]]],
+    ["adapt", [["AH0", "D", "AE1", "P", "T"]]],
+    ["writer", [["R", "AY1", "T", "ER0"]]],
+    ["rider", [["R", "AY1", "D", "ER0"]]],
+    ["button", [["B", "AH1", "T", "AH0", "N"]]],
+    ["sudden", [["S", "AH1", "D", "AH0", "N"]]],
+  ],
+  words: ["seat", "seed", "aid", "attack", "adapt", "writer", "rider", "button", "sudden"],
+  prevalence: [
+    ["seat", 2.5], ["seed", 2.5], ["aid", 2.5], ["attack", 2.5], ["adapt", 2.3],
+    ["writer", 2.5], ["rider", 2.4], ["button", 2.5], ["sudden", 2.5],
+  ],
+});
 
 interface Guardrail {
   seed: string;
@@ -56,6 +80,14 @@ const guardrails: Guardrail[] = [
   { seed: "fire", submission: "fur", claim: "the glide is not the vowel of fur" },
   { seed: "player", submission: "hair", claim: "er after long a is not plain r" },
   { seed: "lower", submission: "lore", claim: "er after long o is not plain r" },
+  // ADR-0011, amendment of 2026-10-16: t and d are one sound only where General
+  // American taps them. At the end of a word, before a stressed vowel, after
+  // "eye" and before a syllabic n they are heard apart.
+  { seed: "seat", submission: "seed", claim: "a final t is not a final d" },
+  { seed: "eight", submission: "aid", claim: "a final t is not a final d" },
+  { seed: "attack", submission: "adapt", claim: "t before a stressed vowel is not tapped" },
+  { seed: "writer", submission: "rider", claim: "the vowel before t and d differs after eye" },
+  { seed: "button", submission: "sudden", claim: "t before a syllabic n is a glottal stop" },
 ];
 
 /**

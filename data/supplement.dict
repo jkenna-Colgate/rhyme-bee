@@ -14,7 +14,7 @@
 #
 # THIS FILE IS WHERE A WRONG PRONUNCIATION GETS FIXED — not a new rule.
 # Reading manufacture (normalisation, coverage derivation) is frozen as of
-# 2026-07-30: five normalisation rules, thirty affix rules, closed sets. See
+# 2026-07-30: six normalisation rules, thirty affix rules, closed sets. See
 # ADR-0011. A verdict that comes out wrong is corrected here, or in
 # data/names.txt (a name that reached the word list) or data/words.txt (junk
 # with wordhood). All three are global — a fix applies to every Puzzle the word

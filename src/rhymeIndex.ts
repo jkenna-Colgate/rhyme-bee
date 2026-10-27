@@ -162,7 +162,13 @@ function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunc
   if (schwa === undefined || sonorant === undefined) return false;
   if (bareSound(schwa) !== "AH" || stressOf(schwa) !== 0) return false;
   if (candidate.at(-1) !== sonorant) return false;
-  return candidate.slice(0, -1).every((phoneme, i) => phoneme === earlier[i]);
+  // The `tap` rule, which runs after this one, reads a t before the schwa as d
+  // in the full reading and leaves the variant's t, with no vowel after it, as
+  // written (`metal`'s `M EH1 D AH0 L` beside `M EH1 T L`; #262).
+  const consonant = candidate.length - 2;
+  return candidate
+    .slice(0, -1)
+    .every((phoneme, i) => phoneme === earlier[i] || (i === consonant && phoneme === "T" && earlier[i] === "D"));
 }
 
 /**
@@ -210,7 +216,7 @@ function isGlideRVariantOf(candidate: Pronunciation, earlier: Pronunciation): bo
  * normalisation appended alongside it, rather than one the pinned data ever
  * transcribed. The three shapes above are the whole of the frozen rule set that
  * appends (ADR-0011); the rules that replace (the cot-caught merger, the weak-
- * vowel merge) never grow a word's reading count, so they need no shape here.
+ * vowel merge, the tap) never grow a word's reading count, so they need no shape here.
  */
 function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   return (

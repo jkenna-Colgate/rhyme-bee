@@ -225,7 +225,8 @@ describe("a lone inflectional coda does not close a syllable", () => {
     ]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("cities")).toEqual([["S", "IH1", "T", "IY0", "Z"]]);
+    // One reading, unpromoted; its t is the tap (#262), read as d.
+    expect(data.pronunciations.get("cities")).toEqual([["S", "IH1", "D", "IY0", "Z"]]);
     expect(data.pronunciations.get("married")).toEqual([["M", "EH1", "R", "IY0", "D"]]);
   });
 
