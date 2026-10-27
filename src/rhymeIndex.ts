@@ -14,6 +14,7 @@ import {
   bareSound,
   rhymeKeyOf,
   stressOf,
+  withSound,
   withStress,
   type Pronunciation,
   type RhymeKey,
@@ -172,11 +173,20 @@ function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunc
 }
 
 /**
+ * The vowel the `vowel-before-r` rule, which runs after stress promotion, writes
+ * for a vowel promotion has just stressed before `r` (#263). "a" is never one:
+ * promotion stresses only the last vowel, and "a" merges only before `r` and a vowel.
+ */
+const PROMOTED_BEFORE_R: Record<string, string> = { IY: "IH", EY: "EH", UW: "UH" };
+
+/**
  * True if `candidate` is exactly `earlier` with one unstressed vowel promoted
  * to secondary stress and nothing else changed — the shape `src/normalise.ts`'s
  * `stress-promotion` rule appends (`module`'s `M AA1 JH UW0 L` gains
- * `M AA1 JH UW2 L`). See `isSyllabicConsonantVariantOf` for why shape, not a
- * schema field, is what pinning reads.
+ * `M AA1 JH UW2 L`). A promoted vowel before `r` may also be respelled by the
+ * `vowel-before-r` rule (`graybeard`'s `IY0 R D` gains `IH2 R D`). See
+ * `isSyllabicConsonantVariantOf` for why shape, not a schema field, is what
+ * pinning reads.
  */
 function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   if (candidate.length !== earlier.length) return false;
@@ -188,7 +198,11 @@ function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronuncia
   }
   if (diffIndex === -1) return false; // identical readings, not a variant
   const original = earlier[diffIndex]!;
-  return stressOf(original) === 0 && candidate[diffIndex] === withStress(original, 2);
+  if (stressOf(original) !== 0) return false;
+  const promoted = withStress(original, 2);
+  if (candidate[diffIndex] === promoted) return true;
+  const respelled = PROMOTED_BEFORE_R[bareSound(original)];
+  return respelled !== undefined && earlier[diffIndex + 1] === "R" && candidate[diffIndex] === withSound(promoted, respelled);
 }
 
 /**

@@ -629,6 +629,57 @@ function glideRVariantsOf(reading: Pronunciation): Pronunciation[] {
   return [variant];
 }
 
+/** The stressed vowels before `r` that are written the way the second of each pair is. */
+const BEFORE_R_MERGES = new Map([
+  ["IY", "IH"],
+  ["EY", "EH"],
+  ["UW", "UH"],
+]);
+/** The vowel that joins "eh" before `r` only when a vowel follows the `r`. */
+const BEFORE_R_VOWEL_MERGES = new Map([["AE", "EH"]]);
+
+/**
+ * Rule 7: a stressed vowel before `r` is written one way (ADR-0011, amendment
+ * of 2026-10-26; #263).
+ *
+ * The source dictionary writes one General American sound two ways before `r`:
+ * `here` with "ee" and `near` with "ih", `poor` with "oo" and `tour` with "uu",
+ * `menswear` with "ay" and `air` with "eh". Before `r` and a vowel it also
+ * leaves `barbaric` on "a" where `generic` has "eh". A vowel carrying stress 1
+ * or 2 directly before `R` is read as `IH` for `IY`, `EH` for `EY` and `UH` for
+ * `UW`, wherever it sits in the word, and as `EH` for `AE` only when a vowel
+ * follows the `R`, so `car` and `care` stay apart. An unstressed vowel before
+ * `r` is left as written. The claim, the reach and the guardrails are the ADR's.
+ *
+ * `poor` / `pour` is not part of it: "uu" + r against "or" is split word by word
+ * in General American, so `cure` and `core` stay two Puzzles.
+ *
+ * It **replaces**, so the respelling shows one vowel and `here` and `beer` stop
+ * showing two ways. It runs after stress promotion, because promotion can make
+ * the vowel before `r` stressed: `graybeard`'s `IY0 R D` is promoted to
+ * `IY2 R D` and only then joins `beard`. `isStressPromotionVariantOf` in
+ * src/rhymeIndex.ts allows for the respelled vowel. A Weak Rhyme sees it too:
+ * the contrast is no more audible to a Weak Rhyme than to a Rhyme.
+ */
+const vowelBeforeR: NormalisationRule = {
+  name: "vowel-before-r",
+  apply: (readings) => readings.map(mergeVowelsBeforeR),
+};
+
+function mergeVowelsBeforeR(reading: Pronunciation): Pronunciation {
+  return reading.map((phoneme, i) => {
+    const stress = stressOf(phoneme);
+    if ((stress !== 1 && stress !== 2) || reading[i + 1] !== RHOTIC) return phoneme;
+    const sound = bareSound(phoneme);
+    const merged = BEFORE_R_MERGES.get(sound);
+    if (merged !== undefined) return withSound(phoneme, merged);
+    const after = reading[i + 2];
+    const beforeVowel = BEFORE_R_VOWEL_MERGES.get(sound);
+    if (beforeVowel !== undefined && after !== undefined && isVowel(after)) return withSound(phoneme, beforeVowel);
+    return phoneme;
+  });
+}
+
 /** Every rule, in application order. Dropping one here disables it wholesale. */
 const RULES: readonly NormalisationRule[] = [
   cotCaughtMerger,
@@ -636,6 +687,7 @@ const RULES: readonly NormalisationRule[] = [
   weakVowelMerge,
   tap,
   stressPromotion,
+  vowelBeforeR,
   glideR,
 ];
 

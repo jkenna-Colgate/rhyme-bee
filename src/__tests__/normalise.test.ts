@@ -370,3 +370,74 @@ describe("t and d after a vowel or r, before a weak vowel, are one sound (#262)"
     expect(() => index.pinSeed("metal", "EH T L")).toThrow(/generated variant/);
   });
 });
+
+describe("a stressed vowel before r is written one way (#263)", () => {
+  // Readings exactly as the source dictionary writes them (ADR-0011, amendment
+  // of 2026-10-26). General American has no "ee" + r against "ih" + r, no "oo"
+  // + r against "uu" + r, no "ay" + r against "eh" + r, and before r and a
+  // vowel no "a" against "eh".
+  const index = makeTestIndex({
+    pronunciations: [
+      ["here", [["HH", "IY1", "R"]]],
+      ["near", [["N", "IH1", "R"]]],
+      ["hearing", [["HH", "IY1", "R", "IH0", "NG"]]],
+      ["cheering", [["CH", "IH1", "R", "IH0", "NG"]]],
+      ["engineered", [["EH2", "N", "JH", "AH0", "N", "IY1", "R", "D"]]],
+      ["beard", [["B", "IH1", "R", "D"]]],
+      ["graybeard", [["G", "R", "EY1", "B", "IY0", "R", "D"]]],
+      ["poor", [["P", "UW1", "R"]]],
+      ["tour", [["T", "UH1", "R"]]],
+      ["menswear", [["M", "EH1", "N", "Z", "W", "EY2", "R"]]],
+      ["air", [["EH1", "R"]]],
+      ["barbaric", [["B", "AA0", "R", "B", "AE1", "R", "IH0", "K"]]],
+      ["generic", [["JH", "AH0", "N", "EH1", "R", "IH0", "K"]]],
+    ],
+    words: [
+      "here", "near", "hearing", "cheering", "engineered", "beard", "graybeard",
+      "poor", "tour", "menswear", "air", "barbaric", "generic",
+    ],
+    prevalence: [
+      ["here", 2.5], ["near", 2.5], ["hearing", 2.5], ["cheering", 2.4], ["engineered", 2.3],
+      ["beard", 2.5], ["graybeard", 1.9], ["poor", 2.5], ["tour", 2.5], ["menswear", 2.2],
+      ["air", 2.5], ["barbaric", 2.3], ["generic", 2.4],
+    ],
+  });
+
+  const pin = (word: string) =>
+    index.pinSeed(word, rhymeKeyOf(index.readingsOf(word)[0]!.pronunciation)!);
+
+  it.each([
+    ["here", "near"],
+    ["hearing", "cheering"],
+    ["engineered", "beard"],
+    ["poor", "tour"],
+    ["menswear", "air"],
+    ["barbaric", "generic"],
+  ])("rhymes %j with %j, in both orders", (a, b) => {
+    expect(index.adjudicate(pin(a), b).outcome).toBe("answer");
+    expect(index.adjudicate(pin(b), a).outcome).toBe("answer");
+  });
+
+  it("writes the stressed vowel the merged way in every position, not only the Rhyme Key's", () => {
+    const t = target([["hearsay", [["HH", "IY1", "R", "S", "EY2"]]]]);
+    applyNormalisation(t);
+    expect(t.pronunciations.get("hearsay")).toEqual([["HH", "IH1", "R", "S", "EY2"]]);
+  });
+
+  it("leaves an unstressed vowel before r as written", () => {
+    const t = target([["copyreader", [["K", "AA1", "P", "IY0", "R", "IY2", "D", "ER0"]]]]);
+    applyNormalisation(t);
+    expect(t.pronunciations.get("copyreader")![0]!.slice(0, 5)).toEqual(["K", "AA1", "P", "IY0", "R"]);
+  });
+
+  it("leaves \"a\" before r and a consonant as written, so `car` and `care` stay apart", () => {
+    const t = target([["nares", [["N", "AE1", "R", "Z"]]]]);
+    applyNormalisation(t);
+    expect(t.pronunciations.get("nares")).toEqual([["N", "AE1", "R", "Z"]]);
+  });
+
+  it("rhymes `graybeard`, whose unstressed vowel a Rhyme hears stressed, with `beard`", () => {
+    expect(index.adjudicate(pin("beard"), "graybeard").outcome).toBe("answer");
+    expect(() => index.pinSeed("graybeard", "IH R D")).toThrow(/generated variant/);
+  });
+});

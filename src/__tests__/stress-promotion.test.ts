@@ -102,7 +102,8 @@ describe("a word-final vowel is never promoted", () => {
     ]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("arrow")).toEqual([["AE1", "R", "OW0"]]);
+    // One reading, no variant. Its "a" before r and a vowel is written "eh" (#263).
+    expect(data.pronunciations.get("arrow")).toEqual([["EH1", "R", "OW0"]]);
     expect(data.pronunciations.get("menu")).toEqual([["M", "EH1", "N", "Y", "UW0"]]);
     expect(data.pronunciations.get("viceroy")).toEqual([["V", "AY1", "S", "R", "OY0"]]);
   });
@@ -215,7 +216,8 @@ describe("a lone inflectional coda does not close a syllable", () => {
     const data = target([["arrows", [["AE1", "R", "OW0", "Z"]]]]);
     applyNormalisation(data);
 
-    expect(data.pronunciations.get("arrows")).toEqual([["AE1", "R", "OW0", "Z"]]);
+    // One reading, no variant. Its "a" before r and a vowel is written "eh" (#263).
+    expect(data.pronunciations.get("arrows")).toEqual([["EH1", "R", "OW0", "Z"]]);
   });
 
   it("does not let `cities` rhyme with `bees`, nor `married` with `deed`", () => {

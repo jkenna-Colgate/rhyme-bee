@@ -21,6 +21,9 @@
  *   - the t-and-d group guards the places the rule reading t and d as one sound
  *     before a weak vowel (ADR-0011, amendment of 2026-10-16) leaves out: the end
  *     of a word, before a stressed vowel, after "eye", before a syllabic n.
+ *   - the vowel-before-r group guards the contrasts next to the rule writing a
+ *     stressed vowel before `r` one way (ADR-0011, amendment of 2026-10-26):
+ *     "ih" + r, "eh" + r, "er", "uu" + r and "ah" + r stay five sounds.
  *
  * A row here failing is not a broken test. It is a normalisation that has
  * overreached, and the rule goes, not the row.
@@ -31,10 +34,10 @@ import { makeTestIndex } from "../__fixtures__/index.ts";
 import { rhymeKeyOf } from "../phonology.ts";
 import type { SeedWord } from "../rhymeIndex.ts";
 
-// The t-and-d rows' words (#262), as the source dictionary writes them, with
-// `eight` from the fixture against `aid`. They are given here rather than in the
-// shared fixture, where `seed` would join `read`'s one-word family that the
-// curation suite counts on.
+// The t-and-d rows' words (#262) and the vowel-before-r rows' (#263), as the
+// source dictionary writes them, with `eight`, `hair` and `fur` from the fixture.
+// They are given here rather than in the shared fixture, where `seed` would join
+// `read`'s one-word family that the curation suite counts on.
 const index = makeTestIndex({
   pronunciations: [
     ["seat", [["S", "IY1", "T"]]],
@@ -46,11 +49,23 @@ const index = makeTestIndex({
     ["rider", [["R", "AY1", "D", "ER0"]]],
     ["button", [["B", "AH1", "T", "AH0", "N"]]],
     ["sudden", [["S", "AH1", "D", "AH0", "N"]]],
+    ["here", [["HH", "IY1", "R"]]],
+    ["fear", [["F", "IH1", "R"]]],
+    ["fair", [["F", "EH1", "R"]]],
+    ["poor", [["P", "UW1", "R"]]],
+    ["purr", [["P", "ER1"]]],
+    ["tour", [["T", "UH1", "R"]]],
+    ["tar", [["T", "AA1", "R"]]],
   ],
-  words: ["seat", "seed", "aid", "attack", "adapt", "writer", "rider", "button", "sudden"],
+  words: [
+    "seat", "seed", "aid", "attack", "adapt", "writer", "rider", "button", "sudden",
+    "here", "fear", "fair", "poor", "purr", "tour", "tar",
+  ],
   prevalence: [
     ["seat", 2.5], ["seed", 2.5], ["aid", 2.5], ["attack", 2.5], ["adapt", 2.3],
     ["writer", 2.5], ["rider", 2.4], ["button", 2.5], ["sudden", 2.5],
+    ["here", 2.5], ["fear", 2.5], ["fair", 2.5], ["poor", 2.5], ["purr", 2.1],
+    ["tour", 2.5], ["tar", 2.3],
   ],
 });
 
@@ -88,6 +103,13 @@ const guardrails: Guardrail[] = [
   { seed: "attack", submission: "adapt", claim: "t before a stressed vowel is not tapped" },
   { seed: "writer", submission: "rider", claim: "the vowel before t and d differs after eye" },
   { seed: "button", submission: "sudden", claim: "t before a syllabic n is a glottal stop" },
+  // ADR-0011, amendment of 2026-10-26: a stressed vowel before r is written one
+  // way, and the vowels next to the merged ones are still heard apart.
+  { seed: "here", submission: "hair", claim: "ih before r is not eh before r" },
+  { seed: "fear", submission: "fair", claim: "ih before r is not eh before r" },
+  { seed: "fair", submission: "fur", claim: "eh before r is not er" },
+  { seed: "poor", submission: "purr", claim: "uu before r is not er" },
+  { seed: "tour", submission: "tar", claim: "uu before r is not ah before r" },
 ];
 
 /**
