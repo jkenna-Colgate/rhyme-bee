@@ -74,6 +74,15 @@ describe("a date resolves to that day's Seed Word, pinned to its Rhyme Key", () 
     const seed = seedForDate(schedule, first.date);
     expect(seed?.rhymeKey).toBe(first.rhymeKey);
   });
+
+  it("shows sentimental on one day only, and kennel on 2026-11-11 (#239)", () => {
+    // sentimental sits in both the t-said and t-dropped families; leading the
+    // second as well showed and spoke the same word twice (ADR-0012).
+    expect(seedForDate(schedule, "2026-11-11")).toEqual({ word: "kennel", rhymeKey: "EH N AH L" });
+    expect(days.filter((day) => day.seed === "sentimental").map((day) => day.date)).toEqual([
+      "2026-08-17",
+    ]);
+  });
 });
 
 describe("a date outside the schedule resolves to nothing", () => {
