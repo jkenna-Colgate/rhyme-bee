@@ -61,11 +61,25 @@ import {
 export interface NormalisationTarget {
   /** Surface form -> its pronunciations (mutated in place). */
   pronunciations: Map<string, Pronunciation[]>;
+  /**
+   * Filled by this stage, if given: surface form -> its readings after every
+   * rule but the `scoringOnly` ones, for each word those rules changed. It is
+   * the reading a Weak Rhyme is worked out from (ADR-0020), which has to see the
+   * weak vowel the dictionary wrote. A word absent here reads the same both ways.
+   */
+  writtenReadings?: Map<string, Pronunciation[]>;
 }
 
 export interface NormalisationRule {
   /** Stable identifier, used in prose and when discussing the rule's effect. */
   name: string;
+  /**
+   * True for a rule that decides a Rhyme but must not reach the reading a Weak
+   * Rhyme is worked out from (ADR-0020). The stage runs every rule for the
+   * reading the index holds, and every rule but these for the written reading
+   * it keeps beside it (`NormalisationTarget.writtenReadings`).
+   */
+  scoringOnly?: boolean;
   /** Rewrite one word's readings — replacing them, or appending variants. */
   apply(readings: readonly Pronunciation[]): Pronunciation[];
 }
@@ -430,10 +444,68 @@ function lastVowelIndex(reading: Pronunciation): number | null {
   return null;
 }
 
+/** The weak "ih" a reading may carry after its Rhyme Key's stressed vowel. */
+const WEAK_IH = "IH";
+
+/**
+ * Rule 4: weak "ih" and weak "uh" are one sound in a scoring Rhyme
+ * (ADR-0011, amendment of 2026-10-07; #260).
+ *
+ * After the stressed vowel that opens a reading's Rhyme Key, `IH0` is read as
+ * `AH0`. The source dictionary writes the same unstressed ending both ways, and
+ * no General American listener can recover which way it chose: `facility` has
+ * one and `utility` the other, and so do the families of `abated` and
+ * `annotated`, and of `collection` and `direction`. None of those families
+ * joined before this rule. The claim, the maintainer's reading of a sample of
+ * the merges, the reach and the guardrail argument are the ADR's.
+ *
+ * It **replaces**, like the cot–caught merger and for the same reason: the
+ * respelling must show the merged vowel, and a word written both ways must not
+ * become two Rhyme Keys over a vowel nobody hears (`annotated` was two before
+ * this rule, and is one now). `AH0` is the survivor because it is the schwa.
+ *
+ * Only the Rhyme Key is touched. A weak vowel before the stressed one is no part
+ * of any Rhyme, so `facility` keeps its first "uh" and `direction` its first
+ * "ih". The position is read off the stress digits, which is why this runs
+ * before stress promotion: a promoted variant must be a promotion of the merged
+ * reading, or the index could no longer tell the variant was appended.
+ *
+ * **It must not reach the reading a Weak Rhyme is worked out from.** A Weak
+ * Rhyme (ADR-0020, as narrowed on #232) sees the weak vowel the dictionary
+ * wrote: `aspirin` for `win` is accepted and `muffin` is not. So this rule is
+ * `scoringOnly`, and the stage keeps each reading it changed as written in
+ * `NormalisationTarget.writtenReadings`, served by `RhymeIndex.writtenReadingsOf`.
+ */
+const weakVowelMerge: NormalisationRule = {
+  name: "weak-vowel-merge",
+  scoringOnly: true,
+  apply: (readings) => readings.map(mergeWeakVowels),
+};
+
+function mergeWeakVowels(reading: Pronunciation): Pronunciation {
+  const stressed = lastStressedIndex(reading);
+  if (stressed === null) return reading;
+  return reading.map((phoneme, i) =>
+    i > stressed && bareSound(phoneme) === WEAK_IH && stressOf(phoneme) === 0
+      ? withSound(phoneme, SCHWA)
+      : phoneme,
+  );
+}
+
+/** The index of the vowel that opens the reading's Rhyme Key, or null if it has none. */
+function lastStressedIndex(reading: Pronunciation): number | null {
+  for (let i = reading.length - 1; i >= 0; i--) {
+    const stress = stressOf(reading[i]!);
+    if (stress === 1 || stress === 2) return i;
+  }
+  return null;
+}
+
 /** Every rule, in application order. Dropping one here disables it wholesale. */
 const RULES: readonly NormalisationRule[] = [
   cotCaughtMerger,
   syllabicConsonant,
+  weakVowelMerge,
   stressPromotion,
 ];
 
@@ -443,9 +515,12 @@ const RULES: readonly NormalisationRule[] = [
  * words both merged and unmerged), and a duplicate reading is a reading the
  * index would carry forever without it ever mattering.
  */
-function normaliseReadings(readings: readonly Pronunciation[]): Pronunciation[] {
+function normaliseReadings(
+  readings: readonly Pronunciation[],
+  rules: readonly NormalisationRule[] = RULES,
+): Pronunciation[] {
   let out: Pronunciation[] = [...readings];
-  for (const rule of RULES) out = rule.apply(out);
+  for (const rule of rules) out = rule.apply(out);
 
   const seen = new Set<string>();
   return out.filter((reading) => {
@@ -456,12 +531,25 @@ function normaliseReadings(readings: readonly Pronunciation[]): Pronunciation[] 
   });
 }
 
+/** Every rule a Weak Rhyme's reading goes through: all but the scoring-only ones. */
+const WRITTEN_RULES = RULES.filter((rule) => !rule.scoringOnly);
+
+/** True if two lists of readings are the same readings in the same order. */
+function sameReadings(a: readonly Pronunciation[], b: readonly Pronunciation[]): boolean {
+  return a.length === b.length && a.every((reading, i) => reading.join(" ") === b[i]!.join(" "));
+}
+
 /**
  * Run the normalisation stage over an index build's pronunciations, in place.
- * Called once by `scripts/build-index.ts`, after the committed supplement.
+ * Called once by `manufactureIndexData`, after the committed supplement.
  */
 export function applyNormalisation(target: NormalisationTarget): void {
   for (const [word, readings] of target.pronunciations) {
-    target.pronunciations.set(word, normaliseReadings(readings));
+    const normalised = normaliseReadings(readings);
+    if (target.writtenReadings) {
+      const written = normaliseReadings(readings, WRITTEN_RULES);
+      if (!sameReadings(written, normalised)) target.writtenReadings.set(word, written);
+    }
+    target.pronunciations.set(word, normalised);
   }
 }

@@ -298,20 +298,21 @@ describe("a derived index adjudicates the words the issue names", () => {
     expect(index.adjudicate(index.pinSeed("restfully"), "zestfully").outcome).toBe("answer");
   });
 
-  it("accepts `abashedly` for a Seed Word on `AE SH IH D L IY`", () => {
+  it("accepts `abashedly` for a Seed Word on `AE SH AH D L IY`", () => {
     // `unabashedly` carries the dictionary's own reading here, so this asserts
     // agreement with CMUdict rather than two derivations sharing a mistake.
     expect(index.adjudicate(index.pinSeed("unabashedly"), "abashedly").outcome).toBe("answer");
   });
 
   it("gives `abashedly` the syllabic `-ed` the dictionary gives it", () => {
-    expect(index.rhymeKeysOf("abashedly")).toEqual(["AE SH IH D L IY"]);
+    // The written "ih" of the `-ed` is read as "uh" in a Rhyme Key (#260).
+    expect(index.rhymeKeysOf("abashedly")).toEqual(["AE SH AH D L IY"]);
   });
 
   it("does not let `cussedly` rhyme with `justly`", () => {
     // The participle route composed `-ly` onto `cussed` (`K AH1 S T`) and landed
     // `cussedly` on `AH S T L IY`. Deriving from `cuss` keeps the two apart.
-    expect(index.rhymeKeysOf("cussedly")).toEqual(["AH S IH D L IY"]);
+    expect(index.rhymeKeysOf("cussedly")).toEqual(["AH S AH D L IY"]);
     expect(index.adjudicate(index.pinSeed("justly"), "cussedly")).toMatchObject({
       outcome: "rejected",
       reason: "does-not-rhyme",

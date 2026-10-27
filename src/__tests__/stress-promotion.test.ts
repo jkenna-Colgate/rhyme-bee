@@ -192,8 +192,10 @@ describe("a reducible vowel is never promoted", () => {
     expect(data.pronunciations.get("accurate")).toEqual([
       ["AE1", "K", "Y", "ER0", "AH0", "T"],
     ]);
+    // Its written "ih" is read as "uh" by the weak-vowel merge (#260), and
+    // still carries no stress.
     expect(data.pronunciations.get("forfeit")).toEqual([
-      ["F", "AO1", "R", "F", "IH0", "T"],
+      ["F", "AO1", "R", "F", "AH0", "T"],
     ]);
   });
 });

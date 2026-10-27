@@ -142,3 +142,92 @@ describe("normalisation runs after the committed supplement", () => {
     expect(index.adjudicate(index.pinSeed("docked"), "chalked").outcome).toBe("bonus");
   });
 });
+
+describe("weak ih and weak uh after the stressed vowel are one sound (#260)", () => {
+  // Readings exactly as the source dictionary writes them, which spells one
+  // ending both ways (ADR-0011, amendment of 2026-10-07).
+  const index = makeTestIndex({
+    pronunciations: [
+      ["facility", [["F", "AH0", "S", "IH1", "L", "IH0", "T", "IY0"]]],
+      ["utility", [["Y", "UW0", "T", "IH1", "L", "AH0", "T", "IY0"]]],
+      ["abated", [["AH0", "B", "EY1", "T", "IH0", "D"]]],
+      ["annotated", [
+        ["AE2", "N", "AH0", "T", "EY1", "T", "IH0", "D"],
+        ["AE1", "N", "AH0", "T", "EY2", "T", "AH0", "D"],
+      ]],
+      ["created", [["K", "R", "IY0", "EY1", "T", "AH0", "D"]]],
+      ["collection", [["K", "AH0", "L", "EH1", "K", "SH", "AH0", "N"]]],
+      ["direction", [
+        ["D", "ER0", "EH1", "K", "SH", "AH0", "N"],
+        ["D", "IY0", "R", "EH1", "K", "SH", "IH0", "N"],
+        ["D", "AY0", "R", "EH1", "K", "SH", "IH0", "N"],
+        ["D", "IH0", "R", "EH1", "K", "SH", "IH0", "N"],
+      ]],
+    ],
+    words: ["facility", "utility", "abated", "annotated", "created", "collection", "direction"],
+    prevalence: [
+      ["facility", 2.5], ["utility", 2.5], ["abated", 1.5], ["annotated", 1.7],
+      ["created", 2.5], ["collection", 2.4], ["direction", 2.3],
+    ],
+  });
+
+  it("rhymes `utility` with `facility`, and the reverse", () => {
+    expect(index.adjudicate(index.pinSeed("facility"), "utility").outcome).toBe("answer");
+    expect(index.adjudicate(index.pinSeed("utility"), "facility").outcome).toBe("answer");
+  });
+
+  it("rhymes `abated` with `created`, the `annotated` family written with weak uh", () => {
+    expect(index.adjudicate(index.pinSeed("abated"), "created").outcome).toBe("answer");
+    expect(index.adjudicate(index.pinSeed("created"), "abated").outcome).toBe("answer");
+  });
+
+  it("hears `annotated` one way, so it pins with no key given", () => {
+    // Its two readings were two Rhyme Keys apart only on the weak vowel written.
+    expect(index.rhymeKeysOf("annotated")).toEqual(["EY T AH D"]);
+    expect(index.adjudicate(index.pinSeed("annotated"), "abated").outcome).toBe("answer");
+  });
+
+  it("files every `direction` reading under the `collection` key", () => {
+    expect(index.rhymeKeysOf("direction")).not.toContain("EH K SH IH N");
+    const seed = index.pinSeed("direction", "EH K SH AH N");
+    expect(index.adjudicate(seed, "collection").outcome).toBe("answer");
+    expect(index.adjudicate(index.pinSeed("collection", "EH K SH AH N"), "direction").outcome)
+      .toBe("answer");
+  });
+
+  it("leaves a weak vowel before the stressed one as written, since no Rhyme reaches it", () => {
+    const data = target([["direction", [["D", "IH0", "R", "EH1", "K", "SH", "IH0", "N"]]]]);
+    applyNormalisation(data);
+
+    expect(data.pronunciations.get("direction")).toEqual([
+      ["D", "IH0", "R", "EH1", "K", "SH", "AH0", "N"],
+    ]);
+  });
+});
+
+describe("the weak vowel a Weak Rhyme reads is the one the dictionary wrote (#260)", () => {
+  // ADR-0020 as narrowed on #232: the Weak Rhyme test sees the written weak
+  // vowel, so `aspirin` for `win` is accepted and `muffin` is not. The merge
+  // above must leave that reading reachable, beside the one a Rhyme reads.
+  const index = makeTestIndex({
+    pronunciations: [
+      ["aspirin", [["AE1", "S", "P", "R", "IH0", "N"]]],
+      ["muffin", [["M", "AH1", "F", "AH0", "N"]]],
+      ["magic", [["M", "AE1", "JH", "IH0", "K"]]],
+      ["trick", [["T", "R", "IH1", "K"]]],
+    ],
+    words: ["aspirin", "muffin", "magic", "trick"],
+    prevalence: [["aspirin", 2.3], ["muffin", 2.4], ["magic", 2.5], ["trick", 2.5]],
+  });
+
+  it("keeps the written ih of `aspirin` and `magic`, where a Rhyme reads uh", () => {
+    expect(index.rhymeKeysOf("magic")).toEqual(["AE JH AH K"]);
+    expect(index.writtenReadingsOf("magic")).toEqual([["M", "AE1", "JH", "IH0", "K"]]);
+    expect(index.writtenReadingsOf("aspirin")).toEqual([["AE1", "S", "P", "R", "IH0", "N"]]);
+  });
+
+  it("gives a word the merge never touched its ordinary readings", () => {
+    expect(index.writtenReadingsOf("trick")).toEqual([["T", "R", "IH1", "K"]]);
+    expect(index.writtenReadingsOf("muffin")).toEqual(index.readingsOf("muffin").map((r) => r.pronunciation));
+  });
+});

@@ -16,6 +16,8 @@ export interface SerialisedIndex {
   /** Pinned source versions, for reproducibility (story 35). */
   sources: Record<string, string>;
   pronunciations: [string, Pronunciation[]][];
+  /** Absent from an artifact built before #260, which reads every word as written. */
+  writtenReadings?: [string, Pronunciation[]][];
   words: string[];
   names: string[];
   prevalence: [string, number][];
@@ -30,6 +32,7 @@ export function serialise(
   return {
     sources,
     pronunciations: [...data.pronunciations.entries()],
+    writtenReadings: [...(data.writtenReadings ?? new Map()).entries()],
     words: [...data.words],
     names: [...data.names],
     prevalence: [...data.prevalence.entries()],
@@ -40,6 +43,7 @@ export function serialise(
 export function deserialise(artifact: SerialisedIndex): RhymeIndex {
   const data: RhymeIndexData = {
     pronunciations: new Map(artifact.pronunciations),
+    writtenReadings: new Map(artifact.writtenReadings ?? []),
     words: new Set(artifact.words),
     names: new Set(artifact.names),
     prevalence: new Map(artifact.prevalence),

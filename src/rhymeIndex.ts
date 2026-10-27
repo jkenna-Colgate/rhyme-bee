@@ -114,6 +114,13 @@ export interface Puzzle {
 export interface RhymeIndexData {
   /** Surface form -> its pronunciations (from CMUdict). */
   pronunciations: Map<string, Pronunciation[]>;
+  /**
+   * Surface form -> its readings with the weak vowels the dictionary wrote, for
+   * each word a scoring-only Normalisation changed (`src/normalise.ts`). The
+   * reading a Weak Rhyme is worked out from; absent, a word reads the same both
+   * ways. Optional, so data built without it reads every word as unchanged.
+   */
+  writtenReadings?: Map<string, Pronunciation[]>;
   /** Common English words, lower-cased. The wordhood gate; excludes names. */
   words: Set<string>;
   /** Lower-cased names, used only to label a rejection as a Proper Noun. */
@@ -301,6 +308,18 @@ export class RhymeIndex {
       pronunciation,
       generated: prons.slice(0, i).some((earlier) => isGeneratedVariantOf(pronunciation, earlier)),
     }));
+  }
+
+  /**
+   * Every reading of a surface form with each weak vowel as the dictionary wrote
+   * it, before the Normalisation that reads weak "ih" and weak "uh" as one sound
+   * (#260). A Rhyme is decided on `readingsOf`; a Weak Rhyme (ADR-0020) is worked
+   * out from these, so `aspirin` for `win` keeps its written "ih". Every other
+   * rule has run on them, so they differ from `readingsOf` only where that one did.
+   */
+  writtenReadingsOf(word: string): Pronunciation[] {
+    const w = normaliseWord(word);
+    return this.#data.writtenReadings?.get(w) ?? this.#data.pronunciations.get(w) ?? [];
   }
 
   /**
