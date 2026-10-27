@@ -332,3 +332,86 @@ describe("the committed supplement", () => {
     expect(entries.get("altos")).toHaveLength(2);
   });
 });
+
+describe("the hand-written readings of #253", () => {
+  /**
+   * Each ruled word as CMUdict writes it, beside a partner on the Rhyme Key the
+   * ruling sends it to. Built once without the committed supplement and once
+   * with it, so each row shows the defect and then the fix.
+   */
+  const UPSTREAM: [string, Pronunciation[]][] = [
+    // #232: the plain -s and -ed forms the one-syllable reading missed.
+    ["dialed", [["D", "AY1", "AH0", "L", "D"]]],
+    ["wild", [["W", "AY1", "L", "D"]]],
+    ["fuels", [["F", "Y", "UW1", "AH0", "L", "Z"]]],
+    ["mules", [["M", "Y", "UW1", "L", "Z"]]],
+    ["royals", [["R", "OY1", "AH0", "L", "Z"]]],
+    ["boils", [["B", "OY1", "L", "Z"]]],
+    // #232: three wrong source readings, and `gruel`.
+    ["skier", [["S", "K", "AY1", "R"], ["S", "K", "IY1", "ER0"]]],
+    ["freer", [["F", "R", "IY1", "ER0"]]],
+    ["fire", [["F", "AY1", "ER0"]]],
+    ["noir", [["N", "OY1", "R"]]],
+    ["boudoir", [["B", "UW1", "D", "OY2", "R"]]],
+    ["car", [["K", "AA1", "R"]]],
+    ["gruel", [["G", "R", "UW1", "IH0", "L"]]],
+    ["cool", [["K", "UW1", "L"]]],
+    // #233: a beat on the last syllable that CMUdict does not mark.
+    ["heretic", [["HH", "EH1", "R", "AH0", "T", "IH0", "K"]]],
+    ["pyramid", [["P", "IH1", "R", "AH0", "M", "IH0", "D"]]],
+    ["grid", [["G", "R", "IH1", "D"]]],
+    ["drumstick", [["D", "R", "AH1", "M", "S", "T", "IH0", "K"]]],
+    ["trick", [["T", "R", "IH1", "K"]]],
+    ["blackbird", [["B", "L", "AE1", "K", "B", "ER0", "D"]]],
+    ["word", [["W", "ER1", "D"]]],
+    ["lookup", [["L", "UH1", "K", "AH0", "P"]]],
+    ["cup", [["K", "AH1", "P"]]],
+    ["magic", [["M", "AE1", "JH", "IH0", "K"]]],
+  ];
+  const words = UPSTREAM.map(([w]) => w);
+  const upstream: TestInputs = {
+    pronunciations: UPSTREAM,
+    words,
+    prevalence: words.map((w): [string, number] => [w, 2.4]),
+  };
+  const committed = readFileSync(
+    fileURLToPath(new URL("../../data/supplement.dict", import.meta.url)),
+    "utf8",
+  );
+  const before = makeTestIndex(upstream);
+  const after = makeTestIndex({ ...upstream, supplement: committed });
+
+  it.each([
+    ["wild", "dialed"],
+    ["mules", "fuels"],
+    ["boils", "royals"],
+    ["car", "noir"],
+    ["car", "boudoir"],
+    ["trick", "heretic"],
+    ["grid", "pyramid"],
+    ["trick", "drumstick"],
+    ["word", "blackbird"],
+    ["cup", "lookup"],
+  ])("scores %s for %s once the supplement is read, and not before", (seed, word) => {
+    expect(before.adjudicate(before.pinSeed(seed), word).outcome).not.toBe("answer");
+    expect(after.adjudicate(after.pinSeed(seed), word).outcome).toBe("answer");
+  });
+
+  it("scores gruel for cool", () => {
+    expect(after.adjudicate(after.pinSeed("cool"), "gruel").outcome).toBe("answer");
+  });
+
+  it("stops skier rhyming with fire, where its wrong reading put it, and keeps it with freer", () => {
+    expect(before.adjudicate(before.pinSeed("fire", "AY ER"), "skier").outcome).toBe("answer");
+    expect(after.adjudicate(after.pinSeed("fire", "AY ER"), "skier")).toMatchObject({
+      outcome: "rejected",
+      reason: "does-not-rhyme",
+    });
+    expect(after.adjudicate(after.pinSeed("freer"), "skier").outcome).toBe("answer");
+  });
+
+  it("leaves a last syllable said with no beat unscored", () => {
+    // Out of scope by the ruling: `magic` is a Weak Rhyme for `trick`, never an Answer.
+    expect(after.adjudicate(after.pinSeed("trick"), "magic").outcome).not.toBe("answer");
+  });
+});
