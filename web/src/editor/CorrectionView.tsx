@@ -5,7 +5,7 @@
  * **One card, two places.** It is drawn on a `needs-correction` Candidate, where
  * the engine holds a reading and the reading is wrong, and on a deferred add
  * whose agent-proposed reading failed verification — which is the word's honest
- * reading, and writing it is what makes the player be told "doesn't rhyme"
+ * reading, and writing it is what makes the player be told "not on our rhyme list"
  * rather than "not a word we know". Those are not two features: they are one
  * proposal awaiting one approval, and #176 specifies them together precisely so
  * they are not built twice. What differs is only whether there is an existing

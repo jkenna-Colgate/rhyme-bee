@@ -21,7 +21,7 @@
  *   and the ruling exists so a Candidate they have considered stops appearing.
  *
  * The honest-reading Decline — the word is real and genuinely does not rhyme —
- * is deliberately **not** here. Making the engine say "doesn't rhyme" means
+ * is deliberately **not** here. Making the engine say "not on our rhyme list" means
  * giving the word wordhood and a reading, which is an add rather than a Decline,
  * and it lives with the corrections work (#180).
  *

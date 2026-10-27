@@ -243,13 +243,13 @@ describe("a lone inflectional coda does not close a syllable", () => {
     ]);
   });
 
-  it("refuses `arrows` for `nose` end to end", () => {
+  it("does not score `arrows` for `nose` end to end", () => {
     const index = makeTestIndex();
 
-    expect(index.adjudicate(index.pinSeed("nose"), "arrows")).toMatchObject({
-      outcome: "rejected",
-      reason: "does-not-rhyme",
-    });
+    // No Rhyme, so no Points. Its last syllable is `nose`'s rime unstressed,
+    // which makes it a Weak Rhyme (ADR-0020, as narrowed on #232): accepted
+    // without Points, as a Bonus Word is shown.
+    expect(index.adjudicate(index.pinSeed("nose"), "arrows")).toMatchObject({ outcome: "weak" });
   });
 });
 

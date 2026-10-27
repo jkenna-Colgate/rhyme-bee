@@ -1,6 +1,6 @@
 # A Weak Rhyme is accepted and not scored
 
-**Status:** amended 2026-10-07 and 2026-10-25. A Weak Rhyme is accepted, scores nothing and is shown as a Bonus Word (decided, not built). The test under it is replaced and provisional: the two last syllables share a rime, stressed in one word and unstressed in the other, and that rime is a vowel actually said plus at least one consonant. It holds in either order and has no substitution property.
+**Status:** amended 2026-10-07 and 2026-10-25. A Weak Rhyme is accepted, scores nothing and is shown as a Bonus Word (built in #258). The test under it is replaced and provisional: the two last syllables share a rime, stressed in one word and unstressed in the other, and that rime is a vowel actually said plus at least one consonant. It holds in either order and has no substitution property.
 
 A Submission that matches the Seed Word only on an unstressed final syllable
 (`magic` for `trick`, `abandoning` for `wing`) is no longer rejected. It is

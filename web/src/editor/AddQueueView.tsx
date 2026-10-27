@@ -525,7 +525,7 @@ function Deferral({
       <code>data/deferred-readings.jsonl</code> for a later pass.
       {/* And offered, because a proposal that failed verification is not only a
           miss: it may be the word's **honest reading**, and writing it is what
-          makes the player be told "doesn't rhyme" rather than "not a word we
+          makes the player be told "not on our rhyme list" rather than "not a word we
           know" (#176). The same card the Candidate Queue's correction draws,
           with nothing to join to — the engine reads this word not at all. */}
       {corrector !== undefined && word.proposed !== null && (

@@ -496,7 +496,12 @@ const weakVowelMerge: NormalisationRule = {
   apply: (readings) => readings.map(mergeWeakVowels),
 };
 
-function mergeWeakVowels(reading: Pronunciation): Pronunciation {
+/**
+ * One reading through this rule alone. Exported so the adjudicator can tell
+ * which of a Seed Word's unmerged readings lie on its pinned Rhyme Key by the
+ * rule itself rather than a restatement of it.
+ */
+export function mergeWeakVowels(reading: Pronunciation): Pronunciation {
   const stressed = lastStressedIndex(reading);
   if (stressed === null) return reading;
   return reading.map((phoneme, i) =>

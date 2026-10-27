@@ -125,7 +125,7 @@ export async function proposeCorrection(
     respelling: respell(authored),
     // Reported rather than enforced: a proposal that misses the target is the
     // word's honest reading, and approving it is what makes the engine say
-    // "doesn't rhyme" rather than "not a word we know" (#176).
+    // "not on our rhyme list" rather than "not a word we know" (#176).
     reaches: rhymeKeyOf(authored) === target,
   };
 }
