@@ -7,7 +7,8 @@
  * A failing day is repaired where it can be, in order, stopping at the first
  * step that works (#256):
  *
- *  1. the same Seed Word on its current Rhyme Key, which fixes a key whose
+ *  1. the same Seed Word on its current Rhyme Key (of several, the one with
+ *     the most Answers the Schedule does not hold), which fixes a key whose
  *     spelling went stale (#151);
  *  2. else the family's lead word on that Rhyme Key;
  *  3. else the day is Free Play, and is counted.
@@ -17,7 +18,7 @@
  */
 
 import type { RhymeKey } from "./phonology.ts";
-import type { RhymeIndex } from "./rhymeIndex.ts";
+import type { RhymeFamily, RhymeIndex } from "./rhymeIndex.ts";
 import { chooseRepresentative, measureAnswers } from "./curation.ts";
 import type { ScheduleDay } from "./schedule.ts";
 
@@ -75,40 +76,62 @@ export function checkContinuity(days: readonly ScheduleDay[], index: RhymeIndex)
     const failure = pinFailure(index, day.seed, day.rhymeKey);
     if (failure === null) return;
 
-    // The day's family: the one that holds its Seed Word now, which is where a
-    // key whose spelling went stale has moved to. A Seed the index no longer
-    // holds (or holds on more than one key) leaves the family on the key the
-    // day recorded, if the index still files one there.
-    const holding = families.filter((f) => f.members.some((m) => m.word === day.seed));
-    const family =
-      holding.length === 1 ? holding[0] : families.find((f) => f.rhymeKey === day.rhymeKey);
-
     // The one-place rule: a repair may not land on a Rhyme Key or a Seed Word
     // another place holds, including one an earlier repair in this same pass
-    // has just taken. Both steps re-pin onto the family's key, so a held key
-    // ends at step 3.
+    // has just taken. Both steps re-pin onto a family's key, so a held key is
+    // never a candidate, and a day with none left ends at step 3.
     const heldElsewhere = (key: RhymeKey) => repaired.some((d, j) => j !== i && d.rhymeKey === key);
     const seedElsewhere = (seed: string) => repaired.some((d, j) => j !== i && d.seed === seed);
 
+    // Every family the Seed Word is in now, the Schedule's own keys left out,
+    // the most Answers first. A word may be in several: glide-r files `power`
+    // under `AW ER` and `AW R` (#261).
+    const holding = families.filter((f) => f.members.some((m) => m.word === day.seed));
+    const free = holding
+      .filter((f) => !heldElsewhere(f.rhymeKey))
+      .sort((a, b) => answersIn(b) - answersIn(a));
+    const recorded = families.find((f) => f.rhymeKey === day.rhymeKey);
+    // While the Seed is still in the family on the key the day recorded, that
+    // key is its current one, and it has just failed (a Seed no longer heard
+    // one way): the day keeps its key and goes to step 2.
+    const keyStands = recorded !== undefined && holding.includes(recorded);
+
+    // Step 1 (ADR-0012): the same word on its current Rhyme Key, the one with
+    // the most Answers that the Schedule does not already hold, among the keys
+    // it can be pinned to.
+    const current =
+      keyStands || seedElsewhere(day.seed)
+        ? undefined
+        : free.find((f) => pinFailure(index, day.seed, f.rhymeKey) === null);
+    if (current !== undefined) return repair(1, day.seed, current.rhymeKey);
+
+    // Step 2: the lead word of the day's family. That is the family on the
+    // recorded key while the Seed is in it, so the day keeps its Puzzle; else
+    // the one the Seed moved to; else, for a Seed the index no longer holds,
+    // whatever the index still files on the recorded key.
+    const family = keyStands ? recorded : holding.length > 0 ? free[0] : recorded;
     if (family !== undefined && !heldElsewhere(family.rhymeKey)) {
-      const steps: { step: 1 | 2; seed: string | undefined }[] = [
-        { step: 1, seed: holding.length === 1 ? day.seed : undefined },
-        { step: 2, seed: chooseRepresentative(family.members.map((m) => m.word), index) },
-      ];
-      for (const { step, seed } of steps) {
-        if (seed === undefined || seedElsewhere(seed)) continue;
-        if (pinFailure(index, seed, family.rhymeKey) !== null) continue;
-        const after = rePin(index, day, seed, family.rhymeKey);
-        repaired[i] = after;
-        repairs.push({ date: day.date, step, before: day, after });
-        return;
+      const lead = chooseRepresentative(family.members.map((m) => m.word), index);
+      if (!seedElsewhere(lead) && pinFailure(index, lead, family.rhymeKey) === null) {
+        return repair(2, lead, family.rhymeKey);
       }
     }
 
     freePlay.push({ date: day.date, seed: day.seed, rhymeKey: day.rhymeKey, detail: failure });
+
+    function repair(step: 1 | 2, seed: string, rhymeKey: RhymeKey): void {
+      const after = rePin(index, day, seed, rhymeKey);
+      repaired[i] = after;
+      repairs.push({ date: day.date, step, before: day, after });
+    }
   });
 
   return { days: repaired, repairs, freePlay, collisions: collisionsIn(repaired) };
+}
+
+/** How many of a family's words are Answers, which is how step 1 ranks a Seed's keys. */
+function answersIn(family: RhymeFamily): number {
+  return family.members.filter((m) => m.tier === "answer").length;
 }
 
 /**

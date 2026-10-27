@@ -47,6 +47,26 @@ describe("step 1: the same Seed Word on its current Rhyme Key", () => {
     ]);
     expect(report.freePlay).toEqual([]);
   });
+
+  it("re-pins a Seed that sits in two families on the one of them it can be pinned to", () => {
+    // `power` is written with "er" only, and glide-r files it under `AW R` as
+    // well (#261), so it is in two families and pins only on `AW ER`.
+    const glide = makeTestIndex({
+      pronunciations: [
+        ["power", [["P", "AW1", "ER0"]]],
+        ["hour", [["AW1", "ER0"], ["AW1", "R"]]],
+        ["flour", [["F", "L", "AW1", "ER0"], ["F", "L", "AW1", "R"]]],
+      ],
+      words: ["power", "hour", "flour"],
+      prevalence: [["power", 2.5], ["hour", 2.5], ["flour", 2.4]],
+    });
+    const stale = day("2026-09-07", "power", "AW AH R", { answerCount: 1, difficulty: 0.9 });
+    const report = checkContinuity([stale], glide);
+
+    expect(report.days[0]).toMatchObject({ seed: "power", rhymeKey: "AW ER" });
+    expect(report.repairs.map((r) => r.step)).toEqual([1]);
+    expect(report.freePlay).toEqual([]);
+  });
 });
 
 describe("step 3: the day is Free Play, and is counted", () => {
