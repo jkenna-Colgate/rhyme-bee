@@ -95,35 +95,55 @@ describe("step 2: the family's lead word on that Rhyme Key", () => {
   });
 });
 
-describe("the repair keeps the one-place rule", () => {
-  it("goes past every step that would land on a Rhyme Key the Schedule already holds", () => {
+describe("the one-place rule is reported and never blocks a repair (2026-10-27)", () => {
+  it("re-pins onto a Rhyme Key the Schedule already holds, and reports the collision", () => {
     const holder = day("2026-09-07", "ate", "EY T");
     const stale = day("2026-09-14", "eight", "EY AH T");
     const report = checkContinuity([holder, stale], index);
 
-    expect(report.days).toEqual([holder, stale]);
-    expect(report.repairs).toEqual([]);
-    expect(report.freePlay.map((d) => d.date)).toEqual(["2026-09-14"]);
+    expect(report.days[1]).toMatchObject({ seed: "eight", rhymeKey: "EY T" });
+    expect(report.repairs.map((r) => [r.date, r.step])).toEqual([["2026-09-14", 1]]);
+    expect(report.freePlay).toEqual([]);
+    expect(report.collisions).toContainEqual({ kind: "rhymeKey", value: "EY T", dates: ["2026-09-07", "2026-09-14"] });
   });
 
-  it("counts a key an earlier repair has just taken as held", () => {
+  it("counts a key an earlier repair has just taken as held, and still re-pins", () => {
     const first = day("2026-09-07", "eight", "EY AH T");
     const second = day("2026-09-14", "late", "EY AH T");
     const report = checkContinuity([first, second], index);
 
-    expect(report.repairs.map((r) => r.date)).toEqual(["2026-09-07"]);
-    expect(report.freePlay.map((d) => d.date)).toEqual(["2026-09-14"]);
+    expect(report.repairs.map((r) => r.date)).toEqual(["2026-09-07", "2026-09-14"]);
+    expect(report.freePlay).toEqual([]);
+    expect(report.collisions).toContainEqual({ kind: "rhymeKey", value: "EY T", dates: ["2026-09-07", "2026-09-14"] });
   });
-});
 
-describe("the repair keeps one place per Seed Word too", () => {
-  it("does not swap in a lead word that already holds another place", () => {
+  it("swaps in a lead word that already holds another place, and reports the Seed Word", () => {
     const lost = day("2026-09-08", "eightish", "EY T");
     const elsewhere = day("2026-09-15", "ate", "AE T");
     const report = checkContinuity([lost, elsewhere], index);
 
+    expect(report.days[0]).toMatchObject({ seed: "ate", rhymeKey: "EY T" });
+    expect(report.collisions).toContainEqual({ kind: "seed", value: "ate", dates: ["2026-09-08", "2026-09-15"] });
+  });
+
+  it("takes a later candidate that collides with no other day over an earlier one that does", () => {
+    // Step 1 would put `eight` on `EY T`, but another day holds `eight`; step 2's
+    // lead word on the same key holds no other place, so the day takes that.
+    const stale = day("2026-09-07", "eight", "EY AH T");
+    const other = day("2026-09-14", "eight", "AE T");
+    const report = checkContinuity([stale, other], index);
+
+    expect(report.repairs[0]).toMatchObject({ date: "2026-09-07", step: 2, after: { seed: "ate", rhymeKey: "EY T" } });
+  });
+
+  it("is Free Play only when nothing pins, whatever the other days hold", () => {
+    const holder = day("2026-11-12", "cool", "UW L");
+    const stale = day("2026-11-13", "cool", "UW UW L");
+    const report = checkContinuity([holder, stale], index);
+
     expect(report.repairs).toEqual([]);
-    expect(report.freePlay.map((d) => d.date)).toEqual(["2026-09-08", "2026-09-15"]);
+    expect(report.days[0]).toEqual(holder);
+    expect(report.freePlay.map((d) => d.date)).toEqual(["2026-11-13"]);
   });
 });
 
@@ -141,6 +161,30 @@ describe("the one-place check", () => {
       { kind: "seed", value: "ate", dates: ["2026-11-04", "2026-11-11"] },
       { kind: "rhymeKey", value: "EY T", dates: ["2026-11-04", "2026-11-11"] },
     ]);
+  });
+
+  it("reports two days whose Puzzles hold the same Answers under two Rhyme Key spellings", () => {
+    // Glide-r appends the other spelling to every word, so `AW ER` and `AW R`
+    // file one family, and `flour`, transcribed with plain r, pins on `AW R`:
+    // one Puzzle under two keys, as the appending rule made `purifier` and `expire`.
+    const twice = makeTestIndex({
+      pronunciations: [
+        ["hour", [["AW1", "ER0"]]],
+        ["flour", [["F", "L", "AW1", "R"]]],
+        ["sour", [["S", "AW1", "ER0"]]],
+      ],
+      words: ["hour", "flour", "sour"],
+      prevalence: [["hour", 2.5], ["flour", 2.4], ["sour", 2.4]],
+    });
+    const report = checkContinuity([day("2026-11-04", "hour", "AW ER"), day("2026-11-05", "flour", "AW R")], twice);
+
+    expect(report.freePlay).toEqual([]);
+    expect(report.collisions).toEqual([
+      { kind: "answers", value: "AW ER / AW R", dates: ["2026-11-04", "2026-11-05"] },
+    ]);
+    expect(continuityLines(report).join("\n")).toMatch(
+      /one-place: the same Answers, on AW ER \/ AW R, hold 2 places: 2026-11-04 \(hour\), 2026-11-05 \(flour\)/,
+    );
   });
 
   it("finds none in a Schedule that keeps the rule", () => {
