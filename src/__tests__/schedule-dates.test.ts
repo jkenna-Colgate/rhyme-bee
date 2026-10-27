@@ -29,8 +29,8 @@ describe("the committed schedule artifact parses", () => {
       weekday: "Mon",
       week: 1,
       seed: "lopsided",
-      rhymeKey: "AY D IH D",
-      answerCount: 21,
+      rhymeKey: "AY D AH D",
+      answerCount: 22,
       difficulty: 0,
     });
   });

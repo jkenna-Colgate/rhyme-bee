@@ -65,8 +65,8 @@
       "weekday": "Mon",
       "week": 1,
       "seed": "lopsided",
-      "rhymeKey": "AY D IH D",
-      "answerCount": 21,
+      "rhymeKey": "AY D AH D",
+      "answerCount": 22,
       "difficulty": 0
     },
     {
@@ -173,9 +173,9 @@
       "weekday": "Sat",
       "week": 2,
       "seed": "idiotic",
-      "rhymeKey": "AA T IH K",
-      "answerCount": 22,
-      "difficulty": 0.1608
+      "rhymeKey": "AA T AH K",
+      "answerCount": 20,
+      "difficulty": 0.1732
     },
     {
       "date": "2026-08-16",
@@ -200,7 +200,7 @@
       "weekday": "Tue",
       "week": 3,
       "seed": "taxpaying",
-      "rhymeKey": "EY IH NG",
+      "rhymeKey": "EY AH NG",
       "answerCount": 48,
       "difficulty": 0.0517
     },
@@ -281,9 +281,9 @@
       "weekday": "Thu",
       "week": 4,
       "seed": "idealistic",
-      "rhymeKey": "IH S T IH K",
-      "answerCount": 70,
-      "difficulty": 0.092
+      "rhymeKey": "IH S T AH K",
+      "answerCount": 71,
+      "difficulty": 0.1087
     },
     {
       "date": "2026-08-28",
@@ -515,7 +515,7 @@
       "weekday": "Tue",
       "week": 8,
       "seed": "storytelling",
-      "rhymeKey": "EH L IH NG",
+      "rhymeKey": "EH L AH NG",
       "answerCount": 29,
       "difficulty": 0.0456
     },
@@ -542,7 +542,7 @@
       "weekday": "Fri",
       "week": 8,
       "seed": "devastatingly",
-      "rhymeKey": "EY T IH NG L IY",
+      "rhymeKey": "EY T AH NG L IY",
       "answerCount": 28,
       "difficulty": 0.1227
     },
@@ -596,9 +596,9 @@
       "weekday": "Thu",
       "week": 9,
       "seed": "microbiologist",
-      "rhymeKey": "AA L AH JH IH S T",
-      "answerCount": 24,
-      "difficulty": 0.0918
+      "rhymeKey": "AA L AH JH AH S T",
+      "answerCount": 39,
+      "difficulty": 0.0579
     },
     {
       "date": "2026-10-02",
@@ -767,9 +767,9 @@
       "weekday": "Tue",
       "week": 12,
       "seed": "corrective",
-      "rhymeKey": "EH K T IH V",
-      "answerCount": 28,
-      "difficulty": 0.0381
+      "rhymeKey": "EH K T AH V",
+      "answerCount": 29,
+      "difficulty": 0.0363
     },
     {
       "date": "2026-10-21",
@@ -893,7 +893,7 @@
       "weekday": "Tue",
       "week": 14,
       "seed": "breathtaking",
-      "rhymeKey": "EY K IH NG",
+      "rhymeKey": "EY K AH NG",
       "answerCount": 37,
       "difficulty": 0.036
     },
@@ -938,7 +938,7 @@
       "weekday": "Sun",
       "week": 14,
       "seed": "schilling",
-      "rhymeKey": "IH L IH NG",
+      "rhymeKey": "IH L AH NG",
       "answerCount": 32,
       "difficulty": 0.2266
     },
@@ -947,7 +947,7 @@
       "weekday": "Mon",
       "week": 15,
       "seed": "longstanding",
-      "rhymeKey": "AE N D IH NG",
+      "rhymeKey": "AE N D AH NG",
       "answerCount": 22,
       "difficulty": 0
     },
@@ -1091,7 +1091,7 @@
       "weekday": "Wed",
       "week": 17,
       "seed": "shortsighted",
-      "rhymeKey": "AY T IH D",
+      "rhymeKey": "AY T AH D",
       "answerCount": 33,
       "difficulty": 0.078
     },
@@ -1136,7 +1136,7 @@
       "weekday": "Mon",
       "week": 18,
       "seed": "darjeeling",
-      "rhymeKey": "IY L IH NG",
+      "rhymeKey": "IY L AH NG",
       "answerCount": 24,
       "difficulty": 0
     },
@@ -1244,7 +1244,7 @@
       "weekday": "Sat",
       "week": 19,
       "seed": "bloodletting",
-      "rhymeKey": "EH T IH NG",
+      "rhymeKey": "EH T AH NG",
       "answerCount": 22,
       "difficulty": 0.1846
     },
@@ -1262,7 +1262,7 @@
       "weekday": "Mon",
       "week": 20,
       "seed": "shortcoming",
-      "rhymeKey": "AH M IH NG",
+      "rhymeKey": "AH M AH NG",
       "answerCount": 21,
       "difficulty": 0
     },
@@ -1280,7 +1280,7 @@
       "weekday": "Wed",
       "week": 20,
       "seed": "grayling",
-      "rhymeKey": "EY L IH NG",
+      "rhymeKey": "EY L AH NG",
       "answerCount": 33,
       "difficulty": 0.0582
     },
@@ -1541,7 +1541,7 @@
       "weekday": "Thu",
       "week": 24,
       "seed": "fanatic",
-      "rhymeKey": "AE T IH K",
+      "rhymeKey": "AE T AH K",
       "answerCount": 70,
       "difficulty": 0.1162
     },
@@ -1604,9 +1604,9 @@
       "weekday": "Thu",
       "week": 25,
       "seed": "technological",
-      "rhymeKey": "AA JH IH K AH L",
-      "answerCount": 35,
-      "difficulty": 0.0932
+      "rhymeKey": "AA JH AH K AH L",
+      "answerCount": 39,
+      "difficulty": 0.1118
     },
     {
       "date": "2027-01-22",
@@ -1712,7 +1712,7 @@
       "weekday": "Tue",
       "week": 27,
       "seed": "ongoing",
-      "rhymeKey": "OW IH NG",
+      "rhymeKey": "OW AH NG",
       "answerCount": 39,
       "difficulty": 0.0358
     },
@@ -1757,9 +1757,9 @@
       "weekday": "Sun",
       "week": 27,
       "seed": "chronic",
-      "rhymeKey": "AA N IH K",
-      "answerCount": 48,
-      "difficulty": 0.2638
+      "rhymeKey": "AA N AH K",
+      "answerCount": 49,
+      "difficulty": 0.2787
     },
     {
       "date": "2027-02-08",
@@ -1775,7 +1775,7 @@
       "weekday": "Tue",
       "week": 28,
       "seed": "highflying",
-      "rhymeKey": "AY IH NG",
+      "rhymeKey": "AY AH NG",
       "answerCount": 91,
       "difficulty": 0.0522
     },
@@ -1829,7 +1829,7 @@
       "weekday": "Mon",
       "week": 29,
       "seed": "splendid",
-      "rhymeKey": "EH N D IH D",
+      "rhymeKey": "EH N D AH D",
       "answerCount": 37,
       "difficulty": 0
     },
@@ -1847,7 +1847,7 @@
       "weekday": "Wed",
       "week": 29,
       "seed": "songwriting",
-      "rhymeKey": "AY T IH NG",
+      "rhymeKey": "AY T AH NG",
       "answerCount": 41,
       "difficulty": 0.0636
     },
@@ -1955,7 +1955,7 @@
       "weekday": "Mon",
       "week": 31,
       "seed": "bioengineering",
-      "rhymeKey": "IH R IH NG",
+      "rhymeKey": "IH R AH NG",
       "answerCount": 33,
       "difficulty": 0
     },
@@ -2315,7 +2315,7 @@
       "weekday": "Sat",
       "week": 36,
       "seed": "administrative",
-      "rhymeKey": "EY T IH V",
+      "rhymeKey": "EY T AH V",
       "answerCount": 34,
       "difficulty": 0.1671
     },
@@ -2387,7 +2387,7 @@
       "weekday": "Sun",
       "week": 37,
       "seed": "genetic",
-      "rhymeKey": "EH T IH K",
+      "rhymeKey": "EH T AH K",
       "answerCount": 44,
       "difficulty": 0.207
     },
