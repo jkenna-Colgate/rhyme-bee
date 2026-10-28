@@ -103,6 +103,8 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
       return "name";
     case "suggested-demotion":
       return "suggested-demotion";
+    case "unconfirmed-rhyme":
+      return "unconfirmed";
     case "needs-correction":
       return "correction";
     case "addable":
@@ -116,11 +118,21 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
 }
 
 /**
- * The cards the seven states resolve to: seven of them, but not one per state:
+ * The cards the eight states resolve to: eight of them, but not one per state:
  * `resolved` and `declined` share `settled`, and `addable` splits on whether
- * there is anything to derive from.
+ * there is anything to derive from. `unconfirmed` is the card a standing
+ * Unconfirmed Rhyme draws on its own, so a Candidate on a listed pair offers
+ * the line's controls and not a second set (#269).
  */
-export type CandidateCard = "settled" | "tier" | "name" | "suggested-demotion" | "correction" | "add" | "derivation";
+export type CandidateCard =
+  | "settled"
+  | "tier"
+  | "name"
+  | "suggested-demotion"
+  | "unconfirmed"
+  | "correction"
+  | "add"
+  | "derivation";
 
 /**
  * The evidence one card shows — the three kinds a Candidate can carry, with the
@@ -181,6 +193,11 @@ export function evidenceFor(candidate: ReadCandidate): CardEvidence {
     case "needs-tier":
     case "needs-correction":
       return { readings: candidate.readings, relatives: [], composed: null };
+    case "unconfirmed-rhyme":
+      // The engine's own readings, for the correction card's reason: an
+      // Overrule's line is weighed against the reading the engine holds. Empty
+      // for a Missing Reading, which has none.
+      return { readings: candidate.listed.readings, relatives: [], composed: null };
     case "addable":
       return cardFor(candidate) === "derivation"
         ? { readings: [], relatives: candidate.relatives, composed: candidate.composed }
@@ -228,10 +245,19 @@ export function suggestedDemotion(candidate: ReadCandidate): DemotionReason | nu
  * The day's Unconfirmed Rhymes: the standing lines on its Rhyme Key, narrowed
  * from the one readout as its Candidates are (#269). Total, for
  * `candidatesForDay`'s reason.
+ *
+ * A line whose word is already a Candidate on this key is left out, so each
+ * pair shows once. The Candidate's card is where it shows: one that reads
+ * `unconfirmed-rhyme` carries the line and offers its controls, and one that
+ * reads anything else (a name, say) wants that ruling first. Both words are
+ * normalised server-side, so they compare as they are.
  */
 export function unconfirmedForDay(
   queue: CandidateQueueReadout | null,
   rhymeKey: RhymeKey,
 ): ReadUnconfirmedRhyme[] {
-  return (queue?.unconfirmedRhymes ?? []).filter((u) => u.line.rhymeKey === rhymeKey);
+  const appealed = new Set(candidatesForDay(queue, rhymeKey).all.map((c) => c.word));
+  return (queue?.unconfirmedRhymes ?? []).filter(
+    (u) => u.line.rhymeKey === rhymeKey && !appealed.has(u.line.word),
+  );
 }

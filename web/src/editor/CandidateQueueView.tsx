@@ -30,7 +30,10 @@
  * **What the Judge left** (#269) is drawn here too: its ruling beside each
  * Candidate it ruled on, and, on the day panel, the day's Unconfirmed Rhymes to
  * confirm or Decline. Confirming is the correction gesture, offered the Judge's
- * reading; Declining is the same three-way menu a Candidate's card offers.
+ * reading, or the add for a word with no reading at all (`confirmGesture`);
+ * Declining is the same three-way menu a Candidate's card offers. A Candidate
+ * on a listed pair draws the same confirm control on its own card, and the
+ * line is left off the day's list, so a pair is shown once.
  */
 
 import { useState } from "react";
@@ -48,7 +51,7 @@ import {
   type DeclineChoice,
 } from "./decline.ts";
 import { candidatesForDay, cardFor, evidenceFor, offersAdd, suggestedDemotion, unconfirmedForDay } from "./dayCandidates.ts";
-import { confirmProposal, judgeRulingSentence, KNEW_SENTENCE } from "./judgeRuling.ts";
+import { confirmGesture, confirmProposal, judgeRulingSentence, KNEW_SENTENCE } from "./judgeRuling.ts";
 import { deferredReadings, proposalFor } from "./deferredReadings.ts";
 import { CorrectionPanel } from "./CorrectionView.tsx";
 import type { Corrector } from "./useCorrector.ts";
@@ -76,6 +79,14 @@ export interface CandidateActs {
    * word and Rhyme Key. The Decline route also takes the line off the list.
    */
   onDeclineUnconfirmed?: (line: UnconfirmedRhyme, choice: DeclineChoice) => void;
+  /**
+   * Confirm an Unconfirmed Rhyme whose word has no reading and nothing proposed,
+   * by queueing it as an add aimed at the line's Rhyme Key (`confirmGesture`).
+   * `appealed` is whether a Candidate stands behind the line, which is what the
+   * add's provenance flag records: a bare line may have come from a Batch, and
+   * nobody Appealed that.
+   */
+  onConfirmByAdd?: (listed: ReadUnconfirmedRhyme, appealed: boolean) => void;
   /** The word a write is in flight for, so its card can say so. */
   writing?: string | null;
   /**
@@ -416,8 +427,17 @@ function CandidateCardView({
     <div className={`editor-candidate editor-candidate-${cardFor(candidate)}`}>
       <span className="editor-candidate-word">{candidate.word}</span>
       <span className="editor-candidate-state">{STATE_SENTENCE[candidate.state]}</span>
-      {candidate.judged !== null && <JudgedLine judged={candidate.judged} />}
+      {candidate.state === "unconfirmed-rhyme" ? (
+        <ListedLine listed={candidate.listed} />
+      ) : (
+        candidate.judged !== null && <JudgedLine judged={candidate.judged} />
+      )}
       <CandidateEvidence candidate={candidate} />
+      {/* A listed pair's confirm, the same control the line's own card draws.
+          Its Decline is the card's own below, which rules on the same pair. */}
+      {candidate.state === "unconfirmed-rhyme" && (
+        <ConfirmUnconfirmed listed={candidate.listed} acts={acts} appealed />
+      )}
       {/* The correction, on the one card whose word the engine already reads
           (#180). Dispatched on `cardFor` rather than on the state directly, so
           the card a Candidate draws is decided in one place and this file goes
@@ -602,7 +622,7 @@ export function DayUnconfirmedRhymesView({
     <section className="editor-queue-day-panel editor-unconfirmed-panel">
       <h3>
         Unconfirmed Rhymes on this Rhyme Key{" "}
-        <span className="editor-muted">— {listed.length}, accepted without Points</span>
+        <span className="editor-muted">: {listed.length}, accepted without Points</span>
       </h3>
       <p className="editor-queue-note">
         The Judge ruled each one a Rhyme here, and nobody has confirmed it. Left alone, it stays
@@ -621,36 +641,19 @@ export function DayUnconfirmedRhymesView({
 }
 
 /**
- * One Unconfirmed Rhyme. Confirming is the correction gesture offered the
- * Judge's reading as a standing proposal, so joining or replacing the engine's
- * own reading stays the editor's choice (ADR-0017). A line with no reading to
- * offer asks an agent for one instead.
+ * One Unconfirmed Rhyme with no Candidate on its pair. Its confirm is
+ * `ConfirmUnconfirmed`, shared with a Candidate's card, and its Decline is the
+ * shared menu on the line's word and key.
  */
 function UnconfirmedRhymeCard({ listed, acts }: { listed: ReadUnconfirmedRhyme; acts: CandidateActs }) {
-  const { line, judged } = listed;
-  const proposal = confirmProposal(listed);
+  const { line } = listed;
   const decline = acts.onDeclineUnconfirmed;
   return (
     <div className="editor-candidate editor-candidate-unconfirmed">
       <span className="editor-candidate-word">{line.word}</span>
-      <span className="editor-candidate-state">an Unconfirmed Rhyme: confirm it or Decline it</span>
-      {judged !== null ? (
-        <JudgedLine judged={judged} />
-      ) : (
-        <p className="editor-candidate-judged">
-          Listed by {line.writer}, on {KNEW_SENTENCE[line.ruling]}, at {line.confidence} confidence.
-        </p>
-      )}
-      {acts.corrector !== undefined && (
-        <CorrectionPanel
-          word={line.word}
-          rhymeKey={line.rhymeKey}
-          current={listed.readings}
-          corrector={acts.corrector}
-          standing={proposal}
-          ask={proposal === null ? `Ask an agent for a reading of ${line.word}` : undefined}
-        />
-      )}
+      <span className="editor-candidate-state">{STATE_SENTENCE["unconfirmed-rhyme"]}</span>
+      <ListedLine listed={listed} />
+      <ConfirmUnconfirmed listed={listed} acts={acts} appealed={false} />
       {decline !== undefined && (
         <div className="editor-candidate-acts">
           <DeclineMenu
@@ -662,6 +665,70 @@ function UnconfirmedRhymeCard({ listed, acts }: { listed: ReadUnconfirmedRhyme; 
         </div>
       )}
     </div>
+  );
+}
+
+/** Who listed a line: the ruling that wrote it, or the line's own fields when the record does not hold one. */
+function ListedLine({ listed }: { listed: ReadUnconfirmedRhyme }) {
+  const { line, judged } = listed;
+  if (judged !== null) return <JudgedLine judged={judged} />;
+  return (
+    <p className="editor-candidate-judged">
+      Listed by {line.writer}, on {KNEW_SENTENCE[line.ruling]}, at {line.confidence} confidence.
+    </p>
+  );
+}
+
+/**
+ * The confirm on an Unconfirmed Rhyme, wherever the pair is drawn: the line's
+ * own card, or the card of a Candidate on the same pair. Which gesture it is,
+ * is `confirmGesture`'s:
+ *
+ * - the Judge's reading as a standing proposal, so joining or replacing the
+ *   engine's own reading stays the editor's choice (ADR-0017);
+ * - an ask for a correction, for an Overrule with no reading proposed;
+ * - the add, for a word with no reading at all, which the correction route
+ *   cannot help with. It queues, as the Candidate add does (#161).
+ */
+function ConfirmUnconfirmed({
+  listed,
+  acts,
+  appealed,
+}: {
+  listed: ReadUnconfirmedRhyme;
+  acts: CandidateActs;
+  appealed: boolean;
+}) {
+  const { line } = listed;
+  const gesture = confirmGesture(listed);
+
+  if (gesture === "add") {
+    const add = acts.onConfirmByAdd;
+    if (add === undefined) return null;
+    return (
+      <div className="editor-candidate-acts">
+        <button
+          type="button"
+          className="editor-candidate-add"
+          disabled={acts.writing === line.word}
+          onClick={() => add(listed, appealed)}
+        >
+          Confirm {line.word}: queue it as an add
+        </button>
+      </div>
+    );
+  }
+
+  if (acts.corrector === undefined) return null;
+  return (
+    <CorrectionPanel
+      word={line.word}
+      rhymeKey={line.rhymeKey}
+      current={listed.readings}
+      corrector={acts.corrector}
+      standing={gesture === "approve" ? confirmProposal(listed) : null}
+      ask={gesture === "ask" ? `Ask an agent for a reading of ${line.word}` : undefined}
+    />
   );
 }
 
@@ -677,7 +744,8 @@ const STATE_SENTENCE: Record<ReadCandidate["state"], string> = {
   declined: "declined for this Rhyme Key",
   "needs-tier": "rhymes, as a Bonus Word: rule its Tier",
   "is-a-name": "a name — demote it",
-  "suggested-demotion": "the Judge says it is a name or not a word — a suggested Demotion",
+  "suggested-demotion": "the Judge says it is a name or not a word: a suggested Demotion",
+  "unconfirmed-rhyme": "an Unconfirmed Rhyme: confirm it or Decline it",
   "needs-correction": "reads on another key — needs a correction",
   addable: "no reading the engine will take — an add",
 };

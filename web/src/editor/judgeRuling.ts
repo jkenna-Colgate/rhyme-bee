@@ -56,9 +56,35 @@ export function judgeRulingSentence(r: JudgeRulingRecord): string {
 }
 
 /**
+ * How an Unconfirmed Rhyme is confirmed, which depends on what there is to
+ * confirm it with:
+ *
+ * - **approve**: the Judge's reading is in hand, so the Confirm is the
+ *   correction gesture offered it as a standing proposal (`confirmProposal`).
+ * - **ask**: there is no proposal, and the engine holds a reading of its own
+ *   that misses the key (an Overrule). Asking an agent for a correction is the
+ *   correction route's own case, and it answers.
+ * - **add**: there is no proposal and the engine holds no reading at all (a
+ *   Missing Reading). The correction route answers `nothing-to-correct` for a
+ *   word with no reading without asking anyone (`proposeCorrection`), so an
+ *   ask there would leave the line with no way to be confirmed. What a word
+ *   with no reading wants is an add, aimed at the line's Rhyme Key: the add
+ *   path asks its agent for a reading on that key and writes it, after which
+ *   the word rhymes by itself and the line is stale.
+ */
+export type ConfirmGesture = "approve" | "ask" | "add";
+
+/** Which of the three a line offers. Pure, so the choice is tested away from the card. */
+export function confirmGesture(u: ReadUnconfirmedRhyme): ConfirmGesture {
+  if (u.proposal !== null) return "approve";
+  return u.readings.length > 0 ? "ask" : "add";
+}
+
+/**
  * The proposal a Confirm approves: the Judge's reading beside the engine's own,
  * through the correction route like any other reading (ADR-0017 amended). Null
- * when there is no reading to confirm, and the editor asks an agent instead.
+ * when there is no reading to confirm, and the editor asks an agent or queues
+ * an add instead (`confirmGesture`).
  */
 export function confirmProposal(u: ReadUnconfirmedRhyme): CorrectionProposal | null {
   if (u.proposal === null) return null;

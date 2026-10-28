@@ -231,6 +231,13 @@ export function EditorApp() {
     // An Unconfirmed Rhyme is Declined the same way, on its own word and key
     // (#269). The Decline route takes the line off the list as it writes.
     onDeclineUnconfirmed: (line, choice) => declinePair(line.word, line.rhymeKey, choice),
+    // Confirming a listed word the engine reads not at all, when the Judge left
+    // no reading to approve (#269). It is `queueWord` again, aimed at the line's
+    // own Rhyme Key for the Candidate add's reason, and flagged as raised from a
+    // Candidate only when one stands behind the line: a bare line may be a
+    // Batch's, and nobody Appealed that.
+    onConfirmByAdd: (listed, appealed) =>
+      adder.queueWord(listed.line.word, { kind: "key", rhymeKey: listed.line.rhymeKey }, appealed),
     writing: decliner.writing ?? demoter.writing,
     // The correction, on the one card that offers it. The whole hook rather than
     // a callback, because the proposal between the ask and the approval is state
@@ -263,6 +270,10 @@ export function EditorApp() {
     ...queueActs,
     onAdd: (candidate) => {
       if (day !== null) adder.queueWord(candidate.word, { kind: "day", date: day }, true);
+    },
+    // Day-aimed for the same reason: the panel's lines are all on the day's key.
+    onConfirmByAdd: (listed, appealed) => {
+      if (day !== null) adder.queueWord(listed.line.word, { kind: "day", date: day }, appealed);
     },
   };
   // The control shows the date the editor last entered in full, and otherwise

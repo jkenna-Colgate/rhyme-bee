@@ -117,7 +117,7 @@ export interface CandidateIdentity {
  * be written against one variant without reaching for fields that mean nothing
  * to it.
  *
- * The six, and what each one means the editor should do:
+ * The eight, and what each one means the editor should do:
  *
  * - **resolved**: the word is an Answer on this key today, with every standing
  *   Tier verdict applied. There is nothing to do, and nothing was written to
@@ -133,6 +133,11 @@ export interface CandidateIdentity {
  * - **suggested-demotion**: the Judge's wordhood question found the word a name
  *   or not a word, so it landed nothing (#266) and arrives with that reason
  *   (#269). Making the Demotion is the editor's act; nothing is demoted here.
+ * - **unconfirmed-rhyme**: the word and this key are a standing Unconfirmed
+ *   Rhyme, so the game already accepts the word here without Points. The
+ *   ruling it wants is the line's own: confirm it or Decline it. It carries the
+ *   line, so the card offers exactly what the line's own card offers, and the
+ *   day's Unconfirmed Rhymes leave the line out rather than show the pair twice.
  * - **needs-correction** — the engine holds a reading of its own for this word
  *   and that reading does not reach the target. A correction, which is slice 3.
  * - **addable** — the engine has no reading it can accept for this word. An add,
@@ -147,6 +152,11 @@ export type ReadCandidate =
       state: "suggested-demotion";
       /** The Demotion the Judge's answer suggests: a name is a Proper Noun, a non-word is not a known word. */
       reason: DemotionReason;
+    })
+  | (CandidateIdentity & {
+      state: "unconfirmed-rhyme";
+      /** The standing line on this word and key, with what a Confirm offers. */
+      listed: ReadUnconfirmedRhyme;
     })
   | (CandidateIdentity & { state: "needs-correction"; readings: ReadingEvidence[] })
   | (CandidateIdentity & {
@@ -272,8 +282,12 @@ export interface JudgeProposal {
 
 /**
  * One standing Unconfirmed Rhyme, for the editor to confirm or Decline (#269).
- * Confirming it is the ordinary add of a reading, through the correction route;
- * Declining it is the ordinary Decline, which also takes the line off the list.
+ * Confirming it is the ordinary add of a reading: through the correction route
+ * when there is a proposal or a reading of the engine's to correct, and through
+ * the add path for a word with neither (`confirmGesture`,
+ * `web/src/editor/judgeRuling.ts`). Declining it is the ordinary Decline, which
+ * also takes the line off the list. A Candidate on the same pair carries it
+ * (the `unconfirmed-rhyme` state), and the line is then shown on that card only.
  */
 export interface ReadUnconfirmedRhyme {
   line: UnconfirmedRhyme;
@@ -320,13 +334,17 @@ export function readCandidateQueue(
   const declined = declinedPairs(declines);
   const ruled = ruledPairs(judge.rulings);
   const dayFor = daysByRhymeKey(schedule);
+  // Read before the Candidates rather than beside them, because a Candidate on a
+  // listed pair takes its state from the line (`readCandidate`).
+  const unconfirmedRhymes = readUnconfirmedRhymes(judge, declined, ruled, ctx);
+  const listed = new Map(unconfirmedRhymes.map((u) => [rulingKey(u.line.word, u.line.rhymeKey), u]));
 
   const groups = new Map<RhymeKey, CandidateGroup>();
   let newest: string | null = null;
 
   for (const candidate of candidates) {
     const rhymeKey = candidate.seedRhymeKey;
-    const read = readCandidate(candidate, declined, ruled, ctx);
+    const read = readCandidate(candidate, declined, ruled, listed, ctx);
 
     let group = groups.get(rhymeKey);
     if (group === undefined) {
@@ -359,7 +377,7 @@ export function readCandidateQueue(
     outstanding: ordered.reduce((n, group) => n + group.outstanding, 0),
     newest,
     deferred: readDeferredSection(deferred, ctx),
-    unconfirmedRhymes: readUnconfirmedRhymes(judge, declined, ruled, ctx),
+    unconfirmedRhymes,
   };
 }
 
@@ -443,6 +461,16 @@ function judgeProposal(reading: string | null, target: RhymeKey): JudgeProposal 
  * the Judge's reason. A suggested Demotion is settled as a name is: by the
  * Demotion and a `reason-is-correct` Decline, the second taking it off the queue.
  *
+ * **Then a standing Unconfirmed Rhyme**, whose ruling is the line's: confirm it
+ * or Decline it. It comes after the two name cases because a name is never
+ * valid however the Judge heard it, and a Demotion overrules the line anyway.
+ * It comes before the three below because each of them would offer a second
+ * gesture for a pair that already has one: the line is what the Judge left, and
+ * a Candidate card that asked for a Tier, a correction or an add beside it
+ * would be the same pair on the screen twice, ruled two ways. In practice the
+ * Tier case cannot meet a line at all, since a word that rhymes by itself makes
+ * its line stale (`readUnconfirmedRhymes`).
+ *
  * **Then the two that want a reading.** `direct` and `relatives`/`composed` are
  * mutually exclusive by `gatherEvidence`'s own construction — a word that
  * already reads is a correction and is never offered relatives — so the split
@@ -452,6 +480,7 @@ function readCandidate(
   candidate: SupplementCandidate,
   declined: ReadonlySet<string>,
   ruled: ReadonlyMap<string, JudgeRulingRecord>,
+  listed: ReadonlyMap<string, ReadUnconfirmedRhyme>,
   ctx: CandidateQueueContext,
 ): ReadCandidate {
   const evidence = gatherEvidence(candidate.word, candidate.seedRhymeKey, ctx);
@@ -472,6 +501,9 @@ function readCandidate(
   if (judged?.landed === "suggested-demotion") {
     return { ...identity, state: "suggested-demotion", reason: judged.wordhood?.verdict === "name" ? "proper-noun" : "not-a-known-word" };
   }
+
+  const line = listed.get(rulingKey(evidence.word, candidate.seedRhymeKey));
+  if (line !== undefined) return { ...identity, state: "unconfirmed-rhyme", listed: line };
 
   if (rhymes) return { ...identity, state: "needs-tier", readings: evidence.direct };
 

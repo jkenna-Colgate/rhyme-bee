@@ -633,4 +633,37 @@ describe("what the Judge left", () => {
     expect(read({ demotedWords: new Set(["hat"]) })).toEqual([]);
     expect(read({}, [{ word: "hat", rhymeKey: ATE }])).toEqual([]);
   });
+
+  /**
+   * A Candidate on a standing line is that line's to rule on, so it reads
+   * `unconfirmed-rhyme` and carries it, rather than asking for a correction
+   * beside it (`hat`'s reading misses `EY T`, so it would otherwise read
+   * `needs-correction`).
+   */
+  it("reads a Candidate whose pair is a standing Unconfirmed Rhyme as that line", () => {
+    const record = ruling("hat", ATE);
+    const readout = readCandidateQueue([candidate("hat", "ate", ATE)], SCHEDULE, [], contextFor(), [], judge({ rulings: [record], unconfirmed: LISTED_HAT }));
+    const read = only(readout);
+
+    expect(read.state).toBe("unconfirmed-rhyme");
+    expect(read.state === "unconfirmed-rhyme" && read.listed).toEqual(readout.unconfirmedRhymes[0]);
+    expect(read.judged).toEqual(record);
+    expect(readout.outstanding).toBe(1);
+  });
+
+  it("reads a Candidate on another key, or with no line, as it would otherwise", () => {
+    const read = (key: string, unconfirmed: string) =>
+      only(readCandidateQueue([candidate("hat", "ate", key)], SCHEDULE, [], contextFor(), [], judge({ unconfirmed }))).state;
+
+    expect(read(ATE, "")).toBe("needs-correction");
+    expect(read(DOCKED, LISTED_HAT)).toBe("needs-correction");
+  });
+
+  it("puts a name and a Decline before the line", () => {
+    const listedRead = (declines: Decline[], extra: Extra) =>
+      only(readCandidateQueue([candidate("hat", "ate", ATE)], SCHEDULE, declines, contextFor(extra), [], judge({ unconfirmed: LISTED_HAT }))).state;
+
+    expect(listedRead([], { names: ["hat"] })).toBe("is-a-name");
+    expect(listedRead([{ word: "hat", rhymeKey: ATE }], {})).toBe("declined");
+  });
 });
