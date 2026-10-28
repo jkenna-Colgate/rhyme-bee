@@ -32,10 +32,12 @@ import type {
   ReadingEvidence,
   RelativeEvidence,
 } from "../../../src/supplementEvidence.ts";
+import type { DemotionReason } from "../../../src/demotions.ts";
 import {
   isOutstanding,
   type CandidateQueueReadout,
   type ReadCandidate,
+  type ReadUnconfirmedRhyme,
 } from "../../../scripts/editorCandidates.ts";
 
 /** One day's slice of the queue. */
@@ -99,6 +101,8 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
       return "tier";
     case "is-a-name":
       return "name";
+    case "suggested-demotion":
+      return "suggested-demotion";
     case "needs-correction":
       return "correction";
     case "addable":
@@ -112,11 +116,11 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
 }
 
 /**
- * The cards the six states resolve to: six of them, but not one per state:
+ * The cards the seven states resolve to: seven of them, but not one per state:
  * `resolved` and `declined` share `settled`, and `addable` splits on whether
  * there is anything to derive from.
  */
-export type CandidateCard = "settled" | "tier" | "name" | "correction" | "add" | "derivation";
+export type CandidateCard = "settled" | "tier" | "name" | "suggested-demotion" | "correction" | "add" | "derivation";
 
 /**
  * The evidence one card shows — the three kinds a Candidate can carry, with the
@@ -169,8 +173,9 @@ export function evidenceFor(candidate: ReadCandidate): CardEvidence {
   switch (candidate.state) {
     case "declined":
     case "is-a-name":
-      // Neither ruling is made from a reading. A Decline is already made, and a
-      // name is never valid however well it rhymes.
+    case "suggested-demotion":
+      // None of these rulings is made from a reading. A Decline is already
+      // made, and a name or a non-word is never valid however well it rhymes.
       return NOTHING;
     case "resolved":
     case "needs-tier":
@@ -208,3 +213,25 @@ export function offersAdd(candidate: ReadCandidate): boolean {
 // and the same one the panel and the whole-queue list read. A predicate here
 // would only forward to it under a second name, and the reasoning it would
 // carry belongs where the gesture is drawn (`CandidateQueueView.tsx`).
+
+/**
+ * The Decline the Judge's wordhood answer points at, for a suggested Demotion,
+ * or null for any other Candidate (#269). It marks one of the three rulings the
+ * Decline already offers; it chooses none of them, because making a Demotion is
+ * the editor's act.
+ */
+export function suggestedDemotion(candidate: ReadCandidate): DemotionReason | null {
+  return candidate.state === "suggested-demotion" ? candidate.reason : null;
+}
+
+/**
+ * The day's Unconfirmed Rhymes: the standing lines on its Rhyme Key, narrowed
+ * from the one readout as its Candidates are (#269). Total, for
+ * `candidatesForDay`'s reason.
+ */
+export function unconfirmedForDay(
+  queue: CandidateQueueReadout | null,
+  rhymeKey: RhymeKey,
+): ReadUnconfirmedRhyme[] {
+  return (queue?.unconfirmedRhymes ?? []).filter((u) => u.line.rhymeKey === rhymeKey);
+}

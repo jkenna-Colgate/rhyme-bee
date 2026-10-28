@@ -171,6 +171,13 @@ describe("once per Candidate", () => {
     expect(plan.ruledBefore.map((r) => r.candidate.seedWord)).toEqual(["crates"]);
   });
 
+  it("does not send a pair the editor has Declined: the editor's ruling is already made (#269)", () => {
+    const plan = planJudging(candidates, [], [{ word: "clique", rhymeKey: "IY K" }]);
+
+    expect(plan.send.map((c) => c.word)).toEqual(["grates"]);
+    expect(plan.declined.map((c) => c.word)).toEqual(["clique"]);
+  });
+
   it("drops a record line that does not read, and names it", () => {
     const { records, malformed } = parseRulingRecords('not json\n{"word":"grates"}\n\n');
     expect([records, malformed]).toEqual([[], ["not json", '{"word":"grates"}']]);

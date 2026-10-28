@@ -28,6 +28,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { judgeQuestion, parseWordhoodReply, WORDHOOD_BATCH, wordhoodPrompt, type WordhoodRuling } from "../src/judge.ts";
 import { labellersOf, parseLabelSet, scoreRhymes, scoreWordhood, type LabelSet, type RhymeScore, type RuledPair } from "../src/judgeLabels.ts";
+import { parseDeclines } from "../src/declines.ts";
 import { planJudging } from "../src/judgeLanding.ts";
 import { decide } from "../src/judgeRules.ts";
 import {
@@ -65,11 +66,11 @@ async function rule(file: string) {
     const rhymeKey = index.pinSeed(c.seedWord, c.rhymeKey ?? scheduledKey(c.seedWord)).rhymeKey;
     return { word: c.word.toLowerCase(), seedWord: c.seedWord, rhymeKey, question: judgeQuestion(wordFacts(index, c.word), rhymeKey) };
   });
-  const { send, ruledBefore } = planJudging(candidates, readRulings());
+  const { send, ruledBefore, declined } = planJudging(candidates, readRulings(), parseDeclines(readFileSync(resolve(root, "data/declines.txt"), "utf8")));
   const stem = `judge.${file.replace(/^.*[\\/]/, "").replace(/\.json$/, "")}.${model}`;
   const run = nextRun(stem);
   const date = today();
-  console.error(`judging ${send.length} Candidates (${ruledBefore.length} ruled on before, not sent again), run ${run}: ${rhymeCalls(send)} rhyme calls, then the wordhood question for any that would act`);
+  console.error(`judging ${send.length} Candidates (${ruledBefore.length} ruled on before and ${declined.length} Declined, neither sent), run ${run}: ${rhymeCalls(send)} rhyme calls, then the wordhood question for any that would act`);
   const leg = await runJudge(send, { model, run, askWordhood: true });
   const landings = landJudgeLeg(leg, { model, date });
   const recorded = new Map(landings.records.map((r) => [`${r.word} ${r.rhymeKey}`, r]));
@@ -83,6 +84,7 @@ async function rule(file: string) {
       : `${r.knew}, ${r.verdict} (${r.confidence}), landed ${r.landed}${r.heldBack ? ` (held back: ${r.heldBack})` : ""}`;
     console.log(`${j.word} for ${j.seedWord} /${j.rhymeKey}/: ${said}`);
   }
+  for (const c of declined) console.log(`${c.word} for ${c.seedWord} /${c.rhymeKey}/: not sent (Declined by the editor)`);
   for (const { candidate: c, record: r } of ruledBefore) console.log(`${c.word} for ${c.seedWord} /${c.rhymeKey}/: not sent (ruled on ${r.date}, landed ${r.landed})`);
 
   const path = writeRunReport(date, stem, run, {
@@ -95,6 +97,7 @@ async function rule(file: string) {
     },
     note: "Every write is listed under writes, and every ruling is recorded in data/judge-rulings.jsonl. The index is not rebuilt (#266).",
     rulings: leg.items.map((j) => ({ ...reportRuling(j), landed: recorded.get(`${j.word} ${j.rhymeKey}`)?.landed ?? null })),
+    declined: declined.map((c) => ({ word: c.word, seedWord: c.seedWord, rhymeKey: c.rhymeKey })),
     ruledBefore: ruledBefore.map(({ candidate: c, record: r }) => ({ word: c.word, seedWord: c.seedWord, rhymeKey: c.rhymeKey, ruledOn: r.date, landed: r.landed })),
   });
   console.log(`\nlanded: ${JSON.stringify(landed)}\nreport: ${path}\nrebuild the index for the writes to take effect: npm run build:index`);

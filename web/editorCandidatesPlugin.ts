@@ -46,7 +46,9 @@ import { parseDeclines, type Decline } from "../src/declines.ts";
 import type { Schedule } from "../src/schedule.ts";
 import { parseCandidates, type SupplementCandidate } from "../src/supplementCandidate.ts";
 import { standingTierOf } from "../src/tierOverride.ts";
-import { readCandidateQueue, type CandidateQueueContext } from "../scripts/editorCandidates.ts";
+import { parseDemotions } from "../src/demotions.ts";
+import { parseRulingRecords } from "../src/judgeLanding.ts";
+import { readCandidateQueue, type CandidateQueueContext, type JudgeLeftovers } from "../scripts/editorCandidates.ts";
 import { pinnedEvidenceContext } from "../scripts/editorAdd.ts";
 import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
 import { measuredPrevalence, overridePath } from "./editorTierPlugin.ts";
@@ -110,6 +112,12 @@ export interface EditorCandidatesDeps {
    * deferred readings are one file with one reader (`web/deferredFile.ts`).
    */
   deferredPath?: string;
+  /**
+   * What the Judge left (#269): its rulings, the Unconfirmed Rhyme list and the
+   * demoted words that overrule a line. Optional, and nothing when unsaid, so a
+   * test about the queue alone supplies none of it.
+   */
+  judge?: () => JudgeLeftovers;
 }
 
 /**
@@ -145,6 +153,7 @@ export function editorCandidatesHandler(deps: EditorCandidatesDeps) {
           deps.declines(),
           deps.context(),
           readDeferredReadings(deps.deferredPath),
+          deps.judge?.(),
         ),
       );
     } catch (error) {
@@ -171,6 +180,11 @@ export function editorCandidatesPlugin(): Plugin {
       schedule: readSchedule,
       declines: () => parseDeclines(readDeclineText(DECLINES_PATH)),
       context: queueContext,
+      judge: () => ({
+        rulings: parseRulingRecords(readOptional(resolve(repoRoot, "data/judge-rulings.jsonl"))).records,
+        unconfirmed: readOptional(resolve(repoRoot, "data/unconfirmed-rhymes.txt")),
+        demotedWords: new Set(parseDemotions(readOptional(resolve(repoRoot, "data/demotions.txt"))).map((d) => d.word)),
+      }),
     }),
   );
 }

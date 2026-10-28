@@ -19,10 +19,12 @@ import type { Schedule } from "../../src/schedule.ts";
 import type { SupplementCandidate } from "../../src/supplementCandidate.ts";
 import { evidenceContextFrom } from "../../src/supplementEvidence.ts";
 import { serialiseTierOverride, standingTierOf } from "../../src/tierOverride.ts";
+import type { JudgeRulingRecord } from "../../src/judgeLanding.ts";
 import {
   readCandidateQueue,
   type CandidateQueueContext,
   type CandidateQueueReadout,
+  type JudgeLeftovers,
 } from "../editorCandidates.ts";
 
 /**
@@ -507,6 +509,7 @@ describe("the readout as a whole", () => {
       // to none, so a caller asking about Candidates alone gets an empty one.
       // What it holds when there *is* one is `editorDeferred.test.ts`'s.
       deferred: { entries: [], outstanding: 0 },
+      unconfirmedRhymes: [],
     });
   });
 
@@ -527,5 +530,107 @@ describe("the readout as a whole", () => {
     // queue's own counts do not move for one.
     expect(readout.total).toBe(0);
     expect(readout.outstanding).toBe(0);
+  });
+});
+
+/**
+ * What the Judge left for the Editor's Pass (#269): its ruling beside each
+ * Candidate it ruled on, a suggested Demotion with the Judge's reason, and the
+ * Unconfirmed Rhymes that stand, each with the ruling that wrote it.
+ */
+describe("what the Judge left", () => {
+  const ruling = (word: string, rhymeKey: string, over: Partial<JudgeRulingRecord> = {}): JudgeRulingRecord => ({
+    date: "2026-10-28",
+    word,
+    rhymeKey,
+    seedWord: "ate",
+    model: "claude-sonnet-5-5",
+    knew: "overrule",
+    verdict: "rhyme",
+    reading: "HH EY1 T",
+    confidence: "high",
+    why: "stubbed",
+    landed: "unconfirmed-rhyme",
+    ...over,
+  });
+  const judge = (over: Partial<JudgeLeftovers> = {}): JudgeLeftovers => ({
+    rulings: [],
+    unconfirmed: "",
+    demotedWords: new Set(),
+    ...over,
+  });
+  const LISTED_HAT = "hat judge:claude-sonnet-5-5 overrule high EY T\n";
+
+  it("carries the Judge's ruling on a Candidate's word and Rhyme Key, and none for another key", () => {
+    const record = ruling("hat", ATE, { landed: "nothing", confidence: "medium" });
+    const read = (key: string) =>
+      only(readCandidateQueue([candidate("hat", "ate", key)], SCHEDULE, [], contextFor(), [], judge({ rulings: [record] })));
+
+    expect(read(ATE).judged).toEqual(record);
+    expect(read(DOCKED).judged).toBeNull();
+  });
+
+  it.each([
+    ["name", "proper-noun"],
+    ["not-a-word", "not-a-known-word"],
+  ] as const)("reads a word the Judge found to be %s as a suggested Demotion with that reason", (verdict, reason) => {
+    const record = ruling("hat", ATE, { landed: "suggested-demotion", wordhood: { verdict, confidence: "high", why: "stubbed" } });
+    const readout = readCandidateQueue([candidate("hat", "ate", ATE)], SCHEDULE, [], contextFor(), [], judge({ rulings: [record] }));
+    const read = only(readout);
+
+    expect(read.state).toBe("suggested-demotion");
+    expect(read.state === "suggested-demotion" && read.reason).toBe(reason);
+    expect(readout.outstanding).toBe(1);
+  });
+
+  it("lets a Decline settle a suggested Demotion, as it settles a name", () => {
+    const record = ruling("hat", ATE, { landed: "suggested-demotion", wordhood: { verdict: "name", confidence: "high", why: "" } });
+    const declines: Decline[] = [{ word: "hat", rhymeKey: ATE }];
+    const read = only(readCandidateQueue([candidate("hat", "ate", ATE)], SCHEDULE, declines, contextFor(), [], judge({ rulings: [record] })));
+
+    expect(read.state).toBe("declined");
+  });
+
+  it("lists a standing Unconfirmed Rhyme with its ruling, the engine's readings and the Judge's reading to confirm", () => {
+    const record = ruling("hat", ATE);
+    const [listed, ...rest] = readCandidateQueue([], SCHEDULE, [], contextFor(), [], judge({ rulings: [record], unconfirmed: LISTED_HAT })).unconfirmedRhymes;
+
+    expect(rest).toEqual([]);
+    expect(listed!.line).toEqual({ word: "hat", rhymeKey: ATE, writer: "judge:claude-sonnet-5-5", ruling: "overrule", confidence: "high" });
+    expect(listed!.judged).toEqual(record);
+    expect(listed!.readings.map((r) => r.key)).not.toContain(ATE);
+    expect(listed!.proposal).toEqual({ phonemes: ["HH", "EY1", "T"], key: ATE, reaches: true });
+  });
+
+  it("reads the Judge's reading after Normalisation, as the build reads it", () => {
+    // The Judge writes the caught vowel, and the key holds the merged one.
+    const record = ruling("hat", DOCKED, { reading: "HH AO1 K T" });
+    const [listed] = readCandidateQueue([], SCHEDULE, [], contextFor(), [], judge({
+      rulings: [record],
+      unconfirmed: "hat judge:claude-sonnet-5-5 overrule high AA K T\n",
+    })).unconfirmedRhymes;
+
+    expect(listed!.proposal).toEqual({ phonemes: ["HH", "AO1", "K", "T"], key: DOCKED, reaches: true });
+  });
+
+  it("offers no reading to confirm for a line the record does not hold", () => {
+    const [listed] = readCandidateQueue([], SCHEDULE, [], contextFor(), [], judge({ unconfirmed: LISTED_HAT })).unconfirmedRhymes;
+
+    expect([listed!.judged, listed!.proposal]).toEqual([null, null]);
+  });
+
+  /**
+   * A line stands by the build's own rule: confirming one writes a reading,
+   * after which the word rhymes by itself and the line is stale; a Demotion
+   * overrules it; and a Decline has taken it off the list.
+   */
+  it("leaves out a line that is stale, demoted or Declined", () => {
+    const read = (j: Partial<JudgeLeftovers>, declines: Decline[] = [], extra: Extra = {}) =>
+      readCandidateQueue([], SCHEDULE, declines, contextFor(extra), [], judge({ unconfirmed: LISTED_HAT, ...j })).unconfirmedRhymes;
+
+    expect(read({})).toHaveLength(1);
+    expect(read({}, [], { pronunciations: [["hat", [["HH", "EY1", "T"]]]] })).toEqual([]);
+    expect(read({ demotedWords: new Set(["hat"]) })).toEqual([]);
+    expect(read({}, [{ word: "hat", rhymeKey: ATE }])).toEqual([]);
   });
 });

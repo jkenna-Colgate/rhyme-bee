@@ -34,7 +34,7 @@ function jot(word: string, seedWord: string, seedRhymeKey: string): SupplementCa
 
 /** One Candidate in a named state, with the evidence that state carries. */
 function read(word: string, seedWord: string, key: string, state: ReadCandidate["state"]): ReadCandidate {
-  const identity = { word, candidate: jot(word, seedWord, key) };
+  const identity = { word, candidate: jot(word, seedWord, key), judged: null };
   switch (state) {
     case "resolved":
       return { ...identity, state, readings: [{ phonemes: ["T", "AA1", "K", "T"], key }] };
@@ -44,6 +44,8 @@ function read(word: string, seedWord: string, key: string, state: ReadCandidate[
       return { ...identity, state, readings: [{ phonemes: ["EY1", "T"], key }] };
     case "is-a-name":
       return { ...identity, state };
+    case "suggested-demotion":
+      return { ...identity, state, reason: "proper-noun" };
     case "needs-correction":
       return { ...identity, state, readings: [{ phonemes: ["EY1", "T"], key: ATE }] };
     case "addable":
@@ -58,6 +60,7 @@ const QUEUE: CandidateQueueReadout = {
   // The queue's second section (#181), which the day panel does not select
   // from: a deferred reading is aimed at a Rhyme Key and belongs to no date.
   deferred: { entries: [], outstanding: 0 },
+  unconfirmedRhymes: [],
   groups: [
     {
       rhymeKey: DOCKED,

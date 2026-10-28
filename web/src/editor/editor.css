@@ -908,6 +908,22 @@ code {
   color: #6b6558;
 }
 
+/* The Judge's ruling beside a card, and the Demotion it suggests (#269). */
+.editor-candidate-judged {
+  flex-basis: 100%;
+  margin: 0.25rem 0;
+  font-size: 0.78rem;
+  color: #6b6558;
+}
+
+.editor-candidate-judged q {
+  font-style: italic;
+}
+
+.editor-candidate-suggested {
+  font-size: 0.72rem;
+}
+
 .editor-candidate-evidence code {
   margin-right: 0.5rem;
   font-size: 0.72rem;

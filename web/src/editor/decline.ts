@@ -67,6 +67,8 @@ import type { DemotionReason } from "../../../src/demotions.ts";
 export interface DeclineWriteResult {
   /** The ruling as written, shown rather than described. */
   appended: Decline;
+  /** True when the Decline also took an Unconfirmed Rhyme's line off the list (#269). */
+  unlisted: boolean;
 }
 
 /**

@@ -37,10 +37,12 @@ import { callRoute as call } from "./routeCall.ts";
 
 let dir: string;
 let path: string;
+let unconfirmedPath: string;
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), "rhyme-bee-decline-route-"));
   path = join(dir, "declines.txt");
+  unconfirmedPath = join(dir, "unconfirmed-rhymes.txt");
 });
 
 afterEach(() => {
@@ -50,7 +52,7 @@ afterEach(() => {
 /** The route over a temp file, so nothing ever touches the repository's `data/`. */
 function endpoint(file?: string) {
   if (file !== undefined) writeFileSync(path, file);
-  return editorMiddleware(editorDeclineSpec({ declinesPath: path }));
+  return editorMiddleware(editorDeclineSpec({ declinesPath: path, unconfirmedPath }));
 }
 
 /** What is on disk now, parsed — the only claim worth making about a write. */
@@ -81,7 +83,29 @@ describe("writing a Decline", () => {
 
     expect(JSON.parse(answered.body)).toEqual({
       appended: { word: "docked", rhymeKey: "AA K T" },
+      unlisted: false,
     });
+  });
+
+  /**
+   * Declining an Unconfirmed Rhyme is the ordinary Decline, and it takes the
+   * line off the list (#269), so the next build gives the word the engine's own
+   * verdict on that key again. Only that pair's line goes.
+   */
+  it("takes the pair's Unconfirmed Rhyme off the list, and leaves the rest as written", async () => {
+    const list = [
+      "# a comment the list keeps",
+      "clique judge:claude-sonnet-5-5 overrule high IH K",
+      "clique judge:claude-sonnet-5-5 overrule high IY K",
+      "hat judge:claude-sonnet-5-5 overrule high EY T",
+      "",
+    ].join("\n");
+    writeFileSync(unconfirmedPath, list);
+    const answered = await call(endpoint(), post({ word: "clique", rhymeKey: "IH K" }));
+
+    expect(JSON.parse(answered.body).unlisted).toBe(true);
+    expect(onDisk()).toEqual([{ word: "clique", rhymeKey: "IH K" }]);
+    expect(readFileSync(unconfirmedPath, "utf8")).toBe(list.replace("clique judge:claude-sonnet-5-5 overrule high IH K\n", ""));
   });
 
   /**
@@ -206,7 +230,7 @@ describe("what the endpoint refuses, and writes nothing for", () => {
     // A path whose parent is a *file* cannot be written, and the cause names it.
     writeFileSync(path, "");
     const handler = editorMiddleware(
-      editorDeclineSpec({ declinesPath: join(path, "declines.txt") }),
+      editorDeclineSpec({ declinesPath: join(path, "declines.txt"), unconfirmedPath }),
     );
     const answered = await call(handler, post({ word: "docked", rhymeKey: "AA K T" }));
 
