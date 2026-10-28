@@ -15,7 +15,7 @@ import type {
 import type { JudgeRulingRecord } from "../../src/judgeLanding.ts";
 import type { SupplementCandidate } from "../../src/supplementCandidate.ts";
 import { cardFor, evidenceFor, suggestedDemotion, unconfirmedForDay } from "../src/editor/dayCandidates.ts";
-import { confirmProposal, judgeRulingSentence } from "../src/editor/judgeRuling.ts";
+import { confirmGesture, confirmProposal, judgeRulingSentence } from "../src/editor/judgeRuling.ts";
 
 const record = (over: Partial<JudgeRulingRecord> = {}): JudgeRulingRecord => ({
   date: "2026-10-28",
@@ -92,7 +92,10 @@ describe("a suggested Demotion", () => {
 });
 
 describe("the day's Unconfirmed Rhymes", () => {
-  const queue = { unconfirmedRhymes: [listed("clique", "IY K"), listed("clique", "IH K"), listed("pique", "IY K")] } as CandidateQueueReadout;
+  const queue = {
+    groups: [],
+    unconfirmedRhymes: [listed("clique", "IY K"), listed("clique", "IH K"), listed("pique", "IY K")],
+  } as unknown as CandidateQueueReadout;
 
   it("are the standing lines on the day's own Rhyme Key", () => {
     expect(unconfirmedForDay(queue, "IY K").map((u) => u.line.word)).toEqual(["clique", "pique"]);
@@ -116,5 +119,49 @@ describe("the day's Unconfirmed Rhymes", () => {
 
   it("offer nothing to confirm when there is no reading, so the editor asks an agent", () => {
     expect(confirmProposal(listed("clique", "IY K", { judged: null, proposal: null }))).toBeNull();
+  });
+});
+
+/**
+ * Which gesture confirms a line. The correction route answers
+ * `nothing-to-correct` for a word with no reading without asking anyone, so a
+ * Missing Reading with nothing proposed would be stuck on an ask; its confirm
+ * is the add instead.
+ */
+describe("how an Unconfirmed Rhyme is confirmed", () => {
+  it("approves the Judge's reading when there is one, whatever the engine reads", () => {
+    expect(confirmGesture(listed("clique", "IY K"))).toBe("approve");
+    expect(confirmGesture(listed("clique", "IY K", { readings: [] }))).toBe("approve");
+  });
+
+  it("asks an agent for a correction on an Overrule with nothing proposed", () => {
+    expect(confirmGesture(listed("clique", "IY K", { judged: null, proposal: null }))).toBe("ask");
+  });
+
+  it("queues an add for a Missing Reading with nothing proposed", () => {
+    expect(confirmGesture(listed("clique", "IY K", { judged: null, readings: [], proposal: null }))).toBe("add");
+  });
+});
+
+/**
+ * A Candidate on a listed pair reads `unconfirmed-rhyme` and carries the line,
+ * so the pair is drawn on the Candidate's card and left off the day's list.
+ */
+describe("a Candidate on a listed pair", () => {
+  const line = listed("clique", "IY K");
+  const appealed: ReadCandidate = { word: "clique", candidate: CAPTURED, judged: record(), state: "unconfirmed-rhyme", listed: line };
+  const queue = {
+    unconfirmedRhymes: [line, listed("pique", "IY K"), listed("clique", "IH K")],
+    groups: [{ rhymeKey: "IY K", day: null, seedWords: ["week"], candidates: [appealed], outstanding: 1 }],
+  } as unknown as CandidateQueueReadout;
+
+  it("draws the line's own card, weighed against the engine's reading", () => {
+    expect(cardFor(appealed)).toBe("unconfirmed");
+    expect(evidenceFor(appealed)).toEqual({ readings: line.readings, relatives: [], composed: null });
+  });
+
+  it("is left off the day's Unconfirmed Rhymes, and a listed pair with no Candidate is not", () => {
+    expect(unconfirmedForDay(queue, "IY K").map((u) => u.line.word)).toEqual(["pique"]);
+    expect(unconfirmedForDay(queue, "IH K").map((u) => u.line.word)).toEqual(["clique"]);
   });
 });

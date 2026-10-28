@@ -837,10 +837,10 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
  * Report a Submission the player believes should have counted as an Answer. One
  * tap on a rejection, or on anything shown as a Bonus Word (#258), sends the
  * word with its Seed Word, the Seed's Rhyme Key, the verdict it was given and
- * the reading the engine used: everything the supplement judge needs, so the
- * player never retypes the word or explains themselves. The judging (add /
- * stress-correction / derive-from-inflection / defer) happens later against the
- * queue this feeds.
+ * the reading the engine used: everything a ruling on it needs, so the player
+ * never retypes the word or explains themselves. The ruling (add /
+ * stress-correction / derive-from-inflection / defer) is made later against the
+ * queue this feeds, the Judge's first and then the editor's.
  *
  * Reporting is out of band and may fail freely: the verdict was already reached
  * in the browser (ADR-0013), so an endpoint that is down or unreachable costs a
