@@ -2,10 +2,11 @@
  * The Judge's leg of a run, shared by `judge` and `synthetic-player` (#250):
  * read what the index knows about each word, send the rhyme prompt, ask the
  * wordhood question of the rulings that would act, and classify where each would
- * land. It writes no game data; the caller writes the run report.
+ * land. `landJudgeLeg` writes what the rulings earn (#266); the caller writes the
+ * run report.
  */
 
-import { readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { loadRhymeIndex } from "../src/loader.ts";
 import {
@@ -23,10 +24,12 @@ import {
   type WordFacts,
   type WordhoodRuling,
 } from "../src/judge.ts";
+import { land, parseRulingRecords, serialiseRulingRecord, supplementAppend, type JudgeRulingRecord, type Landings } from "../src/judgeLanding.ts";
 import type { RulesLexicon } from "../src/judgeRules.ts";
 import { applyNormalisation } from "../src/normalise.ts";
 import { rhymeKeyOf, type RhymeKey } from "../src/phonology.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
+import { serialiseUnconfirmedRhyme } from "../src/unconfirmedRhymes.ts";
 import { indexArtifactPath } from "./indexArtifact.ts";
 import { callModel, inParallel, root } from "./modelCall.ts";
 
@@ -41,7 +44,6 @@ export function wordFacts(index: RhymeIndex, word: string): WordFacts {
   return {
     isWord: index.hasWord(word),
     readings: index.readingsOf(word).map((r) => r.pronunciation),
-    unmergedReadings: index.unmergedReadingsOf(word),
   };
 }
 
@@ -73,10 +75,47 @@ export function seedKeyNow(index: RhymeIndex, seedWord: string, seedReading: str
   throw new Error(`cannot tell which Rhyme Key ${seedWord} is pinned to now (it has ${keys.join(", ") || "none"})`);
 }
 
+function scheduledDays(): { seed: string; rhymeKey: string }[] {
+  return (JSON.parse(readFileSync(resolve(root, "data/schedule.json"), "utf8")) as { days: { seed: string; rhymeKey: string }[] }).days;
+}
+
 /** The Seed Word's key on the Schedule, where it has a day. */
 export function scheduledKey(seedWord: string): RhymeKey | undefined {
-  const schedule = JSON.parse(readFileSync(resolve(root, "data/schedule.json"), "utf8")) as { days: { seed: string; rhymeKey: string }[] };
-  return schedule.days.find((d) => d.seed === seedWord)?.rhymeKey;
+  return scheduledDays().find((d) => d.seed === seedWord)?.rhymeKey;
+}
+
+const RULINGS = resolve(root, "data/judge-rulings.jsonl");
+const SUPPLEMENT = resolve(root, "data/supplement.dict");
+const UNCONFIRMED = resolve(root, "data/unconfirmed-rhymes.txt");
+
+/** Every Candidate the Judge has ruled on, from `data/judge-rulings.jsonl`. A line that does not read is named and dropped. */
+export function readRulings(): JudgeRulingRecord[] {
+  if (!existsSync(RULINGS)) return [];
+  const { records, malformed } = parseRulingRecords(readFileSync(RULINGS, "utf8"));
+  for (const line of malformed) console.error(`judge-rulings.jsonl: dropped a line that does not read: ${line}`);
+  return records;
+}
+
+/**
+ * Land a leg's rulings (#266): what each earns, written to the game's data,
+ * and every ruling recorded so it is never sent again. The record is written
+ * last, so a run that stops part way sends again what it had not yet recorded.
+ * The index is not rebuilt here.
+ */
+export function landJudgeLeg(leg: JudgeLeg, opts: { model: string; date: string }): Landings {
+  const landings = land(leg.items, { ...opts, scheduledSeeds: new Set(scheduledDays().map((d) => d.seed)) });
+  const supplement = supplementAppend(readFileSync(SUPPLEMENT, "utf8"), landings.readings);
+  if (supplement) appendFileSync(SUPPLEMENT, supplement);
+  appendLines(UNCONFIRMED, landings.unconfirmedRhymes.map(serialiseUnconfirmedRhyme));
+  appendLines(RULINGS, landings.records.map(serialiseRulingRecord));
+  return landings;
+}
+
+/** Append whole lines, starting a fresh line if the file's last one was left open. */
+function appendLines(path: string, lines: readonly string[]): void {
+  if (lines.length === 0) return;
+  const open = existsSync(path) && !/(^|\n)$/.test(readFileSync(path, "utf8"));
+  appendFileSync(path, `${open ? "\n" : ""}${lines.join("")}`);
 }
 
 export interface JudgeItem {

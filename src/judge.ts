@@ -1,29 +1,48 @@
 /**
  * The Judge (GLOSSARY.md) as an instrument: the prompts it is sent, how its
  * replies are read, the reading check, which Candidates it is asked about, and
- * where a ruling *would* land (#250). It calls no model and writes no file. The
+ * what a ruling earns (#250). It calls no model and writes no file. The
  * callers in `scripts/` own the `claude -p` call, the cache and the run report,
  * and one module serves the `judge` command, the Synthetic Player, and later the
  * Batch and the Appeals job of ADR-0021.
  *
  * The rhyme prompt is the prototype's `--rules 2` wording with no evidence shown
- * (`prototype/238-judge-margin`), carried across verbatim, because that is the
- * wording the margin was measured on (#238). A change to it is measured with
- * `judge --score` before it is trusted. The wordhood question is asked apart
+ * (`prototype/238-judge-margin`), because that is the wording the margin was
+ * measured on (#238), with a line for every Normalisation that has shipped
+ * (#266). A change to it is measured with `judge --score` before it is trusted. The wordhood question is asked apart
  * from it: folded into the rhyme prompt it caught the names and cost real Rhymes
  * their high confidence.
  *
- * Classifying a ruling is reported and never acted on. Where a ruling lands is
- * ADR-0017's table, built in #266.
+ * Classifying a ruling says what ADR-0017's table gives it, and acts on nothing.
+ * `judgeLanding.ts` turns a classified ruling into the writes it earns (#266).
  */
 
-import { applyNormalisation } from "./normalise.ts";
-import { bareSound, isVowel, isVowelSound, rhymeKeyOf, stressOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
+import { applyNormalisation, NORMALISATION_NAMES } from "./normalise.ts";
+import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
 import { schwaTwinOf } from "./schwaTwins.ts";
 
 // ---- the rhyme prompt -------------------------------------------------------
 
-/** The rules of #232 in the `--rules 2` wording, verbatim. */
+/**
+ * The sounds the Judge must hear as one: a line for every Normalisation that
+ * has shipped, under the rule's name (#241, #266). Without the tap's line it
+ * refused `cruder` for `computer` five times in five. A rule that ships adds its
+ * line here and `judge --score` is run again before the writes are trusted; a
+ * test holds these names to `NORMALISATION_NAMES`. The weak-vowel, glide-r and
+ * syllabic lines are #232's wording, carried across verbatim. A new line's
+ * examples are kept off the label sets, or the score on them is no longer blind.
+ */
+export const NORMALISATION_LINES: Readonly<Record<string, string>> = {
+  "cot-caught-merger": `Except before r, the vowels of "cot" and "caught" (AA and AO) are one sound: "talked" for "docked", "ball" for "doll". Before r they stay apart: "for" is not a Rhyme for "far".`,
+  "syllabic-consonant": `After "eye", "oh", "oo", "ow" or "oy" (AY, OW, UW, AW, OY), a weak "ul" (AH0 L) and plain l are read as each other, and so are their -s and -ed forms: "trial" for "file", "jewel" for "rule", "towels" for "howls".`,
+  "weak-vowel-merge": `After the stressed vowel of the Rhyme Key, weak "ih" and weak "uh" (ARPAbet IH0 and AH0) are one sound: "utility" for "facility", "annotated" for "abated", "direction" for "collection".`,
+  tap: `A t or a d with a vowel or r before it and a weak vowel after it is one sound, the quick tap: "ladder" for "latter", "medal" for "petal", "disorder" for "quarter". Not after "eye" or "ow" ("rider" is not a Rhyme for "writer", nor "crowded" for "shouted"), and not where the next syllable is a weak "n" ("sudden" is not a Rhyme for "button").`,
+  "stress-promotion": `A full vowel in a closed last syllable carries a secondary stress even where a dictionary marks it unstressed: "candidate" for "ate", "module" for "rule". Never a weak vowel ("chocolate" is not a Rhyme for "ate"), and never a vowel closed only by an -s or -ed ending ("arrows" is not a Rhyme for "nose").`,
+  "vowel-before-r": `Before r, a stressed "ee" and "ih" are one sound (IY and IH), and so are "oo" and "uu" (UW and UH), and "ay" and "eh" (EY and EH): "near" for "here", "tour" for "poor", "menswear" for "air". Before r and a vowel, "a" and "eh" (AE and EH) are one sound too: "barbaric" for "generic". "car" and "care" stay apart, and so do "cure" and "core".`,
+  "glide-r": `After "eye", "ow" or "oy" (AY, AW, OY), "er" and plain r are read as each other: "higher" for "fire", "flower" for "hour".`,
+};
+
+/** The rules of #232 in the `--rules 2` wording, with a line for every shipped Normalisation (#266). */
 export const RHYME_RULES = `You are ruling on Candidates for Rhyming Bee, a daily word game. The player is given a Seed Word and types words that rhyme with it. Each Candidate below is a word a player typed that the game did not score. Every Candidate is on the game's word list, so do not rule on whether it is a word, and do not rule on how well known it is. Rule on one thing: is the pair a Rhyme? A Rhyme is what scores.
 
 The game adjudicates in merged General American (cot and caught are the same vowel). It is generous about stress and strict about sound.
@@ -36,9 +55,7 @@ NOT A RHYME:
 - An extra or missing syllable ("serial" for "meal", "betrayal" for "male"), except for the r and l readings below.
 
 READ AS THE SAME:
-- After the stressed vowel of the Rhyme Key, weak "ih" and weak "uh" (ARPAbet IH0 and AH0) are one sound: "utility" for "facility", "annotated" for "abated", "direction" for "collection".
-- After "eye", "ow" or "oy" (AY, AW, OY), "er" and plain r are read as each other: "higher" for "fire", "flower" for "hour".
-- After "eye", "oh", "oo", "ow" or "oy" (AY, OW, UW, AW, OY), a weak "ul" (AH0 L) and plain l are read as each other, and so are their -s and -ed forms: "trial" for "file", "jewel" for "rule", "towels" for "howls".
+${NORMALISATION_NAMES.map((name) => `- ${NORMALISATION_LINES[name]}`).join("\n")}
 
 ALSO A RHYME: a homophone of the Seed Word; a longer word whose last part is the Seed Word; a compound, whose last part keeps a secondary stress ("carsick" and "drumstick" for "trick").
 
@@ -185,7 +202,7 @@ export function parseWordhoodReply(raw: string, words: readonly string[]): Wordh
 const PHONEME = /^[A-Z]{1,2}[012]?$/;
 
 /** A reading's phonemes, or null when it is not ARPAbet. */
-function phonemesOf(reading: string | null): Pronunciation | null {
+export function phonemesOf(reading: string | null): Pronunciation | null {
   const parts = (reading ?? "").trim().toUpperCase().split(/\s+/).filter(Boolean);
   return parts.length && parts.every((p) => PHONEME.test(p)) ? parts : null;
 }
@@ -227,9 +244,7 @@ export type SetAside =
   /** A reading already has the key: what is left is a Tier, or nothing. */
   | "already-rhymes"
   /** Off the word list: a wordhood question, with no right reading to rule on. */
-  | "not-on-word-list"
-  /** The shape #232 did not rule (`lunatic`, `heretic`). #233 has ruled, and #266 drops this. */
-  | "lunatic-shape";
+  | "not-on-word-list";
 
 export type JudgeQuestion = { ask: WhatTheGameKnew } | { setAside: SetAside };
 
@@ -238,36 +253,18 @@ export interface WordFacts {
   isWord: boolean;
   /** The readings a Rhyme is decided on. */
   readings: readonly Pronunciation[];
-  /** The same readings with each weak vowel as the dictionary wrote it. */
-  unmergedReadings: readonly Pronunciation[];
 }
 
-/** Whether the Judge is asked about a word typed for a Rhyme Key, and as what. */
+/**
+ * Whether the Judge is asked about a word typed for a Rhyme Key, and as what.
+ * The `lunatic` shape (`heretic` for `trick`) is asked like any other since
+ * #233 ruled on it: the game holds a reading for it, so it is an Overrule and
+ * lands at most as an Unconfirmed Rhyme (#266).
+ */
 export function judgeQuestion(facts: WordFacts, key: RhymeKey): JudgeQuestion {
   if (!facts.isWord) return { setAside: "not-on-word-list" };
   if (readingsReachKey(facts.readings, key)) return { setAside: "already-rhymes" };
-  if (facts.readings.length === 0) return { ask: "missing-reading" };
-  if (facts.unmergedReadings.some((r) => disputedShape(r, key))) return { setAside: "lunatic-shape" };
-  return { ask: "overrule" };
-}
-
-const sounds = (p: Pronunciation) => p.map(bareSound);
-const vowelsAt = (p: Pronunciation) => p.flatMap((x, i) => (isVowel(x) ? [i] : []));
-const WEAK_CAPABLE = new Set(["IH", "AH", "ER"]);
-
-/**
- * The shape #232 did not rule (`lunatic`, `heretic`, `maverick`, `synonym`): a
- * weak-capable vowel in the last syllable, with an unstressed syllable between
- * it and the stress. Read off a reading with its weak vowels as the dictionary
- * wrote them.
- */
-export function disputedShape(reading: Pronunciation, key: RhymeKey): boolean {
-  const parts = key.split(" ");
-  if (parts.filter(isVowelSound).length !== 1 || !WEAK_CAPABLE.has(parts[0]!)) return false;
-  const v = vowelsAt(reading);
-  if (v.length < 3) return false;
-  const last = v[v.length - 1]!, penult = v[v.length - 2]!;
-  return sounds(reading.slice(last)).join(" ") === key && stressOf(reading[penult]!) === 0;
+  return { ask: facts.readings.length === 0 ? "missing-reading" : "overrule" };
 }
 
 // ---- where a ruling would land -------------------------------------------------

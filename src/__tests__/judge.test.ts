@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import {
   classifyRuling,
   judgeQuestion,
+  NORMALISATION_LINES,
   parseRhymeReply,
   parseWordhoodReply,
   readingReachesKey,
@@ -16,6 +17,7 @@ import {
   wordhoodPrompt,
   type RhymeRuling,
 } from "../judge.ts";
+import { NORMALISATION_NAMES } from "../normalise.ts";
 
 const ruling = (over: Partial<RhymeRuling> = {}): RhymeRuling => ({
   verdict: "rhyme",
@@ -36,6 +38,17 @@ describe("the rhyme prompt", () => {
     expect(prompt).toContain('\nCandidates:\n- "grates" for the Seed Word "plates"\n- "chocolate" for the Seed Word "ate"\n');
     expect(prompt).toContain('"verdict": "rhyme" | "no-rhyme"');
     expect(prompt).not.toContain("not-a-word");
+  });
+
+  it("states every Normalisation that has shipped as a sound to hear as one, in the order they run", () => {
+    expect(Object.keys(NORMALISATION_LINES).sort()).toEqual([...NORMALISATION_NAMES].sort());
+    const prompt = rhymePrompt([{ word: "cruder", seedWord: "computer" }]);
+    const said = NORMALISATION_NAMES.map((name) => prompt.indexOf(`
+- ${NORMALISATION_LINES[name]}
+`));
+    expect(said.every((at) => at > prompt.indexOf("READ AS THE SAME:"))).toBe(true);
+    expect(said).toEqual([...said].sort((a, b) => a - b));
+    expect(prompt).toContain(`"ladder" for "latter"`);
   });
 
   it("carries the r and l readings and the regional-reading sentence the margin was measured with", () => {
@@ -127,11 +140,7 @@ describe("the reading check", () => {
 
 describe("which Candidates the Judge is asked about", () => {
   const split = (r: string) => r.split(" ");
-  const facts = (readings: string[] = [], unmerged: string[] = readings, isWord = true) => ({
-    isWord,
-    readings: readings.map(split),
-    unmergedReadings: unmerged.map(split),
-  });
+  const facts = (readings: string[] = [], isWord = true) => ({ isWord, readings: readings.map(split) });
 
   it("asks about a word the game holds no reading for, as a Missing Reading", () => {
     expect(judgeQuestion(facts(), "EY T S")).toEqual({ ask: "missing-reading" });
@@ -146,13 +155,12 @@ describe("which Candidates the Judge is asked about", () => {
   });
 
   it("does not ask about a word off the word list: that is a wordhood question with no reading to rule on", () => {
-    expect(judgeQuestion(facts([], [], false), "EY T")).toEqual({ setAside: "not-on-word-list" });
+    expect(judgeQuestion(facts([], false), "EY T")).toEqual({ setAside: "not-on-word-list" });
   });
 
-  it("keeps the lunatic shape from the Judge, read off the weak vowel the dictionary wrote", () => {
-    // `heretic` for `trick`: an unstressed syllable between the stress and a
-    // last syllable that matches the key. #233 has since ruled, and #266 drops this.
-    expect(judgeQuestion(facts(["HH EH1 R AH0 D AH0 K"], ["HH EH1 R AH0 T IH0 K"]), "IH K")).toEqual({ setAside: "lunatic-shape" });
+  it("asks about the lunatic shape like any other, as the Overrule it is (#233)", () => {
+    // `heretic` for `trick`: the game holds a reading, with the stress two syllables back.
+    expect(judgeQuestion(facts(["HH EH1 R AH0 D AH0 K"]), "IH K")).toEqual({ ask: "overrule" });
   });
 });
 

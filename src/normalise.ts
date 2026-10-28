@@ -728,6 +728,9 @@ const RULES: readonly NormalisationRule[] = [
   glideR,
 ];
 
+/** Every rule that has shipped, by name, in application order. The Judge's prompt states each one (#266). */
+export const NORMALISATION_NAMES: readonly string[] = RULES.map((rule) => rule.name);
+
 /**
  * The readings of one word, after every rule. Duplicates are collapsed: a rule
  * that replaces can make two of a word's readings identical (CMUdict lists some

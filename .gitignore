@@ -62,6 +62,10 @@ desktop.ini
 # of what a model said on a day.
 !/data/judge-labels/
 !/data/judge-runs/
+# Every Candidate the Judge has ruled on and what landed (#266). It is what keeps
+# a Candidate from being sent twice, and where the Editor's Pass reads the
+# Judge's ruling from, so a fresh clone without it would re-draw every ruling.
+!/data/judge-rulings.jsonl
 # Raw model output from those runs, kept only so an interrupted run resumes
 # rather than pays twice. Not in .scratch/, which is for drafts.
 .model-cache/

@@ -18,7 +18,7 @@
  * Weak Rhyme is never asked about; here it is simply "no Points".
  */
 
-import { disputedShape, readingsReachKey } from "./judge.ts";
+import { readingsReachKey } from "./judge.ts";
 import { applyNormalisation } from "./normalise.ts";
 import { bareSound, isVowel, isVowelSound, stressOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
 
@@ -59,6 +59,24 @@ function asBuilt(readings: readonly Pronunciation[]): Pronunciation[] {
 
 const sounds = (p: Pronunciation) => p.map(bareSound);
 const vowelsAt = (p: Pronunciation) => p.flatMap((x, i) => (isVowel(x) ? [i] : []));
+
+const WEAK_CAPABLE = new Set(["IH", "AH", "ER"]);
+
+/**
+ * The shape #232 did not rule (`lunatic`, `heretic`, `maverick`, `synonym`): a
+ * weak-capable vowel in the last syllable, with an unstressed syllable between
+ * it and the stress. Read off a reading with its weak vowels as the dictionary
+ * wrote them. The Judge is asked about it since #233 ruled (#266); the rules
+ * still leave it unlabelled, as the label sets were cut under #232.
+ */
+function disputedShape(reading: Pronunciation, key: RhymeKey): boolean {
+  const parts = key.split(" ");
+  if (parts.filter(isVowelSound).length !== 1 || !WEAK_CAPABLE.has(parts[0]!)) return false;
+  const v = vowelsAt(reading);
+  if (v.length < 3) return false;
+  const last = v[v.length - 1]!, penult = v[v.length - 2]!;
+  return sounds(reading.slice(last)).join(" ") === key && stressOf(reading[penult]!) === 0;
+}
 
 /** The last syllable's rime is the key, and the stress falls earlier: at most a Weak Rhyme, so no Points. */
 function matchesUnstressed(reading: Pronunciation, key: RhymeKey): boolean {
