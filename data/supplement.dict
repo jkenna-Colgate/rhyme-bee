@@ -644,3 +644,48 @@ toothbrush T UW1 TH B R AH2 SH
 viaduct V AY1 AH0 D AH2 K T
 # viaducts (#253): the plural of `viaduct`, the same mark; joins AH K T S (#233).
 viaducts V AY1 AH0 D AH2 K T S
+
+# --- Corrections (`-ship` carries a beat, ruled 2026-10-28, #253) ---
+#
+# `ship` stands alone as a word and keeps its full vowel inside a compound, so
+# `-ship` is said with a beat: 91 `-ship` words already read SH IH2 P and score
+# on `ship`. CMUdict leaves the words below unstressed there, so each is given
+# IH2 on its last vowel and nothing else changes. `worship` is "WUR-shup" and is
+# left alone. Written in #253.
+
+# acquaintanceship (#253): -ship carries a beat; joins IH P with `ship`.
+acquaintanceship AH0 K W EY1 N T AH0 N S SH IH2 P
+# amidships (#253): -ships carries a beat; joins IH P S with `ships`.
+amidships AH0 M IH1 D SH IH2 P S
+# entrepreneurship (#253): -ship carries a beat; joins IH P with `ship`.
+entrepreneurship AA2 N T R AH0 P R AH0 N ER1 SH IH2 P
+# friendship (#253): -ship carries a beat on both readings; joins IH P with `ship`.
+friendship F R EH1 N D SH IH2 P
+friendship(1) F R EH1 N SH IH2 P
+# friendships (#253): -ships carries a beat on both readings; joins IH P S with `ships`.
+friendships F R EH1 N D SH IH2 P S
+friendships(1) F R EH1 N SH IH2 P S
+# guardianship (#253): -ship carries a beat; joins IH P with `ship`.
+guardianship G AA1 R D IY0 AH0 N SH IH2 P
+# hardship (#253): -ship carries a beat; joins IH P with `ship`.
+hardship HH AA1 R D SH IH2 P
+# hardships (#253): -ships carries a beat; joins IH P S with `ships`.
+hardships HH AA1 R D SH IH2 P S
+# horsemanship (#253): -ship carries a beat; joins IH P with `ship`.
+horsemanship HH AO1 R S M AH0 N SH IH2 P
+# interrelationship (#253): -ship carries a beat; joins IH P with `ship`.
+interrelationship IH1 N T ER0 R IY0 L EY1 SH AH0 N SH IH2 P
+# kingship (#253): -ship carries a beat; joins IH P with `ship`.
+kingship K IH1 NG SH IH2 P
+# lordship (#253): -ship carries a beat; joins IH P with `ship`.
+lordship L AO1 R D SH IH2 P
+# marksmanship (#253): -ship carries a beat; joins IH P with `ship`.
+marksmanship M AA1 R K S M AH0 N SH IH2 P
+# ministership (#253): -ship carries a beat; joins IH P with `ship`.
+ministership M IH1 N IH0 S T ER0 SH IH2 P
+# musicianship (#253): -ship carries a beat; joins IH P with `ship`.
+musicianship M Y UW0 Z IH1 SH AH0 N SH IH2 P
+# township (#253): -ship carries a beat; joins IH P with `ship`.
+township T AW1 N SH IH2 P
+# townships (#253): -ships carries a beat; joins IH P S with `ships`.
+townships T AW1 N SH IH2 P S

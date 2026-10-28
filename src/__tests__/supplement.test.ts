@@ -367,6 +367,13 @@ describe("the hand-written readings of #253", () => {
     ["lookup", [["L", "UH1", "K", "AH0", "P"]]],
     ["cup", [["K", "AH1", "P"]]],
     ["magic", [["M", "AE1", "JH", "IH0", "K"]]],
+    // `-ship` carries a beat (ruled 2026-10-28); `worship` is "WUR-shup".
+    ["friendship", [["F", "R", "EH1", "N", "D", "SH", "IH0", "P"], ["F", "R", "EH1", "N", "SH", "IH0", "P"]]],
+    ["hardship", [["HH", "AA1", "R", "D", "SH", "IH0", "P"]]],
+    ["amidships", [["AH0", "M", "IH1", "D", "SH", "IH0", "P", "S"]]],
+    ["worship", [["W", "ER1", "SH", "AH0", "P"], ["W", "ER1", "SH", "IH0", "P"]]],
+    ["ship", [["SH", "IH1", "P"]]],
+    ["ships", [["SH", "IH1", "P", "S"]]],
   ];
   const words = UPSTREAM.map(([w]) => w);
   const upstream: TestInputs = {
@@ -392,6 +399,9 @@ describe("the hand-written readings of #253", () => {
     ["trick", "drumstick"],
     ["word", "blackbird"],
     ["cup", "lookup"],
+    ["ship", "friendship"],
+    ["ship", "hardship"],
+    ["ships", "amidships"],
   ])("scores %s for %s once the supplement is read, and not before", (seed, word) => {
     expect(before.adjudicate(before.pinSeed(seed), word).outcome).not.toBe("answer");
     expect(after.adjudicate(after.pinSeed(seed), word).outcome).toBe("answer");
@@ -408,6 +418,18 @@ describe("the hand-written readings of #253", () => {
       reason: "does-not-rhyme",
     });
     expect(after.adjudicate(after.pinSeed("freer"), "skier").outcome).toBe("answer");
+  });
+
+  it("gives -ship its beat on every reading, and leaves worship said WUR-shup", () => {
+    expect(before.rhymeKeysOf("friendship")).not.toContain("IH P");
+    for (const word of ["friendship", "hardship"]) expect(after.rhymeKeysOf(word)).toEqual(["IH P"]);
+    expect(after.rhymeKeysOf("amidships")).toEqual(["IH P S"]);
+    // Both of friendship's readings, with and without the D, carry the beat.
+    const friendship = after.readingsOf("friendship").map((r) => r.pronunciation.join(" "));
+    expect(friendship).toHaveLength(2);
+    for (const reading of friendship) expect(reading).toMatch(/SH IH2 P$/);
+    expect(after.rhymeKeysOf("worship")).not.toContain("IH P");
+    expect(after.adjudicate(after.pinSeed("ship"), "worship").outcome).not.toBe("answer");
   });
 
   it("leaves a last syllable said with no beat unscored", () => {
