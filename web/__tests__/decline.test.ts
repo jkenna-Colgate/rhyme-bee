@@ -36,7 +36,7 @@ const RECORD: SupplementCandidate = {
 };
 
 function candidate(state: ReadCandidate["state"]): ReadCandidate {
-  const identity = { word: RECORD.word, candidate: RECORD };
+  const identity = { word: RECORD.word, candidate: RECORD, judged: null };
   switch (state) {
     case "resolved":
       return { ...identity, state, readings: [] };
@@ -46,6 +46,8 @@ function candidate(state: ReadCandidate["state"]): ReadCandidate {
       return { ...identity, state, readings: [] };
     case "is-a-name":
       return { ...identity, state };
+    case "suggested-demotion":
+      return { ...identity, state, reason: "not-a-known-word" };
     case "needs-correction":
       return { ...identity, state, readings: [] };
     case "addable":

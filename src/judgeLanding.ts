@@ -32,6 +32,7 @@
  */
 
 import { normaliseWord } from "./cmudict.ts";
+import { declineKey, declinedPairs, type Decline } from "./declines.ts";
 import {
   phonemesOf,
   type Classification,
@@ -80,34 +81,40 @@ export interface RuledCandidate {
   classification?: Classification;
 }
 
-const pair = (word: string, rhymeKey: RhymeKey) => `${normaliseWord(word)} ${rhymeKey}`;
+/** How a pair is looked up in the record: the word and the Rhyme Key together. */
+export const rulingKey = (word: string, rhymeKey: RhymeKey) => `${normaliseWord(word)} ${rhymeKey}`;
 
 /** The pairs already ruled on, each with the record that ruled it. */
 export function ruledPairs(records: readonly JudgeRulingRecord[]): Map<string, JudgeRulingRecord> {
-  return new Map(records.map((r) => [pair(r.word, r.rhymeKey), r]));
+  return new Map(records.map((r) => [rulingKey(r.word, r.rhymeKey), r]));
 }
 
 /**
- * Which Candidates go to the Judge: each pair once, and none already ruled on.
- * A Candidate the Judge would not be asked about stays in `send`, so the caller
- * can report it set aside.
+ * Which Candidates go to the Judge: each pair once, none already ruled on, and
+ * none the editor has Declined, because the editor rules after the Judge and a
+ * Decline is a ruling already made (#269). A Candidate the Judge would not be
+ * asked about stays in `send`, so the caller can report it set aside.
  */
 export function planJudging<T extends { word: string; rhymeKey: RhymeKey }>(
   candidates: readonly T[],
   records: readonly JudgeRulingRecord[],
-): { send: T[]; ruledBefore: { candidate: T; record: JudgeRulingRecord }[] } {
+  declines: readonly Decline[] = [],
+): { send: T[]; ruledBefore: { candidate: T; record: JudgeRulingRecord }[]; declined: T[] } {
   const ruled = ruledPairs(records);
+  const declinedPair = declinedPairs(declines);
   const seen = new Set<string>();
   const send: T[] = [];
   const ruledBefore: { candidate: T; record: JudgeRulingRecord }[] = [];
+  const declined: T[] = [];
   for (const candidate of candidates) {
-    const key = pair(candidate.word, candidate.rhymeKey);
+    const key = rulingKey(candidate.word, candidate.rhymeKey);
     const record = ruled.get(key);
     if (record) ruledBefore.push({ candidate, record });
+    else if (declinedPair.has(declineKey(candidate.word, candidate.rhymeKey))) declined.push(candidate);
     else if (!seen.has(key)) send.push(candidate);
     seen.add(key);
   }
-  return { send, ruledBefore };
+  return { send, ruledBefore, declined };
 }
 
 /** A reading for `data/supplement.dict`, with the line that says who wrote it. */
@@ -143,7 +150,7 @@ export function land(candidates: readonly RuledCandidate[], ctx: LandingContext)
     const cl = c.classification;
     if (!cl || c.ruling.verdict === "no-ruling" || c.wordhood?.verdict === "no-ruling") continue;
     if (cl.needsWordhood) throw new Error(`${c.word} for ${c.seedWord} would act, and the wordhood question was not asked`);
-    const key = pair(c.word, c.rhymeKey);
+    const key = rulingKey(c.word, c.rhymeKey);
     if (done.has(key)) continue;
     done.add(key);
 

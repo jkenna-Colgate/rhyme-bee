@@ -166,6 +166,7 @@ describe("the dev-only Candidate Queue endpoint", () => {
       outstanding: 0,
       newest: null,
       deferred: { entries: [], outstanding: 0 },
+      unconfirmedRhymes: [],
     });
   });
 

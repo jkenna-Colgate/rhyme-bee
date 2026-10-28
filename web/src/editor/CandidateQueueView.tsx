@@ -26,11 +26,18 @@
  * any other. What differs between the two surfaces is only which aim the screen
  * hands the add: the day panel keeps the day-derived one it already had, and the
  * list above aims at the Candidate's key. See `EditorApp`.
+ *
+ * **What the Judge left** (#269) is drawn here too: its ruling beside each
+ * Candidate it ruled on, and, on the day panel, the day's Unconfirmed Rhymes to
+ * confirm or Decline. Confirming is the correction gesture, offered the Judge's
+ * reading; Declining is the same three-way menu a Candidate's card offers.
  */
 
 import { useState } from "react";
-import { isOutstanding, type ReadCandidate } from "../../../scripts/editorCandidates.ts";
+import { isOutstanding, type ReadCandidate, type ReadUnconfirmedRhyme } from "../../../scripts/editorCandidates.ts";
 import type { CandidateQueueReadout, CandidateGroup } from "../../../scripts/editorCandidates.ts";
+import type { JudgeRulingRecord } from "../../../src/judgeLanding.ts";
+import type { UnconfirmedRhyme } from "../../../src/unconfirmedRhymes.ts";
 import type { DeferredSection, ReadDeferral } from "../../../scripts/editorDeferred.ts";
 import type { Pronunciation } from "../../../src/phonology.ts";
 import {
@@ -40,7 +47,8 @@ import {
   declineWrites,
   type DeclineChoice,
 } from "./decline.ts";
-import { candidatesForDay, cardFor, evidenceFor, offersAdd } from "./dayCandidates.ts";
+import { candidatesForDay, cardFor, evidenceFor, offersAdd, suggestedDemotion, unconfirmedForDay } from "./dayCandidates.ts";
+import { confirmProposal, judgeRulingSentence, KNEW_SENTENCE } from "./judgeRuling.ts";
 import { deferredReadings, proposalFor } from "./deferredReadings.ts";
 import { CorrectionPanel } from "./CorrectionView.tsx";
 import type { Corrector } from "./useCorrector.ts";
@@ -63,6 +71,11 @@ export interface CandidateActs {
   onAdd?: (candidate: ReadCandidate) => void;
   /** Rule on the Candidate. The choice decides which of the two files is written. */
   onDecline?: (candidate: ReadCandidate, choice: DeclineChoice) => void;
+  /**
+   * Rule on an Unconfirmed Rhyme (#269): the same three choices, on the line's
+   * word and Rhyme Key. The Decline route also takes the line off the list.
+   */
+  onDeclineUnconfirmed?: (line: UnconfirmedRhyme, choice: DeclineChoice) => void;
   /** The word a write is in flight for, so its card can say so. */
   writing?: string | null;
   /**
@@ -403,6 +416,7 @@ function CandidateCardView({
     <div className={`editor-candidate editor-candidate-${cardFor(candidate)}`}>
       <span className="editor-candidate-word">{candidate.word}</span>
       <span className="editor-candidate-state">{STATE_SENTENCE[candidate.state]}</span>
+      {candidate.judged !== null && <JudgedLine judged={candidate.judged} />}
       <CandidateEvidence candidate={candidate} />
       {/* The correction, on the one card whose word the engine already reads
           (#180). Dispatched on `cardFor` rather than on the state directly, so
@@ -456,7 +470,6 @@ function CandidateActsView({
   candidate: ReadCandidate;
   acts: CandidateActs;
 }) {
-  const [ruling, setRuling] = useState(false);
   const add = acts.onAdd;
   const decline = acts.onDecline;
   const canAdd = add !== undefined && offersAdd(candidate);
@@ -478,44 +491,174 @@ function CandidateActsView({
         </button>
       )}
 
-      {canDecline && !ruling && (
-        <button
-          type="button"
-          className="editor-candidate-decline"
-          disabled={busy}
-          onClick={() => setRuling(true)}
-        >
-          {busy ? "Declining…" : "Decline…"}
-        </button>
+      {canDecline && (
+        <DeclineMenu
+          word={candidate.word}
+          rhymeKey={candidate.candidate.seedRhymeKey}
+          busy={busy}
+          suggested={suggestedDemotion(candidate)}
+          onChoose={(choice) => decline!(candidate, choice)}
+        />
       )}
+    </div>
+  );
+}
 
-      {canDecline && ruling && (
-        <div
-          className="editor-candidate-rulings"
-          role="group"
-          aria-label={`Decline ${candidate.word}`}
-        >
-          <p className="editor-candidate-rulings-lede">
-            Declining <strong>{candidate.word}</strong> against <code>{candidate.candidate.seedRhymeKey}</code>:
-          </p>
-          {DECLINE_CHOICES.map((choice) => (
-            <p key={choice} className={`editor-candidate-ruling editor-candidate-ruling-${declineWrites(choice)}`}>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  setRuling(false);
-                  decline!(candidate, choice);
-                }}
-              >
-                {DECLINE_LABEL[choice]}
-              </button>{" "}
-              <span className="editor-candidate-consequence">{DECLINE_CONSEQUENCE[choice]}</span>
-            </p>
-          ))}
-          <button type="button" className="editor-candidate-ruling-cancel" onClick={() => setRuling(false)}>
-            Leave it on the queue
-          </button>
+/**
+ * The Decline's three rulings, behind the second click. Shared by a
+ * Candidate's card and an Unconfirmed Rhyme's, which rule on the same pair of a
+ * word and a Rhyme Key with the same three choices (#269). `suggested` marks the
+ * Demotion the Judge's wordhood answer points at, and chooses nothing.
+ */
+function DeclineMenu({
+  word,
+  rhymeKey,
+  busy,
+  suggested = null,
+  onChoose,
+}: {
+  word: string;
+  rhymeKey: string;
+  busy: boolean;
+  suggested?: DeclineChoice | null;
+  onChoose: (choice: DeclineChoice) => void;
+}) {
+  const [ruling, setRuling] = useState(false);
+
+  if (!ruling) {
+    return (
+      <button
+        type="button"
+        className="editor-candidate-decline"
+        disabled={busy}
+        onClick={() => setRuling(true)}
+      >
+        {busy ? "Declining…" : "Decline…"}
+      </button>
+    );
+  }
+
+  return (
+    <div className="editor-candidate-rulings" role="group" aria-label={`Decline ${word}`}>
+      <p className="editor-candidate-rulings-lede">
+        Declining <strong>{word}</strong> against <code>{rhymeKey}</code>:
+      </p>
+      {DECLINE_CHOICES.map((choice) => (
+        <p key={choice} className={`editor-candidate-ruling editor-candidate-ruling-${declineWrites(choice)}`}>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setRuling(false);
+              onChoose(choice);
+            }}
+          >
+            {DECLINE_LABEL[choice]}
+          </button>{" "}
+          {choice === suggested && <strong className="editor-candidate-suggested">the Judge's suggestion. </strong>}
+          <span className="editor-candidate-consequence">{DECLINE_CONSEQUENCE[choice]}</span>
+        </p>
+      ))}
+      <button type="button" className="editor-candidate-ruling-cancel" onClick={() => setRuling(false)}>
+        Leave it on the queue
+      </button>
+    </div>
+  );
+}
+
+/** The Judge's ruling beside a card, and its own reason as it wrote it (#269). */
+function JudgedLine({ judged }: { judged: JudgeRulingRecord }) {
+  return (
+    <p className="editor-candidate-judged">
+      {judgeRulingSentence(judged)}
+      {judged.why !== "" && (
+        <>
+          {" "}
+          <q>{judged.why}</q>
+        </>
+      )}
+    </p>
+  );
+}
+
+/**
+ * The day's Unconfirmed Rhymes, each with the ruling that wrote it, to confirm
+ * or Decline (#269). Drawn only when the day's Rhyme Key has one, for
+ * `DayCandidatesView`'s reason. Left alone, a line stays accepted.
+ */
+export function DayUnconfirmedRhymesView({
+  queue,
+  rhymeKey,
+  acts,
+}: {
+  queue: CandidateQueueReadout | null;
+  rhymeKey: string;
+  acts: CandidateActs;
+}) {
+  const listed = unconfirmedForDay(queue, rhymeKey);
+  if (listed.length === 0) return null;
+
+  return (
+    <section className="editor-queue-day-panel editor-unconfirmed-panel">
+      <h3>
+        Unconfirmed Rhymes on this Rhyme Key{" "}
+        <span className="editor-muted">— {listed.length}, accepted without Points</span>
+      </h3>
+      <p className="editor-queue-note">
+        The Judge ruled each one a Rhyme here, and nobody has confirmed it. Left alone, it stays
+        accepted. Confirming writes the reading, after which the word rhymes by itself. Declining
+        takes it off the list, and the word gets the engine's own verdict on this key again.
+      </p>
+      <ul className="editor-queue-list">
+        {listed.map((u) => (
+          <li key={u.line.word}>
+            <UnconfirmedRhymeCard listed={u} acts={acts} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * One Unconfirmed Rhyme. Confirming is the correction gesture offered the
+ * Judge's reading as a standing proposal, so joining or replacing the engine's
+ * own reading stays the editor's choice (ADR-0017). A line with no reading to
+ * offer asks an agent for one instead.
+ */
+function UnconfirmedRhymeCard({ listed, acts }: { listed: ReadUnconfirmedRhyme; acts: CandidateActs }) {
+  const { line, judged } = listed;
+  const proposal = confirmProposal(listed);
+  const decline = acts.onDeclineUnconfirmed;
+  return (
+    <div className="editor-candidate editor-candidate-unconfirmed">
+      <span className="editor-candidate-word">{line.word}</span>
+      <span className="editor-candidate-state">an Unconfirmed Rhyme: confirm it or Decline it</span>
+      {judged !== null ? (
+        <JudgedLine judged={judged} />
+      ) : (
+        <p className="editor-candidate-judged">
+          Listed by {line.writer}, on {KNEW_SENTENCE[line.ruling]}, at {line.confidence} confidence.
+        </p>
+      )}
+      {acts.corrector !== undefined && (
+        <CorrectionPanel
+          word={line.word}
+          rhymeKey={line.rhymeKey}
+          current={listed.readings}
+          corrector={acts.corrector}
+          standing={proposal}
+          ask={proposal === null ? `Ask an agent for a reading of ${line.word}` : undefined}
+        />
+      )}
+      {decline !== undefined && (
+        <div className="editor-candidate-acts">
+          <DeclineMenu
+            word={line.word}
+            rhymeKey={line.rhymeKey}
+            busy={acts.writing === line.word}
+            onChoose={(choice) => decline(line, choice)}
+          />
         </div>
       )}
     </div>
@@ -525,7 +668,7 @@ function CandidateActsView({
 /**
  * What each state means, in the editor's terms rather than the union's.
  *
- * A `Record` over the closed set rather than a `switch` with a default: a sixth
+ * A `Record` over the closed set rather than a `switch` with a default: a new
  * state cannot be added to the union without this table refusing to compile,
  * which is the shape `REJECTION_MESSAGE` uses for the same guarantee (ADR-0005).
  */
@@ -534,6 +677,7 @@ const STATE_SENTENCE: Record<ReadCandidate["state"], string> = {
   declined: "declined for this Rhyme Key",
   "needs-tier": "rhymes, as a Bonus Word: rule its Tier",
   "is-a-name": "a name — demote it",
+  "suggested-demotion": "the Judge says it is a name or not a word — a suggested Demotion",
   "needs-correction": "reads on another key — needs a correction",
   addable: "no reading the engine will take — an add",
 };

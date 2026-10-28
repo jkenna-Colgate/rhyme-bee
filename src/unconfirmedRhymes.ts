@@ -195,3 +195,22 @@ export function listedSeedWords(
   }
   return listed;
 }
+
+/**
+ * The list with every line for one word on one Rhyme Key taken off, comments
+ * and every other line kept as written. This is what a Decline does to an
+ * Unconfirmed Rhyme (ADR-0017 amended): the word gets the engine's own verdict
+ * on that key again. A line that does not read is left alone, as the build
+ * leaves it.
+ */
+export function withoutUnconfirmed(text: string, word: string, rhymeKey: RhymeKey): { text: string; removed: number } {
+  const target = normaliseWord(word);
+  let removed = 0;
+  const kept = text.split(/(?<=\n)/).filter((raw) => {
+    const { entries } = parseUnconfirmedRhymes(raw);
+    const hit = entries.length === 1 && entries[0]!.word === target && entries[0]!.rhymeKey === rhymeKey;
+    if (hit) removed += 1;
+    return !hit;
+  });
+  return { text: kept.join(""), removed };
+}
