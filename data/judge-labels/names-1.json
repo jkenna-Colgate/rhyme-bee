@@ -1,0 +1,55 @@
+{
+  "set": "names-1",
+  "question": "wordhood",
+  "labelledBy": [
+    "jkenna"
+  ],
+  "labelledOn": "2026-10-14",
+  "blind": true,
+  "rules": [
+    "#238"
+  ],
+  "tuning": true,
+  "notes": [
+    "A tuning set for the wordhood question (#238): each name and non-word was on the word list until its Demotion took it off; the controls are ordinary words that are also names.",
+    "The wordhood question was settled on this set, so a score on it flatters the Judge."
+  ],
+  "pairs": [
+    {"word":"kate","seedWord":"ate","seedReading":null,"rhymeKeyWhenCut":"EY T","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"troy","seedWord":"boy","seedReading":null,"rhymeKeyWhenCut":"OY","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"heinz","seedWord":"pines","seedReading":null,"rhymeKeyWhenCut":"AY N Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"marx","seedWord":"parks","seedReading":null,"rhymeKeyWhenCut":"AA R K S","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"niels","seedWord":"feels","seedReading":null,"rhymeKeyWhenCut":"IY L Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"schelling","seedWord":"telling","seedReading":null,"rhymeKeyWhenCut":"EH L IH NG","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"batz","seedWord":"hats","seedReading":null,"rhymeKeyWhenCut":"AE T S","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"sheard","seedWord":"beard","seedReading":null,"rhymeKeyWhenCut":"IH R D","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"fels","seedWord":"bells","seedReading":null,"rhymeKeyWhenCut":"EH L Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"franz","seedWord":"plants","seedReading":null,"rhymeKeyWhenCut":"AE N T S","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"schwarz","seedWord":"warts","seedReading":null,"rhymeKeyWhenCut":"AO R T S","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"algiers","seedWord":"years","seedReading":null,"rhymeKeyWhenCut":"IH R Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"azores","seedWord":"doors","seedReading":null,"rhymeKeyWhenCut":"AO R Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"rhodes","seedWord":"roads","seedReading":null,"rhymeKeyWhenCut":"OW D Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"versailles","seedWord":"sky","seedReading":null,"rhymeKeyWhenCut":"AY","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"nepal","seedWord":"ball","seedReading":null,"rhymeKeyWhenCut":"AA L","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"storting","seedWord":"sporting","seedReading":null,"rhymeKeyWhenCut":"AO R T IH NG","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"arx","seedWord":"parks","seedReading":null,"rhymeKeyWhenCut":"AA R K S","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"ers","seedWord":"furs","seedReading":null,"rhymeKeyWhenCut":"ER Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"oct","seedWord":"knocked","seedReading":null,"rhymeKeyWhenCut":"AA K T","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"preceeding","seedWord":"leading","seedReading":null,"rhymeKeyWhenCut":"IY D IH NG","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"hiems","seedWord":"dreams","seedReading":null,"rhymeKeyWhenCut":"IY M Z","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"lish","seedWord":"fish","seedReading":null,"rhymeKeyWhenCut":"IH SH","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"kish","seedWord":"dish","seedReading":null,"rhymeKeyWhenCut":"IH SH","verdicts":[{"labeller":"jkenna","verdict":"not-a-word","on":"2026-10-14","blind":true,"note":"demoted in data/demotions.txt"}]},
+    {"word":"sue","seedWord":"blue","seedReading":null,"rhymeKeyWhenCut":"UW","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"bill","seedWord":"hill","seedReading":null,"rhymeKeyWhenCut":"IH L","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"mark","seedWord":"park","seedReading":null,"rhymeKeyWhenCut":"AA R K","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"frank","seedWord":"bank","seedReading":null,"rhymeKeyWhenCut":"AE NG K","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"grace","seedWord":"face","seedReading":null,"rhymeKeyWhenCut":"EY S","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"rose","seedWord":"nose","seedReading":null,"rhymeKeyWhenCut":"OW Z","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"pat","seedWord":"hat","seedReading":null,"rhymeKeyWhenCut":"AE T","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"will","seedWord":"still","seedReading":null,"rhymeKeyWhenCut":"IH L","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"rick","seedWord":"trick","seedReading":null,"rhymeKeyWhenCut":"IH K","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"ray","seedWord":"day","seedReading":null,"rhymeKeyWhenCut":"EY","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"jack","seedWord":"back","seedReading":null,"rhymeKeyWhenCut":"AE K","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]},
+    {"word":"june","seedWord":"moon","seedReading":null,"rhymeKeyWhenCut":"UW N","verdicts":[{"labeller":"jkenna","verdict":"word","on":"2026-10-14","blind":true,"note":"an ordinary word that is also a name, picked as a control"}]}
+  ]
+}
