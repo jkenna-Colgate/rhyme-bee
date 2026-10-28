@@ -249,6 +249,36 @@ export function resolveTierOverrides(rows: TierOverrideRow[]): Map<string, Resol
   return resolved;
 }
 
+/** What a word's Tier is worked out from, before the next build merges the file. */
+export interface StandingTierInput {
+  /** The index's own `Derivation.lemmaCandidates`: the walk `RhymeIndex#tier` makes. */
+  lemmaCandidates: (word: string) => string[];
+  /** The pinned prevalence norms, parsed and unpatched. */
+  measured: ReadonlyMap<string, number>;
+  /** `data/tier-overrides.csv` as text; empty when no verdict stands. */
+  overrides: string;
+  /** The Answer/Bonus line the built index carries. */
+  knownnessThreshold: number;
+}
+
+/**
+ * Each word's Tier with every standing verdict applied: what the next build
+ * will make it. The walk the index makes, over measured prevalence patched by
+ * `overriddenValue`, ended at `tierFor`; a word with no value on the walk is a
+ * Bonus Word, as it is in the index. For a reader that must see a verdict the
+ * moment it is written, as the Candidate Queue must (#258).
+ */
+export function standingTierOf(input: StandingTierInput): (word: string) => Tier {
+  const standing = resolveTierOverrides(parseTierOverrides(input.overrides));
+  return (word) => {
+    for (const candidate of input.lemmaCandidates(normaliseWord(word))) {
+      const value = overriddenValue(standing.get(candidate)?.verdict, input.measured.get(candidate));
+      if (value !== undefined) return tierFor(value, input.knownnessThreshold);
+    }
+    return "bonus";
+  };
+}
+
 /** The part of the index build's data this stage touches. Mutated. */
 export interface TierOverrideTarget {
   /** The measured prevalence map, patched in place. */

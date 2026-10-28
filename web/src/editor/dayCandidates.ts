@@ -95,6 +95,8 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
       return "settled";
     case "declined":
       return "settled";
+    case "needs-tier":
+      return "tier";
     case "is-a-name":
       return "name";
     case "needs-correction":
@@ -110,11 +112,11 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
 }
 
 /**
- * The cards the five states resolve to — five of them, but not one per state:
+ * The cards the six states resolve to: six of them, but not one per state:
  * `resolved` and `declined` share `settled`, and `addable` splits on whether
  * there is anything to derive from.
  */
-export type CandidateCard = "settled" | "name" | "correction" | "add" | "derivation";
+export type CandidateCard = "settled" | "tier" | "name" | "correction" | "add" | "derivation";
 
 /**
  * The evidence one card shows — the three kinds a Candidate can carry, with the
@@ -171,6 +173,7 @@ export function evidenceFor(candidate: ReadCandidate): CardEvidence {
       // name is never valid however well it rhymes.
       return NOTHING;
     case "resolved":
+    case "needs-tier":
     case "needs-correction":
       return { readings: candidate.readings, relatives: [], composed: null };
     case "addable":

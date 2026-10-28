@@ -5,7 +5,7 @@
  * records; the judging — is this a real word, an add or a stress correction,
  * what reading — happens later, on the Editor's Pass's Candidate Queue
  * (ADR-0017). The queue file is append-only: nothing is moved out of it when a
- * Candidate is judged, and a Candidate whose word rhymes on its Rhyme Key
+ * Candidate is judged, and a Candidate whose word is an Answer on its Rhyme Key
  * against the current Rhyme Index is resolved by that fact alone.
  *
  * Nothing here adjudicates. The verdict was reached in the player's browser and

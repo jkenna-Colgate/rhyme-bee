@@ -42,6 +42,8 @@ function candidate(state: ReadCandidate["state"]): ReadCandidate {
       return { ...identity, state, readings: [] };
     case "declined":
       return { ...identity, state };
+    case "needs-tier":
+      return { ...identity, state, readings: [] };
     case "is-a-name":
       return { ...identity, state };
     case "needs-correction":
