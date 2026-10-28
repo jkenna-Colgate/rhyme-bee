@@ -12,13 +12,18 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { makeTestData } from "../../src/__fixtures__/index.ts";
+import { KNOWNNESS_THRESHOLD, makeTestData, makeTestIndex } from "../../src/__fixtures__/index.ts";
 import type { Decline } from "../../src/declines.ts";
 import type { Pronunciation } from "../../src/phonology.ts";
 import type { Schedule } from "../../src/schedule.ts";
 import type { SupplementCandidate } from "../../src/supplementCandidate.ts";
-import { evidenceContextFrom, type EvidenceContext } from "../../src/supplementEvidence.ts";
-import { readCandidateQueue, type CandidateQueueReadout } from "../editorCandidates.ts";
+import { evidenceContextFrom } from "../../src/supplementEvidence.ts";
+import { serialiseTierOverride, standingTierOf } from "../../src/tierOverride.ts";
+import {
+  readCandidateQueue,
+  type CandidateQueueContext,
+  type CandidateQueueReadout,
+} from "../editorCandidates.ts";
 
 /**
  * `node:fs`'s write surface, replaced for the whole file.
@@ -70,27 +75,43 @@ const SCHEDULE: Schedule = {
   ],
 };
 
+/** The fixture index, for the lemma walk a word's knownness is looked up by. */
+const LEMMA_INDEX = makeTestIndex();
+
 interface Extra {
   pronunciations?: [string, Pronunciation[]][];
   words?: string[];
   names?: string[];
+  /** `data/tier-overrides.csv` as text. Absent means no verdict stands. */
+  overrides?: string;
 }
 
 /**
  * The fixture's pinned inputs as an evidence context, Normalisation applied the
  * way the index build applies it — which is what makes the cot–caught merger
- * live here rather than something this test has to simulate.
+ * live here rather than something this test has to simulate. Its Tiers are the
+ * fixture's prevalence with the standing verdicts applied, over the fixture
+ * index's own lemma walk and threshold.
  */
-function contextFor(extra: Extra = {}): EvidenceContext {
+function contextFor(extra: Extra = {}): CandidateQueueContext {
   const raw = makeTestData();
   for (const [word, prons] of extra.pronunciations ?? []) raw.pronunciations.set(word, prons);
   for (const word of extra.words ?? []) raw.words.add(word);
   for (const name of extra.names ?? []) raw.names.add(name);
-  return evidenceContextFrom({
-    pronunciations: raw.pronunciations,
-    words: raw.words,
-    names: raw.names,
+  const tierOf = standingTierOf({
+    lemmaCandidates: (word) => LEMMA_INDEX.derivation.lemmaCandidates(word),
+    measured: raw.prevalence,
+    overrides: extra.overrides ?? "",
+    knownnessThreshold: KNOWNNESS_THRESHOLD,
   });
+  return {
+    ...evidenceContextFrom({
+      pronunciations: raw.pronunciations,
+      words: raw.words,
+      names: raw.names,
+    }),
+    isAnswer: (word) => tierOf(word) === "answer",
+  };
 }
 
 let jotted = 0;
@@ -120,6 +141,52 @@ function only(readout: CandidateQueueReadout) {
   expect(readout.groups[0]!.candidates).toHaveLength(1);
   return readout.groups[0]!.candidates[0]!;
 }
+
+/**
+ * An Appeal says the word should have been an Answer (GLOSSARY.md, Appeal), so
+ * a Candidate is resolved when its word is now an Answer on its Rhyme Key and
+ * not merely when it rhymes there. Since #258 a Bonus Word can be Appealed, and
+ * one rhymes on arrival.
+ */
+describe("a Candidate is resolved only by its word becoming an Answer", () => {
+  it("keeps a Bonus Word Appeal outstanding until a Tier verdict makes it an Answer", () => {
+    // `objurgate` rhymes on `ate`'s key and sits below the knownness line.
+    const appeal = () => [candidate("objurgate", "ate", ATE, { reason: "bonus" })];
+
+    const before = readCandidateQueue(appeal(), SCHEDULE, [], contextFor());
+    expect(only(before).state).toBe("needs-tier");
+    expect(before.outstanding).toBe(1);
+
+    const overrides = serialiseTierOverride({
+      word: "objurgate",
+      verdict: "answer-common",
+      measured: 0.2,
+      decided: "2026-10-28T12:00:00.000Z",
+      note: "",
+    });
+    const after = readCandidateQueue(appeal(), SCHEDULE, [], contextFor({ overrides }));
+    expect(only(after).state).toBe("resolved");
+    expect(after.outstanding).toBe(0);
+  });
+
+  it.each([
+    // Each word's reading misses the key, as a Weak Rhyme's and an Overrule's
+    // always does: no Rhyme, so no Answer.
+    ["a Weak Rhyme", "climate", "weak"],
+    ["an Unconfirmed Rhyme", "hat", "unconfirmed"],
+  ] as const)("keeps %s Appeal outstanding", (_, word, reason) => {
+    const readout = readCandidateQueue([candidate(word, "ate", ATE, { reason })], SCHEDULE, [], contextFor());
+
+    expect(readout.outstanding).toBe(1);
+  });
+
+  it("still resolves a rejection whose word now scores", () => {
+    const readout = readCandidateQueue([candidate("talked", "docked", DOCKED)], SCHEDULE, [], contextFor());
+
+    expect(only(readout).state).toBe("resolved");
+    expect(readout.outstanding).toBe(0);
+  });
+});
 
 describe("a Candidate whose word now rhymes", () => {
   it("comes back resolved, with the readings that reach the key", () => {

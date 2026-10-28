@@ -40,6 +40,8 @@ function read(word: string, seedWord: string, key: string, state: ReadCandidate[
       return { ...identity, state, readings: [{ phonemes: ["T", "AA1", "K", "T"], key }] };
     case "declined":
       return { ...identity, state };
+    case "needs-tier":
+      return { ...identity, state, readings: [{ phonemes: ["EY1", "T"], key }] };
     case "is-a-name":
       return { ...identity, state };
     case "needs-correction":
@@ -125,6 +127,14 @@ describe("the card a state selects", () => {
   it("settles a resolved or declined Candidate", () => {
     expect(cardFor(read("talked", "docked", DOCKED, "resolved"))).toBe("settled");
     expect(cardFor(read("kate", "ate", ATE, "declined"))).toBe("settled");
+  });
+
+  it("gives a Bonus Word that rhymes its own card, showing the reading it rhymes on", () => {
+    // Its Appeal wants a Tier verdict, not a reading (#258).
+    const candidate = read("objurgate", "ate", ATE, "needs-tier");
+    expect(cardFor(candidate)).toBe("tier");
+    expect(evidenceFor(candidate).readings.map((r) => r.key)).toEqual([ATE]);
+    expect(evidenceFor(candidate).relatives).toEqual([]);
   });
 
   it("gives a name its own card", () => {

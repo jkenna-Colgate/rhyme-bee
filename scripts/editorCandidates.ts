@@ -19,10 +19,12 @@
  *
  * ## Resolution is derived, never stored
  *
- * A Candidate whose word the engine would now accept on its Rhyme Key is
- * resolved by that fact alone. Nothing is written and nothing is moved: a fix
- * landing anywhere else in the build — a Normalisation rule, a supplement
- * entry, a coverage derivation — clears the Candidate the next time this
+ * A Candidate whose word is now an Answer on its Rhyme Key is resolved by that
+ * fact alone: an Appeal says the word should have been an Answer, so a word
+ * that merely rhymes there, as a Bonus Word does, is not resolved (#258).
+ * Nothing is written and nothing is moved: a fix landing anywhere else in the
+ * build (a Normalisation rule, a supplement entry, a coverage derivation, a
+ * Tier verdict) clears the Candidate the next time this
  * function runs. That is what retires the five cot–caught Candidates
  * (`talked`, `hawked`, `walked`, `balked`, `stalked`, Appealed against
  * `docked`) on first render, having been fixed when the merger landed and
@@ -76,6 +78,16 @@ import {
   type DeferredSection,
 } from "./editorDeferred.ts";
 
+/**
+ * What the queue reads each Candidate against: the evidence context, and
+ * whether a word is an Answer today, with every standing Tier verdict applied
+ * (`standingTierOf`), so a verdict written in the Editor's Pass resolves a
+ * Candidate before the next build, as a reading written there does.
+ */
+export interface CandidateQueueContext extends EvidenceContext {
+  isAnswer: (word: string) => boolean;
+}
+
 /** What every Candidate carries, whatever state it is in. */
 export interface CandidateIdentity {
   /** The word as the engine reads it — normalised, which is how it is captured. */
@@ -94,12 +106,16 @@ export interface CandidateIdentity {
  * be written against one variant without reaching for fields that mean nothing
  * to it.
  *
- * The five, and what each one means the editor should do:
+ * The six, and what each one means the editor should do:
  *
- * - **resolved** — the engine would accept this word on this key today. There
- *   is nothing to do, and nothing was written to say so.
+ * - **resolved**: the word is an Answer on this key today, with every standing
+ *   Tier verdict applied. There is nothing to do, and nothing was written to
+ *   say so.
  * - **declined** — a standing Decline names this word *and* this key. The
  *   editor has already ruled; the queue stops presenting it.
+ * - **needs-tier**: the word rhymes on this key and holds the Bonus Word Tier.
+ *   An Appeal says it should have been an Answer, so the ruling it wants is a
+ *   Tier verdict, and it is resolved once one makes it an Answer (#258).
  * - **is-a-name** — the word is in the names data. Never valid, however well it
  *   rhymes (GLOSSARY.md), so the ruling it wants is the existing demote gesture
  *   and not a reading.
@@ -111,6 +127,7 @@ export interface CandidateIdentity {
 export type ReadCandidate =
   | (CandidateIdentity & { state: "resolved"; readings: ReadingEvidence[] })
   | (CandidateIdentity & { state: "declined" })
+  | (CandidateIdentity & { state: "needs-tier"; readings: ReadingEvidence[] })
   | (CandidateIdentity & { state: "is-a-name" })
   | (CandidateIdentity & { state: "needs-correction"; readings: ReadingEvidence[] })
   | (CandidateIdentity & {
@@ -233,7 +250,7 @@ export function readCandidateQueue(
   candidates: readonly SupplementCandidate[],
   schedule: Schedule,
   declines: readonly Decline[],
-  ctx: EvidenceContext,
+  ctx: CandidateQueueContext,
   deferred: readonly DeferredRecord[] = [],
 ): CandidateQueueReadout {
   const declined = declinedPairs(declines);
@@ -287,9 +304,15 @@ export function readCandidateQueue(
  * and a ruling made against an older index is stale the moment the word starts
  * rhyming. A Decline is the editor agreeing with a rejection; a word the engine
  * now accepts is not being rejected at all, so there is nothing left to agree
- * with. Resolution is the engine's own acceptance test, not merely the rhyme:
+ * with. Resolution is the engine's own Answer test, not merely the rhyme:
  * `rhymesDirectly` alone would call a word with no wordhood resolved while the
- * player went on being refused it.
+ * player went on being refused it, and would call a Bonus Word resolved on
+ * arrival, though its Appeal says it should have been an Answer (#258).
+ *
+ * **Then the Decline, then a name**, below.
+ *
+ * **Then a word that rhymes and is not an Answer**, which wants a Tier verdict
+ * and not a reading.
  *
  * A name is excluded from that test rather than ordered around it. A name is
  * never valid however well it rhymes (GLOSSARY.md), which is `resolveAddOutcome`'s
@@ -317,12 +340,13 @@ export function readCandidateQueue(
 function readCandidate(
   candidate: SupplementCandidate,
   declined: ReadonlySet<string>,
-  ctx: EvidenceContext,
+  ctx: CandidateQueueContext,
 ): ReadCandidate {
   const evidence = gatherEvidence(candidate.word, candidate.seedRhymeKey, ctx);
   const identity: CandidateIdentity = { word: evidence.word, candidate };
 
-  if (evidence.isWord && !evidence.isName && evidence.rhymesDirectly) {
+  const rhymes = evidence.isWord && !evidence.isName && evidence.rhymesDirectly;
+  if (rhymes && ctx.isAnswer(evidence.word)) {
     return { ...identity, state: "resolved", readings: evidence.direct };
   }
 
@@ -331,6 +355,8 @@ function readCandidate(
   }
 
   if (evidence.isName) return { ...identity, state: "is-a-name" };
+
+  if (rhymes) return { ...identity, state: "needs-tier", readings: evidence.direct };
 
   if (evidence.direct.length > 0 && !evidence.rhymesDirectly) {
     return { ...identity, state: "needs-correction", readings: evidence.direct };

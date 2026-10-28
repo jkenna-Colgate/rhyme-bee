@@ -20,11 +20,12 @@ import {
   type RhymeKey,
 } from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
-import { BEFORE_R_MERGES, GLIDING_VOWELS, RHOTIC, TAP, WEAK_ER } from "./normalise.ts";
+import { BEFORE_R_MERGES, GLIDING_VOWELS, mergeWeakVowels, RHOTIC, TAP, WEAK_ER } from "./normalise.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
 import { schwaTwinOf } from "./schwaTwins.ts";
 import { tierFor, type Tier, type Verdict } from "./verdict.ts";
+import { isWeakRhyme } from "./weakRhyme.ts";
 
 /** A curated Seed Word: the word itself plus its single pinned Rhyme Key. */
 export interface SeedWord {
@@ -483,19 +484,37 @@ export class RhymeIndex {
       return { outcome: "rejected", reason: "already-submitted" };
     }
 
-    // An Unconfirmed Rhyme turns exactly two rejections into an acceptance
-    // without Points: a word the Judge ruled a Rhyme on this key, whose reading
-    // misses it (an Overrule) or which has none (a Missing Reading). A Proper
-    // Noun stays one, and a word that rhymes here by itself keeps its Tier.
+    // Two things turn a rejection into an acceptance without Points, and a
+    // word that rhymes here by itself keeps its Tier either way. An Unconfirmed
+    // Rhyme turns two: a word the Judge ruled a Rhyme on this key, whose
+    // reading misses it (an Overrule) or which has none (a Missing Reading). A
+    // Weak Rhyme turns one, a word with readings that is no Rhyme. A Proper
+    // Noun stays one.
     const verdict = this.#adjudicateWord(seed, word);
+    if (verdict.outcome !== "rejected") return verdict;
     if (
-      verdict.outcome === "rejected" &&
       (verdict.reason === "does-not-rhyme" || verdict.reason === "not-a-known-word") &&
       this.isUnconfirmedRhyme(word, seed.rhymeKey)
     ) {
       return { outcome: "unconfirmed", length: word.length };
     }
+    if (verdict.reason === "does-not-rhyme" && this.#isWeakRhyme(seed, word)) {
+      return { outcome: "weak", length: word.length };
+    }
     return verdict;
+  }
+
+  /**
+   * The Weak Rhyme test (`src/weakRhyme.ts`), over the readings with each weak
+   * vowel as the dictionary wrote it. The Seed Word is heard one way, so only
+   * its readings on the pinned Rhyme Key take part: an unmerged reading is one
+   * of those when the weak-vowel Normalisation would put it there.
+   */
+  #isWeakRhyme(seed: SeedWord, word: string): boolean {
+    const pinned = this.unmergedReadingsOf(seed.word).filter(
+      (reading) => matchingPronunciation(seed.rhymeKey, [mergeWeakVowels(reading)]) !== null,
+    );
+    return isWeakRhyme(pinned, this.unmergedReadingsOf(word));
   }
 
   /**

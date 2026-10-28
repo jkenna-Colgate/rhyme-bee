@@ -532,6 +532,7 @@ function CandidateActsView({
 const STATE_SENTENCE: Record<ReadCandidate["state"], string> = {
   resolved: "rhymes now — nothing to do",
   declined: "declined for this Rhyme Key",
+  "needs-tier": "rhymes, as a Bonus Word: rule its Tier",
   "is-a-name": "a name — demote it",
   "needs-correction": "reads on another key — needs a correction",
   addable: "no reading the engine will take — an add",

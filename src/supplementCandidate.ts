@@ -5,7 +5,7 @@
  * records; the judging — is this a real word, an add or a stress correction,
  * what reading — happens later, on the Editor's Pass's Candidate Queue
  * (ADR-0017). The queue file is append-only: nothing is moved out of it when a
- * Candidate is judged, and a Candidate whose word rhymes on its Rhyme Key
+ * Candidate is judged, and a Candidate whose word is an Answer on its Rhyme Key
  * against the current Rhyme Index is resolved by that fact alone.
  *
  * Nothing here adjudicates. The verdict was reached in the player's browser and
@@ -36,7 +36,7 @@
 
 import { normaliseWord } from "./cmudict.ts";
 import { hasOnlyFields, refuse, type Validated } from "./report.ts";
-import { REJECTION_MESSAGE, type RejectionReason } from "./verdict.ts";
+import { isAppealedVerdict, type AppealedVerdict } from "./verdict.ts";
 
 export interface SupplementCandidate {
   /**
@@ -49,11 +49,17 @@ export interface SupplementCandidate {
   seedWord: string;
   /** The Seed's pinned Rhyme Key — the target the judge authors stress toward. */
   seedRhymeKey: string;
-  /** Why the engine rejected it — the judge's first hint at add vs correction. */
-  reason: RejectionReason;
   /**
-   * For a `does-not-rhyme` rejection, the reading the engine used (respelled), so
-   * the judge can see which stress it must correct. Null for the other reasons.
+   * The verdict the engine gave it: why it was rejected, the judge's first hint
+   * at add vs correction, or, since any word not counted as an Answer can be
+   * Appealed (#258), the unscored outcome it was accepted with. The field keeps
+   * its old name so every record already in the queue still reads.
+   */
+  reason: AppealedVerdict;
+  /**
+   * The reading the engine used (respelled), for a `does-not-rhyme` rejection
+   * so the judge can see which stress it must correct, and for a Bonus Word.
+   * Null for the other verdicts.
    */
   engineRespelling: string | null;
   /** When the Appeal was raised (ISO 8601). */
@@ -129,15 +135,17 @@ export type CandidateReport = Validated<"candidate", SupplementCandidate>;
  * Coerce an untrusted report body into a candidate, or refuse it.
  *
  * The body is whatever a public endpoint was sent, so every field is checked
- * rather than trusted: the rejection reason must be one the engine can actually
- * give, the word and Seed must be the shape a Submission is allowed to take, and
- * a field nobody recognises means the sender is not the game — so the whole
- * report goes, rather than being quietly trimmed to the parts we liked.
+ * rather than trusted: the verdict must be one the engine can actually give and
+ * a player can Appeal, the word and Seed must be the shape a Submission is
+ * allowed to take, and a field nobody recognises means the sender is not the
+ * game, so the whole report goes, rather than being quietly trimmed to the
+ * parts we liked.
  *
- * `reason` is checked against `REJECTION_MESSAGE`, not a second hand-written
- * list. That table is a `Record<RejectionReason, string>`, so it is exhaustive
- * by construction (ADR-0005): adding a reason to the closed set cannot compile
- * without extending the table, and this validation follows it for free.
+ * `reason` is checked by `isAppealedVerdict`, not a second hand-written list.
+ * It reads `REJECTION_MESSAGE` and the unscored outcomes, both tables exhaustive
+ * by construction (ADR-0005): adding a reason or an outcome to its closed set
+ * cannot compile without extending the table, and this validation follows it
+ * for free.
  *
  * The timestamp is the caller's, never the sender's — capture owns when an
  * Appeal arrived, and a client that could name it could scatter records across
@@ -166,10 +174,10 @@ export function candidateFromReport(body: unknown, timestamp: string): Candidate
   if (seedRhymeKey.length > MAX_RHYME_KEY_LENGTH) return refuse("That Rhyme Key is too long.");
   if (!RHYME_KEY_SHAPE.test(seedRhymeKey)) return refuse("That is not a Rhyme Key.");
 
-  if (typeof report.reason !== "string" || !Object.hasOwn(REJECTION_MESSAGE, report.reason)) {
-    return refuse("That is not a rejection reason.");
+  if (typeof report.reason !== "string" || !isAppealedVerdict(report.reason)) {
+    return refuse("That is not a verdict a player can Appeal.");
   }
-  const reason = report.reason as RejectionReason;
+  const reason = report.reason;
 
   let engineRespelling: string | null = null;
   if (report.engineRespelling !== undefined && report.engineRespelling !== null) {

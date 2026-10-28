@@ -76,7 +76,7 @@ export interface CorrectionProposal {
    * **Reported, never enforced.** A proposal that reaches the target is the
    * correction the Candidate asked for. One that does not is the word's *honest
    * reading* — the player was wrong, and writing it is what makes the engine say
-   * "doesn't rhyme" instead of "not a word we know" (#176). Both are approved
+   * "not on our rhyme list" instead of "not a word we know" (#176). Both are approved
    * through this one value and this one act; refusing the second here would be
    * the second code path the ticket rules out.
    */

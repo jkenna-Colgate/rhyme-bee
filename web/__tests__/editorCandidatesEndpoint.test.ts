@@ -24,7 +24,8 @@ import { makeTestData } from "../../src/__fixtures__/index.ts";
 import type { Decline } from "../../src/declines.ts";
 import type { Schedule } from "../../src/schedule.ts";
 import type { SupplementCandidate } from "../../src/supplementCandidate.ts";
-import { evidenceContextFrom, type EvidenceContext } from "../../src/supplementEvidence.ts";
+import { evidenceContextFrom } from "../../src/supplementEvidence.ts";
+import type { CandidateQueueContext } from "../../scripts/editorCandidates.ts";
 import { editorCandidatesSpec } from "../editorCandidatesPlugin.ts";
 import { editorMiddleware } from "../editorRoute.ts";
 import { callRoute as call } from "./routeCall.ts";
@@ -63,14 +64,21 @@ const QUEUE: SupplementCandidate[] = [
   jot("undocked", "shellshocked", "2026-08-07T18:30:00.000Z"),
 ];
 
-/** The fixture's pinned inputs, which is where the cot–caught merger lives. */
-function context(): EvidenceContext {
+/**
+ * The fixture's pinned inputs, which is where the cot–caught merger lives. Every
+ * word counts as an Answer: Tiers are the queue's business
+ * (`scripts/__tests__/editorCandidates.test.ts`), and this file is transport.
+ */
+function context(): CandidateQueueContext {
   const raw = makeTestData();
-  return evidenceContextFrom({
-    pronunciations: raw.pronunciations,
-    words: raw.words,
-    names: raw.names,
-  });
+  return {
+    ...evidenceContextFrom({
+      pronunciations: raw.pronunciations,
+      words: raw.words,
+      names: raw.names,
+    }),
+    isAnswer: () => true,
+  };
 }
 
 /**

@@ -420,7 +420,7 @@ describe("applyCorrection", () => {
    * The honest reading, approved off a proposal the add path made and
    * verification refused. There is no reading to join to and no correction being
    * made — the write is the whole of the act, and what it buys is wordhood plus
-   * a reading, which is what turns "not a word we know" into "doesn't rhyme".
+   * a reading, which is what turns "not a word we know" into "not on our rhyme list".
    */
   it("writes an honest reading for a word the engine reads not at all", async () => {
     let rebuilt = false;
