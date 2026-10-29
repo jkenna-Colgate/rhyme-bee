@@ -43,7 +43,11 @@ import type { Pronunciation } from "./phonology.ts";
 import { parsePrevalenceCsv, parseWordList } from "./pipeline.ts";
 import { matchingPronunciation, type RhymeIndexData } from "./rhymeIndex.ts";
 import { applySupplement } from "./supplement.ts";
-import { applyTierOverrides, type AppliedTierOverride } from "./tierOverride.ts";
+import {
+  applyTierLayers,
+  type AppliedTierMove,
+  type AppliedTierOverride,
+} from "./tierOverride.ts";
 import {
   applyUnconfirmedRhymes,
   unconfirmedKeysByWord,
@@ -75,6 +79,12 @@ export interface PinnedInputs {
    */
   tierOverrides: string;
   /**
+   * The Tier moves from Session Records (#270): Bonus Words enough players
+   * produce, moved to Answer by `npm run tier:moves`. Read over the editor's
+   * verdicts and under a locked one. Absent or empty moves nothing.
+   */
+  tierMoves?: string;
+  /**
    * The committed Unconfirmed Rhyme list (#259): words the Judge ruled a Rhyme
    * on one Rhyme Key, accepted there without Points. Empty text lists nothing.
    */
@@ -104,6 +114,8 @@ export interface ManufacturedIndex {
   dropped: DroppedWord[];
   /** Every word the Retrieval override layer patched (ADR-0015). */
   overridden: AppliedTierOverride[];
+  /** Every word the Tier moves from Session Records moved, over the editor's verdicts (#270). */
+  moved: AppliedTierMove[];
   /** The Unconfirmed Rhyme list as applied, with what it dropped (#259). */
   unconfirmed: AppliedUnconfirmedRhymes;
 }
@@ -147,7 +159,13 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   // that overrides exist. *Last*: it touches only `prevalence`, and running it
   // ahead of coverage would risk a fabricated entry wandering into coverage's
   // candidate set (see the header comment). See src/tierOverride.ts.
-  const overridden = applyTierOverrides(inputs.tierOverrides, { prevalence });
+  // The Tier moves from Session Records (#270) are merged in the same call, so
+  // the precedence (prevalence, the editor's verdicts, the moves, a locked
+  // verdict) lives in one place.
+  const { overridden, moved } = applyTierLayers(
+    { overrides: inputs.tierOverrides, moves: inputs.tierMoves ?? "" },
+    { prevalence },
+  );
 
   // Dropped-words report (story 40), read off the finished state: every CMUdict
   // surface form that will never be a valid Submission, so over-aggressive
@@ -180,6 +198,7 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
     derived,
     dropped,
     overridden,
+    moved,
     unconfirmed,
   };
 }

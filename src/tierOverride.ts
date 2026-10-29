@@ -27,6 +27,7 @@
 import { normaliseWord } from "./cmudict.ts";
 import { splitCsvRow } from "./pipeline.ts";
 import { isRare, type ScoringConfig } from "./scoring.ts";
+import { parseTierMoves } from "./tierMoves.ts";
 import { tierFor, type Tier } from "./verdict.ts";
 
 /**
@@ -108,6 +109,44 @@ export function overriddenValue(
   return measured;
 }
 
+/** What stands on one word, layer by layer, below its measured prevalence. */
+export interface WordLayers {
+  /** The editor's standing verdict on the word, if any. */
+  verdict?: TierVerdict;
+  /** Whether that verdict is locked. */
+  locked?: boolean;
+  /** Whether `data/tier-moves.csv` moves the word to Answer. */
+  moved?: boolean;
+}
+
+/**
+ * A word's value with every layer applied, lowest to highest: **prevalence,
+ * then the editor's verdicts, then the job's moves, then a locked editor
+ * verdict** (#270, ADR-0015 amended). The editor's verdicts are judgment and the
+ * job's are evidence, so the evidence wins unless the editor has locked the
+ * verdict.
+ *
+ * A move makes a word an Answer and asks for no more. An editor's Answer
+ * verdict already does that, so it stands with its rarity as the editor set it.
+ * Otherwise the word keeps a measured value that already makes an Answer (an
+ * unlocked `bonus` the move beats puts prevalence back in charge) and takes the
+ * rare-Answer sentinel where it does not: a word players produce and few people
+ * recognise is still rare by the measure the rare bonus is drawn on. The
+ * sentinel clears every threshold ADR-0015 allows, so this needs no knob.
+ *
+ * Every reader of a standing value goes through this one rule, the build and
+ * the Editor's Pass alike, so the screen cannot drift from the next rebuild.
+ */
+export function layeredValue(
+  layers: WordLayers,
+  measured: number | undefined,
+): number | undefined {
+  const { verdict, locked = false, moved = false } = layers;
+  if (!moved || (locked && verdict !== undefined)) return overriddenValue(verdict, measured);
+  if (verdict === "answer-rare" || verdict === "answer-common") return VERDICT_VALUE[verdict];
+  return Math.max(measured ?? -Infinity, VERDICT_VALUE["answer-rare"]);
+}
+
 /** One line of the file: what was decided about one word, and when. */
 export interface TierOverrideRow {
   word: string;
@@ -129,12 +168,30 @@ export interface TierOverrideRow {
   decided: string;
   /** Whatever the editor wanted to say about it. Free text, may be empty. */
   note: string;
+  /**
+   * The editor's **lock** (#270, ADR-0015 amended): set from the Editor's Pass,
+   * it puts this verdict over the Tier moves Session Records make. With moves
+   * going one way, its one use is to keep a Bonus Word from becoming an Answer.
+   * Absent means unlocked. Like the verdict it is last-row-wins, so a lock is
+   * cleared by a later row for the word that does not carry it, and the job's
+   * next run cannot undo it the way it would a newer row.
+   */
+  locked?: true;
 }
 
-/** The column header the file carries, and the order the columns are written in. */
-export const TIER_OVERRIDE_HEADER = "word,verdict,measured,decided,note";
+/**
+ * The column header the file carries, and the order the columns are written in.
+ * `locked` is the one optional column: a row written without it (every row
+ * before #270, and every unlocked one since) is an unlocked verdict, so the
+ * file never had to be rewritten to gain it.
+ */
+export const TIER_OVERRIDE_HEADER = "word,verdict,measured,decided,note,locked";
+
+/** What the `locked` column holds on a locked row. */
+const LOCKED = "locked";
 
 const COLUMNS = 5;
+const COLUMNS_WITH_LOCK = 6;
 
 /**
  * Read a value back to the verdict that produced it, or null when it is an
@@ -168,6 +225,7 @@ export function serialiseTierOverride(row: TierOverrideRow): string {
     row.decided,
     row.note.replace(/\r?\n/g, " "),
   ];
+  if (row.locked === true) fields.push(LOCKED);
   return fields.map(csvField).join(",") + "\n";
 }
 
@@ -193,9 +251,17 @@ export function parseTierOverrides(text: string): TierOverrideRow[] {
     // can collide: `verdict` is not one of the verdicts.
     if (fields[0]?.trim() === "word" && fields[1]?.trim() === "verdict") continue;
 
-    if (fields.length !== COLUMNS) {
+    if (fields.length !== COLUMNS && fields.length !== COLUMNS_WITH_LOCK) {
       throw new Error(
-        `Tier override "${line}": expected ${COLUMNS} columns (${TIER_OVERRIDE_HEADER}), found ${fields.length}.`,
+        `Tier override "${line}": expected ${COLUMNS} or ${COLUMNS_WITH_LOCK} columns ` +
+          `(${TIER_OVERRIDE_HEADER}), found ${fields.length}.`,
+      );
+    }
+
+    const lock = fields[5]?.trim() ?? "";
+    if (lock !== "" && lock !== LOCKED) {
+      throw new Error(
+        `Tier override "${line}": the last column is "${lock}". It is "${LOCKED}" or empty.`,
       );
     }
 
@@ -219,6 +285,7 @@ export function parseTierOverrides(text: string): TierOverrideRow[] {
       measured,
       decided: fields[3]!.trim(),
       note: fields[4]!,
+      ...(lock === LOCKED ? { locked: true as const } : {}),
     });
   }
   return out;
@@ -257,25 +324,37 @@ export interface StandingTierInput {
   measured: ReadonlyMap<string, number>;
   /** `data/tier-overrides.csv` as text; empty when no verdict stands. */
   overrides: string;
+  /** `data/tier-moves.csv` as text; empty or absent when nothing has moved. */
+  moves?: string;
   /** The Answer/Bonus line the built index carries. */
   knownnessThreshold: number;
 }
 
 /**
- * Each word's Tier with every standing verdict applied: what the next build
- * will make it. The walk the index makes, over measured prevalence patched by
- * `overriddenValue`, ended at `tierFor`; a word with no value on the walk is a
- * Bonus Word, as it is in the index. For a reader that must see a verdict the
- * moment it is written, as the Candidate Queue must (#258).
+ * Each word's Tier with every standing verdict and move applied: what the next
+ * build will make it. The walk the index makes, over measured prevalence
+ * patched by `layeredValue`, ended at `tierFor`; a word with no value on the
+ * walk is a Bonus Word, as it is in the index. For a reader that must see a
+ * verdict the moment it is written, as the Candidate Queue must (#258).
  */
 export function standingTierOf(input: StandingTierInput): (word: string) => Tier {
-  const standing = resolveTierOverrides(parseTierOverrides(input.overrides));
+  const layersOf = standingLayers(input.overrides, input.moves ?? "");
   return (word) => {
     for (const candidate of input.lemmaCandidates(normaliseWord(word))) {
-      const value = overriddenValue(standing.get(candidate)?.verdict, input.measured.get(candidate));
+      const value = layeredValue(layersOf(candidate), input.measured.get(candidate));
       if (value !== undefined) return tierFor(value, input.knownnessThreshold);
     }
     return "bonus";
+  };
+}
+
+/** Each word's layers, read off the two files. */
+export function standingLayers(overrides: string, moves: string): (word: string) => WordLayers {
+  const standing = resolveTierOverrides(parseTierOverrides(overrides));
+  const moved = parseTierMoves(moves);
+  return (word) => {
+    const row = standing.get(word);
+    return { verdict: row?.verdict, locked: row?.locked === true, moved: moved.has(word) };
   };
 }
 
@@ -316,14 +395,56 @@ export function applyTierOverrides(
   text: string,
   target: TierOverrideTarget,
 ): AppliedTierOverride[] {
-  const applied: AppliedTierOverride[] = [];
-  for (const [word, override] of resolveTierOverrides(parseTierOverrides(text))) {
-    const hadPrevalence = target.prevalence.has(word);
+  return applyTierLayers({ overrides: text, moves: "" }, target).overridden;
+}
+
+/** One move as the build applied it, so the build can report what the moves did. */
+export interface AppliedTierMove {
+  word: string;
+  /** The value the word now carries; for a locked word, the editor's. */
+  patched: number | null;
+  /** The unlocked editor verdict the move beat, if it beat one. */
+  overrode: TierVerdict | null;
+  /** Whether a locked editor verdict held the word where the editor put it. */
+  locked: boolean;
+}
+
+/**
+ * Merge both layers over the parsed prevalence map, by `layeredValue`: the
+ * editor's verdicts (`data/tier-overrides.csv`) and the job's moves
+ * (`data/tier-moves.csv`, #270). One function, so the precedence lives in one
+ * place; `overridden` reports the editor's rows as `applyTierOverrides` always
+ * has, and `moved` reports what the moves did over them.
+ */
+export function applyTierLayers(
+  texts: { overrides: string; moves: string },
+  target: TierOverrideTarget,
+): { overridden: AppliedTierOverride[]; moved: AppliedTierMove[] } {
+  const standing = resolveTierOverrides(parseTierOverrides(texts.overrides));
+  const movedWords = parseTierMoves(texts.moves);
+  const measured = new Map<string, number | undefined>();
+  for (const word of [...standing.keys(), ...movedWords]) {
+    measured.set(word, target.prevalence.get(word));
+  }
+
+  const overridden: AppliedTierOverride[] = [];
+  for (const [word, override] of standing) {
+    const hadPrevalence = measured.get(word) !== undefined;
     const patched = override.verdict === "none" ? null : VERDICT_VALUE[override.verdict];
     if (patched !== null) target.prevalence.set(word, patched);
-    applied.push({ word, verdict: override.verdict, patched, rows: override.rows, hadPrevalence });
+    overridden.push({ word, verdict: override.verdict, patched, rows: override.rows, hadPrevalence });
   }
-  return applied;
+
+  const moved: AppliedTierMove[] = [];
+  for (const word of movedWords) {
+    const row = standing.get(word);
+    const locked = row?.locked === true;
+    const patched = layeredValue({ verdict: row?.verdict, locked, moved: true }, measured.get(word)) ?? null;
+    if (patched !== null) target.prevalence.set(word, patched);
+    const overrode = !locked && row?.verdict === "bonus" ? row.verdict : null;
+    moved.push({ word, patched, overrode, locked });
+  }
+  return { overridden, moved };
 }
 
 // --- the build-time guard ------------------------------------------------------

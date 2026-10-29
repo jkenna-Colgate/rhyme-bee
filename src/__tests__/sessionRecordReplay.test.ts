@@ -41,6 +41,17 @@ describe("replaying a Session Record", () => {
     expect(replay.maxScore).toBeGreaterThan(replay.score);
   });
 
+  it("says which words the Puzzle holds, so a Tier move can count the Sessions that had the chance", () => {
+    const replay = replaySessionRecord(index, record);
+    if (!replay.replayed) throw new Error(replay.problem);
+
+    const puzzle = index.buildPuzzle(index.pinSeed("ate"));
+    expect(replay.held.answers).toEqual(puzzle.answers.map((a) => a.word));
+    expect(replay.held.bonusWords).toEqual(puzzle.bonusWords.map((b) => b.word));
+    expect(replay.held.answers).toContain("late");
+    expect(replay.held.bonusWords).toContain("objurgate");
+  });
+
   it("lists each rejection in order, with its reason and the words a player was shown", () => {
     const replay = replaySessionRecord(index, record);
     if (!replay.replayed) throw new Error(replay.problem);

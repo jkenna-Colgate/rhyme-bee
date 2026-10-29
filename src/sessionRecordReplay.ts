@@ -44,6 +44,11 @@ export type SessionReplay =
       rank: Rank;
       outcome: SessionOutcome;
       found: { answers: string[]; bonus: string[] };
+      /**
+       * Every word the Puzzle holds, by Tier. What a Tier move (#270) counts a
+       * Session against: a Session had the chance to find each of these.
+       */
+      held: { answers: string[]; bonusWords: string[] };
       totalAnswers: number;
       submissions: ReplayedSubmission[];
       rejections: ReplayedRejection[];
@@ -95,6 +100,10 @@ export function replaySessionRecord(index: RhymeIndex, record: SessionRecord): S
     rank: session.rank(),
     outcome: session.outcome(),
     found: { answers: [...session.foundAnswers], bonus: [...session.foundBonus] },
+    held: {
+      answers: session.puzzle.answers.map((entry) => entry.word),
+      bonusWords: session.puzzle.bonusWords.map((entry) => entry.word),
+    },
     totalAnswers: session.progress().totalAnswers,
     submissions,
     rejections,

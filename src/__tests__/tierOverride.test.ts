@@ -15,11 +15,14 @@
 import { describe, expect, it } from "vitest";
 import {
   VERDICT_VALUE,
+  applyTierLayers,
   applyTierOverrides,
   checkTierSentinels,
+  layeredValue,
   parseTierOverrides,
   resolveTierOverrides,
   serialiseTierOverride,
+  standingTierOf,
   verdictForValue,
   type TierOverrideRow,
 } from "../tierOverride.ts";
@@ -300,6 +303,135 @@ describe("applyTierOverrides", () => {
     );
 
     expect(applied!.hadPrevalence).toBe(false);
+  });
+});
+
+describe("the editor's lock", () => {
+  it("reads a sixth column of `locked` as a locked verdict", () => {
+    const [parsed] = parseTierOverrides("excuse,bonus,,2026-11-01T00:00:00.000Z,,locked\n");
+    expect(parsed).toMatchObject({ word: "excuse", verdict: "bonus", locked: true });
+  });
+
+  it("reads a row with no sixth column, every row written before the lock, as unlocked", () => {
+    const [parsed] = parseTierOverrides("excuse,bonus,,2026-11-01T00:00:00.000Z,\n");
+    expect(parsed!.locked).toBeUndefined();
+  });
+
+  it("throws on a sixth column that is neither empty nor `locked`", () => {
+    expect(() => parseTierOverrides("excuse,bonus,,2026-11-01T00:00:00.000Z,,yes\n")).toThrow(
+      /locked/,
+    );
+  });
+
+  it("round-trips a locked row, and writes an unlocked one as it always has", () => {
+    const locked = row({ locked: true });
+    expect(parseTierOverrides(serialiseTierOverride(locked))).toEqual([locked]);
+    expect(serialiseTierOverride(row()).trimEnd().split(",")).toHaveLength(5);
+  });
+
+  it("is cleared by a later row for the word without it, last row winning", () => {
+    const file =
+      serialiseTierOverride(row({ verdict: "bonus", locked: true })) +
+      serialiseTierOverride(row({ verdict: "bonus" }));
+    expect(resolveTierOverrides(parseTierOverrides(file)).get("counterthrust")!.locked).toBeUndefined();
+  });
+});
+
+describe("the precedence: prevalence, the editor's verdicts, the job's moves, a locked verdict", () => {
+  const RARE = VERDICT_VALUE["answer-rare"];
+
+  it("leaves prevalence governing where nothing else stands", () => {
+    expect(layeredValue({}, -1.2)).toBe(-1.2);
+    expect(layeredValue({}, undefined)).toBeUndefined();
+  });
+
+  it("puts an editor's verdict over prevalence", () => {
+    expect(layeredValue({ verdict: "bonus" }, 1.5)).toBe(-3.0);
+  });
+
+  it("makes a moved word a rare Answer, over its measured prevalence", () => {
+    const value = layeredValue({ moved: true }, -1.2);
+    expect(value).toBe(RARE);
+    expect(tierFor(value!, THRESHOLD)).toBe("answer");
+  });
+
+  it("puts a move over an unlocked editor's `bonus`, and prevalence back in charge where it makes an Answer", () => {
+    expect(layeredValue({ verdict: "bonus", moved: true }, -1.2)).toBe(RARE);
+    expect(layeredValue({ verdict: "bonus", moved: true }, 1.5)).toBe(1.5);
+  });
+
+  it("leaves an editor's Answer verdict as it is under a move, which asks for no more", () => {
+    expect(layeredValue({ verdict: "answer-common", moved: true }, -1.2)).toBe(3.0);
+    expect(layeredValue({ verdict: "answer-rare", moved: true }, 1.5)).toBe(RARE);
+  });
+
+  it("puts a locked verdict over a move", () => {
+    expect(layeredValue({ verdict: "bonus", locked: true, moved: true }, -1.2)).toBe(-3.0);
+    // A locked `none` keeps prevalence governing, move or no move.
+    expect(layeredValue({ verdict: "none", locked: true, moved: true }, -1.2)).toBe(-1.2);
+  });
+});
+
+describe("applyTierLayers", () => {
+  function prevalence(entries: Record<string, number> = {}) {
+    return { prevalence: new Map(Object.entries(entries)) };
+  }
+
+  it("patches a moved word over its measured prevalence", () => {
+    const target = prevalence({ excuse: -1.2 });
+    const { moved } = applyTierLayers({ overrides: "", moves: "excuse,2026-11-01,3,3,0.3684\n" }, target);
+
+    expect(target.prevalence.get("excuse")).toBe(VERDICT_VALUE["answer-rare"]);
+    expect(moved).toEqual([{ word: "excuse", patched: VERDICT_VALUE["answer-rare"], overrode: null, locked: false }]);
+  });
+
+  it("names the editor's verdict a move overrode", () => {
+    const target = prevalence({ excuse: -1.2 });
+    const { moved } = applyTierLayers(
+      {
+        overrides: serialiseTierOverride(row({ word: "excuse", verdict: "bonus" })),
+        moves: "excuse,2026-11-01,3,3,0.3684\n",
+      },
+      target,
+    );
+    expect(target.prevalence.get("excuse")).toBe(VERDICT_VALUE["answer-rare"]);
+    expect(moved[0]).toMatchObject({ overrode: "bonus", locked: false });
+  });
+
+  it("leaves a word under a locked verdict where the editor put it", () => {
+    const target = prevalence({ excuse: -1.2 });
+    const { moved } = applyTierLayers(
+      {
+        overrides: serialiseTierOverride(row({ word: "excuse", verdict: "bonus", locked: true })),
+        moves: "excuse,2026-11-01,3,3,0.3684\n",
+      },
+      target,
+    );
+    expect(target.prevalence.get("excuse")).toBe(-3.0);
+    expect(moved[0]).toMatchObject({ locked: true });
+  });
+
+  it("is what applyTierOverrides does when there are no moves", () => {
+    const a = prevalence({ counterthrust: 1.2119 });
+    const b = prevalence({ counterthrust: 1.2119 });
+    const text = serialiseTierOverride(row({ verdict: "bonus" }));
+    expect(applyTierLayers({ overrides: text, moves: "" }, a).overridden).toEqual(
+      applyTierOverrides(text, b),
+    );
+    expect(a.prevalence).toEqual(b.prevalence);
+  });
+});
+
+describe("standingTierOf, with the job's moves", () => {
+  it("tiers a moved word as the next build will", () => {
+    const tierOf = standingTierOf({
+      lemmaCandidates: (word) => [word],
+      measured: new Map([["excuse", -1.2]]),
+      overrides: "",
+      moves: "excuse,2026-11-01,3,3,0.3684\n",
+      knownnessThreshold: THRESHOLD,
+    });
+    expect(tierOf("excuse")).toBe("answer");
   });
 });
 

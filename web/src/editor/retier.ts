@@ -52,7 +52,7 @@
 import { measureAnswers } from "../../../src/curation.ts";
 import type { PuzzleFacts } from "../../../src/schedule.ts";
 import {
-  overriddenValue,
+  layeredValue,
   type TierOverrideRow,
   type TierVerdict,
 } from "../../../src/tierOverride.ts";
@@ -75,6 +75,8 @@ export interface StandingVerdict {
   decided: string;
   /** What prevalence said when that row was written; null for no row at all. */
   measured: number | null;
+  /** Present when the editor has locked the verdict over the job's moves (#270). */
+  locked?: true;
 }
 
 /**
@@ -94,6 +96,12 @@ export interface TierPickerState {
   /** The day this state was built for, so a stale reply can be discarded. */
   date: string;
   standing: StandingVerdict[];
+  /**
+   * Every word `data/tier-moves.csv` moves to Answer (#270). Read over the
+   * standing verdicts and under a locked one, as the build reads it. Optional
+   * so a state from before the moves existed still reads as "nothing moved".
+   */
+  moved?: string[];
   lookups: KnownnessLookup[];
   /** Measured prevalence, for every candidate above that has a row of its own. */
   measured: Record<string, number>;
@@ -126,6 +134,10 @@ export interface RetieredWord extends DayWord {
   verdict: TierVerdict | null;
   /** Rows this word carries. More than one is a reversal, and is flagged. */
   rows: number;
+  /** Whether the verdict standing on this word is locked over the job's moves. */
+  locked: boolean;
+  /** Whether Session Records moved this word to Answer (`data/tier-moves.csv`). */
+  moved: boolean;
   /**
    * The word whose value supplied this one's knownness — itself, when it has a
    * prevalence row or a verdict of its own, and otherwise the lemma it fell back
@@ -154,13 +166,19 @@ export interface RetieredDay {
  */
 export function retierDay(lists: DayLists, state: TierPickerState): RetieredDay {
   const standing = new Map(state.standing.map((row) => [row.word, row]));
+  const moved = new Set(state.moved ?? []);
   const candidatesOf = new Map(state.lookups.map((l) => [l.word, l.candidates]));
 
-  // The value a candidate carries now, by the sentinel-vs-measured rule
-  // `overriddenValue` shares with the build and with the write route's own
-  // reach report.
-  const valueOf = (candidate: string): number | undefined =>
-    overriddenValue(standing.get(candidate)?.verdict, state.measured[candidate]);
+  // The value a candidate carries now, by the precedence `layeredValue` shares
+  // with the build and with the write route's own reach report: prevalence,
+  // the editor's verdicts, the job's moves, a locked verdict.
+  const valueOf = (candidate: string): number | undefined => {
+    const row = standing.get(candidate);
+    return layeredValue(
+      { verdict: row?.verdict, locked: row?.locked === true, moved: moved.has(candidate) },
+      state.measured[candidate],
+    );
+  };
 
   const retier = (entry: DayWord): RetieredWord => {
     const own = standing.get(entry.word);
@@ -186,6 +204,8 @@ export function retierDay(lists: DayLists, state: TierPickerState): RetieredDay 
       knownness,
       verdict: own?.verdict ?? null,
       rows: own?.rows ?? 0,
+      locked: own?.locked === true,
+      moved: moved.has(entry.word),
       source,
       sourceVerdict:
         source === null || source === entry.word ? null : standing.get(source)?.verdict ?? null,

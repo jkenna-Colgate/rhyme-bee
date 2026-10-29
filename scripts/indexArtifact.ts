@@ -136,7 +136,9 @@ export function indexArtifactPath(outDir: string): string {
  * fixes it as a legitimate no-op, the same standing an *empty* file has, and
  * for a project with no Editor's Pass behind it yet that absence is not a
  * step still to run — it may never be. See `OPTIONAL_DATA_INPUTS` below for
- * how that changes what "absent" means for this one entry.
+ * how that changes what "absent" means for this one entry. `tier-moves.csv`
+ * (#270) stands on the same footing: nothing has moved until Session Records
+ * move something.
  *
  * `sources.sha256` (#272) is read by the build's source check rather than by
  * the manufacture, and is here for that reason: a pulled commit that re-pins a
@@ -153,6 +155,7 @@ const DATA_INPUTS = [
   "demotions.txt",
   "supplement.dict",
   "tier-overrides.csv",
+  "tier-moves.csv",
 ];
 
 /**
@@ -171,7 +174,7 @@ const DATA_INPUTS = [
  * once it exists, a newer mtime than the artifact is stale exactly like any
  * other input, which is what makes a rebuild after an Editor's Pass automatic.
  */
-const OPTIONAL_DATA_INPUTS = new Set(["tier-overrides.csv"]);
+const OPTIONAL_DATA_INPUTS = new Set(["tier-overrides.csv", "tier-moves.csv"]);
 
 /**
  * The build's own source counts as an input.

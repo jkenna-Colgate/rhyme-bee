@@ -78,6 +78,7 @@ const inputs = {
   demotions: readOptional("demotions.txt"),
   supplement: readOptional("supplement.dict"),
   tierOverrides: readOptional("tier-overrides.csv"),
+  tierMoves: readOptional("tier-moves.csv"),
   unconfirmedRhymes: readOptional("unconfirmed-rhymes.txt"),
 };
 

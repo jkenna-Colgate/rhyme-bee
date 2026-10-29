@@ -111,6 +111,45 @@ describe("the override layer, merged into the composed build", () => {
   });
 });
 
+describe("the Tier moves from Session Records, merged into the composed build (#270)", () => {
+  // objurgate made a Bonus Word at the shipped threshold, as a word nobody
+  // recognises would be.
+  const unknown: [string, number][] = [["objurgate", -1.0]];
+  const moves = "objurgate,2026-11-01T00:00:00.000Z,3,3,0.3684\n";
+
+  it("makes a moved Bonus Word an Answer", () => {
+    const before = makeTestIndex({ prevalence: unknown, knownnessThreshold: SHIPPED_THRESHOLD });
+    const after = makeTestIndex({
+      prevalence: unknown,
+      tierMoves: moves,
+      knownnessThreshold: SHIPPED_THRESHOLD,
+    });
+
+    expect(before.tierOf("objurgate").tier).toBe("bonus");
+    expect(after.tierOf("objurgate").tier).toBe("answer");
+  });
+
+  it("puts the move over the editor's unlocked verdict", () => {
+    const index = makeTestIndex({
+      prevalence: unknown,
+      tierOverrides: row({ word: "objurgate", verdict: "bonus" }),
+      tierMoves: moves,
+      knownnessThreshold: SHIPPED_THRESHOLD,
+    });
+    expect(index.tierOf("objurgate").tier).toBe("answer");
+  });
+
+  it("leaves a word under a locked verdict a Bonus Word", () => {
+    const index = makeTestIndex({
+      prevalence: unknown,
+      tierOverrides: row({ word: "objurgate", verdict: "bonus", locked: true }),
+      tierMoves: moves,
+      knownnessThreshold: SHIPPED_THRESHOLD,
+    });
+    expect(index.tierOf("objurgate")).toEqual({ tier: "bonus", knownness: -3.0 });
+  });
+});
+
 describe("an override on a lemma also re-tiers the surface forms that lemmatise to it (pinned, not asserted as intended)", () => {
   // `RhymeIndex#tier` resolves knownness through `lemmaCandidates`, which tries
   // the surface form first and falls back to candidate lemmas. `gates` is the

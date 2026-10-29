@@ -21,7 +21,7 @@
 import { describe, expect, it } from "vitest";
 import type { RhymeIndex } from "../../src/rhymeIndex.ts";
 import type { Schedule } from "../../src/schedule.ts";
-import type { TierOverrideRow } from "../../src/tierOverride.ts";
+import { serialiseTierOverride, type TierOverrideRow } from "../../src/tierOverride.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "../editorTierRequest.ts";
 import { editorTierSpec } from "../editorTierPlugin.ts";
 import { editorMiddleware } from "../editorRoute.ts";
@@ -85,7 +85,7 @@ function endpoint(overrides: Partial<Parameters<typeof editorTierSpec>[0]> = {})
       overrides: () => text,
       append: (row) => {
         written.push(row);
-        text += `${row.word},${row.verdict},${row.measured ?? ""},${row.decided},${row.note}\n`;
+        text += serialiseTierOverride(row);
       },
       now: () => "2026-08-08T12:00:00.000Z",
       knownnessThreshold: () => 0,
@@ -235,6 +235,49 @@ describe("writing a judgement", () => {
       verdict: "none",
       rows: 2,
     });
+  });
+});
+
+describe("the editor's lock (#270)", () => {
+  it("writes a locked verdict as a row carrying the lock", async () => {
+    const { handler, written } = endpoint();
+    const answered = await call(handler, {
+      url: "/?date=2026-08-03",
+      ...post({ word: "sedate", verdict: "bonus", locked: true }),
+    });
+
+    expect(written[0]).toMatchObject({ word: "sedate", verdict: "bonus", locked: true });
+    expect(JSON.parse(answered.body).state.standing[0]).toMatchObject({ locked: true });
+  });
+
+  it("clears the lock with a later row for the word that does not carry it", async () => {
+    const { handler } = endpoint();
+    await call(handler, { ...post({ word: "sedate", verdict: "bonus", locked: true }) });
+    const answered = await call(handler, {
+      ...post({ word: "sedate", verdict: "bonus", locked: false }),
+    });
+
+    const standing = JSON.parse(answered.body).state.standing[0];
+    expect(standing).toMatchObject({ verdict: "bonus", rows: 2 });
+    expect(standing.locked).toBeUndefined();
+  });
+
+  it("refuses a lock that is not true or false, and writes nothing", async () => {
+    const { handler, written } = endpoint();
+    const answered = await call(handler, {
+      ...post({ word: "sedate", verdict: "bonus", locked: "yes" }),
+    });
+
+    expect(answered.status).toBe(400);
+    expect(JSON.parse(answered.body).error).toMatch(/lock/);
+    expect(written).toEqual([]);
+  });
+
+  it("answers with the words the job has moved, so the picker tiers them as the build will", async () => {
+    const { handler } = endpoint({ moves: () => "sedate,2026-11-01T00:00:00.000Z,9,10,0.6058\n" });
+    const answered = await call(handler, { url: "/?date=2026-08-03" });
+
+    expect(JSON.parse(answered.body).moved).toEqual(["sedate"]);
   });
 });
 

@@ -43,9 +43,11 @@ export interface TierPicker {
   recorded: TierWriteResult | null;
   /**
    * Record a verdict against the day on screen. Resolves once the file has it
-   * and the state is refreshed.
+   * and the state is refreshed. `locked` writes it locked over the job's moves
+   * (#270); a verdict written without it is unlocked, which is also how a lock
+   * is cleared.
    */
-  judge: (word: string, verdict: TierVerdict) => Promise<void>;
+  judge: (word: string, verdict: TierVerdict, locked?: boolean) => Promise<void>;
 }
 
 export function useTierPicker(date: string | null): TierPicker {
@@ -84,7 +86,7 @@ export function useTierPicker(date: string | null): TierPicker {
   }, [date]);
 
   const judge = useCallback(
-    async (word: string, verdict: TierVerdict) => {
+    async (word: string, verdict: TierVerdict, locked = false) => {
       // The day posted is the one the words on screen belong to, which is this
       // argument: `EditorApp` passes the readout's own date, and `DayReadoutView`
       // builds both lists from that same readout — so the words being judged and
@@ -109,7 +111,7 @@ export function useTierPicker(date: string | null): TierPicker {
         const response = await fetch(`${EDITOR_TIER_PATH}?date=${date}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word, verdict }),
+          body: JSON.stringify({ word, verdict, locked }),
         });
         const outcome = await readEndpointResponse<TierWriteResult>(response, "Tier");
         if (!outcome.ok) {

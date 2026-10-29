@@ -172,6 +172,23 @@ describe("the staleness predicate", () => {
     });
   });
 
+  it("does not report stale when only tier-moves.csv is missing", () => {
+    // Nothing has moved until Session Records move something (#270).
+    const { root } = repo(["tier-moves.csv"]);
+    expect(indexStaleness(root)).toEqual({ stale: false, reason: null });
+  });
+
+  it("reports stale once tier-moves.csv is newer than the artifact", () => {
+    // A run that moved words must ship them on the next deploy.
+    const { root } = repo();
+    touch(resolve(root, "data/tier-moves.csv"));
+    expect(indexStaleness(root)).toEqual({
+      stale: true,
+      reason: "input-newer",
+      input: resolve(root, "data/tier-moves.csv"),
+    });
+  });
+
   it("reports stale when no index has been built at all", () => {
     const root = mkdtempSync(resolve(tmpdir(), "rhyme-bee-staleness-"));
     expect(indexStaleness(root)).toEqual({ stale: true, reason: "no-artifact" });

@@ -84,7 +84,15 @@ export function correctedDay(
 
 /** A day with no picker state yet: the readout's own words, judged by nobody. */
 function unjudged(entry: DayWord): RetieredWord {
-  return { ...entry, verdict: null, rows: 0, source: null, sourceVerdict: null };
+  return {
+    ...entry,
+    verdict: null,
+    rows: 0,
+    locked: false,
+    moved: false,
+    source: null,
+    sourceVerdict: null,
+  };
 }
 
 /**
