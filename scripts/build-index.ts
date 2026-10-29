@@ -158,7 +158,8 @@ console.log(
 );
 
 // The Continuity check (#256): every place in the Schedule, past dates
-// included, because every place comes round again. A failing day is repaired
+// included, because every place comes round again (a spare in front of the lap
+// is repaired too, and holds no place in the one-place check). A failing day is repaired
 // in `data/schedule.json` where it can be and counted as Free Play where it
 // cannot. None of it blocks the build: the index above is already written,
 // and with nobody attending, a blocked build never unblocks. Run on
@@ -170,7 +171,7 @@ try {
   if (schedule === null) {
     console.log(`Continuity: ${schedulePath} is not a readable schedule; nothing checked.`);
   } else {
-    const report = checkContinuity(schedule.days, deserialise(artifact));
+    const report = checkContinuity(schedule.days, deserialise(artifact), { lapStart: schedule.lapStart });
     if (report.repairs.length > 0) {
       writeFileSync(schedulePath, `${JSON.stringify({ ...raw, days: report.days }, null, 2)}\n`);
     }

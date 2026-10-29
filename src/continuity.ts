@@ -95,6 +95,14 @@ export interface ContinuityOptions {
    * either way, since its lead word is a Seed Word joining the Schedule.
    */
   seedWordTest?: boolean;
+  /**
+   * The date the lap in progress began (`Schedule.lapStart`). A day before it
+   * is a spare in front of the lap: it played once on its own date and never
+   * comes round, so it holds no place, and a spare's Seed Word is free to fill
+   * one (#265). It is still repaired like any day. Without it, every day holds
+   * a place.
+   */
+  lapStart?: string;
 }
 
 export function checkContinuity(
@@ -109,6 +117,7 @@ export function checkContinuity(
   const puzzleOf = puzzleReader(index);
   const passes = (seed: string, rhymeKey: RhymeKey) =>
     !options.seedWordTest || testSeedWord(index, seed, rhymeKey).passes;
+  const holdsPlace = (day: ScheduleDay) => options.lapStart === undefined || day.date >= options.lapStart;
 
   repaired.forEach((day, i) => {
     const failure = pinFailure(index, day.seed, day.rhymeKey) ?? testFailure(index, day, options);
@@ -155,7 +164,9 @@ export function checkContinuity(
       const answers = puzzleOf(seed, rhymeKey);
       return repaired.some(
         (d, j) =>
-          j !== i && (d.seed === seed || d.rhymeKey === rhymeKey || (answers !== null && puzzleOf(d.seed, d.rhymeKey) === answers)),
+          j !== i &&
+          holdsPlace(d) &&
+          (d.seed === seed || d.rhymeKey === rhymeKey || (answers !== null && puzzleOf(d.seed, d.rhymeKey) === answers)),
       );
     };
     const chosen = candidates.find((c) => !collides(c.seed, c.rhymeKey)) ?? candidates[0];
@@ -169,7 +180,7 @@ export function checkContinuity(
     freePlay.push({ date: day.date, seed: day.seed, rhymeKey: day.rhymeKey, detail: failure });
   });
 
-  return { days: repaired, repairs, freePlay, collisions: collisionsIn(repaired, puzzleOf) };
+  return { days: repaired, repairs, freePlay, collisions: collisionsIn(repaired.filter(holdsPlace), puzzleOf) };
 }
 
 /**
@@ -207,7 +218,8 @@ function answersIn(family: RhymeFamily): number {
  * Normalisation can file one family under two key spellings (`purifier` on
  * `AY ER`, `expire` on `AY R`); days on one Rhyme Key are reported once, as
  * that key. Run over the Schedule as repaired, since that is the Schedule the
- * build writes.
+ * build writes, and over the days that hold a place: a spare in front of the
+ * lap holds none (`ContinuityOptions.lapStart`).
  */
 function collisionsIn(
   days: readonly ScheduleDay[],
