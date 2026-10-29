@@ -43,7 +43,7 @@ import type { Plugin } from "vite";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, type Schedule } from "../src/schedule.ts";
-import { layeredValue, type TierOverrideRow } from "../src/tierOverride.ts";
+import { layeredValue, standingLayers, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
@@ -131,11 +131,11 @@ export function editorTierHandler(deps: EditorTierDeps) {
       const judgement = tierWriteRequest(body);
       if (!judgement.ok) return sendJson(res, 400, { error: judgement.error });
 
-      sendJson(
-        res,
-        200,
-        record(deps, judgement.word, judgement.verdict, judgement.locked === true, asked.date),
-      );
+      // A verdict picked without naming the lock keeps the word's own: only
+      // the editor's Unlock clears it (#270).
+      const locked =
+        judgement.locked ?? standingLayers(deps.overrides(), "")(judgement.word).locked === true;
+      sendJson(res, 200, record(deps, judgement.word, judgement.verdict, locked, asked.date));
     } catch (error) {
       // What throws past here is a missing artifact, an unreadable schedule or
       // a file that would not take the append, and all three already name their

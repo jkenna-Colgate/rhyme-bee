@@ -44,8 +44,11 @@ export const MAX_TIER_BODY_BYTES = 512;
 const WORD = /^[a-z]+$/;
 
 export type TierWriteRequest =
-  /** `locked` is present only on a request that locks the verdict (#270). */
-  | { ok: true; word: string; verdict: TierVerdict; locked?: true }
+  /**
+   * `locked` is present only on a request that names the lock (#270): true locks
+   * the verdict, false unlocks it. Absent keeps whatever lock the word carries.
+   */
+  | { ok: true; word: string; verdict: TierVerdict; locked?: boolean }
   | { ok: false; error: string };
 
 /**
@@ -85,8 +88,9 @@ export function tierWriteRequest(body: string): TierWriteRequest {
   if (typeof verdict !== "string" || !isTierVerdict(verdict)) {
     return { ok: false, error: notAVerdict(String(verdict)) };
   }
-  // The lock (#270): true locks the verdict over the job's moves; false or
-  // absent writes it unlocked, which is also how a lock is cleared.
+  // The lock (#270): true locks the verdict over the job's moves and false
+  // clears it. Absent is a verdict picked with the lock left alone, so a re-pick
+  // on a locked word cannot quietly hand it back to the job.
   if (locked !== undefined && typeof locked !== "boolean") {
     return { ok: false, error: `"${String(locked)}" is not a lock. It is true or false.` };
   }
@@ -95,6 +99,6 @@ export function tierWriteRequest(body: string): TierWriteRequest {
     ok: true,
     word: normaliseWord(word),
     verdict,
-    ...(locked === true ? { locked: true as const } : {}),
+    ...(typeof locked === "boolean" ? { locked } : {}),
   };
 }

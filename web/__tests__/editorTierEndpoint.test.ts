@@ -262,6 +262,28 @@ describe("the editor's lock (#270)", () => {
     expect(standing.locked).toBeUndefined();
   });
 
+  it("keeps the word's lock when a verdict is picked without naming one", async () => {
+    // Picking a verdict is not unlocking: a re-pick on a locked word that dropped
+    // the lock would let the next run move the word the editor locked.
+    const { handler, written } = endpoint();
+    await call(handler, { ...post({ word: "sedate", verdict: "bonus", locked: true }) });
+    const answered = await call(handler, { ...post({ word: "sedate", verdict: "answer-rare" }) });
+
+    expect(written[1]).toMatchObject({ word: "sedate", verdict: "answer-rare", locked: true });
+    expect(JSON.parse(answered.body).state.standing[0]).toMatchObject({
+      verdict: "answer-rare",
+      locked: true,
+    });
+  });
+
+  it("writes a verdict picked on an unlocked word unlocked", async () => {
+    const { handler, written } = endpoint();
+    await call(handler, { ...post({ word: "sedate", verdict: "bonus" }) });
+    await call(handler, { ...post({ word: "sedate", verdict: "answer-rare" }) });
+
+    expect(written[1]!.locked).toBeUndefined();
+  });
+
   it("refuses a lock that is not true or false, and writes nothing", async () => {
     const { handler, written } = endpoint();
     const answered = await call(handler, {

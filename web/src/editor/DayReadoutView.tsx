@@ -661,11 +661,11 @@ function VerdictMenu({
 }
 
 /**
- * The editor's **lock** (#270, ADR-0015 amended): a flag on the verdict
+ * The editor's **lock** (#270, ADR-0015 amended): a lock on the verdict
  * standing on this word, so it is offered only where one stands. Locking writes
  * that verdict again with the lock; unlocking writes it again without, last row
- * winning as every row in the file does. A verdict picked from the menu above is
- * written unlocked, so changing a verdict is never a silent re-lock.
+ * winning as every row in the file does. A verdict picked from the menu above
+ * keeps the word's lock, so only this button ever clears one.
  *
  * Session Records move a Bonus Word to Answer over an unlocked verdict, and only
  * that way, so the lock's one use is keeping a Bonus Word a Bonus Word.
