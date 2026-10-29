@@ -46,7 +46,7 @@ import { resolve } from "node:path";
 import { normaliseWord, parseCmudict } from "../src/cmudict.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import { parseWordList } from "../src/pipeline.ts";
-import type { Schedule } from "../src/schedule.ts";
+import { scheduledDayFor, type Schedule } from "../src/schedule.ts";
 import { applySupplement } from "../src/supplement.ts";
 import {
   evidenceContextFrom,
@@ -609,11 +609,12 @@ function printWordOutcome(w: WordOutcome, target: RhymeKey): void {
  * and each surface supplies its own.
  */
 export function targetIn(schedule: Schedule, date: string): ScheduledAddTarget | null {
-  const day = schedule.days.find((d) => d.date === date);
-  if (day === undefined) return null;
+  // A date past the first lap aims at the day it repeats (#257).
+  const day = scheduledDayFor(schedule, date);
+  if (day === null) return null;
   return {
     target: day.rhymeKey,
-    provenance: `${day.date}, the ${day.seed} Puzzle`,
+    provenance: `${date}, the ${day.seed} Puzzle`,
     seed: day.seed,
   };
 }

@@ -159,6 +159,15 @@ export interface Schedule {
   startDate: string;
   days: ScheduleDay[];
   /**
+   * The date the lap in progress began (ADR-0012, amended 2026-10-11). The
+   * listed days from here to the end are the loop, a whole number of weeks, and
+   * a date past the last of them is the day one lap earlier. Days listed before
+   * it are played once, on their own dates. Absent, the Schedule does not loop
+   * and resolves only the dates it lists: the committed artifact always records
+   * one, and the fixtures that stand in for it mostly do not need one.
+   */
+  lapStart?: string;
+  /**
    * The Answer-count band the run was dealt from, when the artifact records one.
    * Nothing a player does needs it — it is here so the Editor's Pass can ask
    * whether a Puzzle has since drifted out of the band it was chosen for,
@@ -201,11 +210,20 @@ function isScheduleDay(value: unknown): value is ScheduleDay {
  */
 export function parseSchedule(raw: unknown): Schedule | null {
   if (typeof raw !== "object" || raw === null) return null;
-  const artifact = raw as { startDate?: unknown; days?: unknown; band?: unknown };
+  const artifact = raw as { startDate?: unknown; lapStart?: unknown; days?: unknown; band?: unknown };
   if (typeof artifact.startDate !== "string") return null;
   if (!Array.isArray(artifact.days) || artifact.days.length === 0) return null;
   if (!artifact.days.every(isScheduleDay)) return null;
   const schedule: Schedule = { startDate: artifact.startDate, days: artifact.days };
+  if (artifact.lapStart !== undefined) {
+    // A lap start that does not mark out a loop of whole, consecutive weeks is a
+    // file that has changed shape, not a schedule to half-read: a loop of any
+    // other length would carry a Seed Word onto a different weekday each lap.
+    if (typeof artifact.lapStart !== "string" || !isLoop(artifact.days, artifact.lapStart)) {
+      return null;
+    }
+    schedule.lapStart = artifact.lapStart;
+  }
   // Optional, and deliberately not a reason to reject the file: a schedule with
   // no recorded band still serves Puzzles perfectly well, and only the Editor's
   // Pass is poorer for its absence.
@@ -216,20 +234,79 @@ export function parseSchedule(raw: unknown): Schedule | null {
   return schedule;
 }
 
+const MS_PER_DAY = 86_400_000;
+
+/** Whether an ISO-shaped string names a real calendar date (no 30 February). */
+function isCalendarDate(isoDate: string): boolean {
+  if (!ISO_DATE.test(isoDate)) return false;
+  const time = Date.parse(`${isoDate}T00:00:00Z`);
+  return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === isoDate;
+}
+
+/** Whole days from one ISO date to another; negative when `to` is earlier. */
+function daysBetween(from: string, to: string): number {
+  return Math.round(
+    (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / MS_PER_DAY,
+  );
+}
+
+/** The listed days the loop is made of: every day from the lap start on. */
+function loopDays(days: readonly ScheduleDay[], lapStart: string): ScheduleDay[] {
+  const first = days.findIndex((d) => d.date === lapStart);
+  return first === -1 ? [] : days.slice(first);
+}
+
+/**
+ * Whether `lapStart` marks out a loop: a listed date, followed to the end of the
+ * list by consecutive dates, a whole number of weeks of them. Consecutive is what
+ * lets a date be found by counting rather than by search, and whole weeks is what
+ * keeps every Seed Word on the weekday it was dealt to, lap after lap.
+ */
+function isLoop(days: readonly ScheduleDay[], lapStart: string): boolean {
+  if (!isCalendarDate(lapStart)) return false;
+  const loop = loopDays(days, lapStart);
+  return (
+    loop.length > 0 &&
+    loop.length % DAYS_PER_WEEK === 0 &&
+    loop.every((day, i) => day.date === addDays(lapStart, i))
+  );
+}
+
+/**
+ * The listed day a calendar date plays. Within the list that is the day with
+ * that date; past it, on a looping Schedule, it is the day the date repeats,
+ * found by counting days from the lap start and wrapping at the lap's length
+ * (ADR-0012, amended 2026-10-11). The day comes back as listed, with the date it
+ * was listed on: the caller holds the date it asked about.
+ *
+ * Null for a date the Schedule does not reach: one before it begins, one past
+ * the list of a Schedule that does not loop, or a string that is not a date.
+ */
+export function scheduledDayFor(schedule: Schedule, isoDate: string): ScheduleDay | null {
+  if (!isCalendarDate(isoDate)) return null;
+  const { lapStart } = schedule;
+  if (lapStart === undefined || isoDate < lapStart) {
+    return schedule.days.find((d) => d.date === isoDate) ?? null;
+  }
+  const loop = loopDays(schedule.days, lapStart);
+  return loop[daysBetween(lapStart, isoDate) % loop.length] ?? null;
+}
+
 /**
  * The Seed Word for a calendar date, pinned to the Rhyme Key the schedule
  * records — exactly as the free-play draw pins a Seed to its family's key, so an
  * ambiguous representative cannot misfire into the wrong Puzzle.
  *
- * Null for any date the run does not cover: an early visit before the start
- * date, a visit after the 260 days are up, or a date that is not a date. All
- * three mean the same thing to the shell — there is no Puzzle of the day, so
- * play a free one.
+ * A date past the last listed day is the Seed Word one lap earlier, and nothing
+ * about the answer says so: a Puzzle that has come round again is not announced
+ * to the player (#257). Null for an early visit before the Schedule begins, or a
+ * date that is not a date. Both mean the same thing to the shell — there is no
+ * Puzzle of the day, so play a free one.
  */
 export function seedForDate(schedule: Schedule | null, isoDate: string): SeedWord | null {
-  if (schedule === null || !ISO_DATE.test(isoDate)) return null;
-  const day = schedule.days.find((d) => d.date === isoDate);
-  return day === undefined ? null : { word: day.seed, rhymeKey: day.rhymeKey };
+  if (schedule === null) return null;
+  const day = scheduledDayFor(schedule, isoDate);
+  return day === null ? null : { word: day.seed, rhymeKey: day.rhymeKey };
 }
 
 /**

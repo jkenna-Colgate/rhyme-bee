@@ -62,7 +62,7 @@ export function readDay(schedule: Schedule, date: string): void {
   if (readout.outcome === "not-scheduled") {
     fail(
       `No Daily Puzzle scheduled for ${date}. ` +
-        `The run covers ${readout.firstDate} to ${readout.lastDate}.`,
+        `The Schedule begins on ${readout.firstDate}.`,
     );
   }
   if (readout.outcome === "unpinnable") failDisagreement(readout);

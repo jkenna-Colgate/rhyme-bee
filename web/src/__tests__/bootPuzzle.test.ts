@@ -83,6 +83,25 @@ describe("dailyPuzzle", () => {
     });
   });
 
+  it("carries the calendar date on a lap past the first, so two laps stay two Sessions (#257)", () => {
+    // One week, Thursday 2026-01-01 onward, looping from its first day.
+    const week = Array.from({ length: 7 }, (_, i) => ({
+      date: `2026-01-0${i + 1}`,
+      weekday: (["Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed"] as const)[i],
+      week: 1,
+      seed: "ate",
+      rhymeKey: "EY T",
+      answerCount: 6,
+      difficulty: 0,
+    }));
+    const looping = parseSchedule({ startDate: SCHEDULED_DATE, lapStart: SCHEDULED_DATE, days: week });
+    expect(dailyPuzzle(index, looping, "2026-01-08")).toEqual({
+      kind: "daily",
+      date: "2026-01-08",
+      seed: { word: "ate", rhymeKey: "EY T" },
+    });
+  });
+
   it("is null when the schedule has no entry for the date", () => {
     expect(dailyPuzzle(index, schedule, UNSCHEDULED_DATE)).toBeNull();
   });
