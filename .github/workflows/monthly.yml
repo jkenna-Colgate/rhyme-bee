@@ -1,0 +1,174 @@
+# The unattended loop's one scheduled workflow (#274, ADR-0021 amended
+# 2026-10-26). Each step is a command that also runs by hand; this file only
+# puts them in order:
+#
+#   1. judge the Appeals          npm run appeals:pull, npm run appeals:judge
+#   2. make the Tier moves        npm run records:pull, npm run tier:moves
+#   3. commit the writes and the run report (after a rebuild, so the report
+#      carries the Continuity lines and a repaired schedule is committed)
+#   4. keepalive                  the enable-workflow API, on this workflow
+#   5. deploy                     the deploy workflow, called directly
+#
+# Only the Appeals step may fail and leave the rest running. A run whose
+# Appeals step failed (no token, an expired one, or a model that cannot be
+# reached) still makes the Tier moves, commits and deploys, and is then marked
+# failed by the last job, so GitHub emails the workflow's owner. There is no
+# other alarm.
+#
+# Settings:
+#   - The timer: the cron below. It starts at once a month and must stay under
+#     60 days, after which GitHub switches off a scheduled workflow in a public
+#     repository with no activity. The report commit and the keepalive step are
+#     both there for that rule; neither is documented to count (#275 tests which).
+#   - The Appeals limit per run: APPEALS_LIMIT below, the most Candidates sent
+#     to the Judge in one run. Anyone can send an Appeal, and each one judged
+#     spends the maintainer's plan. A manual run may set its own.
+#   - The model: JUDGE_MODEL in scripts/judgeRun.ts, the exact model id the
+#     Judge was measured on, never an alias. It moves only in the yearly sitting.
+#
+# Secrets (repository secrets):
+#   - CLAUDE_CODE_OAUTH_TOKEN: the maintainer's Claude subscription token, from
+#     `claude setup-token`. It lasts a year.
+#     Expires: (the maintainer writes the date here when the token is added)
+#   - R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY: the read-only R2
+#     token, which reads the Appeals, the Session Records and the source mirror.
+#   - The Cloudflare token belongs to the deploy workflow, which gets it through
+#     `secrets: inherit`.
+#
+# The four index sources are private and the prevalence norms are licensed for
+# academic use, so nothing here prints them or uploads an artifact.
+
+name: Monthly
+
+on:
+  schedule:
+    # 07:17 UTC on the 1st of every month.
+    - cron: "17 7 1 * *"
+  workflow_dispatch:
+    inputs:
+      appeals-limit:
+        description: The most Candidates sent to the Judge in this run
+        required: false
+
+env:
+  APPEALS_LIMIT: ${{ inputs.appeals-limit || '40' }}
+
+permissions:
+  contents: read
+
+jobs:
+  loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: monthly-loop
+      cancel-in-progress: false
+    permissions:
+      # To push the report commit, and to call the enable-workflow API.
+      contents: write
+      actions: write
+    outputs:
+      appeals: ${{ steps.appeals.outcome }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Fetch the index sources from the mirror
+        run: npm run sources:fetch
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      # The Judge and the Tier moves both read the built index.
+      - name: Build the Rhyme Index
+        run: npm run build:index
+
+      - name: Judge the Appeals
+        id: appeals
+        continue-on-error: true
+        shell: bash
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::error::There is no CLAUDE_CODE_OAUTH_TOKEN secret, so the Judge cannot be reached and no Appeal is judged this run."
+            exit 1
+          fi
+          npm install -g @anthropic-ai/claude-code
+          npm run appeals:pull
+          npm run appeals:judge -- --limit "$APPEALS_LIMIT"
+
+      - name: Make the Tier moves from Session Records
+        shell: bash
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          mkdir -p data/monthly-run
+          npm run records:pull
+          npm run -s tier:moves | tee data/monthly-run/tier-moves.log
+
+      # The index as the deploy will build it, with this run's writes. Its
+      # Continuity check repairs data/schedule.json where it can, and that
+      # repair is committed below.
+      - name: Rebuild the index and check Continuity
+        shell: bash
+        run: npm run build:index | tee data/monthly-run/build.log
+
+      - name: Write the run report
+        run: npm run -s monthly:report -- --appeals-step "${{ steps.appeals.outcome }}"
+
+      # `git add -A data` adds only the committed data files: everything else
+      # under data/ (the sources, the Appeal queue, the Session Records and
+      # data/monthly-run/) is gitignored.
+      - name: Commit the writes and the run report
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data
+          git commit -F data/monthly-run/commit-message.txt
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Keep this workflow enabled
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method PUT "repos/{owner}/{repo}/actions/workflows/monthly.yml/enable"
+
+  # A push made with GITHUB_TOKEN starts no other workflow, so the deploy is
+  # called here. It checks out main, which now holds the commit above, and it
+  # deploys only once the setup check has passed (SETUP_CHECK_PASSED).
+  deploy:
+    needs: loop
+    permissions:
+      contents: read
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+
+  alarm:
+    needs: [loop, deploy]
+    if: always() && needs.loop.outputs.appeals == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the run failed, because the Appeals step failed
+        run: |
+          echo "::error::The Appeals step failed, so no Appeal was judged. The Tier moves, the commit and the deploy ran without it. Check CLAUDE_CODE_OAUTH_TOKEN and the model id in scripts/judgeRun.ts."
+          exit 1
