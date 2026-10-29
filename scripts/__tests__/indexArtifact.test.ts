@@ -93,6 +93,13 @@ describe("the Rhyme Index input list", () => {
     );
   });
 
+  it("holds the committed source checksums", () => {
+    // A pulled commit that re-pins a source changes no local source file, so
+    // only this input makes the deploy rebuild, and the rebuild's check then
+    // refuses until the new source is fetched (#272).
+    expect(inputs).toContain("/data/sources.sha256");
+  });
+
   it("does not hold the committed schedule", () => {
     // The schedule is read by the web bundle and never by the Index. Treating
     // it as an input would reinstate exactly the four minutes this removes.

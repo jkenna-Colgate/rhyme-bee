@@ -137,9 +137,15 @@ export function indexArtifactPath(outDir: string): string {
  * for a project with no Editor's Pass behind it yet that absence is not a
  * step still to run — it may never be. See `OPTIONAL_DATA_INPUTS` below for
  * how that changes what "absent" means for this one entry.
+ *
+ * `sources.sha256` (#272) is read by the build's source check rather than by
+ * the manufacture, and is here for that reason: a pulled commit that re-pins a
+ * source touches no source file, so without it the deploy would skip the
+ * rebuild and ship the index built from the old bytes.
  */
 const DATA_INPUTS = [
   "sources.json",
+  "sources.sha256",
   "cmudict.dict",
   "words.txt",
   "names.txt",

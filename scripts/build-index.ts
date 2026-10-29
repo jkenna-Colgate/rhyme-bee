@@ -3,8 +3,9 @@
  *
  *   npm run build:index
  *
- * Reads the raw inputs from `data/` (uncommitted — see .gitignore and
- * data/README.md), writes the built artifact and the dropped-words and
+ * Reads the raw inputs from `data/` (the four large sources are uncommitted and
+ * fetched from a private mirror by `npm run sources:fetch`, checked against the
+ * committed `data/sources.sha256`; see `sourceMirror.ts`), writes the built artifact and the dropped-words and
  * derived-words reports to `dist-data/`. It then runs the Continuity check over
  * `data/schedule.json`, which is the one file in `data/` it may write: a day
  * the check repairs is written back there (#256). Rebuilding from the same pinned inputs
@@ -26,6 +27,7 @@ import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { checkTierSentinels } from "../src/tierOverride.ts";
 import { listedSeedWords } from "../src/unconfirmedRhymes.ts";
 import { MANIFEST_FILENAME, writeIndexArtifact } from "./indexArtifact.ts";
+import { buildRefusal, checkLocalSources } from "./sourceMirror.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
@@ -58,6 +60,16 @@ if (sentinelFaults.length > 0) {
     `Tier override sentinel check failed — a scoring knob has moved underneath a committed ` +
       `override (ADR-0015):\n${lines.join("\n")}`,
   );
+}
+
+// The laptop check (#272, ADR-0013 amended 2026-10-26): the four sources git
+// does not hold must be the bytes `data/sources.sha256` pins, the same bytes CI
+// fetches from the private mirror, or the two builders could ship different
+// judges from one commit. Checked before anything is read.
+const sourceFaults = checkLocalSources(dataDir);
+if (sourceFaults.length > 0) {
+  console.error(buildRefusal(sourceFaults));
+  process.exit(1);
 }
 
 function read(name: string): string {
