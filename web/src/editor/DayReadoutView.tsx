@@ -100,7 +100,7 @@ export function DayReadoutView({
     case "unpinnable":
       return <Disagreement readout={readout} />;
     case "not-scheduled":
-      return <OutsideTheRun readout={readout} />;
+      return <UnscheduledDate readout={readout} />;
     case "day":
       return (
         <ScheduledDay
@@ -173,7 +173,7 @@ function Disagreement({ readout }: { readout: UnpinnableDayReadout }) {
  * A date the Schedule does not cover. It names where the Schedule begins rather
  * than showing nothing, so a typo reads as a typo instead of as an empty screen.
  */
-function OutsideTheRun({ readout }: { readout: UnscheduledDateReadout }) {
+function UnscheduledDate({ readout }: { readout: UnscheduledDateReadout }) {
   return (
     <section className="editor-empty">
       <h2>No Daily Puzzle on {readout.date}</h2>

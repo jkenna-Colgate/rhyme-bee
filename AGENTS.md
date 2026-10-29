@@ -5,7 +5,7 @@ A daily word puzzle where the mechanic is rhyming, not spelling.
 The slug `rhyme-bee` is not the wordmark and deliberately does not track it.
 The game names itself **Rhyming Bee** to players, from `GAME_NAME` in
 `web/src/brand.ts`; `rhyme-bee` is an identifier — the package names, the
-repository, the R2 bucket, the deployed Worker, the log prefixes and both
+repository, the R2 bucket, the deployed Worker, the log prefixes and the
 `localStorage` keys — and renaming it would discard live players' in-progress
 Sessions in exchange for a string no player ever sees (#199). Leave it alone.
 
@@ -40,7 +40,7 @@ them.
 `vitest.config.ts` exists for one exclusion: `.claude/worktrees/`, where agent
 checkouts keep their own copy of every test file. Without it a bare `npm test`
 walks into them and reports several times the real suite — and passes, which is
-the dangerous direction to be wrong in. The real suite is 98 files.
+the dangerous direction to be wrong in. The real suite is 107 files.
 
 ## Scratch scripts
 

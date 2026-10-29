@@ -24,8 +24,8 @@ import {
 } from "../src/tierMoves.ts";
 import { parseTierOverrides, resolveTierOverrides } from "../src/tierOverride.ts";
 
-/** The rung the Playability Bar's Reachability part names. */
-const REACHABILITY_RUNG = "Laureate";
+/** The Rank the Playability Bar's Reachability part names. */
+const REACHABILITY_RANK = "Laureate";
 
 export interface TierMovesRunInput {
   records: readonly SessionRecord[];
@@ -57,8 +57,8 @@ export interface TierMovesRun {
 
 export function runTierMoves(input: TierMovesRunInput): TierMovesRun {
   const settings = input.settings ?? TIER_MOVE_SETTINGS;
-  const laureate = DEFAULT_RANK_LADDER.find((rung) => rung.label === REACHABILITY_RUNG);
-  if (laureate === undefined) throw new Error(`The Rank ladder has no ${REACHABILITY_RUNG} rung.`);
+  const laureate = DEFAULT_RANK_LADDER.find((rank) => rank.label === REACHABILITY_RANK);
+  if (laureate === undefined) throw new Error(`The Rank ladder has no ${REACHABILITY_RANK} Rank.`);
 
   const played: PlayedSession[] = [];
   const days: DaySession[] = [];
@@ -132,7 +132,7 @@ export function runTierMoves(input: TierMovesRunInput): TierMovesRun {
       ? `No day under the Reachability floor.`
       : `Days under the Reachability floor: ${under.length}. Reported, never acted on.`,
     ...under.map(
-      (d) => `  ${d.date}: ${d.reached} of ${d.sessions} Sessions reached ${REACHABILITY_RUNG} (${percent(d.share)})`,
+      (d) => `  ${d.date}: ${d.reached} of ${d.sessions} Sessions reached ${REACHABILITY_RANK} (${percent(d.share)})`,
     ),
   ];
 

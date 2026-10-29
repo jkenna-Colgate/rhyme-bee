@@ -58,21 +58,21 @@ hundred.
 The deployed game sends a copy of each Daily Puzzle you play to the game's
 private storage, so the maintainer can see how hard each day really was
 ([ADR-0019](./docs/adr/0019-session-records-are-whole-and-unlinked.md)). It is
-sent when the page loads and when you leave it, and again if you play on. Each
-copy holds:
+sent once the game has loaded and when you leave the page, and again if you
+play on. Each copy holds:
 
 - the date and the day's Seed Word (with the Rhyme Key it is played on),
 - every word you entered, in the order you entered it, including the ones the
   game refused,
 - whether you took the Reveal,
-- a random id for that one day's game, so a later copy replaces an earlier one,
-- for today's game only, which version of the rhyme list judged it.
+- a random id for that one Session, so a later copy replaces an earlier one,
+- for today's Daily Puzzle only, which version of the rhyme list judged it.
 
 It does **not** hold your name, an account, any identifier for you or your
 browser, your IP address (it is used to limit how often a browser can send,
 then dropped), or the time of any word. The id is new every day, so nothing
 links one day's copy to another's. Free Play and the Tutorial are never sent,
-and a development build sends nothing. Your browser keeps the same games it
+and a development build sends nothing. Your browser keeps the same Sessions it
 always has; nothing about play changes if sending fails.
 
 Copies are pulled to the maintainer's machine and never committed to this

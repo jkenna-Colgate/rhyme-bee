@@ -331,8 +331,8 @@ export function nextDateOf(
  * A date past the last listed day is the Seed Word one lap earlier, and nothing
  * about the answer says so: a Puzzle that has come round again is not announced
  * to the player (#257). Null for an early visit before the Schedule begins, or a
- * date that is not a date. Both mean the same thing to the shell — there is no
- * Puzzle of the day, so play a free one.
+ * date that is not a date. Both mean the same thing to the shell: there is no
+ * Daily Puzzle, so play a free one.
  */
 export function seedForDate(schedule: Schedule | null, isoDate: string): SeedWord | null {
   if (schedule === null) return null;
