@@ -192,6 +192,19 @@ describe("the one-place rule is reported and never blocks a repair (2026-10-27)"
     expect(report.repairs[0]).toMatchObject({ date: "2026-09-07", step: 2, after: { seed: "ate", rhymeKey: "EY T" } });
   });
 
+  it("does not count a spare in front of the lap as holding a place", () => {
+    // As in the case above, but the other `eight` is a spare: step 1 is free to
+    // take. The spare is listed after the stale day so that it is still `eight`
+    // when the stale day is repaired (it does not pin, and is repaired in turn).
+    const stale = day("2026-09-07", "eight", "EY AH T");
+    const spare = day("2026-08-03", "eight", "AE T");
+    const repairOf = (lapStart?: string) =>
+      checkContinuity([stale, spare], index, { lapStart }).repairs.find((r) => r.date === "2026-09-07");
+
+    expect(repairOf()).toMatchObject({ step: 2 });
+    expect(repairOf("2026-08-04")).toMatchObject({ step: 1, after: { seed: "eight", rhymeKey: "EY T" } });
+  });
+
   it("is Free Play only when nothing pins, whatever the other days hold", () => {
     const holder = day("2026-11-12", "cool", "UW L");
     const stale = day("2026-11-13", "cool", "UW UW L");
@@ -241,6 +254,25 @@ describe("the one-place check", () => {
     expect(continuityLines(report).join("\n")).toMatch(
       /one-place: the same Answers, on AW ER \/ AW R, hold 2 places: 2026-11-04 \(hour\), 2026-11-05 \(flour\)/,
     );
+  });
+
+  it("counts no place for a spare in front of the lap, which never plays again (#265)", () => {
+    // `lopsided` was the spare on 2026-08-03 and fills a place in the loop.
+    const spare = day("2026-08-03", "ate", "EY T");
+    const placed = day("2027-03-29", "ate", "EY T");
+    const loop = day("2026-08-04", "hat", "AE T");
+    const days = [spare, loop, placed];
+
+    expect(checkContinuity(days, index).collisions).not.toEqual([]);
+    expect(checkContinuity(days, index, { lapStart: "2026-08-04" }).collisions).toEqual([]);
+  });
+
+  it("still reports two places held inside the lap when a lap start is given", () => {
+    const days = [day("2026-08-04", "ate", "EY T"), day("2026-08-11", "ate", "EY T")];
+    expect(checkContinuity(days, index, { lapStart: "2026-08-04" }).collisions).toEqual([
+      { kind: "seed", value: "ate", dates: ["2026-08-04", "2026-08-11"] },
+      { kind: "rhymeKey", value: "EY T", dates: ["2026-08-04", "2026-08-11"] },
+    ]);
   });
 
   it("finds none in a Schedule that keeps the rule", () => {
