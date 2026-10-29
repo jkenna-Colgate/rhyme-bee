@@ -1,0 +1,99 @@
+# Continuous deployment (#273, ADR-0013 amended 2026-10-26): every push to main
+# that passes the checks deploys the game. A step that fails stops every step
+# after it, so a failing check leaves the live game as it was.
+#
+# The deploy step is held back until the once-only setup check has passed: CI
+# and the laptop build the index from the same commit and the filenames must be
+# equal. The maintainer sets the repository variable SETUP_CHECK_PASSED to
+# `true` when they are (docs/deploy.md). It is not a switch to turn off again.
+#
+# The four index sources are private and the prevalence norms are licensed for
+# academic use, so nothing here prints them or uploads an artifact.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    # A docs-only push changes nothing that ships.
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+  # The scheduled workflow calls this one directly (with `secrets: inherit`),
+  # because a push it makes with GITHUB_TOKEN starts no other workflow.
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # One deploy at a time. A literal group name rather than one built from
+    # `github.workflow`, which names the caller's workflow under workflow_call.
+    concurrency:
+      group: deploy-bramble-bee
+      cancel-in-progress: false
+    steps:
+      # Always main, whatever started the run: the scheduled workflow's own
+      # github.sha predates the commit it has just pushed.
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # The laptop's version, so the setup check compares builders and not
+      # Node releases.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.17.0
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install
+        run: npm ci && npm ci --prefix web
+
+      - name: Fetch the index sources from the mirror
+        run: npm run sources:fetch
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      # Also runs the Continuity check and repair (#256).
+      - name: Build the Rhyme Index
+        run: npm run build:index
+
+      # The CI half of the setup check: the commit and the index filename,
+      # which holds the content hash.
+      - name: Name the commit and the index built from it
+        run: echo "$(git rev-parse HEAD) $(ls dist-data | grep -E '^index-[0-9a-f]+\.json$')" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Typecheck the web shell
+        run: npx tsc --noEmit -p web/tsconfig.json
+
+      - name: Build the web shell
+        run: npm run --prefix web build
+
+      - name: Say why there is no deploy
+        if: vars.SETUP_CHECK_PASSED != 'true'
+        run: echo "::notice::Checks passed. Not deployed - the setup check has not passed yet (docs/deploy.md)."
+
+      - name: Deploy
+        if: vars.SETUP_CHECK_PASSED == 'true'
+        run: npm run --prefix web deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # The R2 endpoint's account is the Cloudflare account the Worker is in.
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

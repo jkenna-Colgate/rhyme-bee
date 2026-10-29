@@ -14,10 +14,84 @@ browser, so the deploy is a file upload with a routing table attached — see
 | Rate limiters | `APPEAL_LIMITER`, `FEEDBACK_LIMITER`, `SESSION_RECORD_LIMITER` |
 | Worker secret | `GITHUB_ISSUE_TOKEN` |
 | Config | `web/wrangler.jsonc`, committed |
+| CI workflow | `.github/workflows/deploy.yml` |
 
-## The command
+## Every push to main deploys
 
-From the repo root:
+A push to main runs `.github/workflows/deploy.yml` (#273, ADR-0013 amended
+2026-10-26). In order: fetch the four sources from the mirror and check them,
+`npm run build:index` (which runs the Continuity check and repair), `npm test`,
+both typechecks, the web build, then `wrangler deploy`. A step that fails stops
+the steps after it, so a failing check leaves the live game as it was. There is
+no browser test, deliberately.
+
+- A push that touches only `docs/**` or Markdown files runs nothing.
+- The scheduled workflow calls this one with `workflow_call` and
+  `secrets: inherit`, because a push made with `GITHUB_TOKEN` starts no other
+  workflow. **Run workflow** on the Actions tab (`workflow_dispatch`) runs it by
+  hand.
+- It always checks out and ships main, whatever started it.
+- One deploy runs at a time: a second waits for the first rather than racing it.
+- The job summary names the commit and the index filename it built.
+- Nothing in it prints a source file or uploads an artifact: the prevalence norms
+  are licensed for academic use and a CI log is public.
+
+The deploy step runs only when the repository variable `SETUP_CHECK_PASSED` is
+`true`. Until then the workflow runs every check and stops before the deploy
+with a notice saying so. The variable records that the setup check below has
+passed. It is not a switch to turn off again: ADR-0013 rejected keeping the CI
+deploy off, because the unattended deploy would then run for the first time
+after the maintainer had left.
+
+### Setting it up, once
+
+1. **Put the sources in the mirror**, if they are not there yet:
+   `npm run sources:upload -- data/cmudict.dict data/words.txt data/names.txt data/prevalence.csv`
+   from the machine that holds them. The checksums it rewrites should come out
+   unchanged; if `git diff data/sources.sha256` shows a change, commit it.
+2. **Create a Cloudflare API token** (My Profile → API Tokens → Create Token →
+   Custom token) with **Account → Workers Scripts → Edit**, on this account only,
+   and **no expiry** (leave the TTL empty). Cloudflare cannot scope a token to
+   one Worker, so this account-wide permission is the narrowest there is. If the
+   first deploy is refused for a missing permission, add the one it names and
+   record it here.
+3. **Add four repository secrets** (Settings → Secrets and variables → Actions →
+   Secrets):
+   - `CLOUDFLARE_API_TOKEN`: the token from step 2.
+   - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`: the read-only
+     R2 token, the same three values as `credentials.env`. The account ID is
+     also the Cloudflare account the deploy targets.
+4. **Run the CI half.** Merge the workflow to main, or press **Run workflow** on
+   the Actions tab. The deploy is skipped. Open the run's summary and copy the
+   line under "Name the commit and the index built from it": a commit SHA and
+   `index-<hash>.json`.
+5. **Run the laptop half from the same commit**, in a clean checkout:
+
+   ```
+   git fetch origin
+   git checkout <sha from step 4>
+   npm ci && npm ci --prefix web
+   npm run sources:fetch
+   npm run build:index
+   ls dist-data/index-*.json
+   ```
+
+6. **Compare.** If the two filenames are equal, record both on #273, then set
+   the repository variable (Settings → Secrets and variables → Actions →
+   Variables) `SETUP_CHECK_PASSED` to `true`. The next push to main deploys.
+   If they differ, do not set it: find the difference first. The likely causes
+   are the Node version (CI pins the laptop's, 22.17.0, in the workflow), line
+   endings (`.gitattributes` checks text out as LF on both), CSV parsing and
+   sort order.
+
+Check the first deploy from CI: the site loads and serves the index filename
+the run named. `npm run --prefix web deployments` lists it as a new version.
+
+## The laptop deploy
+
+`npm run deploy` still works, as the way to ship when Actions is down. Its
+build makes the same checksum check against the local sources, so it builds
+from the same bytes CI does. From the repo root:
 
 ```
 npm run deploy
@@ -76,13 +150,14 @@ Worker's settings page showing nothing beforehand is expected, not a fault.
 ### What is not done, deliberately
 
 - **Nothing is built on Cloudflare's infrastructure, and the Worker has no Git
-  repository connected for builds.** `data/sources.json` pins cmudict, the word
-  list and the names list, and a pinned source re-fetched in a build environment
-  is not pinned: upstream edits a pronunciation and the judge changes verdicts
-  silently between two deploys, making a player's "this worked yesterday"
-  unreproducible. The prevalence norms are additionally licensed for academic use
-  and are republished to no public build environment. This machine is the only
-  build host, and that is the cost of a reproducible judge.
+  repository connected for builds.** A source re-fetched from upstream in a build
+  environment is not pinned: upstream edits a pronunciation and the judge changes
+  verdicts silently between two deploys, making a player's "this worked
+  yesterday" unreproducible. So the two build hosts, this machine and the GitHub
+  workflow above, both build from the private mirror's bytes, checked against the
+  committed checksums, and never from upstream. The prevalence norms are
+  additionally licensed for academic use, so they sit in the private bucket and
+  are never logged or uploaded as a workflow artifact.
 - **Nothing is bound in the dashboard.** A binding that lives only there is
   clobbered by the next deploy from a config that does not declare it, so
   `web/wrangler.jsonc` is the only home for bindings. Add them there.
@@ -158,12 +233,13 @@ still playing. Once a day, or whenever the Appeals look worth a look:
 ```
 npm run appeals:pull          # 1. bring down what players Appealed (#120)
 npm --prefix web run dev      # 2. judge the Candidate Queue in the Editor's Pass
-npm run deploy                # 3. rebuild the index and ship it
+git commit && git push        # 3. the push to main rebuilds the index and ships it
 ```
 
-All three run from the repo root. Step 2 starts `web/`'s dev server without
-moving you there, because step 3's `npm run deploy` is the root script that
-rebuilds the index — from inside `web/` the same words mean `wrangler deploy`,
+All three run from the repo root. Step 3 ships through the workflow above. When
+Actions is down, or before the setup check has passed, `npm run deploy` is step
+3 instead: run it from the repo root, because it is the root script that
+rebuilds the index. From inside `web/` the same words mean `wrangler deploy`,
 which uploads the last build and rebuilds nothing.
 
 1. **Pull.** Players tap "should have counted" on a rejection they were sure
@@ -182,12 +258,12 @@ which uploads the last build and rebuilds nothing.
    ([ADR-0009](./adr/0009-pronunciation-supplement-is-the-permanent-override-layer.md)).
    Nothing empties the queue: it stays as the record of what was Appealed and
    when.
-3. **Deploy.** Step 3 is the ordinary command; it rebuilds the index from the
-   supplement you just edited, so a new judge is a new artifact filename and
-   every browser picks it up on the next load without a cache clear.
-
-Commit the supplement edit. It is a hand-authored input, and the index that
-shipped is reproducible only from the sources plus that file.
+3. **Deploy.** Committing the supplement edit and pushing it to main is the
+   deploy: the workflow rebuilds the index from it, so a new judge is a new
+   artifact filename and every browser picks it up on the next load without a
+   cache clear. The commit is needed either way. The supplement is a
+   hand-authored input, and the index that shipped is reproducible only from the
+   sources plus that file.
 
 ### Why this is safe mid-playtest
 
