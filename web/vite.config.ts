@@ -162,6 +162,10 @@ export default defineConfig(({ command }) => {
     publicDir: command === "build" ? false : distDataDir,
     define: {
       __INDEX_ARTIFACT__: JSON.stringify(manifest?.index ?? UNBUILT_ARTIFACT_FILENAME),
+      // The same manifest's hash, which a Session Record for today carries
+      // (ADR-0019). Only a production build sends one, and that build refuses
+      // to run without a manifest above, so the empty fallback never ships.
+      __INDEX_HASH__: JSON.stringify(manifest?.hash ?? ""),
       // Where the share pages live for a bundle that was not built alongside
       // them. `shareAssetPlugin` is build-only, so under `npm run dev` nothing
       // has written `/share/`, and a link to this dev server would point at a

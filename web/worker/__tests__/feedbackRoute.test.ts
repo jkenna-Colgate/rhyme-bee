@@ -49,6 +49,7 @@ function tracker(reply: Response | (() => never), token: string | null = TOKEN, 
         return { success: allow };
       },
     },
+    SESSION_RECORD_LIMITER: { limit: async () => ({ success: true }) },
     ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
     GITHUB_ISSUE_TOKEN: token ?? undefined,
   } satisfies Env;

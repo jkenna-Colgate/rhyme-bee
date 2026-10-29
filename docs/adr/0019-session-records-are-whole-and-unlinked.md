@@ -6,7 +6,7 @@ every Submission in order, whether it ended), plus a random id for that one
 Session and the content hash of the Rhyme Index that judged it. Nothing in it
 says who played, and nothing links one day's record to another day's.
 
-This is decided here and not yet built. It was settled in
+Built in [#230](https://github.com/jkenna-Colgate/rhyme-bee/issues/230). It was settled in
 [Does live telemetry have a role, and what would it collect?](https://github.com/jkenna-Colgate/rhyme-bee/issues/226),
 one ticket of the effort to run the game unattended
 ([#218](https://github.com/jkenna-Colgate/rhyme-bee/issues/218)).

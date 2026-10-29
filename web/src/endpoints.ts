@@ -52,6 +52,15 @@ export const APPEAL_PATH = "/api/supplement-candidate";
 export const FEEDBACK_PATH = "/api/feedback";
 
 /**
+ * Where a **Session Record** is sent: a copy of one Daily Puzzle Session, posted
+ * by the browser on load and when the page is hidden (ADR-0019). Unlike the two
+ * paths above, no player chooses to send one. It is still a report and never a
+ * request for a verdict, and it has no dev half: a dev build sends nothing
+ * (`web/src/sessionRecords.ts`), so no Vite plugin answers this path.
+ */
+export const SESSION_RECORD_PATH = "/api/session-record";
+
+/**
  * Where the Editor's Pass reads one scheduled day from: `GET`, with the day
  * named as `?date=YYYY-MM-DD` and tomorrow when it is not. Dev only, and
  * structurally so — `editorDayPlugin` is built by `web/editorRoute.ts`, which
