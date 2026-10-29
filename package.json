@@ -16,7 +16,12 @@
     "play": "tsx scripts/play.ts",
     "editor:read": "tsx scripts/editor.ts read",
     "editor:add": "tsx scripts/editor.ts add",
-    "appeals:pull": "tsx scripts/pull-appeals.ts"
+    "appeals:pull": "tsx scripts/pull-appeals.ts",
+    "records:pull": "tsx scripts/pull-session-records.ts",
+    "records:replay": "tsx scripts/replay-session-records.ts",
+    "tier:moves": "tsx scripts/tier-moves.ts",
+    "sources:fetch": "tsx scripts/fetch-sources.ts",
+    "sources:upload": "tsx scripts/upload-source.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

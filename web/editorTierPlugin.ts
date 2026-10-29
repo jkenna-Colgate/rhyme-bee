@@ -43,7 +43,7 @@ import type { Plugin } from "vite";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, type Schedule } from "../src/schedule.ts";
-import { overriddenValue, type TierOverrideRow } from "../src/tierOverride.ts";
+import { layeredValue, layersFrom, standingLayers, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
@@ -54,6 +54,7 @@ import { reachOf, tierPickerState } from "./editorTierPayload.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "./editorTierRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
+import { readOptional } from "./readOptional.ts";
 import { repoRoot } from "./repoRoot.ts";
 import { appendTierOverride, readTierOverrideText } from "./tierOverrideFile.ts";
 
@@ -72,6 +73,8 @@ export interface EditorTierDeps {
   measured: () => ReadonlyMap<string, number>;
   /** `data/tier-overrides.csv` as text; empty when no pass has ever written it. */
   overrides: () => string;
+  /** `data/tier-moves.csv` as text (#270); read, never written, here. Absent reads as nothing moved. */
+  moves?: () => string;
   append: (row: TierOverrideRow) => void;
   /** When the judgement was made, as the file records it. */
   now: () => string;
@@ -101,6 +104,7 @@ function stateFor(deps: EditorTierDeps, date: string): TierPickerState {
     lists,
     measured: deps.measured(),
     overrides: deps.overrides(),
+    moves: deps.moves?.() ?? "",
     knownnessThreshold: deps.knownnessThreshold(),
   });
 }
@@ -128,7 +132,11 @@ export function editorTierHandler(deps: EditorTierDeps) {
       const judgement = tierWriteRequest(body);
       if (!judgement.ok) return sendJson(res, 400, { error: judgement.error });
 
-      sendJson(res, 200, record(deps, judgement.word, judgement.verdict, asked.date));
+      // A verdict picked without naming the lock keeps the word's own: only
+      // the editor's Unlock clears it (#270).
+      const locked =
+        judgement.locked ?? standingLayers(deps.overrides(), "")(judgement.word).locked === true;
+      sendJson(res, 200, record(deps, judgement.word, judgement.verdict, locked, asked.date));
     } catch (error) {
       // What throws past here is a missing artifact, an unreadable schedule or
       // a file that would not take the append, and all three already name their
@@ -167,6 +175,7 @@ function record(
   deps: EditorTierDeps,
   word: string,
   verdict: TierOverrideRow["verdict"],
+  locked: boolean,
   date: string,
 ): TierWriteResult {
   const appended: TierOverrideRow = {
@@ -175,22 +184,29 @@ function record(
     measured: deps.measured().get(word) ?? null,
     decided: deps.now(),
     note: "",
+    ...(locked ? { locked: true as const } : {}),
   };
   deps.append(appended);
 
   const state = stateFor(deps, date);
-  const standing = new Map(state.standing.map((row) => [row.word, row]));
+  const layersOf = layersFrom(
+    new Map(state.standing.map((row) => [row.word, row])),
+    new Set(state.moved ?? []),
+  );
   const measured = deps.measured();
-  // The sentinel-vs-measured rule `overriddenValue` shares with the build and
-  // with the picker's own re-tiering.
+  // The precedence `layeredValue` shares with the build and with the picker's
+  // own re-tiering.
   const valueOf = (candidate: string): number | undefined =>
-    overriddenValue(standing.get(candidate)?.verdict, measured.get(candidate));
+    layeredValue(layersOf(candidate), measured.get(candidate));
 
   return { state, appended, reach: reachOf(word, deps.openIndex(), valueOf) };
 }
 
 /** The standing Tier verdicts, read here and by the Candidate Queue (`editorCandidatesPlugin.ts`). */
 export const overridePath = resolve(repoRoot, "data/tier-overrides.csv");
+
+/** The job's Tier moves (#270), read here and by the Candidate Queue; written only by `npm run tier:moves`. */
+export const movesPath = resolve(repoRoot, "data/tier-moves.csv");
 
 /**
  * The pinned prevalence norms, parsed once and kept. 62k rows and a few
@@ -211,6 +227,8 @@ export function editorTierPlugin(): Plugin {
       today: () => localCalendarDate(),
       measured: measuredPrevalence,
       overrides: () => readTierOverrideText(overridePath),
+      // The same read: a missing file is empty text, which moves nothing.
+      moves: () => readOptional(movesPath),
       append: (row) => appendTierOverride(overridePath, row),
       now: () => new Date().toISOString(),
       knownnessThreshold: builtKnownnessThreshold,

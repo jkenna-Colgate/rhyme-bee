@@ -100,7 +100,7 @@ export function DayReadoutView({
     case "unpinnable":
       return <Disagreement readout={readout} />;
     case "not-scheduled":
-      return <OutsideTheRun readout={readout} />;
+      return <UnscheduledDate readout={readout} />;
     case "day":
       return (
         <ScheduledDay
@@ -170,15 +170,15 @@ function Disagreement({ readout }: { readout: UnpinnableDayReadout }) {
 }
 
 /**
- * A date the run does not cover. It names the edges rather than showing nothing,
- * so a typo reads as a typo instead of as an empty screen.
+ * A date the Schedule does not cover. It names where the Schedule begins rather
+ * than showing nothing, so a typo reads as a typo instead of as an empty screen.
  */
-function OutsideTheRun({ readout }: { readout: UnscheduledDateReadout }) {
+function UnscheduledDate({ readout }: { readout: UnscheduledDateReadout }) {
   return (
     <section className="editor-empty">
       <h2>No Daily Puzzle on {readout.date}</h2>
       <p>
-        The run covers <strong>{readout.firstDate}</strong> to <strong>{readout.lastDate}</strong>.
+        The Schedule begins on <strong>{readout.firstDate}</strong>.
       </p>
     </section>
   );
@@ -221,9 +221,9 @@ function ScheduledDay({
   // that says why, and stands the drift report down.
   const { answers, bonusWords, facts, moved } = correctedDay(readout, picker.state, demoter.state);
 
-  const judge = (word: string, verdict: TierVerdict) => {
+  const judge = (word: string, verdict: TierVerdict, locked?: boolean) => {
     setPicking(null);
-    void picker.judge(word, verdict);
+    void picker.judge(word, verdict, locked);
   };
 
   const demote = (word: string, reason: DemotionReason) => {
@@ -515,7 +515,7 @@ function WordList({
   words: RetieredWord[];
   picking: string | null;
   onPick: (word: string | null) => void;
-  onJudge: (word: string, verdict: TierVerdict) => void;
+  onJudge: (word: string, verdict: TierVerdict, locked?: boolean) => void;
   onDemote: (word: string, reason: DemotionReason) => void;
   writing: string | null;
 }) {
@@ -572,6 +572,19 @@ function Marks({ entry }: { entry: RetieredWord }) {
           {VERDICT_LABEL[entry.verdict]}
         </span>
       )}
+      {entry.locked && (
+        <span className="editor-mark editor-locked" title="Locked over the Tier moves from Session Records">
+          locked
+        </span>
+      )}
+      {entry.moved && (
+        <span
+          className="editor-mark editor-moved"
+          title="Moved to Answer by Session Records (data/tier-moves.csv)"
+        >
+          moved by play
+        </span>
+      )}
       {entry.rows > 1 && (
         <span
           className="editor-mark editor-reversed"
@@ -620,7 +633,7 @@ function VerdictMenu({
   onDemote,
 }: {
   entry: RetieredWord;
-  onJudge: (word: string, verdict: TierVerdict) => void;
+  onJudge: (word: string, verdict: TierVerdict, locked?: boolean) => void;
   onDemote: (word: string, reason: DemotionReason) => void;
 }) {
   return (
@@ -638,9 +651,49 @@ function VerdictMenu({
             {VERDICT_LABEL[verdict]}
           </button>
         ))}
+        {entry.verdict !== null && (
+          <LockToggle word={entry.word} verdict={entry.verdict} locked={entry.locked} onJudge={onJudge} />
+        )}
       </div>
       <DemoteMenu entry={entry} onDemote={onDemote} />
     </div>
+  );
+}
+
+/**
+ * The editor's **lock** (#270, ADR-0015 amended): a lock on the verdict
+ * standing on this word, so it is offered only where one stands. Locking writes
+ * that verdict again with the lock; unlocking writes it again without, last row
+ * winning as every row in the file does. A verdict picked from the menu above
+ * keeps the word's lock, so only this button ever clears one.
+ *
+ * Session Records move a Bonus Word to Answer over an unlocked verdict, and only
+ * that way, so the lock's one use is keeping a Bonus Word a Bonus Word.
+ */
+function LockToggle({
+  word,
+  verdict,
+  locked,
+  onJudge,
+}: {
+  word: string;
+  verdict: TierVerdict;
+  locked: boolean;
+  onJudge: (word: string, verdict: TierVerdict, locked?: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`editor-verdict editor-lock${locked ? " editor-verdict-standing" : ""}`}
+      title={
+        locked
+          ? "Locked: Session Records cannot move this word. Click to unlock."
+          : "Lock this verdict, so Session Records cannot move the word to Answer."
+      }
+      onClick={() => onJudge(word, verdict, !locked)}
+    >
+      {locked ? "Unlock" : "Lock"}
+    </button>
   );
 }
 

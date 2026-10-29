@@ -195,7 +195,6 @@ describe("joinPastedList", () => {
         outcome: "not-scheduled",
         date: DATE,
         firstDate: "2026-08-01",
-        lastDate: "2026-08-14",
       }),
     ).toEqual(nothing);
   });

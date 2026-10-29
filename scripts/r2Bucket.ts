@@ -12,8 +12,8 @@
  * can get, put and delete a *named* object but cannot list a bucket, and the pull
  * has to enumerate a batch it does not know the keys of.
  *
- * The signing and the listing parse are pure and tested; only `listObjects` and
- * `getObject` touch the network.
+ * The signing and the listing parse are pure and tested; only `listObjects`,
+ * `getObject` and `getObjectBytes` touch the network.
  */
 
 import { createHash, createHmac } from "node:crypto";
@@ -234,4 +234,16 @@ export async function getObject(credentials: R2Credentials, key: string): Promis
     `read ${key}`,
   );
   return response.text();
+}
+
+/**
+ * One object's body as raw bytes, for a file that is checked against a SHA-256
+ * (`sourceMirror.ts`) and must not pass through a text decoding on the way.
+ */
+export async function getObjectBytes(credentials: R2Credentials, key: string): Promise<Uint8Array> {
+  const response = await get(
+    signGet(credentials, `/${credentials.bucket}/${key}`, {}, new Date()),
+    `read ${key}`,
+  );
+  return new Uint8Array(await response.arrayBuffer());
 }

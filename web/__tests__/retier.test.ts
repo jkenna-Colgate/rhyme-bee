@@ -46,8 +46,12 @@ const ATES = { seed: "plates", key: "EY T S" };
 /** The measured norms, unpatched — what `data/prevalence.csv` says. */
 const MEASURED = buildTestIndex().data.prevalence;
 
-function index(overrides = ""): RhymeIndex {
-  return makeTestIndex({ tierOverrides: overrides, knownnessThreshold: SHIPPED_THRESHOLD });
+function index(overrides = "", moves = ""): RhymeIndex {
+  return makeTestIndex({
+    tierOverrides: overrides,
+    tierMoves: moves,
+    knownnessThreshold: SHIPPED_THRESHOLD,
+  });
 }
 
 function listsOf(built: RhymeIndex, family: { seed: string; key: string }): DayLists {
@@ -64,13 +68,14 @@ function overrideFile(...rows: string[]): string {
 }
 
 /** The state the endpoint would send for this day, over the fixture's own data. */
-function stateFor(built: RhymeIndex, lists: DayLists, overrides: string) {
+function stateFor(built: RhymeIndex, lists: DayLists, overrides: string, moves = "") {
   return tierPickerState({
     date: "2026-08-09",
     lemmaCandidates: (word) => built.derivation.lemmaCandidates(word),
     lists,
     measured: MEASURED,
     overrides,
+    moves,
     knownnessThreshold: SHIPPED_THRESHOLD,
   });
 }
@@ -240,5 +245,45 @@ describe("what the day view shows about a word's history", () => {
     const retiered = retierDay(lists, stateFor(built, lists, ""));
 
     expect(retiered.answers.every((w) => w.verdict === null && w.rows === 0)).toBe(true);
+  });
+});
+
+describe("the job's moves and the editor's lock, as a rebuild applies them (#270)", () => {
+  const BONUS = "collate,bonus,1.8,2026-08-09T10:00:00.000Z,";
+  const LOCKED = "collate,bonus,1.8,2026-08-09T10:00:00.000Z,,locked";
+  const MOVES = "collate,2026-11-01T00:00:00.000Z,9,10,0.6058\n";
+
+  it("puts a move over the editor's unlocked `bonus`, as a rebuild does", () => {
+    const built = index();
+    const lists = listsOf(built, ATE);
+    const file = overrideFile(BONUS);
+
+    const retiered = retierDay(lists, stateFor(built, lists, file, MOVES));
+    const rebuilt = listsOf(index(file, MOVES), ATE);
+
+    expect(words(retiered.answers)).toContain("collate");
+    expect(words(retiered.answers)).toEqual(words(rebuilt.answers));
+    expect(retiered.facts).toEqual(measureAnswers(rebuilt.answers));
+  });
+
+  it("keeps a word under a locked verdict a Bonus Word, as a rebuild does", () => {
+    const built = index();
+    const lists = listsOf(built, ATE);
+    const file = overrideFile(LOCKED);
+
+    const retiered = retierDay(lists, stateFor(built, lists, file, MOVES));
+    const rebuilt = listsOf(index(file, MOVES), ATE);
+
+    expect(words(retiered.bonusWords)).toContain("collate");
+    expect(words(retiered.bonusWords)).toEqual(words(rebuilt.bonusWords));
+  });
+
+  it("marks the word as locked, and as moved", () => {
+    const built = index();
+    const lists = listsOf(built, ATE);
+    const retiered = retierDay(lists, stateFor(built, lists, overrideFile(LOCKED), MOVES));
+    const collate = retiered.bonusWords.find((w) => w.word === "collate")!;
+
+    expect(collate).toMatchObject({ verdict: "bonus", locked: true, moved: true });
   });
 });

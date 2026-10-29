@@ -32,6 +32,7 @@
  */
 
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
+import { parseTierMoves } from "../src/tierMoves.ts";
 import { parseTierOverrides, resolveTierOverrides } from "../src/tierOverride.ts";
 import type {
   DayLists,
@@ -55,6 +56,8 @@ export interface TierPickerInput {
   measured: ReadonlyMap<string, number>;
   /** `data/tier-overrides.csv` as text; empty when no pass has ever written it. */
   overrides: string;
+  /** `data/tier-moves.csv` as text (#270); empty when nothing has moved. */
+  moves?: string;
   /** The Answer/Bonus line the built index carries. */
   knownnessThreshold: number;
 }
@@ -93,12 +96,15 @@ export function tierPickerState(input: TierPickerInput): TierPickerState {
       rows: resolved.rows,
       decided: resolved.decided,
       measured: resolved.measured,
+      ...(resolved.locked === true ? { locked: true as const } : {}),
     });
   }
 
   return {
     date: input.date,
     standing,
+    // The whole file, as `standing` is: a move is a property of the word.
+    moved: [...parseTierMoves(input.moves ?? "")].sort(),
     lookups,
     measured,
     knownnessThreshold: input.knownnessThreshold,

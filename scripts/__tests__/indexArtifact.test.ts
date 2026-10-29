@@ -14,6 +14,7 @@
  * *timestamps*, which a real checkout has whatever it has.
  */
 
+import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
@@ -89,8 +90,25 @@ describe("the Rhyme Index input list", () => {
         "/data/demotions.txt",
         "/data/supplement.dict",
         "/data/tier-overrides.csv",
+        "/data/tier-moves.csv",
       ]),
     );
+  });
+
+  it("can commit the two Tier layers despite the blanket csv ignore", () => {
+    // An ignored layer is an input the deploy never sees: the run writes a move,
+    // nothing can commit it, and the rebuild ships without it (#270).
+    for (const path of ["data/tier-overrides.csv", "data/tier-moves.csv"]) {
+      const ignored = spawnSync("git", ["check-ignore", "-q", path], { cwd: repoRoot });
+      expect(ignored.status, path).toBe(1);
+    }
+  });
+
+  it("holds the committed source checksums", () => {
+    // A pulled commit that re-pins a source changes no local source file, so
+    // only this input makes the deploy rebuild, and the rebuild's check then
+    // refuses until the new source is fetched (#272).
+    expect(inputs).toContain("/data/sources.sha256");
   });
 
   it("does not hold the committed schedule", () => {
@@ -162,6 +180,23 @@ describe("the staleness predicate", () => {
       stale: true,
       reason: "input-newer",
       input: resolve(root, "data/tier-overrides.csv"),
+    });
+  });
+
+  it("does not report stale when only tier-moves.csv is missing", () => {
+    // Nothing has moved until Session Records move something (#270).
+    const { root } = repo(["tier-moves.csv"]);
+    expect(indexStaleness(root)).toEqual({ stale: false, reason: null });
+  });
+
+  it("reports stale once tier-moves.csv is newer than the artifact", () => {
+    // A run that moved words must ship them on the next deploy.
+    const { root } = repo();
+    touch(resolve(root, "data/tier-moves.csv"));
+    expect(indexStaleness(root)).toEqual({
+      stale: true,
+      reason: "input-newer",
+      input: resolve(root, "data/tier-moves.csv"),
     });
   });
 

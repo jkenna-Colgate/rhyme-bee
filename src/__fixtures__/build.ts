@@ -25,6 +25,7 @@ export interface FixtureSlice {
   demotions?: string;
   supplement?: string;
   tierOverrides?: string;
+  tierMoves?: string;
   unconfirmedRhymes?: string;
 }
 
@@ -64,6 +65,7 @@ function toPinnedInputs(slice: FixtureSlice): PinnedInputs {
     demotions: slice.demotions ?? "",
     supplement: slice.supplement ?? "",
     tierOverrides: slice.tierOverrides ?? "",
+    tierMoves: slice.tierMoves ?? "",
     unconfirmedRhymes: slice.unconfirmedRhymes ?? "",
   };
 }

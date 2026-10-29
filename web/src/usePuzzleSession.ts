@@ -8,9 +8,11 @@
  * returns a fresh one), a single `useState` cell drives re-renders — nothing is
  * denormalised here.
  *
- * It also holds the daily Puzzle's persistence. `firstVisit.ts` is the only
- * other place in the game that touches `localStorage` — its own guarded
- * read/write, for a single boolean flag rather than a Session. The format
+ * It also holds the daily Puzzle's persistence. Two other places touch
+ * `localStorage`: `firstVisit.ts`, for a single boolean flag, and
+ * `sessionRecords.ts`, which reads the snapshots written here (never writing
+ * them) to send each as a Session Record, keeping its own ids under a key of
+ * its own (ADR-0019). The format
  * here is the engine's (`sessionSnapshot.ts`); the transport is this file's,
  * and it stays thin, untested I/O — the same principle under which the
  * browser index loader is left untested. What is written is the raw

@@ -40,6 +40,7 @@ function bucket(onPut?: () => never, allow = true) {
       },
     },
     FEEDBACK_LIMITER: { limit: async () => ({ success: true }) },
+    SESSION_RECORD_LIMITER: { limit: async () => ({ success: true }) },
     ISSUE_REPO: "jkenna-Colgate/rhyme-bee",
   } satisfies Env;
   return { env, writes, limitKeys };

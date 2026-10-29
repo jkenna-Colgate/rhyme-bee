@@ -68,7 +68,7 @@ import { ruledPairs, rulingKey, type JudgeRulingRecord } from "../src/judgeLandi
 import { applyNormalisation } from "../src/normalise.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "../src/phonology.ts";
 import { applyUnconfirmedRhymes, type UnconfirmedRhyme } from "../src/unconfirmedRhymes.ts";
-import type { Schedule, ScheduleDay, Weekday } from "../src/schedule.ts";
+import { nextDateOf, type Schedule, type ScheduleDay, type Weekday } from "../src/schedule.ts";
 import type { SupplementCandidate } from "../src/supplementCandidate.ts";
 import {
   gatherEvidence,
@@ -91,6 +91,8 @@ import {
  */
 export interface CandidateQueueContext extends EvidenceContext {
   isAnswer: (word: string) => boolean;
+  /** The editor's calendar date, from which each group's next day is found (#257). */
+  today: string;
 }
 
 /** What every Candidate carries, whatever state it is in. */
@@ -333,7 +335,7 @@ export function readCandidateQueue(
 ): CandidateQueueReadout {
   const declined = declinedPairs(declines);
   const ruled = ruledPairs(judge.rulings);
-  const dayFor = daysByRhymeKey(schedule);
+  const dayFor = daysByRhymeKey(schedule, ctx.today);
   // Read before the Candidates rather than beside them, because a Candidate on a
   // listed pair takes its state from the line (`readCandidate`).
   const unconfirmedRhymes = readUnconfirmedRhymes(judge, declined, ruled, ctx);
@@ -521,7 +523,11 @@ function readCandidate(
 }
 
 /**
- * The schedule's days, by the Rhyme Key each was dealt on.
+ * The schedule's days, by the Rhyme Key each was dealt on, each dated by the
+ * next time it plays on or after `today` (#257). The listed date is the first
+ * lap's, and once that lap has gone every listed date is past, so "soonest
+ * first" would stop meaning anything. A day that will not play again (the spare
+ * in front of the lap, once its date has gone) names no day at all.
  *
  * The run holds 260 days over 260 distinct Rhyme Keys, so a key reaches at most
  * one day. Should two ever share one, the first wins and the second is simply
@@ -530,16 +536,18 @@ function readCandidate(
  * artifact (ADR-0012) where a duplicate key is a defect to fix rather than a
  * case to design for.
  */
-function daysByRhymeKey(schedule: Schedule): ReadonlyMap<RhymeKey, CandidateDay> {
+function daysByRhymeKey(schedule: Schedule, today: string): ReadonlyMap<RhymeKey, CandidateDay> {
   const days = new Map<RhymeKey, CandidateDay>();
   for (const day of schedule.days) {
-    if (!days.has(day.rhymeKey)) days.set(day.rhymeKey, toCandidateDay(day));
+    if (days.has(day.rhymeKey)) continue;
+    const date = nextDateOf(schedule, day, today);
+    if (date !== null) days.set(day.rhymeKey, toCandidateDay(day, date));
   }
   return days;
 }
 
-function toCandidateDay(day: ScheduleDay): CandidateDay {
-  return { date: day.date, weekday: day.weekday, week: day.week, seed: day.seed };
+function toCandidateDay(day: ScheduleDay, date: string): CandidateDay {
+  return { date, weekday: day.weekday, week: day.week, seed: day.seed };
 }
 
 /**

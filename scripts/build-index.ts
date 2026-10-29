@@ -3,8 +3,9 @@
  *
  *   npm run build:index
  *
- * Reads the raw inputs from `data/` (uncommitted — see .gitignore and
- * data/README.md), writes the built artifact and the dropped-words and
+ * Reads the raw inputs from `data/` (the four large sources are uncommitted and
+ * fetched from a private mirror by `npm run sources:fetch`, checked against the
+ * committed `data/sources.sha256`; see `sourceMirror.ts`), writes the built artifact and the dropped-words and
  * derived-words reports to `dist-data/`. It then runs the Continuity check over
  * `data/schedule.json`, which is the one file in `data/` it may write: a day
  * the check repairs is written back there (#256). Rebuilding from the same pinned inputs
@@ -26,6 +27,7 @@ import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { checkTierSentinels } from "../src/tierOverride.ts";
 import { listedSeedWords } from "../src/unconfirmedRhymes.ts";
 import { MANIFEST_FILENAME, writeIndexArtifact } from "./indexArtifact.ts";
+import { buildRefusal, checkLocalSources } from "./sourceMirror.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
@@ -60,13 +62,23 @@ if (sentinelFaults.length > 0) {
   );
 }
 
+// The laptop check (#272, ADR-0013 amended 2026-10-26): the four sources git
+// does not hold must be the bytes `data/sources.sha256` pins, the same bytes CI
+// fetches from the private mirror, or the two builders could ship different
+// judges from one commit. Checked before anything is read.
+const sourceFaults = checkLocalSources(dataDir);
+if (sourceFaults.length > 0) {
+  console.error(buildRefusal(sourceFaults));
+  process.exit(1);
+}
+
 function read(name: string): string {
   return readFileSync(resolve(dataDir, name), "utf8");
 }
 
 /**
  * Like `read`, but a missing file is a legitimate no-op rather than a build
- * error. Only `tier-overrides.csv` uses this: unlike the other pinned inputs,
+ * error. `tier-overrides.csv` and `tier-moves.csv` use this: unlike the other pinned inputs,
  * it may never have been written at all — no Editor's Pass has necessarily
  * happened yet — and that absence means "no overrides", not "broken build".
  */
@@ -80,7 +92,7 @@ const sources = JSON.parse(read("sources.json")) as Record<string, string>;
 // coverage, normalisation, the Retrieval override layer — so the script cannot
 // run them out of turn, twice, or not at all. Its job from here is files in,
 // files out. See src/manufacture.ts.
-const { data, demoted, derived, dropped, overridden, unconfirmed } = manufactureIndexData({
+const { data, demoted, derived, dropped, overridden, moved, unconfirmed } = manufactureIndexData({
   cmudict: read("cmudict.dict"),
   words: read("words.txt"),
   names: read("names.txt"),
@@ -88,6 +100,7 @@ const { data, demoted, derived, dropped, overridden, unconfirmed } = manufacture
   demotions: read("demotions.txt"),
   supplement: read("supplement.dict"),
   tierOverrides: readOptional("tier-overrides.csv"),
+  tierMoves: readOptional("tier-moves.csv"),
   unconfirmedRhymes: read("unconfirmed-rhymes.txt"),
 });
 
@@ -124,6 +137,15 @@ const reversed = overridden.filter((o) => o.rows > 1);
 console.log(
   `Tier-overrode ${overridden.length} words` +
     `${reversed.length > 0 ? ` (${reversed.length} reversed: ${reversed.map((o) => o.word).join(", ")})` : ""}.`,
+);
+
+// The Tier moves from Session Records (#270): what each did over the editor.
+const overrode = moved.filter((m) => m.overrode !== null);
+const lockedOut = moved.filter((m) => m.locked);
+console.log(
+  `Tier-moved ${moved.length - lockedOut.length} words to Answer` +
+    `${overrode.length > 0 ? `; over the editor's verdict on ${overrode.map((m) => m.word).join(", ")}` : ""}` +
+    `${lockedOut.length > 0 ? `; held by the editor's lock: ${lockedOut.map((m) => m.word).join(", ")}` : ""}.`,
 );
 
 // The Unconfirmed Rhyme list (#259). It is written by a job, so a line that

@@ -113,6 +113,7 @@ function contextFor(extra: Extra = {}): CandidateQueueContext {
       names: raw.names,
     }),
     isAnswer: (word) => tierOf(word) === "answer",
+    today: "2026-08-31",
   };
 }
 
@@ -329,6 +330,44 @@ describe("grouping by Rhyme Key", () => {
     );
 
     expect(readout.groups.map((g) => g.rhymeKey)).toEqual([ATE, DOCKED]);
+  });
+});
+
+describe("a group's day once the first lap has gone (#257)", () => {
+  // One week, looping: `ate` on Tuesday 2026-09-01, `shellshocked` on the
+  // Wednesday. On Wednesday the Tuesday has gone, and comes round again on
+  // 2026-09-08; the Wednesday is today.
+  const WEEK: Schedule = {
+    ...SCHEDULE,
+    lapStart: "2026-09-01",
+    days: Array.from({ length: 7 }, (_, i) => ({
+      date: `2026-09-0${i + 1}`,
+      weekday: (["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"] as const)[i]!,
+      week: 1,
+      seed: ["ate", "shellshocked"][i] ?? `seed${i}`,
+      rhymeKey: [ATE, DOCKED][i] ?? `K${i}`,
+      answerCount: 10,
+      difficulty: 0,
+    })),
+  };
+  const readout = readCandidateQueue(
+    [candidate("grates", "ate", ATE), candidate("undocked", "docked", DOCKED)],
+    WEEK,
+    [],
+    { ...contextFor(), today: "2026-09-02" },
+  );
+
+  it("names the next date the lap plays the key, not the date it was first listed", () => {
+    expect(readout.groups.find((g) => g.rhymeKey === ATE)!.day).toEqual({
+      date: "2026-09-08",
+      weekday: "Tue",
+      week: 1,
+      seed: "ate",
+    });
+  });
+
+  it("puts the soonest of those first", () => {
+    expect(readout.groups.map((g) => g.rhymeKey)).toEqual([DOCKED, ATE]);
   });
 });
 

@@ -25,6 +25,14 @@ export type IndexLoad =
  */
 const INDEX_URL = `${import.meta.env.BASE_URL}${__INDEX_ARTIFACT__}`;
 
+let settleIndexLoad!: () => void;
+
+/**
+ * Settles once the index load below has finished, loaded or failed, so work that
+ * must not compete with it (the Session Records' load sends, #230) can wait.
+ */
+export const indexLoadSettled = new Promise<void>((resolve) => (settleIndexLoad = resolve));
+
 export function useRhymeIndex(): IndexLoad {
   const [load, setLoad] = useState<IndexLoad>({ status: "loading" });
 
@@ -41,7 +49,8 @@ export function useRhymeIndex(): IndexLoad {
             message: error instanceof Error ? error.message : String(error),
           });
         }
-      });
+      })
+      .finally(() => settleIndexLoad());
     return () => {
       cancelled = true;
     };

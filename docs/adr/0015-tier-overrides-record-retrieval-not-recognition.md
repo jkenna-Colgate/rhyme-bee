@@ -130,6 +130,12 @@ as is every move and every editor verdict a move overrode.
 The remaining risk is a known word on a wrong reading that many players type
 anyway. Nothing checks it, and a lock or a Demotion undoes it on a later visit.
 
+Built in [#270](https://github.com/jkenna-Colgate/rhyme-bee/issues/270): the
+job is `npm run tier:moves`, its file is `data/tier-moves.csv`, and the lock is
+an optional sixth column, `locked`, on a row of this file. The bound is the
+exact (Clopper-Pearson) one, named in `src/tierMoves.ts`, which holds the
+unclaimed settings.
+
 ### Rejected
 
 **An Answer nobody found becomes a Bonus Word, on a day under the floor.** This

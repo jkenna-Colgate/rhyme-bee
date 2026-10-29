@@ -32,6 +32,7 @@ import { measureAnswers } from "../src/curation.ts";
 import {
   checkDayDrift,
   scheduleBands,
+  scheduledDayFor,
   type DayDrift,
   type PuzzleFacts,
   type Schedule,
@@ -88,14 +89,14 @@ export interface ScheduledDayReadout {
 }
 
 /**
- * A date the schedule does not cover. It names the run's edges rather than
- * returning nothing, so a typo reads as a typo instead of as an empty screen.
+ * A date the schedule does not cover. It names the date the Schedule begins
+ * rather than returning nothing, so a typo reads as a typo instead of as an
+ * empty screen. The Schedule loops, so there is no last date to name.
  */
 export interface UnscheduledDateReadout {
   outcome: "not-scheduled";
   date: string;
   firstDate: string;
-  lastDate: string;
 }
 
 /**
@@ -135,15 +136,14 @@ export function readScheduledDay(
   schedule: Schedule,
   date: string,
 ): DayReadout {
-  const day = schedule.days.find((d) => d.date === date);
-  if (day === undefined) {
-    return {
-      outcome: "not-scheduled",
-      date,
-      firstDate: schedule.days[0]!.date,
-      lastDate: schedule.days[schedule.days.length - 1]!.date,
-    };
+  const listed = scheduledDayFor(schedule, date);
+  if (listed === null) {
+    return { outcome: "not-scheduled", date, firstDate: schedule.days[0]!.date };
   }
+  // A date past the first lap reads as the day it repeats, under its own date:
+  // the editor asked about that date, and every correction attaches to a word
+  // rather than to either date (#257).
+  const day: ScheduleDay = { ...listed, date };
 
   const index = openIndex();
   let puzzle: ReturnType<RhymeIndex["buildPuzzle"]>;

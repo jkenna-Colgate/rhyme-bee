@@ -23,6 +23,8 @@ desktop.ini
 # regenerable. See docs/adr/0003 and docs/adr/0004. The committed pronunciation
 # supplement (ADR-0009) is the one hand-authored input, so it is kept.
 /data/*
+# `data/session-records/` (npm run records:pull) is ignored by the line above
+# and must never be un-ignored: Session Records are never committed (ADR-0019).
 !/data/supplement.dict
 # The schedule is dealt once, reviewed by hand and then fixed (ADR-0012), so it
 # is an authored input like the supplement — not a regenerable artifact.
@@ -45,6 +47,12 @@ desktop.ini
 # list for a later pass and the instrument that turns "7 out of 7" into a real
 # miss rate (ADR-0014). A record kept on one machine measures nothing.
 !/data/deferred-readings.jsonl
+# The four large sources are not committed: they are mirrored in private R2
+# and pinned by checksum (#272, ADR-0013 amended). The checksums are committed
+# so the laptop and CI build from the same bytes, and the provenance record the
+# index serialises is committed so a fresh clone can build at all.
+!/data/sources.sha256
+!/data/sources.json
 *.csv
 *.xlsx
 # The Retrieval override layer, and the one negation that has to come after the
@@ -56,6 +64,11 @@ desktop.ini
 # a Tier verdict is a judgement about Retrieval that only the editor who made it
 # holds, and `*.csv` was quietly making a night of them uncommittable.
 !/data/tier-overrides.csv
+# The moves the run makes from Session Records (#270, ADR-0015), which the build
+# layers under the editor's verdicts. Same ordering constraint as the line above:
+# without this negation every move the run writes is uncommittable, so the deploy
+# rebuild never sees it.
+!/data/tier-moves.csv
 # The maintainer's verdicts the Judge is scored against, authored like the
 # demotion list, and the report every Judge and Synthetic Player run commits
 # (#250). Neither can be regenerated: one is a person's ear, the other a record

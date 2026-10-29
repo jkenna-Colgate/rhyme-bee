@@ -109,6 +109,18 @@
       "name": "FEEDBACK_LIMITER",
       "namespace_id": "2132",
       "simple": { "limit": 5, "period": 60 }
+    },
+    // Session Records (#230, ADR-0019), written to the `APPEAL_QUEUE` bucket
+    // under `sessions/`. A third budget so a browser sending its history cannot
+    // use up a player's Appeals. One request per stored Daily Puzzle Session,
+    // sent one at a time on load: a playtester holds 50 or more from before
+    // this shipped, so 60 a minute lets most send the lot on their first visit,
+    // and whatever this refuses is sent on a later one, because a Session is
+    // only marked sent when this route accepted it.
+    {
+      "name": "SESSION_RECORD_LIMITER",
+      "namespace_id": "2301",
+      "simple": { "limit": 60, "period": 60 }
     }
   ]
 }

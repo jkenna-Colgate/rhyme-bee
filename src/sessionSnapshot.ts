@@ -48,6 +48,16 @@ export function snapshotKey(date: string): string {
   return `${KEY_PREFIX}${date}`;
 }
 
+/**
+ * The date a storage key holds a snapshot for, or null if it is not a snapshot
+ * key. The inverse of `snapshotKey`, for the one reader that walks storage
+ * rather than asking for a date: the Session Record sender (ADR-0019), which
+ * sends every stored Daily Puzzle Session and so has to find them.
+ */
+export function snapshotDateOf(key: string): string | null {
+  return key.startsWith(KEY_PREFIX) ? key.slice(KEY_PREFIX.length) : null;
+}
+
 export function snapshot(persisted: PersistedSession, meta: { date: string }): string {
   const { session, submissions } = persisted;
   return JSON.stringify({
@@ -60,7 +70,7 @@ export function snapshot(persisted: PersistedSession, meta: { date: string }): s
 }
 
 /** The stored shape, once it has been recognised as one. */
-interface StoredSnapshot {
+export interface StoredSnapshot {
   version: number;
   date: string;
   seed: { word: string; rhymeKey: string };
@@ -80,7 +90,7 @@ interface StoredSnapshot {
  * genuinely happens to storage a player's browser owns.
  */
 export function resume(index: RhymeIndex, seed: SeedWord, raw: string | null): PersistedSession {
-  const stored = parse(raw);
+  const stored = readSnapshot(raw);
   // A Seed mismatch is not corruption — it is yesterday's Session found under
   // today's key, or a snapshot pinned to the other reading of an ambiguous Seed.
   // Replaying it would build a Puzzle the player never saw, so it is discarded.
@@ -94,8 +104,12 @@ export function resume(index: RhymeIndex, seed: SeedWord, raw: string | null): P
   return replay(index, seed, stored.submissions, stored.ended);
 }
 
-/** The snapshot this string holds, or null if it does not hold one. */
-function parse(raw: string | null): StoredSnapshot | null {
+/**
+ * The snapshot this string holds, or null if it does not hold one. Exported for
+ * the Session Record sender, which copies a stored snapshot's fields as they
+ * are rather than replaying them: a Session Record is the Session as played.
+ */
+export function readSnapshot(raw: string | null): StoredSnapshot | null {
   if (raw === null || raw === "") return null;
 
   let value: unknown;

@@ -43,7 +43,7 @@ import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { parseDeclines, type Decline } from "../src/declines.ts";
-import type { Schedule } from "../src/schedule.ts";
+import { localCalendarDate, type Schedule } from "../src/schedule.ts";
 import { parseCandidates, type SupplementCandidate } from "../src/supplementCandidate.ts";
 import { standingTierOf } from "../src/tierOverride.ts";
 import { parseDemotions } from "../src/demotions.ts";
@@ -51,7 +51,7 @@ import { parseRulingRecords } from "../src/judgeLanding.ts";
 import { readCandidateQueue, type CandidateQueueContext, type JudgeLeftovers } from "../scripts/editorCandidates.ts";
 import { pinnedEvidenceContext } from "../scripts/editorAdd.ts";
 import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
-import { measuredPrevalence, overridePath } from "./editorTierPlugin.ts";
+import { measuredPrevalence, movesPath, overridePath } from "./editorTierPlugin.ts";
 import { readTierOverrideText } from "./tierOverrideFile.ts";
 import { DECLINES_PATH, readDeclineText } from "./declinesFile.ts";
 import { readDeferredReadings } from "./deferredFile.ts";
@@ -192,8 +192,9 @@ export function editorCandidatesPlugin(): Plugin {
 /**
  * The pinned evidence, and whether a word is an Answer today. The Tier is the
  * next build's: the built index's lemma walk and threshold, over the pinned
- * norms with `data/tier-overrides.csv` applied, so a Tier verdict written in
- * the Editor's Pass resolves a Bonus Word's Appeal at once (#258).
+ * norms with `data/tier-overrides.csv` and `data/tier-moves.csv` applied, so
+ * a Tier verdict written in the Editor's Pass resolves a Bonus Word's Appeal at
+ * once (#258), and so does a move from Session Records (#270).
  */
 function queueContext(): CandidateQueueContext {
   const index = builtIndex();
@@ -201,7 +202,12 @@ function queueContext(): CandidateQueueContext {
     lemmaCandidates: (word) => index.derivation.lemmaCandidates(word),
     measured: measuredPrevalence(),
     overrides: readTierOverrideText(overridePath),
+    moves: readOptional(movesPath),
     knownnessThreshold: builtKnownnessThreshold(),
   });
-  return { ...pinnedEvidenceContext(), isAnswer: (word) => tierOf(word) === "answer" };
+  return {
+    ...pinnedEvidenceContext(),
+    isAnswer: (word) => tierOf(word) === "answer",
+    today: localCalendarDate(),
+  };
 }

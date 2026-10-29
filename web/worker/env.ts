@@ -56,6 +56,12 @@ export interface Env {
   APPEAL_LIMITER: RateLimiter;
   FEEDBACK_LIMITER: RateLimiter;
   /**
+   * The Session Record endpoint's budget (#230), its own for the same reason:
+   * a browser sending its history in a burst must not use up a player's
+   * Appeals, and the records are written to `APPEAL_QUEUE` under `sessions/`.
+   */
+  SESSION_RECORD_LIMITER: RateLimiter;
+  /**
    * `owner/repo` of the tracker a general note is filed on — a plaintext `var`
    * in `wrangler.jsonc`, because which tracker this game reports to is not a
    * secret and belongs beside the config it is deployed with.

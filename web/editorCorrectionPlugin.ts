@@ -42,7 +42,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
-import type { Schedule } from "../src/schedule.ts";
+import { localCalendarDate, type Schedule } from "../src/schedule.ts";
 import type { EvidenceContext } from "../src/supplementEvidence.ts";
 import { pinnedEvidenceContext, type AgentAuthor } from "../scripts/editorAdd.ts";
 import { applyCorrection, proposeCorrection } from "../scripts/editorCorrection.ts";
@@ -72,6 +72,8 @@ import { EDITOR_CORRECTION_PATH } from "./src/endpoints.ts";
 export interface EditorCorrectionDeps {
   context: () => EvidenceContext;
   schedule: () => Schedule;
+  /** The editor's calendar date, from which a recheck names each day's next date. Today when unsaid. */
+  today?: () => string;
   openIndex: () => RhymeIndex;
   rebuild: () => Promise<RebuildResult>;
   author?: AgentAuthor;
@@ -128,6 +130,7 @@ export function editorCorrectionHandler(deps: EditorCorrectionDeps) {
         {
           context: deps.context,
           schedule: deps.schedule,
+          today: deps.today ?? (() => localCalendarDate()),
           openIndex: deps.openIndex,
           rebuild: deps.rebuild,
           supplementPath: deps.supplementPath,

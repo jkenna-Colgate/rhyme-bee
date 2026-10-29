@@ -69,7 +69,7 @@ import { resolve } from "node:path";
 import { normaliseWord } from "../src/cmudict.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "../src/phonology.ts";
 import { respell } from "../src/respelling.ts";
-import type { PuzzleFacts, Schedule, ScheduleDay } from "../src/schedule.ts";
+import { nextDateOf, type PuzzleFacts, type Schedule, type ScheduleDay } from "../src/schedule.ts";
 import { gatherEvidence, type EvidenceContext } from "../src/supplementEvidence.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { RebuildResult } from "../web/src/editor/add.ts";
@@ -152,6 +152,8 @@ export interface CorrectionAsk {
 export interface CorrectionDeps {
   context: () => EvidenceContext;
   schedule: () => Schedule;
+  /** The editor's calendar date, from which each rechecked day's next date is found. */
+  today: () => string;
   openIndex: () => RhymeIndex;
   rebuild: () => Promise<RebuildResult>;
   /** Where the reading lands. `data/supplement.dict`, live. */
@@ -187,7 +189,7 @@ export async function applyCorrection(
   const keysAfter = keysOf(written);
   const rechecked = union(keysBefore, keysAfter);
 
-  const days = daysOnKeys(schedule, rechecked);
+  const days = daysOnKeys(schedule, rechecked, deps.today());
   const before = days.map((day) => readDay(deps.openIndex, schedule, day.date));
 
   appendCorrection(
@@ -254,15 +256,29 @@ function union(a: readonly RhymeKey[], b: readonly RhymeKey[]): RhymeKey[] {
 }
 
 /**
- * The scheduled days the given Rhyme Keys reach, in schedule order.
+ * The scheduled days the given Rhyme Keys reach, in schedule order, each under
+ * the next date it plays on or after `today` (#257). The listed date is the
+ * first lap's, and a recheck named by a date already gone would report on a day
+ * nobody will play; the day it names is the one the correction will reach.
  *
  * The run holds 260 days over 260 distinct keys, so this is at most one day per
  * key and usually none: most Candidates are aimed at a key the schedule never
- * dealt. A key with no day is simply not represented, which is right — there is
- * no day to recheck and nothing to say about one.
+ * dealt. A key with no day, or whose day will not play again, is simply not
+ * represented, which is right — there is no day to recheck and nothing to say
+ * about one.
  */
-export function daysOnKeys(schedule: Schedule, keys: readonly RhymeKey[]): ScheduleDay[] {
-  return schedule.days.filter((day) => keys.includes(day.rhymeKey));
+export function daysOnKeys(
+  schedule: Schedule,
+  keys: readonly RhymeKey[],
+  today: string,
+): ScheduleDay[] {
+  const days: ScheduleDay[] = [];
+  for (const day of schedule.days) {
+    if (!keys.includes(day.rhymeKey)) continue;
+    const date = nextDateOf(schedule, day, today);
+    if (date !== null) days.push({ ...day, date });
+  }
+  return days;
 }
 
 /**

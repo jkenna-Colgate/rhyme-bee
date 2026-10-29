@@ -22,7 +22,8 @@ import { Derivation, IndexDataSource } from "../../src/derivation.ts";
 import type { Pronunciation, RhymeKey } from "../../src/phonology.ts";
 import type { EvidenceContext, WordEvidence } from "../../src/supplementEvidence.ts";
 import type { AddTarget } from "../../web/src/editor/addOutcome.ts";
-import { add, printAddOutcome, resolveAddOutcome, type AgentAuthor } from "../editorAdd.ts";
+import { parseSchedule } from "../../src/schedule.ts";
+import { add, printAddOutcome, resolveAddOutcome, targetIn, type AgentAuthor } from "../editorAdd.ts";
 import { parseDeferredReadings } from "../editorDeferred.ts";
 
 function context(overrides: {
@@ -461,5 +462,25 @@ describe("add, over a temp dir with a stubbed agent", () => {
     const deferred = readFileSync(deferredPath, "utf8");
     expect(deferred).toContain('"word":"zorp"');
     expect(deferred).not.toContain("gleeb");
+  });
+});
+
+describe("an add aimed at a date past the first lap (#257)", () => {
+  const schedule = parseSchedule(
+    JSON.parse(readFileSync(new URL("../../data/schedule.json", import.meta.url), "utf8")),
+  )!;
+
+  it("lands on the Rhyme Key of the day the date repeats", () => {
+    // Tuesday 2027-04-20 repeats Tuesday 2026-08-04, the boulder Puzzle.
+    expect(targetIn(schedule, "2027-04-20")).toEqual({
+      target: "OW L D ER",
+      provenance: "2027-04-20, the boulder Puzzle",
+      seed: "boulder",
+    });
+    expect(targetIn(schedule, "2027-04-20")?.target).toBe(targetIn(schedule, "2026-08-04")?.target);
+  });
+
+  it("finds nothing before the Schedule begins", () => {
+    expect(targetIn(schedule, "2026-08-02")).toBeNull();
   });
 });

@@ -78,6 +78,7 @@ function context(): CandidateQueueContext {
       names: raw.names,
     }),
     isAnswer: () => true,
+    today: "2026-08-01",
   };
 }
 
