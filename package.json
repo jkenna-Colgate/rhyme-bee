@@ -17,6 +17,8 @@
     "editor:read": "tsx scripts/editor.ts read",
     "editor:add": "tsx scripts/editor.ts add",
     "appeals:pull": "tsx scripts/pull-appeals.ts",
+    "appeals:judge": "tsx scripts/judge-appeals.ts",
+    "monthly:report": "tsx scripts/monthly-report.ts",
     "records:pull": "tsx scripts/pull-session-records.ts",
     "records:replay": "tsx scripts/replay-session-records.ts",
     "tier:moves": "tsx scripts/tier-moves.ts",
