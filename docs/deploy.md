@@ -56,6 +56,20 @@ To see what would be uploaded without uploading it,
    `npm run appeals:pull` and `npm run records:pull`. Git-ignored, and it stays
    that way.
 
+### The index sources
+
+`cmudict.dict`, `words.txt`, `names.txt` and `prevalence.csv` are not in git.
+They are mirrored in the private bucket under `sources/`, and their SHA-256s
+are committed in `data/sources.sha256` (#272). `npm run build:index` refuses
+when a local copy does not match, and names the file.
+
+- `npm run sources:fetch` downloads them, refusing and writing nothing if one
+  fails its checksum. It uses the read-only token above, from `credentials.env`
+  or the same three environment variables, so CI can run it.
+- `npm run sources:upload -- <file>...` uploads a changed source through
+  `wrangler r2 object put` and rewrites its checksum. Commit the checksum file
+  and push; that commit is what ships the change.
+
 The `APPEAL_QUEUE` binding does not exist until the first deploy creates it. The
 Worker's settings page showing nothing beforehand is expected, not a fault.
 

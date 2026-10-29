@@ -47,6 +47,12 @@ desktop.ini
 # list for a later pass and the instrument that turns "7 out of 7" into a real
 # miss rate (ADR-0014). A record kept on one machine measures nothing.
 !/data/deferred-readings.jsonl
+# The four large sources are not committed: they are mirrored in private R2
+# and pinned by checksum (#272, ADR-0013 amended). The checksums are committed
+# so the laptop and CI build from the same bytes, and the provenance record the
+# index serialises is committed so a fresh clone can build at all.
+!/data/sources.sha256
+!/data/sources.json
 *.csv
 *.xlsx
 # The Retrieval override layer, and the one negation that has to come after the

@@ -18,7 +18,9 @@
     "editor:add": "tsx scripts/editor.ts add",
     "appeals:pull": "tsx scripts/pull-appeals.ts",
     "records:pull": "tsx scripts/pull-session-records.ts",
-    "records:replay": "tsx scripts/replay-session-records.ts"
+    "records:replay": "tsx scripts/replay-session-records.ts",
+    "sources:fetch": "tsx scripts/fetch-sources.ts",
+    "sources:upload": "tsx scripts/upload-source.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

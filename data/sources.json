@@ -1,0 +1,7 @@
+{
+  "cmudict": "https://github.com/cmusphinx/cmudict/blob/master/cmudict.dict",
+  "prevalence": "https://osf.io/g4xrt/files/nbu9e (Brysbaert et al. 2019)",
+  "words": "https://github.com/dwyl/english-words/blob/master/words_alpha.txt",
+  "names": "SSA baby names 1880–2023",
+  "supplement": "data/supplement.dict (committed human override layer, ADR-0009)"
+}

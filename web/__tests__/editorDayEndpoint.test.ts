@@ -125,7 +125,7 @@ describe("the dev-only day endpoint", () => {
     expect(JSON.parse(answered.body)).toMatchObject({ outcome: "day", date: "2026-08-03" });
   });
 
-  it("names the run's edges for a date outside it, without opening the index", async () => {
+  it("names where the Schedule begins for a date outside it, without opening the index", async () => {
     const { handler, opened } = endpoint();
     const answered = await call(handler, { url: "/?date=2027-01-01" });
 
@@ -134,7 +134,6 @@ describe("the dev-only day endpoint", () => {
       outcome: "not-scheduled",
       date: "2027-01-01",
       firstDate: "2026-08-03",
-      lastDate: "2026-08-04",
     });
     expect(opened).toEqual([]);
   });

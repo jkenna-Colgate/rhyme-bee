@@ -170,15 +170,15 @@ function Disagreement({ readout }: { readout: UnpinnableDayReadout }) {
 }
 
 /**
- * A date the run does not cover. It names the edges rather than showing nothing,
- * so a typo reads as a typo instead of as an empty screen.
+ * A date the Schedule does not cover. It names where the Schedule begins rather
+ * than showing nothing, so a typo reads as a typo instead of as an empty screen.
  */
 function OutsideTheRun({ readout }: { readout: UnscheduledDateReadout }) {
   return (
     <section className="editor-empty">
       <h2>No Daily Puzzle on {readout.date}</h2>
       <p>
-        The run covers <strong>{readout.firstDate}</strong> to <strong>{readout.lastDate}</strong>.
+        The Schedule begins on <strong>{readout.firstDate}</strong>.
       </p>
     </section>
   );
