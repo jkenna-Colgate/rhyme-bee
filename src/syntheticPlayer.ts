@@ -42,7 +42,7 @@ export function playerPrompt(seedWord: string, respelling: string, example?: str
  */
 export function exampleRhyme(context: PuzzleContext, index: RhymeIndex): string | null {
   const others = context.puzzle.answers.map((a) => a.word).filter((w) => w !== context.seed.word);
-  return others.length ? chooseRepresentative(others, index) : null;
+  return others.length ? chooseRepresentative(others, index, context.seed.rhymeKey) : null;
 }
 
 /** The words in a reply: one a line, lower-cased, list marks taken off, anything else dropped. */
