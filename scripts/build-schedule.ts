@@ -18,7 +18,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEFAULT_PLAYABLE_BAND, playableSeeds } from "../src/curation.ts";
-import { dealSchedule, reviewSchedule } from "../src/schedule.ts";
+import { dealSchedule, lapStartOf, reviewSchedule } from "../src/schedule.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
 import { indexArtifactPath } from "./indexArtifact.ts";
@@ -58,9 +58,10 @@ writeFileSync(
     {
       generated: new Date().toISOString().slice(0, 10),
       startDate,
-      // The loop is the last whole weeks of the deal; the days of a short week
-      // left over at the front of it are spares (ADR-0012, amended 2026-10-11).
-      lapStart: days[deal.finalWeekLength]?.date,
+      // The loop is the whole weeks counted back from the deal's last day, its
+      // short week included; the first days of week 1 in front of it are spares
+      // (ADR-0012, amended 2026-10-11).
+      lapStart: lapStartOf(deal),
       band: DEFAULT_PLAYABLE_BAND,
       // Every day's Difficulty is a share of a Puzzle's maximum achievable
       // Score, so it means nothing without the configuration that scored it

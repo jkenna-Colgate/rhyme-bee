@@ -5,7 +5,14 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { dealSchedule, DAYS_PER_WEEK, type Schedulable } from "../schedule.ts";
+import {
+  dealSchedule,
+  DAYS_PER_WEEK,
+  lapStartOf,
+  parseSchedule,
+  scheduledDayFor,
+  type Schedulable,
+} from "../schedule.ts";
 
 /** A pool of `count` families, Difficulty spread evenly over 0…1. */
 function pool(count: number): Schedulable[] {
@@ -106,6 +113,52 @@ describe("a pool that is not a multiple of seven", () => {
 
   it("reports a whole number of weeks as no short week at all", () => {
     expect(dealSchedule(pool(294), MONDAY).finalWeekLength).toBe(0);
+  });
+});
+
+describe("the lap of a fresh deal", () => {
+  // The short week is the deal's last, so the loop, which always runs to the end
+  // of the list, is the whole weeks counted back from there. What falls in front
+  // of it is the spares: the first days of week 1, played once on their dates.
+  const deal = dealSchedule(pool(291), MONDAY);
+  const lapStart = lapStartOf(deal)!;
+  const schedule = parseSchedule({
+    startDate: MONDAY,
+    lapStart,
+    days: deal.days.map((day) => ({
+      date: day.date,
+      weekday: day.weekday,
+      week: day.week,
+      seed: day.entry.representative,
+      rhymeKey: day.entry.rhymeKey,
+      answerCount: 10,
+      difficulty: day.entry.difficulty,
+    })),
+  });
+
+  it("starts after the spares, so the lap is a whole number of weeks", () => {
+    expect(lapStart).toBe("2026-08-07");
+    expect(schedule?.lapStart).toBe(lapStart);
+  });
+
+  it("gives every date past the list a day on its own weekday", () => {
+    const last = deal.days.at(-1)!.date;
+    for (const [date, weekday] of [
+      [last, "Thu"],
+      ["2027-05-21", "Fri"],
+      ["2027-05-24", "Mon"],
+      ["2028-01-02", "Sun"],
+    ] as const) {
+      expect(scheduledDayFor(schedule!, date)?.weekday, date).toBe(weekday);
+    }
+  });
+
+  it("starts on the first day when the deal is whole weeks", () => {
+    expect(lapStartOf(dealSchedule(pool(294), MONDAY))).toBe(MONDAY);
+  });
+
+  it("has no lap for a pool short of one week", () => {
+    expect(lapStartOf(dealSchedule(pool(5), MONDAY))).toBeUndefined();
   });
 });
 

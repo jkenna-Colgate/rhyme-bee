@@ -135,6 +135,17 @@ export function dealSchedule<T extends Schedulable>(
   return { days, finalWeekLength };
 }
 
+/**
+ * Where a fresh deal's first lap begins (ADR-0012, amended 2026-10-11). The deal
+ * puts its short week last, and a lap always runs to the end of the list, so the
+ * lap is the whole weeks counted back from the last day. The days in front of it
+ * are the spares: the first `finalWeekLength` days of week 1, played once on
+ * their own dates. Undefined for a deal too short to hold one whole week.
+ */
+export function lapStartOf(deal: Deal<Schedulable>): string | undefined {
+  return deal.days[deal.finalWeekLength]?.date;
+}
+
 // --- Reading the artifact back ------------------------------------------------
 
 /**
