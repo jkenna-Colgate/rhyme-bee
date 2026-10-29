@@ -444,3 +444,248 @@ absume AH B0 S UW1 M
 # `curl`). ER L, with `curl`.
 squirrel S K W ER1 AH0 L
 squirrel(1) S K W ER1 L
+
+# --- Corrections (one syllable before `l`, and three wrong sources, #232) ---
+#
+# The syllabic-consonant rule gives `dial` the one-syllable reading AY L, so it
+# rhymes with `mile`, but only on a reading that ends in the `l`: `dialed` keeps
+# its schwa and misses `wild`. Each plain -s or -ed form below has a base word
+# that scores on the one-syllable key, and is given that reading beside its own.
+# Ruled in #232, written in #253.
+
+# gruel (#253): read with one syllable, UW L, so it rhymes with `cool` (#232).
+gruel G R UW1 AH0 L
+gruel(1) G R UW1 L
+# accruals (#253): `accrual` scores on UW L; the plural joins UW L Z (#232).
+accruals AH0 K R UW1 AH0 L Z
+accruals(1) AH0 K R UW1 L Z
+# denials (#253): `denial` scores on AY L; the plural joins AY L Z (#232).
+denials D IH0 N AY1 AH0 L Z
+denials(1) D IH0 N AY1 L Z
+# dialed (#253): `dial` scores on AY L; the -ed form joins AY L D, with `wild` (#232).
+dialed D AY1 AH0 L D
+dialed(1) D AY1 L D
+# dowels (#253): `dowel` scores on AW L; the plural joins AW L Z, with `owls` (#232).
+dowels D AW1 AH0 L Z
+dowels(1) D AW1 L Z
+# duals (#253): `dual` scores on UW L; the plural joins UW L Z (#232).
+duals D UW1 AH0 L Z
+duals(1) D UW1 L Z
+# dueled (#253): `duel` scores on UW L; the -ed form joins UW L D, with `cooled` (#232).
+dueled D UW1 AH0 L D
+dueled(1) D UW1 L D
+# duels (#253): `duel` scores on UW L; the plural joins UW L Z, with `rules` (#232).
+duels D UW1 AH0 L Z
+duels(1) D UW1 L Z
+# fueled (#253): `fuel` scores on UW L; the -ed form joins UW L D, with `ruled` (#232).
+fueled F Y UW1 AH0 L D
+fueled(1) F Y UW1 L D
+# fuelled (#253): the spelling of `fueled` with two l's, read the same (#232).
+fuelled F Y UW1 AH0 L D
+fuelled(1) F Y UW1 L D
+# fuels (#253): `fuel` scores on UW L; the plural joins UW L Z, with `mules` (#232).
+fuels F Y UW1 AH0 L Z
+fuels(1) F Y UW1 L Z
+# mistrials (#253): `mistrial` scores on AY L; both stresses join AY L Z (#232).
+mistrials M IH0 S T R AY1 AH0 L Z
+mistrials(1) M IH0 S T R AY1 L Z
+mistrials(2) M IH1 S T R AY2 AH0 L Z
+mistrials(3) M IH1 S T R AY2 L Z
+# refueled (#253): `refuel` scores on UW L; the -ed form joins UW L D (#232).
+refueled R IY0 F Y UW1 AH0 L D
+refueled(1) R IY0 F Y UW1 L D
+# renewals (#253): `renewal` scores on UW L; the plural joins UW L Z (#232).
+renewals R IH0 N UW1 AH0 L Z
+renewals(1) R IH0 N UW1 L Z
+# royals (#253): `royal` scores on OY L; the plural joins OY L Z, with `boils` (#232).
+royals R OY1 AH0 L Z
+royals(1) R OY1 L Z
+# spirituals (#253): `spiritual` scores on UW L; the plural joins UW L Z (#232).
+spirituals S P IH1 R IH0 CH UW2 AH0 L Z
+spirituals(1) S P IH1 R IH0 CH UW2 L Z
+# vials (#253): `vial` scores on AY L; the plural joins AY L Z, with `miles` (#232).
+vials V AY1 AH0 L Z
+vials(1) V AY1 L Z
+# withdrawals (#253): `withdrawal` scores on AA L; the plural joins AA L Z, with `walls` (#232).
+withdrawals W IH0 TH D R AO1 AH0 L Z
+withdrawals(1) W IH0 TH D R AO1 L Z
+withdrawals(2) W IH0 DH D R AO1 AH0 L Z
+withdrawals(3) W IH0 DH D R AO1 L Z
+
+# skier (#253): upstream also reads `S K AY1 R`, which put it with `fire`; it is "SKEE-er" only (#232).
+skier S K IY1 ER0
+# noir (#253): upstream `N OY1 R` rhymes it with `employer`; it is "nwahr", with `car` (#232).
+noir N W AA1 R
+# boudoir (#253): upstream `D OY2 R` is the same mistake as `noir`; it is "BOO-dwahr", with `car` (#232).
+boudoir B UW1 D W AA2 R
+
+# --- Corrections (a beat on the last syllable that CMUdict does not mark, #233) ---
+#
+# A word earns Points on its last stressed syllable, main or secondary (ADR-0020,
+# amended 2026-10-25). Each word below is said with a beat on its last syllable
+# that CMUdict leaves unmarked, so it is given secondary stress (`2`) there and
+# nothing else changes. The compounds were found by the sounds-level test (both
+# halves are words, the tail rhymes on its key) and then read by hand. Ruled in
+# #233, written in #253.
+
+# heretic (#253): "HAIR-uh-tick", a beat on -tic, so IH K with `trick` (#233).
+heretic HH EH1 R AH0 T IH2 K
+# limerick (#253): "LIM-er-rick", a beat on -rick, so IH K with `trick` (#233).
+limerick L IH1 M ER0 IH2 K
+# pyramid (#253): "PEER-uh-mid", a beat on -mid, so IH D with `grid` (#233).
+pyramid P IH1 R AH0 M IH2 D
+# aqualung (#253): compound, aqua + lung; joins AH NG with `lung` (#233).
+aqualung AE1 K W AH0 L AH2 NG
+# babysit (#253): compound, baby + sit; joins IH T with `sit` (#233).
+babysit B EY1 B IY0 S IH2 T
+# backspin (#253): compound, back + spin; joins IH N with `spin` (#233).
+backspin B AE1 K S P IH2 N
+# backstitch (#253): compound, back + stitch; joins IH CH with `stitch` (#233).
+backstitch B AE1 K S T IH2 CH
+# bandwidth (#253): compound, band + width; joins IH D TH with `width` (#233).
+bandwidth B AE1 N D W IH2 D TH
+# bathtub (#253): compound, bath + tub; joins AH B with `tub` (#233).
+bathtub B AE1 TH T AH2 B
+# bedbug (#253): compound, bed + bug; joins AH G with `bug` (#233).
+bedbug B EH1 D B AH2 G
+# bedbugs (#253): the plural of `bedbug`, the same mark; joins AH G Z (#233).
+bedbugs B EH1 D B AH2 G Z
+# blackbird (#253): compound, black + bird; joins ER D with `bird` (#233).
+blackbird B L AE1 K B ER2 D
+# blackbirds (#253): the plural of `blackbird`, the same mark; joins ER D Z (#233).
+blackbirds B L AE1 K B ER2 D Z
+# blowfish (#253): compound, blow + fish; joins IH SH with `fish` (#233).
+blowfish B L OW1 F IH2 SH
+# breakups (#253): compound, break + ups; joins AH P S with `cups` (#233).
+breakups B R EY1 K AH2 P S
+# buzzword (#253): compound, buzz + word; joins ER D with `word` (#233).
+buzzword B AH1 Z W ER2 D
+# buzzwords (#253): the plural of `buzzword`, the same mark; joins ER D Z (#233).
+buzzwords B AH1 Z W ER2 D Z
+# carsick (#253): compound, car + sick; joins IH K with `sick` (#233).
+carsick K AA1 R S IH2 K
+# catnip (#253): compound, cat + nip; joins IH P with `nip` (#233).
+catnip K AE1 T N IH2 P
+# cowlick (#253): compound, cow + lick; joins IH K with `lick` (#233).
+cowlick K AW1 L IH2 K
+# cowlicks (#253): the plural of `cowlick`, the same mark; joins IH K S (#233).
+cowlicks K AW1 L IH2 K S
+# cowslip (#253): compound, cow + slip; joins IH P with `slip` (#233).
+cowslip K AW1 S L IH2 P
+# crayfish (#253): compound, cray + fish; joins IH SH with `fish` (#233).
+crayfish K R EY1 F IH2 SH
+# doorsill (#253): compound, door + sill; joins IH L with `sill` (#233).
+doorsill D AO1 R S IH2 L
+# drumstick (#253): compound, drum + stick; joins IH K with `stick`, as `lipstick` does (#233).
+drumstick D R AH1 M S T IH2 K
+# dustbin (#253): compound, dust + bin; joins IH N with `bin` (#233).
+dustbin D AH1 S T B IH2 N
+# flashbulb (#253): compound, flash + bulb; joins AH L B with `bulb` (#233).
+flashbulb F L AE1 SH B AH2 L B
+# flashbulbs (#253): the plural of `flashbulb`, the same mark; joins AH L B Z (#233).
+flashbulbs F L AE1 SH B AH2 L B Z
+# flashguns (#253): compound, flash + guns; joins AH N Z with `guns` (#233).
+flashguns F L AE1 SH G AH2 N Z
+# flatworm (#253): compound, flat + worm; joins ER M with `worm` (#233).
+flatworm F L AE1 T W ER2 M
+# gunflint (#253): compound, gun + flint; joins IH N T with `flint` (#233).
+gunflint G AH1 N F L IH2 N T
+# hagfish (#253): compound, hag + fish; joins IH SH with `fish` (#233).
+hagfish HH AE1 G F IH2 SH
+# halfwit (#253): compound, half + wit; joins IH T with `wit` (#233).
+halfwit HH AE1 F W IH2 T
+# hookworm (#253): compound, hook + worm; joins ER M with `worm` (#233).
+hookworm HH UH1 K W ER2 M
+# hookworms (#253): the plural of `hookworm`, the same mark; joins ER M Z (#233).
+hookworms HH UH1 K W ER2 M Z
+# iceberg (#253): compound, ice + berg; joins ER G with `berg` (#233).
+iceberg AY1 S B ER2 G
+# icebergs (#253): the plural of `iceberg`, the same mark; joins ER G Z (#233).
+icebergs AY1 S B ER2 G Z
+# liverworts (#253): compound, liver + worts; joins ER T S with `worts` (#233).
+liverworts L IH1 V ER0 W ER2 T S
+# lookup (#253): compound, look + up; joins AH P with `up` (#233).
+lookup L UH1 K AH2 P
+# lookups (#253): the plural of `lookup`, the same mark; joins AH P S (#233).
+lookups L UH1 K AH2 P S
+# lugworm (#253): compound, lug + worm; joins ER M with `worm` (#233).
+lugworm L AH1 G W ER2 M
+# lugworms (#253): the plural of `lugworm`, the same mark; joins ER M Z (#233).
+lugworms L AH1 G W ER2 M Z
+# nitpick (#253): compound, nit + pick; joins IH K with `pick` (#233).
+nitpick N IH1 T P IH2 K
+# pinprick (#253): compound, pin + prick; joins IH K with `prick` (#233).
+pinprick P IH1 N P R IH2 K
+# rosebud (#253): compound, rose + bud; joins AH D with `bud` (#233).
+rosebud R OW1 Z B AH2 D
+# roundworm (#253): compound, round + worm; joins ER M with `worm` (#233).
+roundworm R AW1 N D W ER2 M
+# roundworms (#253): the plural of `roundworm`, the same mark; joins ER M Z (#233).
+roundworms R AW1 N D W ER2 M Z
+# seafront (#253): compound, sea + front; joins AH N T with `front` (#233).
+seafront S IY1 F R AH2 N T
+# shindig (#253): compound, shin + dig; joins IH G with `dig` (#233).
+shindig SH IH1 N D IH2 G
+# silkworm (#253): compound, silk + worm; joins ER M with `worm` (#233).
+silkworm S IH1 L K W ER2 M
+# skinflint (#253): compound, skin + flint; joins IH N T with `flint` (#233).
+skinflint S K IH1 N F L IH2 N T
+# starlit (#253): compound, star + lit; joins IH T with `lit` (#233).
+starlit S T AA1 R L IH2 T
+# stinkbug (#253): compound, stink + bug; joins AH G with `bug` (#233).
+stinkbug S T IH1 NG K B AH2 G
+# stinkbugs (#253): the plural of `stinkbug`, the same mark; joins AH G Z (#233).
+stinkbugs S T IH1 NG K B AH2 G Z
+# sunup (#253): compound, sun + up; joins AH P with `up` (#233).
+sunup S AH1 N AH2 P
+# toothbrush (#253): compound, tooth + brush; joins AH SH with `brush` (#233).
+toothbrush T UW1 TH B R AH2 SH
+# viaduct (#253): compound, via + duct; joins AH K T with `duct` (#233).
+viaduct V AY1 AH0 D AH2 K T
+# viaducts (#253): the plural of `viaduct`, the same mark; joins AH K T S (#233).
+viaducts V AY1 AH0 D AH2 K T S
+
+# --- Corrections (`-ship` carries a beat, ruled 2026-10-28, #253) ---
+#
+# `ship` stands alone as a word and keeps its full vowel inside a compound, so
+# `-ship` is said with a beat: 91 `-ship` words already read SH IH2 P and score
+# on `ship`. CMUdict leaves the words below unstressed there, so each is given
+# IH2 on its last vowel and nothing else changes. `worship` is "WUR-shup" and is
+# left alone. Written in #253.
+
+# acquaintanceship (#253): -ship carries a beat; joins IH P with `ship`.
+acquaintanceship AH0 K W EY1 N T AH0 N S SH IH2 P
+# amidships (#253): -ships carries a beat; joins IH P S with `ships`.
+amidships AH0 M IH1 D SH IH2 P S
+# entrepreneurship (#253): -ship carries a beat; joins IH P with `ship`.
+entrepreneurship AA2 N T R AH0 P R AH0 N ER1 SH IH2 P
+# friendship (#253): -ship carries a beat on both readings; joins IH P with `ship`.
+friendship F R EH1 N D SH IH2 P
+friendship(1) F R EH1 N SH IH2 P
+# friendships (#253): -ships carries a beat on both readings; joins IH P S with `ships`.
+friendships F R EH1 N D SH IH2 P S
+friendships(1) F R EH1 N SH IH2 P S
+# guardianship (#253): -ship carries a beat; joins IH P with `ship`.
+guardianship G AA1 R D IY0 AH0 N SH IH2 P
+# hardship (#253): -ship carries a beat; joins IH P with `ship`.
+hardship HH AA1 R D SH IH2 P
+# hardships (#253): -ships carries a beat; joins IH P S with `ships`.
+hardships HH AA1 R D SH IH2 P S
+# horsemanship (#253): -ship carries a beat; joins IH P with `ship`.
+horsemanship HH AO1 R S M AH0 N SH IH2 P
+# interrelationship (#253): -ship carries a beat; joins IH P with `ship`.
+interrelationship IH1 N T ER0 R IY0 L EY1 SH AH0 N SH IH2 P
+# kingship (#253): -ship carries a beat; joins IH P with `ship`.
+kingship K IH1 NG SH IH2 P
+# lordship (#253): -ship carries a beat; joins IH P with `ship`.
+lordship L AO1 R D SH IH2 P
+# marksmanship (#253): -ship carries a beat; joins IH P with `ship`.
+marksmanship M AA1 R K S M AH0 N SH IH2 P
+# ministership (#253): -ship carries a beat; joins IH P with `ship`.
+ministership M IH1 N IH0 S T ER0 SH IH2 P
+# musicianship (#253): -ship carries a beat; joins IH P with `ship`.
+musicianship M Y UW0 Z IH1 SH AH0 N SH IH2 P
+# township (#253): -ship carries a beat; joins IH P with `ship`.
+township T AW1 N SH IH2 P
+# townships (#253): -ships carries a beat; joins IH P S with `ships`.
+townships T AW1 N SH IH2 P S

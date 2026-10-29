@@ -21,7 +21,7 @@
  *   and the ruling exists so a Candidate they have considered stops appearing.
  *
  * The honest-reading Decline — the word is real and genuinely does not rhyme —
- * is deliberately **not** here. Making the engine say "doesn't rhyme" means
+ * is deliberately **not** here. Making the engine say "not on our rhyme list" means
  * giving the word wordhood and a reading, which is an add rather than a Decline,
  * and it lives with the corrections work (#180).
  *
@@ -67,6 +67,8 @@ import type { DemotionReason } from "../../../src/demotions.ts";
 export interface DeclineWriteResult {
   /** The ruling as written, shown rather than described. */
   appended: Decline;
+  /** True when the Decline also took an Unconfirmed Rhyme's line off the list (#269). */
+  unlisted: boolean;
 }
 
 /**

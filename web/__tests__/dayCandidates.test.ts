@@ -34,14 +34,29 @@ function jot(word: string, seedWord: string, seedRhymeKey: string): SupplementCa
 
 /** One Candidate in a named state, with the evidence that state carries. */
 function read(word: string, seedWord: string, key: string, state: ReadCandidate["state"]): ReadCandidate {
-  const identity = { word, candidate: jot(word, seedWord, key) };
+  const identity = { word, candidate: jot(word, seedWord, key), judged: null };
   switch (state) {
     case "resolved":
       return { ...identity, state, readings: [{ phonemes: ["T", "AA1", "K", "T"], key }] };
     case "declined":
       return { ...identity, state };
+    case "needs-tier":
+      return { ...identity, state, readings: [{ phonemes: ["EY1", "T"], key }] };
     case "is-a-name":
       return { ...identity, state };
+    case "suggested-demotion":
+      return { ...identity, state, reason: "proper-noun" };
+    case "unconfirmed-rhyme":
+      return {
+        ...identity,
+        state,
+        listed: {
+          line: { word, rhymeKey: key, writer: "judge:test", ruling: "overrule", confidence: "high" },
+          judged: null,
+          readings: [{ phonemes: ["EY1", "T"], key: ATE }],
+          proposal: null,
+        },
+      };
     case "needs-correction":
       return { ...identity, state, readings: [{ phonemes: ["EY1", "T"], key: ATE }] };
     case "addable":
@@ -56,6 +71,7 @@ const QUEUE: CandidateQueueReadout = {
   // The queue's second section (#181), which the day panel does not select
   // from: a deferred reading is aimed at a Rhyme Key and belongs to no date.
   deferred: { entries: [], outstanding: 0 },
+  unconfirmedRhymes: [],
   groups: [
     {
       rhymeKey: DOCKED,
@@ -125,6 +141,14 @@ describe("the card a state selects", () => {
   it("settles a resolved or declined Candidate", () => {
     expect(cardFor(read("talked", "docked", DOCKED, "resolved"))).toBe("settled");
     expect(cardFor(read("kate", "ate", ATE, "declined"))).toBe("settled");
+  });
+
+  it("gives a Bonus Word that rhymes its own card, showing the reading it rhymes on", () => {
+    // Its Appeal wants a Tier verdict, not a reading (#258).
+    const candidate = read("objurgate", "ate", ATE, "needs-tier");
+    expect(cardFor(candidate)).toBe("tier");
+    expect(evidenceFor(candidate).readings.map((r) => r.key)).toEqual([ATE]);
+    expect(evidenceFor(candidate).relatives).toEqual([]);
   });
 
   it("gives a name its own card", () => {

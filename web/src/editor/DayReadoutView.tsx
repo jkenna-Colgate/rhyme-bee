@@ -33,7 +33,7 @@ import type { DriftReason } from "../../../src/schedule.ts";
 import { VERDICTS, type TierVerdict } from "../../../src/tierOverride.ts";
 import type { CandidateQueueReadout } from "../../../scripts/editorCandidates.ts";
 import { AddQueueView } from "./AddQueueView.tsx";
-import { DayCandidatesView, type CandidateActs } from "./CandidateQueueView.tsx";
+import { DayCandidatesView, DayUnconfirmedRhymesView, type CandidateActs } from "./CandidateQueueView.tsx";
 import { correctedDay } from "./correctedDay.ts";
 import { DEMOTION_LABEL, DEMOTION_TITLE, showsDemotionReassurance } from "./demote.ts";
 import type { RetieredWord } from "./retier.ts";
@@ -341,6 +341,7 @@ function ScheduledDay({
           Rhyme Key, and drawn only when that key holds Candidates — which is
           five days in 260. */}
       <DayCandidatesView queue={candidates} rhymeKey={readout.rhymeKey} acts={candidateActs} />
+      <DayUnconfirmedRhymesView queue={candidates} rhymeKey={readout.rhymeKey} acts={candidateActs} />
 
       <p className="editor-lists-note">
         Click a word to set its <strong>Tier</strong>. The verdict is written to{" "}

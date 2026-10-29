@@ -32,10 +32,12 @@ import type {
   ReadingEvidence,
   RelativeEvidence,
 } from "../../../src/supplementEvidence.ts";
+import type { DemotionReason } from "../../../src/demotions.ts";
 import {
   isOutstanding,
   type CandidateQueueReadout,
   type ReadCandidate,
+  type ReadUnconfirmedRhyme,
 } from "../../../scripts/editorCandidates.ts";
 
 /** One day's slice of the queue. */
@@ -95,8 +97,14 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
       return "settled";
     case "declined":
       return "settled";
+    case "needs-tier":
+      return "tier";
     case "is-a-name":
       return "name";
+    case "suggested-demotion":
+      return "suggested-demotion";
+    case "unconfirmed-rhyme":
+      return "unconfirmed";
     case "needs-correction":
       return "correction";
     case "addable":
@@ -110,11 +118,21 @@ export function cardFor(candidate: ReadCandidate): CandidateCard {
 }
 
 /**
- * The cards the five states resolve to — five of them, but not one per state:
+ * The cards the eight states resolve to: eight of them, but not one per state:
  * `resolved` and `declined` share `settled`, and `addable` splits on whether
- * there is anything to derive from.
+ * there is anything to derive from. `unconfirmed` is the card a standing
+ * Unconfirmed Rhyme draws on its own, so a Candidate on a listed pair offers
+ * the line's controls and not a second set (#269).
  */
-export type CandidateCard = "settled" | "name" | "correction" | "add" | "derivation";
+export type CandidateCard =
+  | "settled"
+  | "tier"
+  | "name"
+  | "suggested-demotion"
+  | "unconfirmed"
+  | "correction"
+  | "add"
+  | "derivation";
 
 /**
  * The evidence one card shows — the three kinds a Candidate can carry, with the
@@ -167,12 +185,19 @@ export function evidenceFor(candidate: ReadCandidate): CardEvidence {
   switch (candidate.state) {
     case "declined":
     case "is-a-name":
-      // Neither ruling is made from a reading. A Decline is already made, and a
-      // name is never valid however well it rhymes.
+    case "suggested-demotion":
+      // None of these rulings is made from a reading. A Decline is already
+      // made, and a name or a non-word is never valid however well it rhymes.
       return NOTHING;
     case "resolved":
+    case "needs-tier":
     case "needs-correction":
       return { readings: candidate.readings, relatives: [], composed: null };
+    case "unconfirmed-rhyme":
+      // The engine's own readings, for the correction card's reason: an
+      // Overrule's line is weighed against the reading the engine holds. Empty
+      // for a Missing Reading, which has none.
+      return { readings: candidate.listed.readings, relatives: [], composed: null };
     case "addable":
       return cardFor(candidate) === "derivation"
         ? { readings: [], relatives: candidate.relatives, composed: candidate.composed }
@@ -205,3 +230,34 @@ export function offersAdd(candidate: ReadCandidate): boolean {
 // and the same one the panel and the whole-queue list read. A predicate here
 // would only forward to it under a second name, and the reasoning it would
 // carry belongs where the gesture is drawn (`CandidateQueueView.tsx`).
+
+/**
+ * The Decline the Judge's wordhood answer points at, for a suggested Demotion,
+ * or null for any other Candidate (#269). It marks one of the three rulings the
+ * Decline already offers; it chooses none of them, because making a Demotion is
+ * the editor's act.
+ */
+export function suggestedDemotion(candidate: ReadCandidate): DemotionReason | null {
+  return candidate.state === "suggested-demotion" ? candidate.reason : null;
+}
+
+/**
+ * The day's Unconfirmed Rhymes: the standing lines on its Rhyme Key, narrowed
+ * from the one readout as its Candidates are (#269). Total, for
+ * `candidatesForDay`'s reason.
+ *
+ * A line whose word is already a Candidate on this key is left out, so each
+ * pair shows once. The Candidate's card is where it shows: one that reads
+ * `unconfirmed-rhyme` carries the line and offers its controls, and one that
+ * reads anything else (a name, say) wants that ruling first. Both words are
+ * normalised server-side, so they compare as they are.
+ */
+export function unconfirmedForDay(
+  queue: CandidateQueueReadout | null,
+  rhymeKey: RhymeKey,
+): ReadUnconfirmedRhyme[] {
+  const appealed = new Set(candidatesForDay(queue, rhymeKey).all.map((c) => c.word));
+  return (queue?.unconfirmedRhymes ?? []).filter(
+    (u) => u.line.rhymeKey === rhymeKey && !appealed.has(u.line.word),
+  );
+}

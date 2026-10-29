@@ -45,9 +45,14 @@ import type { Plugin } from "vite";
 import { parseDeclines, type Decline } from "../src/declines.ts";
 import type { Schedule } from "../src/schedule.ts";
 import { parseCandidates, type SupplementCandidate } from "../src/supplementCandidate.ts";
-import type { EvidenceContext } from "../src/supplementEvidence.ts";
-import { readCandidateQueue } from "../scripts/editorCandidates.ts";
+import { standingTierOf } from "../src/tierOverride.ts";
+import { parseDemotions } from "../src/demotions.ts";
+import { parseRulingRecords } from "../src/judgeLanding.ts";
+import { readCandidateQueue, type CandidateQueueContext, type JudgeLeftovers } from "../scripts/editorCandidates.ts";
 import { pinnedEvidenceContext } from "../scripts/editorAdd.ts";
+import { builtIndex, builtKnownnessThreshold } from "./builtIndex.ts";
+import { measuredPrevalence, overridePath } from "./editorTierPlugin.ts";
+import { readTierOverrideText } from "./tierOverrideFile.ts";
 import { DECLINES_PATH, readDeclineText } from "./declinesFile.ts";
 import { readDeferredReadings } from "./deferredFile.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
@@ -93,7 +98,8 @@ export interface EditorCandidatesDeps {
   queue: () => SupplementCandidate[];
   schedule: () => Schedule;
   declines: () => Decline[];
-  context: () => EvidenceContext;
+  /** The evidence context, with each word's Tier under the standing verdicts. */
+  context: () => CandidateQueueContext;
   /**
    * Where the queue's **second section** is read from —
    * `data/deferred-readings.jsonl` when unsaid (#181).
@@ -106,6 +112,12 @@ export interface EditorCandidatesDeps {
    * deferred readings are one file with one reader (`web/deferredFile.ts`).
    */
   deferredPath?: string;
+  /**
+   * What the Judge left (#269): its rulings, the Unconfirmed Rhyme list and the
+   * demoted words that overrule a line. Optional, and nothing when unsaid, so a
+   * test about the queue alone supplies none of it.
+   */
+  judge?: () => JudgeLeftovers;
 }
 
 /**
@@ -141,6 +153,7 @@ export function editorCandidatesHandler(deps: EditorCandidatesDeps) {
           deps.declines(),
           deps.context(),
           readDeferredReadings(deps.deferredPath),
+          deps.judge?.(),
         ),
       );
     } catch (error) {
@@ -166,7 +179,29 @@ export function editorCandidatesPlugin(): Plugin {
       queue: () => parseCandidates(readOptional(QUEUE_PATH)),
       schedule: readSchedule,
       declines: () => parseDeclines(readDeclineText(DECLINES_PATH)),
-      context: pinnedEvidenceContext,
+      context: queueContext,
+      judge: () => ({
+        rulings: parseRulingRecords(readOptional(resolve(repoRoot, "data/judge-rulings.jsonl"))).records,
+        unconfirmed: readOptional(resolve(repoRoot, "data/unconfirmed-rhymes.txt")),
+        demotedWords: new Set(parseDemotions(readOptional(resolve(repoRoot, "data/demotions.txt"))).map((d) => d.word)),
+      }),
     }),
   );
+}
+
+/**
+ * The pinned evidence, and whether a word is an Answer today. The Tier is the
+ * next build's: the built index's lemma walk and threshold, over the pinned
+ * norms with `data/tier-overrides.csv` applied, so a Tier verdict written in
+ * the Editor's Pass resolves a Bonus Word's Appeal at once (#258).
+ */
+function queueContext(): CandidateQueueContext {
+  const index = builtIndex();
+  const tierOf = standingTierOf({
+    lemmaCandidates: (word) => index.derivation.lemmaCandidates(word),
+    measured: measuredPrevalence(),
+    overrides: readTierOverrideText(overridePath),
+    knownnessThreshold: builtKnownnessThreshold(),
+  });
+  return { ...pinnedEvidenceContext(), isAnswer: (word) => tierOf(word) === "answer" };
 }

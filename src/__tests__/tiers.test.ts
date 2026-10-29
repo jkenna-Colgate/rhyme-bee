@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { isAccepted } from "../verdict.ts";
+import { isTiered } from "../verdict.ts";
 import { KNOWNNESS_THRESHOLD, makeTestIndex } from "../__fixtures__/index.ts";
 import { makeShortPluralIndex } from "../__fixtures__/shortPlurals.ts";
 
@@ -22,7 +22,7 @@ describe("the ADR-0003 assumption, as a test", () => {
   it("scores defenestrate strictly above objurgate", () => {
     const known = index.adjudicate(ate, "defenestrate");
     const obscure = index.adjudicate(ate, "objurgate");
-    if (isAccepted(known) && isAccepted(obscure)) {
+    if (isTiered(known) && isTiered(obscure)) {
       expect(known.knownness!).toBeGreaterThan(obscure.knownness!);
     }
   });
@@ -92,7 +92,7 @@ describe("absent from the prevalence data defaults to Bonus", () => {
   it("tiers a rhyming word with no prevalence entry as Bonus, knownness null", () => {
     const verdict = index.adjudicate(ate, "sate");
     expect(verdict.outcome).toBe("bonus");
-    if (isAccepted(verdict)) expect(verdict.knownness).toBeNull();
+    if (isTiered(verdict)) expect(verdict.knownness).toBeNull();
   });
 });
 

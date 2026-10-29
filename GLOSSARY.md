@@ -113,7 +113,7 @@ The record an Appeal becomes: the Submission, the verdict the engine gave it, an
 _Avoid_: Suggestion, correction, fix (those name what judging may produce, not what the player sent)
 
 **Candidate Queue**:
-Every outstanding Candidate, grouped by Rhyme Key. The term covers Candidates from all three capture paths — a player's Appeal in the deployed game, a player's Appeal in dev, and the Editor's Pass disagreement — and, as a second section, the readings the add path asked an agent for and did not get. The Judge rules on each Candidate once, and whatever it leaves is ruled on in the Editor's Pass rather than in a pass of its own ([ADR-0017](./docs/adr/0017-candidates-are-judged-in-the-editors-pass.md)). A Candidate whose word rhymes on its Rhyme Key against the current Rhyme Index is resolved by that fact alone, without anyone ruling on it.
+Every outstanding Candidate, grouped by Rhyme Key. The term covers Candidates from all three capture paths — a player's Appeal in the deployed game, a player's Appeal in dev, and the Editor's Pass disagreement — and, as a second section, the readings the add path asked an agent for and did not get. The Judge rules on each Candidate once, and whatever it leaves is ruled on in the Editor's Pass rather than in a pass of its own ([ADR-0017](./docs/adr/0017-candidates-are-judged-in-the-editors-pass.md)). A Candidate whose word is an Answer on its Rhyme Key against the current Rhyme Index is resolved by that fact alone, without anyone ruling on it.
 _Avoid_: "the add queue", which is the existing browser-side list of words an editor has typed and not yet submitted, and is a different thing on the same screen
 
 **Demotion**:

@@ -35,7 +35,9 @@ export type RejectionReason =
  * the submitted word however it likes.
  */
 export const REJECTION_MESSAGE: Record<RejectionReason, string> = {
-  "does-not-rhyme": "doesn’t rhyme with the Seed Word",
+  // Most rejected rhymes players Appeal are missing readings, so this claims
+  // less than the old "doesn't rhyme" did (ADR-0020, #258).
+  "does-not-rhyme": "not on our rhyme list",
   "is-the-seed-word": "that’s the Seed Word itself",
   "already-submitted": "you’ve already found that",
   "proper-noun": "proper nouns don’t count",
@@ -63,7 +65,8 @@ export function tierFor(knownness: number, knownnessThreshold: number): Tier {
   return knownness >= knownnessThreshold ? "answer" : "bonus";
 }
 
-export interface AcceptedVerdict {
+/** A Submission that rhymes and is a word: it holds a Tier. */
+export interface TieredVerdict {
   outcome: Tier;
   /** The pronunciation whose Rhyme Key matched the Seed Word. */
   pronunciation: Pronunciation;
@@ -74,6 +77,28 @@ export interface AcceptedVerdict {
   /** Word-prevalence score, or null when the word is absent from the data. */
   knownness: number | null;
 }
+
+/**
+ * A word accepted without Points that holds no Tier, so it carries no knownness.
+ * A client shows it exactly as a Bonus Word, and it is never in the Reveal. Two
+ * reasons make one, and the player is told neither:
+ *
+ * - `unconfirmed`, an Unconfirmed Rhyme (GLOSSARY.md): a word listed for the
+ *   Seed Word's Rhyme Key in `data/unconfirmed-rhymes.txt` that does not rhyme
+ *   there by itself. It carries no pronunciation: on a Missing Reading the game
+ *   has none.
+ * - `weak`, a Weak Rhyme (GLOSSARY.md, ADR-0020): a word that is no Rhyme,
+ *   whose last syllable matches the Seed Word's under different stress. It is
+ *   worked out at submission (`src/weakRhyme.ts`).
+ */
+export interface UntieredVerdict {
+  outcome: "unconfirmed" | "weak";
+  /** Letter count of the surface form, as a Tiered verdict reports it. */
+  length: number;
+}
+
+/** Every verdict that accepts the Submission. */
+export type AcceptedVerdict = TieredVerdict | UntieredVerdict;
 
 export interface RejectedVerdict {
   outcome: "rejected";
@@ -91,4 +116,44 @@ export type Verdict = AcceptedVerdict | RejectedVerdict;
 
 export function isAccepted(verdict: Verdict): verdict is AcceptedVerdict {
   return verdict.outcome !== "rejected";
+}
+
+/** True for an accepted word that holds a Tier, and so reports its reading. */
+export function isTiered(verdict: Verdict): verdict is TieredVerdict {
+  return verdict.outcome === "answer" || verdict.outcome === "bonus";
+}
+
+/** Every accepted outcome that scores nothing. A client shows all three as a Bonus Word. */
+export type UnscoredOutcome = Exclude<AcceptedVerdict["outcome"], "answer">;
+
+/**
+ * The closed set of unscored outcomes, kept exhaustive by its type as
+ * `REJECTION_MESSAGE` keeps the rejection reasons: an accepted outcome added to
+ * the union does not compile until it is listed here, so the Appeal's
+ * validation (`src/supplementCandidate.ts`) cannot fall behind it.
+ */
+const UNSCORED_OUTCOMES: Record<UnscoredOutcome, true> = { bonus: true, unconfirmed: true, weak: true };
+
+/**
+ * What an Appeal says the engine gave a word (GLOSSARY.md, Appeal): the
+ * rejection reason, or the unscored outcome. Anything not counted as an Answer
+ * can be Appealed (ADR-0020, #258).
+ */
+export type AppealedVerdict = RejectionReason | UnscoredOutcome;
+
+/**
+ * The verdict an Appeal of this Submission would carry, or null for an Answer,
+ * which nobody Appeals. A client offers the Appeal control exactly when this is
+ * not null, so a Bonus Word, a Weak Rhyme and an Unconfirmed Rhyme, which look
+ * the same, all offer it.
+ */
+export function appealedVerdict(verdict: Verdict): AppealedVerdict | null {
+  if (verdict.outcome === "rejected") return verdict.reason;
+  if (verdict.outcome === "answer") return null;
+  return verdict.outcome;
+}
+
+/** True for a string an Appeal may carry as its verdict. */
+export function isAppealedVerdict(value: string): value is AppealedVerdict {
+  return Object.hasOwn(REJECTION_MESSAGE, value) || Object.hasOwn(UNSCORED_OUTCOMES, value);
 }

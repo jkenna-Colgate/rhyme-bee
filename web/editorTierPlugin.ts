@@ -189,7 +189,8 @@ function record(
   return { state, appended, reach: reachOf(word, deps.openIndex(), valueOf) };
 }
 
-const overridePath = resolve(repoRoot, "data/tier-overrides.csv");
+/** The standing Tier verdicts, read here and by the Candidate Queue (`editorCandidatesPlugin.ts`). */
+export const overridePath = resolve(repoRoot, "data/tier-overrides.csv");
 
 /**
  * The pinned prevalence norms, parsed once and kept. 62k rows and a few
@@ -197,7 +198,7 @@ const overridePath = resolve(repoRoot, "data/tier-overrides.csv");
  * pinned third-party source rather than anything this tool writes.
  */
 let norms: Map<string, number> | undefined;
-function measuredPrevalence(): ReadonlyMap<string, number> {
+export function measuredPrevalence(): ReadonlyMap<string, number> {
   norms ??= parsePrevalenceCsv(readFileSync(resolve(repoRoot, "data/prevalence.csv"), "utf8"));
   return norms;
 }

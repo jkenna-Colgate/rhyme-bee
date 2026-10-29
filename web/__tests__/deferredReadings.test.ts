@@ -60,6 +60,7 @@ const QUEUE: CandidateQueueReadout = {
   outstanding: 0,
   newest: null,
   groups: [],
+  unconfirmedRhymes: [],
   deferred: { entries: [UNREACHED, PROPOSED, ANSWERED], outstanding: 2 },
 };
 

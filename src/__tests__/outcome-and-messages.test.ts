@@ -104,6 +104,12 @@ describe("one rejection-message table serves both clients", () => {
     expect(message).not.toContain("-");
   });
 
+  it("claims no more than that a word is missing from the list, for a word that does not rhyme", () => {
+    // Most rejected rhymes players Appeal are missing readings (#258), so the
+    // message says what the game knows rather than that the word cannot rhyme.
+    expect(REJECTION_MESSAGE["does-not-rhyme"]).toBe("not on our rhyme list");
+  });
+
   it("has a message for every rejection the engine actually issues", () => {
     const session = Session.start(index, "ate");
     const submissions = ["ate", "hat", "kate", "zzzz", "l8", "late"];

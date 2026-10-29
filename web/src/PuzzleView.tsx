@@ -34,7 +34,13 @@ import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts"
 import { localCalendarDate } from "../../src/schedule.ts";
 import type { RankTier } from "../../src/scoring.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
-import { isAccepted, REJECTION_MESSAGE, type RejectionReason } from "../../src/verdict.ts";
+import {
+  appealedVerdict,
+  isAccepted,
+  isTiered,
+  REJECTION_MESSAGE,
+  type AppealedVerdict,
+} from "../../src/verdict.ts";
 import { dailyPuzzle, freePlayPuzzle, openingPuzzle, SCHEDULE, type PuzzleKind } from "./bootPuzzle.ts";
 import { GAME_NAME } from "./brand.ts";
 import { APPEAL_PATH } from "./endpoints.ts";
@@ -790,7 +796,7 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
         <ShouldCountButton
           word={word}
           seed={seed}
-          reason={verdict.reason}
+          verdict={verdict.reason}
           engineRespelling={verdict.respelling ?? null}
         />
       </p>
@@ -807,21 +813,34 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
     );
   }
 
+  // A Bonus Word, a Weak Rhyme and an Unconfirmed Rhyme are shown alike, and
+  // each can be Appealed: none counted as an Answer, and the player cannot tell
+  // them apart, so the control cannot differ between them (ADR-0020, #258).
+  const appealed = appealedVerdict(verdict);
   return (
     <p className="feedback feedback--bonus" role="status" aria-live="polite">
       <span className="feedback__badge">★ Bonus Word!</span>
       <b className="feedback__word">{word}</b>
+      {appealed !== null && (
+        <ShouldCountButton
+          word={word}
+          seed={seed}
+          verdict={appealed}
+          engineRespelling={isTiered(verdict) ? verdict.respelling : null}
+        />
+      )}
     </p>
   );
 }
 
 /**
  * Report a Submission the player believes should have counted as an Answer. One
- * tap on the rejection sends the word with its Seed Word, the Seed's Rhyme Key,
- * the reason it was refused and the reading the engine used — everything the
- * supplement judge needs, so the player never retypes the word or explains
- * themselves. The judging (add / stress-correction / derive-from-inflection /
- * defer) happens later against the queue this feeds.
+ * tap on a rejection, or on anything shown as a Bonus Word (#258), sends the
+ * word with its Seed Word, the Seed's Rhyme Key, the verdict it was given and
+ * the reading the engine used: everything a ruling on it needs, so the player
+ * never retypes the word or explains themselves. The ruling (add /
+ * stress-correction / derive-from-inflection / defer) is made later against the
+ * queue this feeds, the Judge's first and then the editor's.
  *
  * Reporting is out of band and may fail freely: the verdict was already reached
  * in the browser (ADR-0013), so an endpoint that is down or unreachable costs a
@@ -831,12 +850,12 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
 function ShouldCountButton({
   word,
   seed,
-  reason,
+  verdict,
   engineRespelling,
 }: {
   word: string;
   seed: SeedWord;
-  reason: RejectionReason;
+  verdict: AppealedVerdict;
   engineRespelling: string | null;
 }) {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -852,7 +871,7 @@ function ShouldCountButton({
           word,
           seedWord: seed.word,
           seedRhymeKey: seed.rhymeKey,
-          reason,
+          reason: verdict,
           engineRespelling,
         }),
       });

@@ -2,8 +2,9 @@
  * The standing **Declines**: the editor's ruling that a Candidate should not
  * become an Answer, recorded against the word and the Rhyme Key *together*.
  *
- * A Candidate's state is otherwise derived — a word that rhymes on its Rhyme Key
- * against the current Rhyme Index is resolved by that fact alone, and nothing is
+ * A Candidate's state is otherwise derived: a word that is an Answer on its
+ * Rhyme Key against the current Rhyme Index is resolved by that fact alone, and
+ * nothing is
  * written for it (#176). A Decline is the one thing written, and only for the
  * one case that leaves no trace anywhere else: the editor read the Candidate,
  * agreed with the rejection the player already received, and wants it to stop

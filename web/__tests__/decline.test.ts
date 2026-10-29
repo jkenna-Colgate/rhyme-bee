@@ -36,14 +36,29 @@ const RECORD: SupplementCandidate = {
 };
 
 function candidate(state: ReadCandidate["state"]): ReadCandidate {
-  const identity = { word: RECORD.word, candidate: RECORD };
+  const identity = { word: RECORD.word, candidate: RECORD, judged: null };
   switch (state) {
     case "resolved":
       return { ...identity, state, readings: [] };
     case "declined":
       return { ...identity, state };
+    case "needs-tier":
+      return { ...identity, state, readings: [] };
     case "is-a-name":
       return { ...identity, state };
+    case "suggested-demotion":
+      return { ...identity, state, reason: "not-a-known-word" };
+    case "unconfirmed-rhyme":
+      return {
+        ...identity,
+        state,
+        listed: {
+          line: { word: RECORD.word, rhymeKey: RECORD.seedRhymeKey, writer: "judge:test", ruling: "missing-reading", confidence: "medium" },
+          judged: null,
+          readings: [],
+          proposal: null,
+        },
+      };
     case "needs-correction":
       return { ...identity, state, readings: [] };
     case "addable":
@@ -143,6 +158,11 @@ describe("which acts a Candidate's state offers", () => {
     expect(offersAdd(candidate("declined"))).toBe(false);
   });
 
+  it("offers no Candidate add on a listed pair, whose confirm is the line's own", () => {
+    // `confirmGesture` decides that one, so the card does not offer two adds.
+    expect(offersAdd(candidate("unconfirmed-rhyme"))).toBe(false);
+  });
+
   /**
    * The Decline is offered on `isOutstanding` directly — there is no predicate
    * of its own for it, because there is nothing for one to decide. All three
@@ -154,6 +174,7 @@ describe("which acts a Candidate's state offers", () => {
     expect(isOutstanding(candidate("addable"))).toBe(true);
     expect(isOutstanding(candidate("needs-correction"))).toBe(true);
     expect(isOutstanding(candidate("is-a-name"))).toBe(true);
+    expect(isOutstanding(candidate("unconfirmed-rhyme"))).toBe(true);
   });
 
   it("offers nothing to a Candidate already settled", () => {

@@ -72,13 +72,18 @@
  * repository over localhost.
  */
 
+import { writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { resolve } from "node:path";
 import type { Plugin } from "vite";
 import { declineKey, declinedPairs, parseDeclines, type Decline } from "../src/declines.ts";
+import { withoutUnconfirmed } from "../src/unconfirmedRhymes.ts";
 import { appendDecline, readDeclineText, DECLINES_PATH } from "./declinesFile.ts";
 import { MAX_DECLINE_BODY_BYTES, declineWriteRequest } from "./editorDeclineRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
+import { readOptional } from "./readOptional.ts";
+import { repoRoot } from "./repoRoot.ts";
 import type { DeclineWriteResult } from "./src/editor/decline.ts";
 import { EDITOR_DECLINE_PATH } from "./src/endpoints.ts";
 
@@ -93,7 +98,14 @@ import { EDITOR_DECLINE_PATH } from "./src/endpoints.ts";
 export interface EditorDeclineDeps {
   /** Where the rulings live. `data/declines.txt` when a caller says nothing. */
   declinesPath?: string;
+  /**
+   * The Unconfirmed Rhyme list, which a Decline takes the pair's line off
+   * (#269). `data/unconfirmed-rhymes.txt` when a caller says nothing.
+   */
+  unconfirmedPath?: string;
 }
+
+const UNCONFIRMED_PATH = resolve(repoRoot, "data/unconfirmed-rhymes.txt");
 
 /**
  * The route's own work, over a body the shared skeleton has already read and
@@ -107,6 +119,7 @@ export interface EditorDeclineDeps {
  */
 export function editorDeclineHandler(deps: EditorDeclineDeps) {
   const path = deps.declinesPath ?? DECLINES_PATH;
+  const unconfirmedPath = deps.unconfirmedPath ?? UNCONFIRMED_PATH;
 
   return (_req: IncomingMessage, res: ServerResponse, body: string): void => {
     try {
@@ -131,7 +144,13 @@ export function editorDeclineHandler(deps: EditorDeclineDeps) {
 
       const appended: Decline = { word: asked.word, rhymeKey: asked.rhymeKey };
       appendDecline(path, appended);
-      const result: DeclineWriteResult = { appended };
+      // A Decline on an Unconfirmed Rhyme takes its line off the list, so the
+      // word gets the engine's own verdict on this key again (ADR-0017 amended).
+      // After the Decline is written, so a failure here leaves the ruling made
+      // and the Judge never sends the pair again.
+      const listed = withoutUnconfirmed(readOptional(unconfirmedPath), asked.word, asked.rhymeKey);
+      if (listed.removed > 0) writeFileSync(unconfirmedPath, listed.text);
+      const result: DeclineWriteResult = { appended, unlisted: listed.removed > 0 };
       sendJson(res, 200, result);
     } catch (error) {
       // What throws past here is a file that would not take the append or a

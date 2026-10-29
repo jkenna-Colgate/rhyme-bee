@@ -36,6 +36,9 @@ desktop.ini
 # derived, a Decline is the one thing written — so a copy on one machine would
 # lose every ruling the next clone made again.
 !/data/declines.txt
+# The Unconfirmed Rhymes the Judge writes (#259, ADR-0017). Authored, like the
+# demotion list, so kept for its reason: the next clone could not derive it.
+!/data/unconfirmed-rhymes.txt
 # The Editor's Pass defers what it cannot compose a reading for. Unlike the
 # Appeal candidates queue beside it, which is pulled down from R2 and can be
 # pulled again, this is the only record that a miss happened — it is the work
@@ -53,6 +56,19 @@ desktop.ini
 # a Tier verdict is a judgement about Retrieval that only the editor who made it
 # holds, and `*.csv` was quietly making a night of them uncommittable.
 !/data/tier-overrides.csv
+# The maintainer's verdicts the Judge is scored against, authored like the
+# demotion list, and the report every Judge and Synthetic Player run commits
+# (#250). Neither can be regenerated: one is a person's ear, the other a record
+# of what a model said on a day.
+!/data/judge-labels/
+!/data/judge-runs/
+# Every Candidate the Judge has ruled on and what landed (#266). It is what keeps
+# a Candidate from being sent twice, and where the Editor's Pass reads the
+# Judge's ruling from, so a fresh clone without it would re-draw every ruling.
+!/data/judge-rulings.jsonl
+# Raw model output from those runs, kept only so an interrupted run resumes
+# rather than pays twice. Not in .scratch/, which is for drafts.
+.model-cache/
 # Docs
 deploy_walkthrough.md
 # Dependencies / build
