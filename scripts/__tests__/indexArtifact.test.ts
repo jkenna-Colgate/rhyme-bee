@@ -14,6 +14,7 @@
  * *timestamps*, which a real checkout has whatever it has.
  */
 
+import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
@@ -89,8 +90,18 @@ describe("the Rhyme Index input list", () => {
         "/data/demotions.txt",
         "/data/supplement.dict",
         "/data/tier-overrides.csv",
+        "/data/tier-moves.csv",
       ]),
     );
+  });
+
+  it("can commit the two Tier layers despite the blanket csv ignore", () => {
+    // An ignored layer is an input the deploy never sees: the run writes a move,
+    // nothing can commit it, and the rebuild ships without it (#270).
+    for (const path of ["data/tier-overrides.csv", "data/tier-moves.csv"]) {
+      const ignored = spawnSync("git", ["check-ignore", "-q", path], { cwd: repoRoot });
+      expect(ignored.status, path).toBe(1);
+    }
   });
 
   it("holds the committed source checksums", () => {
