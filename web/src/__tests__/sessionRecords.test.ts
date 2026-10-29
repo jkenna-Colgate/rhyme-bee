@@ -12,6 +12,7 @@ import { recordFromBody, type SessionRecord } from "../../../src/sessionRecord.t
 import { Session } from "../../../src/session.ts";
 import { snapshot, snapshotKey } from "../../../src/sessionSnapshot.ts";
 import {
+  afterIndexLoad,
   createSessionRecordSender,
   RECORD_LEDGER_KEY,
   type RecordStorage,
@@ -111,6 +112,15 @@ describe("sending Session Records", () => {
     store(storage, TODAY, ["late"]);
     await sender(storage, server.post).flush("hide");
     expect(server.requests[0]!.keepalive).toBe(true);
+  });
+
+  it("sends the load's history without keepalive, whose bodies share a 64 KB budget", async () => {
+    const storage = memoryStorage();
+    const server = route();
+    store(storage, TODAY, ["late"]);
+    store(storage, "2026-08-06", ["eight"]);
+    await sender(storage, server.post).flush("load");
+    expect(server.requests.map((request) => request.keepalive)).toEqual([false, false]);
   });
 
   it("carries the index hash only on today's Session, and a different id on every date", async () => {
@@ -216,5 +226,46 @@ describe("sending Session Records", () => {
       set: () => undefined,
     };
     await expect(sender(broken, server.post).flush("load")).resolves.toBeUndefined();
+  });
+});
+
+describe("when the load's sends start", () => {
+  /** An idle queue the test runs by hand, standing in for `requestIdleCallback`. */
+  function idleQueue() {
+    const queued: (() => void)[] = [];
+    return {
+      idle: (run: () => void) => void queued.push(run),
+      runIdle: () => queued.splice(0).forEach((run) => run()),
+    };
+  }
+
+  /** Whether a promise has settled, after letting every pending callback run. */
+  async function settled(promise: Promise<unknown>): Promise<boolean> {
+    let done = false;
+    void promise.then(() => (done = true));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    return done;
+  }
+
+  it("waits for the Rhyme Index to load and then for idle time, so nothing competes with play", async () => {
+    let finishLoad!: () => void;
+    const indexLoad = new Promise<void>((resolve) => (finishLoad = resolve));
+    const { idle, runIdle } = idleQueue();
+    const start = afterIndexLoad(indexLoad, idle);
+
+    runIdle();
+    expect(await settled(start)).toBe(false);
+    finishLoad();
+    expect(await settled(start)).toBe(false);
+    runIdle();
+    expect(await settled(start)).toBe(true);
+  });
+
+  it("still starts when the Rhyme Index fails to load", async () => {
+    const { idle, runIdle } = idleQueue();
+    const start = afterIndexLoad(Promise.reject(new Error("offline")), idle);
+    await settled(start);
+    runIdle();
+    expect(await settled(start)).toBe(true);
   });
 });

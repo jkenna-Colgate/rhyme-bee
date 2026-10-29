@@ -7,7 +7,8 @@
  * and the history every playtester's browser has held since 2026-08-06.
  *
  * It reads the snapshots `usePuzzleSession` writes and nothing else of the
- * game's, so it never touches play: it does not wait on the Rhyme Index, holds
+ * game's, so it never touches play: the game never waits on it, the load's sends
+ * wait for the Rhyme Index and idle time instead of competing with them, it holds
  * no React state, and every failure (storage blocked, the route down, the
  * limiter saying no) is swallowed. A Free Play or Tutorial Session is never
  * stored, so it is never found here to send.
@@ -188,8 +189,10 @@ export function createSessionRecordSender(options: SenderOptions): SessionRecord
           await Promise.all(records.map((record) => send(record, true)));
           return;
         }
+        // Without keepalive: keepalive bodies share a 64 KB in-flight budget,
+        // which a history this long would exceed, and the page is not going away.
         for (const record of records) {
-          if (!(await send(record, true))) return;
+          if (!(await send(record, false))) return;
         }
       } catch {
         // Storage blocked or full. A Session Record is reporting, and a failed
@@ -214,8 +217,8 @@ const browserStorage: RecordStorage = {
 };
 
 /**
- * `fetch` with `keepalive`, so a send started as the page is hidden outlives the
- * page. Not `sendBeacon`, which reports no response, and a Session is marked
+ * `fetch`, with `keepalive` on the hide's sends so a send started as the page is
+ * hidden outlives the page. Not `sendBeacon`, which reports no response, and a Session is marked
  * sent only on one.
  */
 const postRecord: PostRecord = async (body, { keepalive }) => {
@@ -234,11 +237,35 @@ function randomId(): string {
 }
 
 /**
- * Send what is owed now, and again whenever the page is hidden. Called once,
- * from `main.tsx`, before the game renders: nothing here waits on anything the
- * game does.
+ * Settles once the Rhyme Index has loaded, or failed to, and the page is next
+ * idle: when the load's sends can start without competing with play for the
+ * network or the main thread. Reading every stored snapshot is not free, and
+ * "sending must never block, delay or change play" (#230).
  */
-export function startSessionRecords(): void {
+export async function afterIndexLoad(
+  indexLoad: Promise<unknown>,
+  idle: (run: () => void) => void,
+): Promise<void> {
+  await indexLoad.catch(() => undefined);
+  await new Promise<void>((resolve) => idle(resolve));
+}
+
+/** `requestIdleCallback` where the browser has one, a short timeout where it does not. */
+function browserIdle(run: () => void): void {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(() => run(), { timeout: 5000 });
+  } else {
+    setTimeout(run, 1000);
+  }
+}
+
+/**
+ * Send what is owed once play is under way, and again whenever the page is
+ * hidden. Called once, from `main.tsx`, after the game first renders, with the
+ * Rhyme Index load the game started: the load's sends wait for it, so nothing
+ * here runs ahead of the game.
+ */
+export function startSessionRecords(indexLoad: Promise<unknown>): void {
   // A dev build is where the maintainer plays after reading the day's Answers,
   // and those Sessions would inflate the figure with no way to pick them out.
   if (!import.meta.env.PROD) return;
@@ -251,7 +278,7 @@ export function startSessionRecords(): void {
     newId: randomId,
   });
 
-  void sender.flush("load");
+  void afterIndexLoad(indexLoad, browserIdle).then(() => sender.flush("load"));
   const onHide = () => {
     if (document.visibilityState === "hidden") void sender.flush("hide");
   };
