@@ -58,6 +58,9 @@ writeFileSync(
     {
       generated: new Date().toISOString().slice(0, 10),
       startDate,
+      // The loop is the last whole weeks of the deal; the days of a short week
+      // left over at the front of it are spares (ADR-0012, amended 2026-10-11).
+      lapStart: days[deal.finalWeekLength]?.date,
       band: DEFAULT_PLAYABLE_BAND,
       // Every day's Difficulty is a share of a Puzzle's maximum achievable
       // Score, so it means nothing without the configuration that scored it

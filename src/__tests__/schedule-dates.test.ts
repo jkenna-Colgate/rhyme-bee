@@ -85,6 +85,61 @@ describe("a date resolves to that day's Seed Word, pinned to its Rhyme Key", () 
   });
 });
 
+describe("the Schedule loops: a date past the last listed day repeats a lap earlier (#257)", () => {
+  // ADR-0012 (amended 2026-10-11): the first loop is the last 259 days, 37
+  // whole weeks from Tuesday 2026-08-04 to Monday 2027-04-19. `lopsided`, on
+  // 2026-08-03, falls outside it and is a spare.
+  const schedule = parseSchedule(artifact);
+  const boulder = { word: "boulder", rhymeKey: "OW L D ER" };
+  const smile = { word: "smile", rhymeKey: "AY L" };
+
+  it("records the date the lap in progress began", () => {
+    expect(schedule?.lapStart).toBe("2026-08-04");
+  });
+
+  it("resolves the lap's first day and its last day as listed", () => {
+    expect(seedForDate(schedule, "2026-08-04")).toEqual(boulder);
+    expect(seedForDate(schedule, "2027-04-19")).toEqual(smile);
+  });
+
+  it("shows on Tuesday 2027-04-20 the Seed Word of Tuesday 2026-08-04", () => {
+    expect(seedForDate(schedule, "2027-04-20")).toEqual(boulder);
+  });
+
+  it("wraps again two laps on, on the same weekday", () => {
+    expect(seedForDate(schedule, "2028-01-04")).toEqual(boulder);
+    expect(seedForDate(schedule, "2028-05-12")).toEqual({ word: "unisex", rhymeKey: "EH K S" });
+    expect(seedForDate(schedule, "2028-09-18")).toEqual(smile);
+  });
+
+  it("leaves the spare before the lap out of every later lap", () => {
+    expect(seedForDate(schedule, "2026-08-03")).toEqual({ word: "lopsided", rhymeKey: "AY D AH D" });
+    expect(seedForDate(schedule, "2027-04-19")).not.toEqual({ word: "lopsided", rhymeKey: "AY D AH D" });
+  });
+
+  it("has no end", () => {
+    expect(seedForDate(schedule, "2099-12-31")).not.toBeNull();
+  });
+
+  it("refuses a lap start that does not mark out whole weeks", () => {
+    // Eight days, Monday 2026-08-03 to Monday 2026-08-10. A lap from the
+    // Tuesday is one week; a lap from the Monday would be eight days, and would
+    // carry each Seed Word one weekday later on every lap.
+    const eight = Array.from({ length: 8 }, (_, i) => ({
+      date: `2026-08-${String(3 + i).padStart(2, "0")}`,
+      weekday: (["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const)[i % 7],
+      week: 1 + Math.floor(i / 7),
+      seed: `seed${i}`,
+      rhymeKey: "AY T",
+      answerCount: 20,
+      difficulty: 0,
+    }));
+    expect(parseSchedule({ startDate: "2026-08-03", lapStart: "2026-08-04", days: eight })).not.toBeNull();
+    expect(parseSchedule({ startDate: "2026-08-03", lapStart: "2026-08-03", days: eight })).toBeNull();
+    expect(parseSchedule({ startDate: "2026-08-03", lapStart: "2026-09-01", days: eight })).toBeNull();
+  });
+});
+
 describe("a date outside the schedule resolves to nothing", () => {
   const schedule = parseSchedule(artifact);
   const days = schedule?.days ?? [];
@@ -92,11 +147,10 @@ describe("a date outside the schedule resolves to nothing", () => {
   it.each([
     ["the day before the run starts", "2026-08-02"],
     ["long before the run starts", "2020-01-01"],
-    ["the day after the run ends", "2027-04-20"],
-    ["long after the run ends", "2099-12-31"],
     ["a malformed date", "not-a-date"],
     ["an empty date", ""],
     ["a date that looks ISO but is not one", "2026-13-45"],
+    ["a date past the run that is not a calendar date", "2027-02-30"],
   ])("%s", (_case, date) => {
     expect(seedForDate(schedule, date)).toBeNull();
   });

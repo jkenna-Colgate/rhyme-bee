@@ -111,15 +111,47 @@ describe("a scheduled day", () => {
   });
 });
 
+describe("a date past the first lap (#257)", () => {
+  /** A one-week loop from Tuesday 2026-09-01: `ate` on the Tuesday, `cool` on the rest. */
+  function loopingSchedule(): Schedule {
+    const cool = index.pinSeed("cool");
+    const weekdays = ["Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon"] as const;
+    const days: ScheduleDay[] = weekdays.map((weekday, i) => ({
+      date: `2026-09-0${i + 1}`,
+      weekday,
+      week: 1,
+      seed: i === 0 ? "ate" : "cool",
+      rhymeKey: i === 0 ? seed.rhymeKey : cool.rhymeKey,
+      answerCount: facts.answerCount,
+      difficulty: facts.difficulty,
+    }));
+    return { startDate: "2026-09-01", lapStart: "2026-09-01", band: { min: 1, max: 500 }, days };
+  }
+
+  it("opens as the Puzzle of the date it repeats, under the date asked for", () => {
+    const listed = readScheduledDay(() => index, loopingSchedule(), "2026-09-01");
+    const repeated = readScheduledDay(() => index, loopingSchedule(), "2026-09-08");
+    expect(repeated).toMatchObject({ outcome: "day", date: "2026-09-08", weekday: "Tue", seed: "ate" });
+    if (listed.outcome !== "day" || repeated.outcome !== "day") throw new Error("not a day");
+    expect(repeated.answers).toEqual(listed.answers);
+    expect(repeated.bonusWords).toEqual(listed.bonusWords);
+    expect(repeated.drift.date).toBe("2026-09-08");
+  });
+
+  it("wraps at the lap's length, two laps on as well as one", () => {
+    expect(readScheduledDay(() => index, loopingSchedule(), "2026-09-09")).toMatchObject({ seed: "cool" });
+    expect(readScheduledDay(() => index, loopingSchedule(), "2026-09-15")).toMatchObject({ seed: "ate" });
+  });
+});
+
 describe("a date the run does not cover", () => {
   const readout = readScheduledDay(() => index, scheduleWith(), "2027-01-01");
 
-  it("is a case in the value, naming the run's first and last dates", () => {
+  it("is a case in the value, naming the date the Schedule begins", () => {
     expect(readout).toEqual({
       outcome: "not-scheduled",
       date: "2027-01-01",
       firstDate: "2026-09-01",
-      lastDate: "2026-09-02",
     });
   });
 
