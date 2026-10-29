@@ -10,7 +10,8 @@
  *  1. the same Seed Word on its current Rhyme Key (of several, the one with
  *     the most Answers the Schedule does not hold), which fixes a key whose
  *     spelling went stale (#151);
- *  2. else the family's lead word on that Rhyme Key;
+ *  2. else the family's lead word on that Rhyme Key: its best-ranked word that
+ *     passes the Seed Word test (#264), since that word joins the Schedule;
  *  3. else the day is Free Play, and is counted.
  *
  * Continuity is held exactly and the one-place rule is only reported (ADR-0012,
@@ -25,8 +26,9 @@
 
 import type { RhymeKey } from "./phonology.ts";
 import type { RhymeFamily, RhymeIndex } from "./rhymeIndex.ts";
-import { chooseRepresentative, measureAnswers } from "./curation.ts";
+import { measureAnswers } from "./curation.ts";
 import type { ScheduleDay } from "./schedule.ts";
+import { seedWordFor, seedWordTestLine, testSeedWord } from "./seedWord.ts";
 
 /** A day the check re-pinned, as recorded before and as written after. */
 export interface DayRepair {
@@ -67,6 +69,13 @@ export interface ContinuityReport {
   collisions: PlaceCollision[];
 }
 
+/** Null when the test is off or the day's Seed Word passes it; otherwise the test's sentence. */
+function testFailure(index: RhymeIndex, day: ScheduleDay, options: ContinuityOptions): string | null {
+  if (!options.seedWordTest) return null;
+  const test = testSeedWord(index, day.seed, day.rhymeKey);
+  return test.passes ? null : seedWordTestLine(day.seed, day.rhymeKey, test);
+}
+
 /** Null when the pair pins; otherwise what the index said, verbatim. */
 function pinFailure(index: RhymeIndex, seed: string, rhymeKey: RhymeKey): string | null {
   try {
@@ -77,15 +86,41 @@ function pinFailure(index: RhymeIndex, seed: string, rhymeKey: RhymeKey): string
   }
 }
 
-export function checkContinuity(days: readonly ScheduleDay[], index: RhymeIndex): ContinuityReport {
+export interface ContinuityOptions {
+  /**
+   * Also fail a day whose Seed Word pins but fails the Seed Word test
+   * (`src/seedWord.ts`), and hold step 1 to it too. Off at the build, which
+   * does not run the test (ADR-0012, amended 2026-10-14); on for the run over
+   * the whole Schedule and for a Seed Word joining it. Step 2 runs the test
+   * either way, since its lead word is a Seed Word joining the Schedule.
+   */
+  seedWordTest?: boolean;
+  /**
+   * The date the lap in progress began (`Schedule.lapStart`). A day before it
+   * is a spare in front of the lap: it played once on its own date and never
+   * comes round, so it holds no place, and a spare's Seed Word is free to fill
+   * one (#265). It is still repaired like any day. Without it, every day holds
+   * a place.
+   */
+  lapStart?: string;
+}
+
+export function checkContinuity(
+  days: readonly ScheduleDay[],
+  index: RhymeIndex,
+  options: ContinuityOptions = {},
+): ContinuityReport {
   const families = [...index.families().values()];
   const repaired = [...days];
   const repairs: DayRepair[] = [];
   const freePlay: FreePlayDay[] = [];
   const puzzleOf = puzzleReader(index);
+  const passes = (seed: string, rhymeKey: RhymeKey) =>
+    !options.seedWordTest || testSeedWord(index, seed, rhymeKey).passes;
+  const holdsPlace = (day: ScheduleDay) => options.lapStart === undefined || day.date >= options.lapStart;
 
   repaired.forEach((day, i) => {
-    const failure = pinFailure(index, day.seed, day.rhymeKey);
+    const failure = pinFailure(index, day.seed, day.rhymeKey) ?? testFailure(index, day, options);
     if (failure === null) return;
 
     // Every family the Seed Word is in now, the most Answers first. A word may
@@ -107,16 +142,17 @@ export function checkContinuity(days: readonly ScheduleDay[], index: RhymeIndex)
     const step2Families = keyStands ? [recorded] : holding.length > 0 ? holding : recorded ? [recorded] : [];
     const candidates: { step: 1 | 2; seed: string; rhymeKey: RhymeKey }[] = [
       ...(keyStands ? [] : holding.map((f) => ({ step: 1 as const, seed: day.seed, rhymeKey: f.rhymeKey }))),
-      ...step2Families.map((f) => ({
-        step: 2 as const,
-        seed: chooseRepresentative(f.members.map((m) => m.word), index),
-        rhymeKey: f.rhymeKey,
-      })),
+      ...step2Families.flatMap((f) => {
+        // The lead word is a Seed Word joining the Schedule, so it is the
+        // family's best-ranked word that passes the Seed Word test (#264),
+        // which also keeps an Unconfirmed Rhyme out (ADR-0012 amended). Step 1
+        // keeps the day's own Seed Word, which the build reports instead if
+        // it is listed.
+        const seed = seedWordFor(f.members.map((m) => m.word), index, f.rhymeKey);
+        return seed === null ? [] : [{ step: 2 as const, seed, rhymeKey: f.rhymeKey }];
+      }),
     ]
-      // A lead word that is an Unconfirmed Rhyme cannot join the Schedule
-      // (ADR-0012 amended). Step 1 keeps the day's own Seed Word, which the
-      // build reports instead if it is listed.
-      .filter((c) => c.step === 1 || !index.isUnconfirmedRhyme(c.seed))
+      .filter((c) => c.step === 2 || passes(c.seed, c.rhymeKey))
       .filter((c) => pinFailure(index, c.seed, c.rhymeKey) === null);
 
     // The one-place rule is reported and never blocks (ADR-0012, 2026-10-27):
@@ -128,7 +164,9 @@ export function checkContinuity(days: readonly ScheduleDay[], index: RhymeIndex)
       const answers = puzzleOf(seed, rhymeKey);
       return repaired.some(
         (d, j) =>
-          j !== i && (d.seed === seed || d.rhymeKey === rhymeKey || (answers !== null && puzzleOf(d.seed, d.rhymeKey) === answers)),
+          j !== i &&
+          holdsPlace(d) &&
+          (d.seed === seed || d.rhymeKey === rhymeKey || (answers !== null && puzzleOf(d.seed, d.rhymeKey) === answers)),
       );
     };
     const chosen = candidates.find((c) => !collides(c.seed, c.rhymeKey)) ?? candidates[0];
@@ -142,7 +180,7 @@ export function checkContinuity(days: readonly ScheduleDay[], index: RhymeIndex)
     freePlay.push({ date: day.date, seed: day.seed, rhymeKey: day.rhymeKey, detail: failure });
   });
 
-  return { days: repaired, repairs, freePlay, collisions: collisionsIn(repaired, puzzleOf) };
+  return { days: repaired, repairs, freePlay, collisions: collisionsIn(repaired.filter(holdsPlace), puzzleOf) };
 }
 
 /**
@@ -180,7 +218,8 @@ function answersIn(family: RhymeFamily): number {
  * Normalisation can file one family under two key spellings (`purifier` on
  * `AY ER`, `expire` on `AY R`); days on one Rhyme Key are reported once, as
  * that key. Run over the Schedule as repaired, since that is the Schedule the
- * build writes.
+ * build writes, and over the days that hold a place: a spare in front of the
+ * lap holds none (`ContinuityOptions.lapStart`).
  */
 function collisionsIn(
   days: readonly ScheduleDay[],
@@ -210,9 +249,10 @@ function collisionsIn(
 /**
  * The day on a new pair, keeping its date, weekday and week. The figures are
  * re-measured the way curation and the Editor's Pass measure a Puzzle, and
- * recorded to the precision the Schedule was dealt with.
+ * recorded to the precision the Schedule was dealt with. Exported for the
+ * Seed Word run's re-seed (`src/seedWordRun.ts`), which moves a day the same way.
  */
-function rePin(index: RhymeIndex, day: ScheduleDay, seed: string, rhymeKey: RhymeKey): ScheduleDay {
+export function rePin(index: RhymeIndex, day: ScheduleDay, seed: string, rhymeKey: RhymeKey): ScheduleDay {
   const facts = measureAnswers(index.buildPuzzle(index.pinSeed(seed, rhymeKey)).answers);
   return {
     ...day,
