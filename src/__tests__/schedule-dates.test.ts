@@ -65,7 +65,7 @@ describe("a date resolves to that day's Seed Word, pinned to its Rhyme Key", () 
 
   it("resolves a date in the middle to that day's Puzzle and no other", () => {
     expect(seedForDate(schedule, "2026-08-04")).toEqual({ word: "boulder", rhymeKey: "OW L D ER" });
-    expect(seedForDate(schedule, "2026-12-11")).toEqual({ word: "unisex", rhymeKey: "EH K S" });
+    expect(seedForDate(schedule, "2026-12-11")).toEqual({ word: "flex", rhymeKey: "EH K S" });
   });
 
   it("pins the Seed Word to the schedule's Rhyme Key rather than leaving it raw", () => {
@@ -75,13 +75,13 @@ describe("a date resolves to that day's Seed Word, pinned to its Rhyme Key", () 
     expect(seed?.rhymeKey).toBe(first.rhymeKey);
   });
 
-  it("shows sentimental on one day only, and kennel on 2026-11-11 (#239)", () => {
+  it("shows kennel on 2026-11-11 (#239), and sentimental on no day (#264)", () => {
     // sentimental sits in both the t-said and t-dropped families; leading the
-    // second as well showed and spoke the same word twice (ADR-0012).
+    // second as well showed and spoke the same word twice (ADR-0012). It is
+    // not heard one way either, so its first day went to incidental.
     expect(seedForDate(schedule, "2026-11-11")).toEqual({ word: "kennel", rhymeKey: "EH N AH L" });
-    expect(days.filter((day) => day.seed === "sentimental").map((day) => day.date)).toEqual([
-      "2026-08-17",
-    ]);
+    expect(seedForDate(schedule, "2026-08-17")).toEqual({ word: "incidental", rhymeKey: "EH N T AH L" });
+    expect(days.filter((day) => day.seed === "sentimental")).toEqual([]);
   });
 });
 
@@ -108,7 +108,7 @@ describe("the Schedule loops: a date past the last listed day repeats a lap earl
 
   it("wraps again two laps on, on the same weekday", () => {
     expect(seedForDate(schedule, "2028-01-04")).toEqual(boulder);
-    expect(seedForDate(schedule, "2028-05-12")).toEqual({ word: "unisex", rhymeKey: "EH K S" });
+    expect(seedForDate(schedule, "2028-05-12")).toEqual({ word: "flex", rhymeKey: "EH K S" });
     expect(seedForDate(schedule, "2028-09-18")).toEqual(smile);
   });
 

@@ -184,11 +184,11 @@ describe("Seed Words and Unconfirmed Rhymes, kept apart", () => {
 
   it("is never the word curation picks to stand for a family", () => {
     const family = ["ate", "eight", "late"];
-    expect(chooseRepresentative(family, makeTestIndex())).toBe("ate");
+    expect(chooseRepresentative(family, makeTestIndex(), "EY T")).toBe("ate");
 
     // `ate` listed for `hat`'s key loses its family's Seed Word to the next best.
     const listed = makeTestIndex({ unconfirmedRhymes: line({ word: "ate", rhymeKey: "AE T" }) });
-    expect(chooseRepresentative(family, listed)).toBe("late");
+    expect(chooseRepresentative(family, listed, "EY T")).toBe("late");
   });
 
   it("is never a Seed Word curation offers, even when its family has no other", () => {

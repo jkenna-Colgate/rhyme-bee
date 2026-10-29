@@ -93,6 +93,62 @@ describe("step 2: the family's lead word on that Rhyme Key", () => {
     ]);
     expect(report.freePlay).toEqual([]);
   });
+
+  it("swaps in the family's best-ranked word that passes the Seed Word test (#264)", () => {
+    // `frob` carries `AA B` on its main stress and ranks first, but it is a
+    // Bonus Word, so the day goes to `doorknob`.
+    const knobs = makeTestIndex({
+      pronunciations: [
+        ["frob", [["F", "R", "AA1", "B"]]],
+        ["doorknob", [["D", "AO1", "R", "N", "AA2", "B"]]],
+        ["heartthrob", [["HH", "AA1", "R", "T", "TH", "R", "AA2", "B"]]],
+      ],
+      words: ["frob", "doorknob", "heartthrob"],
+      prevalence: [["doorknob", 2.0], ["heartthrob", 1.5]],
+    });
+    const lost = day("2026-09-08", "knobbish", "AA B");
+    const report = checkContinuity([lost], knobs);
+
+    expect(report.days[0]).toMatchObject({ seed: "doorknob", rhymeKey: "AA B" });
+    expect(report.repairs.map((r) => r.step)).toEqual([2]);
+  });
+});
+
+describe("the Seed Word test, when the caller asks for it (#264)", () => {
+  it("is not run unless asked, since it is not run at every build", () => {
+    const days = [day("2026-09-07", "objurgate", "EY T")];
+    expect(checkContinuity(days, index).repairs).toEqual([]);
+  });
+
+  it("gives the day of a Seed Word that is not an Answer to its family's lead word, keeping its key", () => {
+    const bonus = day("2026-09-07", "objurgate", "EY T");
+    const report = checkContinuity([bonus], index, { seedWordTest: true });
+
+    expect(report.days).toEqual([{ ...bonus, seed: "ate", ...figuresOf("ate", "EY T") }]);
+    expect(report.repairs).toEqual([{ date: "2026-09-07", step: 2, before: bonus, after: report.days[0] }]);
+  });
+
+  it("gives the day of a Seed Word not heard one way to the next word, passing over the one that failed", () => {
+    const heardTwoWays = day("2026-09-07", "tear", "IH R");
+    const report = checkContinuity([heardTwoWays], index, { seedWordTest: true });
+
+    expect(report.days[0]).toMatchObject({ seed: "beer", rhymeKey: "IH R" });
+    expect(report.repairs.map((r) => r.step)).toEqual([2]);
+  });
+
+  it("makes the day Free Play, and counts it, when no word of the family passes", () => {
+    const alone = makeTestIndex({
+      pronunciations: [["zounds", [["Z", "AW1", "N", "D", "Z"]]]],
+      words: ["zounds"],
+      prevalence: [["zounds", -0.21]],
+    });
+    const report = checkContinuity([day("2026-11-23", "zounds", "AW N D Z")], alone, { seedWordTest: true });
+
+    expect(report.repairs).toEqual([]);
+    expect(report.freePlay).toEqual([
+      expect.objectContaining({ date: "2026-11-23", seed: "zounds", detail: expect.stringContaining("not an Answer") }),
+    ]);
+  });
 });
 
 describe("the one-place rule is reported and never blocks a repair (2026-10-27)", () => {

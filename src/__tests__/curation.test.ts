@@ -340,3 +340,41 @@ describe("the representative is the best-known native word", () => {
     expect(family?.representative).not.toBe("gained");
   });
 });
+
+/**
+ * Main stress on the Rhyme Key ranks second, after native (#264): the rhyme the
+ * player hears in the Seed Word is the one the Puzzle is about, so the family
+ * of `cup` is shown as `cup` and not as `makeup`, which carries the key on its
+ * secondary stress.
+ */
+describe("the representative carries the main stress on its Rhyme Key", () => {
+  const p = (...phonemes: string[]): Pronunciation[] => [phonemes];
+  const stressIndex = buildSlice({
+    pronunciations: new Map([
+      ["makeup", p("M", "EY1", "K", "AH2", "P")],
+      ["cup", p("K", "AH1", "P")],
+      ["pup", p("P", "AH1", "P")],
+      ["take", p("T", "EY1", "K")],
+      ["taking", p("T", "EY1", "K", "IH0", "NG")],
+      ["breathtaking", p("B", "R", "EH1", "TH", "T", "EY2", "K", "IH0", "NG")],
+    ]),
+    words: ["makeup", "cup", "pup", "take", "taking", "breathtaking"],
+    prevalence: new Map([
+      ["makeup", 2.5], ["cup", 2.0], ["pup", 1.5],
+      ["take", 2.5], ["taking", 2.5], ["breathtaking", 2.0],
+    ]),
+  }, 0).index;
+  const families = curate(stressIndex, { sizeBand: { min: 0, max: 100 } }).families;
+  const representativeOf = (key: string) => families.find((f) => f.rhymeKey === key)?.representative;
+
+  it("prefers a main-stress word to a better-known one on a secondary stress", () => {
+    expect(representativeOf("AH P")).toBe("cup");
+  });
+
+  it("still ranks native ahead of it, so an inflection never wins on stress", () => {
+    // `taking` has the main stress on `EY K AH NG` (its weak "ih" read as
+    // weak "uh", #260) but is an inflection of
+    // `take`, so `breathtaking` keeps its day, as eleven scheduled days do.
+    expect(representativeOf("EY K AH NG")).toBe("breathtaking");
+  });
+});

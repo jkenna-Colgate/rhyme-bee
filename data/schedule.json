@@ -110,10 +110,10 @@
       "date": "2026-08-08",
       "weekday": "Sat",
       "week": 1,
-      "seed": "centimeter",
+      "seed": "eater",
       "rhymeKey": "IY D ER",
       "answerCount": 46,
-      "difficulty": 0.1602
+      "difficulty": 0.158
     },
     {
       "date": "2026-08-09",
@@ -137,10 +137,10 @@
       "date": "2026-08-11",
       "weekday": "Tue",
       "week": 2,
-      "seed": "shellshocked",
+      "seed": "concoct",
       "rhymeKey": "AA K T",
       "answerCount": 29,
-      "difficulty": 0.037
+      "difficulty": 0
     },
     {
       "date": "2026-08-12",
@@ -191,7 +191,7 @@
       "date": "2026-08-17",
       "weekday": "Mon",
       "week": 3,
-      "seed": "sentimental",
+      "seed": "incidental",
       "rhymeKey": "EH N T AH L",
       "answerCount": 38,
       "difficulty": 0.0304
@@ -209,10 +209,10 @@
       "date": "2026-08-19",
       "weekday": "Wed",
       "week": 3,
-      "seed": "landlord",
+      "seed": "sword",
       "rhymeKey": "AO R D",
       "answerCount": 89,
-      "difficulty": 0.0589
+      "difficulty": 0.0587
     },
     {
       "date": "2026-08-20",
@@ -236,10 +236,10 @@
       "date": "2026-08-22",
       "weekday": "Sat",
       "week": 3,
-      "seed": "grasshopper",
+      "seed": "proper",
       "rhymeKey": "AA P ER",
-      "answerCount": 22,
-      "difficulty": 0.1617
+      "answerCount": 20,
+      "difficulty": 0.1709
     },
     {
       "date": "2026-08-23",
@@ -290,19 +290,19 @@
       "date": "2026-08-28",
       "weekday": "Fri",
       "week": 4,
-      "seed": "smallpox",
+      "seed": "fox",
       "rhymeKey": "AA K S",
       "answerCount": 74,
-      "difficulty": 0.135
+      "difficulty": 0.1337
     },
     {
       "date": "2026-08-29",
       "weekday": "Sat",
       "week": 4,
-      "seed": "cheerleader",
+      "seed": "leader",
       "rhymeKey": "IY D ER",
-      "answerCount": 20,
-      "difficulty": 0.1731
+      "answerCount": 46,
+      "difficulty": 0.1585
     },
     {
       "date": "2026-08-30",
@@ -317,10 +317,10 @@
       "date": "2026-08-31",
       "weekday": "Mon",
       "week": 5,
-      "seed": "housewares",
+      "seed": "airs",
       "rhymeKey": "EH R Z",
       "answerCount": 56,
-      "difficulty": 0.0171
+      "difficulty": 0.0455
     },
     {
       "date": "2026-09-01",
@@ -344,10 +344,10 @@
       "date": "2026-09-03",
       "weekday": "Thu",
       "week": 5,
-      "seed": "toothpaste",
+      "seed": "chaste",
       "rhymeKey": "EY S T",
-      "answerCount": 42,
-      "difficulty": 0.102
+      "answerCount": 46,
+      "difficulty": 0.0564
     },
     {
       "date": "2026-09-04",
@@ -515,10 +515,10 @@
       "date": "2026-09-22",
       "weekday": "Tue",
       "week": 8,
-      "seed": "storytelling",
+      "seed": "bestselling",
       "rhymeKey": "EH L AH NG",
       "answerCount": 29,
-      "difficulty": 0.0456
+      "difficulty": 0.0455
     },
     {
       "date": "2026-09-23",
@@ -533,10 +533,10 @@
       "date": "2026-09-24",
       "weekday": "Thu",
       "week": 8,
-      "seed": "aircraft",
+      "seed": "craft",
       "rhymeKey": "AE F T",
       "answerCount": 31,
-      "difficulty": 0.1073
+      "difficulty": 0.1061
     },
     {
       "date": "2026-09-25",
@@ -650,10 +650,10 @@
       "date": "2026-10-07",
       "weekday": "Wed",
       "week": 10,
-      "seed": "mesdames",
+      "seed": "damns",
       "rhymeKey": "AE M Z",
-      "answerCount": 29,
-      "difficulty": 0.0804
+      "answerCount": 28,
+      "difficulty": 0.0825
     },
     {
       "date": "2026-10-08",
@@ -668,19 +668,19 @@
       "date": "2026-10-09",
       "weekday": "Fri",
       "week": 10,
-      "seed": "eyebrow",
+      "seed": "cow",
       "rhymeKey": "AW",
       "answerCount": 31,
-      "difficulty": 0.1481
+      "difficulty": 0.1446
     },
     {
       "date": "2026-10-10",
       "weekday": "Sat",
       "week": 10,
-      "seed": "typewriter",
+      "seed": "lighter",
       "rhymeKey": "AY T ER",
       "answerCount": 30,
-      "difficulty": 0.1733
+      "difficulty": 0.1714
     },
     {
       "date": "2026-10-11",
@@ -785,10 +785,10 @@
       "date": "2026-10-22",
       "weekday": "Thu",
       "week": 12,
-      "seed": "makeup",
+      "seed": "cup",
       "rhymeKey": "AH P",
-      "answerCount": 35,
-      "difficulty": 0.0948
+      "answerCount": 37,
+      "difficulty": 0.1189
     },
     {
       "date": "2026-10-23",
@@ -821,10 +821,10 @@
       "date": "2026-10-26",
       "weekday": "Mon",
       "week": 13,
-      "seed": "playhouse",
+      "seed": "mouse",
       "rhymeKey": "AW S",
       "answerCount": 49,
-      "difficulty": 0.0231
+      "difficulty": 0.0229
     },
     {
       "date": "2026-10-27",
@@ -902,10 +902,10 @@
       "date": "2026-11-04",
       "weekday": "Wed",
       "week": 14,
-      "seed": "notebook",
+      "seed": "hook",
       "rhymeKey": "UH K",
       "answerCount": 44,
-      "difficulty": 0.066
+      "difficulty": 0.0652
     },
     {
       "date": "2026-11-05",
@@ -947,7 +947,7 @@
       "date": "2026-11-09",
       "weekday": "Mon",
       "week": 15,
-      "seed": "longstanding",
+      "seed": "notwithstanding",
       "rhymeKey": "AE N D AH NG",
       "answerCount": 22,
       "difficulty": 0
@@ -1001,10 +1001,10 @@
       "date": "2026-11-15",
       "weekday": "Sun",
       "week": 15,
-      "seed": "radar",
+      "seed": "guitar",
       "rhymeKey": "AA R",
-      "answerCount": 61,
-      "difficulty": 0.2387
+      "answerCount": 63,
+      "difficulty": 0.2326
     },
     {
       "date": "2026-11-16",
@@ -1073,19 +1073,19 @@
       "date": "2026-11-23",
       "weekday": "Mon",
       "week": 17,
-      "seed": "zounds",
+      "seed": "bounds",
       "rhymeKey": "AW N D Z",
-      "answerCount": 22,
+      "answerCount": 21,
       "difficulty": 0
     },
     {
       "date": "2026-11-24",
       "weekday": "Tue",
       "week": 17,
-      "seed": "retrospect",
+      "seed": "deflect",
       "rhymeKey": "EH K T",
       "answerCount": 74,
-      "difficulty": 0.0333
+      "difficulty": 0.0331
     },
     {
       "date": "2026-11-25",
@@ -1127,18 +1127,18 @@
       "date": "2026-11-29",
       "weekday": "Sun",
       "week": 17,
-      "seed": "tripod",
+      "seed": "nod",
       "rhymeKey": "AA D",
       "answerCount": 51,
-      "difficulty": 0.2669
+      "difficulty": 0.2643
     },
     {
       "date": "2026-11-30",
       "weekday": "Mon",
       "week": 18,
-      "seed": "darjeeling",
+      "seed": "mealing",
       "rhymeKey": "IY L AH NG",
-      "answerCount": 24,
+      "answerCount": 23,
       "difficulty": 0
     },
     {
@@ -1154,10 +1154,10 @@
       "date": "2026-12-02",
       "weekday": "Wed",
       "week": 18,
-      "seed": "handicap",
+      "seed": "flap",
       "rhymeKey": "AE P",
       "answerCount": 47,
-      "difficulty": 0.0537
+      "difficulty": 0.0528
     },
     {
       "date": "2026-12-03",
@@ -1235,10 +1235,10 @@
       "date": "2026-12-11",
       "weekday": "Fri",
       "week": 19,
-      "seed": "unisex",
+      "seed": "flex",
       "rhymeKey": "EH K S",
       "answerCount": 51,
-      "difficulty": 0.1217
+      "difficulty": 0.1209
     },
     {
       "date": "2026-12-12",
@@ -1289,10 +1289,10 @@
       "date": "2026-12-17",
       "weekday": "Thu",
       "week": 20,
-      "seed": "broadcast",
+      "seed": "vast",
       "rhymeKey": "AE S T",
-      "answerCount": 54,
-      "difficulty": 0.0986
+      "answerCount": 53,
+      "difficulty": 0.0754
     },
     {
       "date": "2026-12-18",
@@ -1316,10 +1316,10 @@
       "date": "2026-12-20",
       "weekday": "Sun",
       "week": 20,
-      "seed": "crayon",
+      "seed": "gone",
       "rhymeKey": "AA N",
       "answerCount": 100,
-      "difficulty": 0.2683
+      "difficulty": 0.2675
     },
     {
       "date": "2026-12-21",
@@ -1388,10 +1388,10 @@
       "date": "2026-12-28",
       "weekday": "Mon",
       "week": 22,
-      "seed": "manuscript",
+      "seed": "script",
       "rhymeKey": "IH P T",
       "answerCount": 35,
-      "difficulty": 0.0296
+      "difficulty": 0.0292
     },
     {
       "date": "2026-12-29",
@@ -1442,10 +1442,10 @@
       "date": "2027-01-03",
       "weekday": "Sun",
       "week": 22,
-      "seed": "kilogram",
+      "seed": "damn",
       "rhymeKey": "AE M",
       "answerCount": 55,
-      "difficulty": 0.211
+      "difficulty": 0.2086
     },
     {
       "date": "2027-01-04",
@@ -1550,10 +1550,10 @@
       "date": "2027-01-15",
       "weekday": "Fri",
       "week": 24,
-      "seed": "payoff",
+      "seed": "cough",
       "rhymeKey": "AA F",
       "answerCount": 25,
-      "difficulty": 0.1273
+      "difficulty": 0.1265
     },
     {
       "date": "2027-01-16",
@@ -1568,10 +1568,10 @@
       "date": "2027-01-17",
       "weekday": "Sun",
       "week": 24,
-      "seed": "ceremony",
+      "seed": "pepperoni",
       "rhymeKey": "OW N IY",
       "answerCount": 24,
-      "difficulty": 0.2834
+      "difficulty": 0.2849
     },
     {
       "date": "2027-01-18",
@@ -1649,10 +1649,10 @@
       "date": "2027-01-26",
       "weekday": "Tue",
       "week": 26,
-      "seed": "gatekeeper",
+      "seed": "keeper",
       "rhymeKey": "IY P ER",
       "answerCount": 23,
-      "difficulty": 0.041
+      "difficulty": 0.0402
     },
     {
       "date": "2027-01-27",
@@ -1712,10 +1712,10 @@
       "date": "2027-02-02",
       "weekday": "Tue",
       "week": 27,
-      "seed": "ongoing",
+      "seed": "easygoing",
       "rhymeKey": "OW AH NG",
       "answerCount": 39,
-      "difficulty": 0.0358
+      "difficulty": 0.0361
     },
     {
       "date": "2027-02-03",
@@ -1820,10 +1820,10 @@
       "date": "2027-02-14",
       "weekday": "Sun",
       "week": 28,
-      "seed": "envelope",
+      "seed": "soap",
       "rhymeKey": "OW P",
       "answerCount": 33,
-      "difficulty": 0.2075
+      "difficulty": 0.2045
     },
     {
       "date": "2027-02-15",
@@ -1883,10 +1883,10 @@
       "date": "2027-02-21",
       "weekday": "Sun",
       "week": 29,
-      "seed": "glucose",
+      "seed": "diagnose",
       "rhymeKey": "OW S",
       "answerCount": 28,
-      "difficulty": 0.3953
+      "difficulty": 0.3972
     },
     {
       "date": "2027-02-22",
@@ -1964,10 +1964,10 @@
       "date": "2027-03-02",
       "weekday": "Tue",
       "week": 31,
-      "seed": "purifier",
+      "seed": "hire",
       "rhymeKey": "AY ER",
-      "answerCount": 93,
-      "difficulty": 0.0534
+      "answerCount": 115,
+      "difficulty": 0.0442
     },
     {
       "date": "2027-03-03",
@@ -2000,10 +2000,10 @@
       "date": "2027-03-06",
       "weekday": "Sat",
       "week": 31,
-      "seed": "crossword",
+      "seed": "bird",
       "rhymeKey": "ER D",
-      "answerCount": 56,
-      "difficulty": 0.1942
+      "answerCount": 58,
+      "difficulty": 0.1851
     },
     {
       "date": "2027-03-07",
@@ -2045,10 +2045,10 @@
       "date": "2027-03-11",
       "weekday": "Thu",
       "week": 32,
-      "seed": "synthesizer",
+      "seed": "wiser",
       "rhymeKey": "AY Z ER",
       "answerCount": 103,
-      "difficulty": 0.1158
+      "difficulty": 0.1152
     },
     {
       "date": "2027-03-12",
@@ -2180,19 +2180,19 @@
       "date": "2027-03-26",
       "weekday": "Fri",
       "week": 34,
-      "seed": "sunburn",
+      "seed": "learn",
       "rhymeKey": "ER N",
       "answerCount": 25,
-      "difficulty": 0.1543
+      "difficulty": 0.1524
     },
     {
       "date": "2027-03-27",
       "weekday": "Sat",
       "week": 34,
-      "seed": "upload",
+      "seed": "explode",
       "rhymeKey": "OW D",
       "answerCount": 79,
-      "difficulty": 0.1578
+      "difficulty": 0.1581
     },
     {
       "date": "2027-03-28",
@@ -2315,10 +2315,10 @@
       "date": "2027-04-10",
       "weekday": "Sat",
       "week": 36,
-      "seed": "administrative",
+      "seed": "creative",
       "rhymeKey": "EY D AH V",
       "answerCount": 34,
-      "difficulty": 0.1671
+      "difficulty": 0.1646
     },
     {
       "date": "2027-04-11",
@@ -2333,10 +2333,10 @@
       "date": "2027-04-12",
       "weekday": "Mon",
       "week": 37,
-      "seed": "schmalz",
+      "seed": "dolls",
       "rhymeKey": "AA L Z",
-      "answerCount": 53,
-      "difficulty": 0.0272
+      "answerCount": 46,
+      "difficulty": 0.0399
     },
     {
       "date": "2027-04-13",
@@ -2369,10 +2369,10 @@
       "date": "2027-04-16",
       "weekday": "Fri",
       "week": 37,
-      "seed": "category",
+      "seed": "glory",
       "rhymeKey": "AO R IY",
       "answerCount": 76,
-      "difficulty": 0.1327
+      "difficulty": 0.1321
     },
     {
       "date": "2027-04-17",
