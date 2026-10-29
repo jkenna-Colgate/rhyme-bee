@@ -350,8 +350,17 @@ export function standingTierOf(input: StandingTierInput): (word: string) => Tier
 
 /** Each word's layers, read off the two files. */
 export function standingLayers(overrides: string, moves: string): (word: string) => WordLayers {
-  const standing = resolveTierOverrides(parseTierOverrides(overrides));
-  const moved = parseTierMoves(moves);
+  return layersFrom(resolveTierOverrides(parseTierOverrides(overrides)), parseTierMoves(moves));
+}
+
+/**
+ * Each word's layers, from the standing verdicts and the moved words already
+ * read: for a reader that holds them parsed, as the Editor's Pass does.
+ */
+export function layersFrom(
+  standing: ReadonlyMap<string, Pick<TierOverrideRow, "verdict" | "locked">>,
+  moved: ReadonlySet<string>,
+): (word: string) => WordLayers {
   return (word) => {
     const row = standing.get(word);
     return { verdict: row?.verdict, locked: row?.locked === true, moved: moved.has(word) };
@@ -435,13 +444,14 @@ export function applyTierLayers(
     overridden.push({ word, verdict: override.verdict, patched, rows: override.rows, hadPrevalence });
   }
 
+  const layersOf = layersFrom(standing, movedWords);
   const moved: AppliedTierMove[] = [];
   for (const word of movedWords) {
-    const row = standing.get(word);
-    const locked = row?.locked === true;
-    const patched = layeredValue({ verdict: row?.verdict, locked, moved: true }, measured.get(word)) ?? null;
+    const layers = layersOf(word);
+    const locked = layers.locked === true;
+    const patched = layeredValue(layers, measured.get(word)) ?? null;
     if (patched !== null) target.prevalence.set(word, patched);
-    const overrode = !locked && row?.verdict === "bonus" ? row.verdict : null;
+    const overrode = !locked && layers.verdict === "bonus" ? layers.verdict : null;
     moved.push({ word, patched, overrode, locked });
   }
   return { overridden, moved };

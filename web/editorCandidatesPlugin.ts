@@ -202,7 +202,7 @@ function queueContext(): CandidateQueueContext {
     lemmaCandidates: (word) => index.derivation.lemmaCandidates(word),
     measured: measuredPrevalence(),
     overrides: readTierOverrideText(overridePath),
-    moves: readTierOverrideText(movesPath),
+    moves: readOptional(movesPath),
     knownnessThreshold: builtKnownnessThreshold(),
   });
   return {

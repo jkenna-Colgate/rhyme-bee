@@ -28,7 +28,7 @@
  */
 
 import { localCalendarDate } from "../../src/schedule.ts";
-import { recordFromBody, type SessionRecord } from "../../src/sessionRecord.ts";
+import { recordFromBody, SESSION_ID_SHAPE, type SessionRecord } from "../../src/sessionRecord.ts";
 import { readSnapshot, snapshotDateOf } from "../../src/sessionSnapshot.ts";
 import { SESSION_RECORD_PATH } from "./endpoints.ts";
 
@@ -76,8 +76,6 @@ interface LedgerEntry {
 
 type Ledger = Record<string, LedgerEntry>;
 
-const ID_SHAPE = /^[0-9a-f]{32}$/;
-
 function readLedger(storage: RecordStorage): Ledger {
   let value: unknown;
   try {
@@ -90,7 +88,7 @@ function readLedger(storage: RecordStorage): Ledger {
   for (const [date, raw] of Object.entries(value as Record<string, unknown>)) {
     if (typeof raw !== "object" || raw === null) continue;
     const entry = raw as Partial<LedgerEntry>;
-    if (typeof entry.id !== "string" || !ID_SHAPE.test(entry.id)) continue;
+    if (typeof entry.id !== "string" || !SESSION_ID_SHAPE.test(entry.id)) continue;
     const sent = entry.sent;
     ledger[date] =
       typeof sent === "object" &&

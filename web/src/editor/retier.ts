@@ -53,6 +53,7 @@ import { measureAnswers } from "../../../src/curation.ts";
 import type { PuzzleFacts } from "../../../src/schedule.ts";
 import {
   layeredValue,
+  layersFrom,
   type TierOverrideRow,
   type TierVerdict,
 } from "../../../src/tierOverride.ts";
@@ -172,13 +173,9 @@ export function retierDay(lists: DayLists, state: TierPickerState): RetieredDay 
   // The value a candidate carries now, by the precedence `layeredValue` shares
   // with the build and with the write route's own reach report: prevalence,
   // the editor's verdicts, the job's moves, a locked verdict.
-  const valueOf = (candidate: string): number | undefined => {
-    const row = standing.get(candidate);
-    return layeredValue(
-      { verdict: row?.verdict, locked: row?.locked === true, moved: moved.has(candidate) },
-      state.measured[candidate],
-    );
-  };
+  const layersOf = layersFrom(standing, moved);
+  const valueOf = (candidate: string): number | undefined =>
+    layeredValue(layersOf(candidate), state.measured[candidate]);
 
   const retier = (entry: DayWord): RetieredWord => {
     const own = standing.get(entry.word);

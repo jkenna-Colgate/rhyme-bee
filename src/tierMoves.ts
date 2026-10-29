@@ -103,6 +103,16 @@ export interface FindCount {
 }
 
 /**
+ * One copy per Session, its last: a Session Record is one per Session and a
+ * resend overwrites it, so a Session met twice counts once.
+ */
+function latestCopies<T extends { id: string }>(sessions: readonly T[]): Iterable<T> {
+  const latest = new Map<string, T>();
+  for (const session of sessions) latest.set(session.id, session);
+  return latest.values();
+}
+
+/**
  * Each word's finds, **pooled** over every Session on every day the word is in,
  * and so over every lap. A word on two Rhyme Keys (`excuse` on the `booze` and
  * `juice` days) gets one count and so one verdict: acting on each day alone
@@ -116,11 +126,8 @@ export interface FindCount {
  * met twice counts once, as its last copy.
  */
 export function poolFinds(sessions: readonly PlayedSession[]): Map<string, FindCount> {
-  const latest = new Map<string, PlayedSession>();
-  for (const session of sessions) latest.set(session.id, session);
-
   const pooled = new Map<string, FindCount>();
-  for (const session of latest.values()) {
+  for (const session of latestCopies(sessions)) {
     const found = new Set(session.found);
     for (const word of new Set(session.held)) {
       const count = pooled.get(word) ?? { finds: 0, sessions: 0 };
@@ -301,11 +308,8 @@ export function daysUnderFloor(
   sessions: readonly DaySession[],
   settings: ReachabilitySettings,
 ): DayUnderFloor[] {
-  const latest = new Map<string, DaySession>();
-  for (const session of sessions) latest.set(session.id, session);
-
   const days = new Map<string, { sessions: number; reached: number }>();
-  for (const session of latest.values()) {
+  for (const session of latestCopies(sessions)) {
     const day = days.get(session.date) ?? { sessions: 0, reached: 0 };
     day.sessions += 1;
     if (session.reachedLaureate) day.reached += 1;

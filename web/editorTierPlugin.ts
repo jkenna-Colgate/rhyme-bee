@@ -43,7 +43,7 @@ import type { Plugin } from "vite";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { localCalendarDate, type Schedule } from "../src/schedule.ts";
-import { layeredValue, standingLayers, type TierOverrideRow } from "../src/tierOverride.ts";
+import { layeredValue, layersFrom, standingLayers, type TierOverrideRow } from "../src/tierOverride.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { EDITOR_TIER_PATH } from "./src/endpoints.ts";
 import type { DayLists, TierPickerState, TierWriteResult } from "./src/editor/retier.ts";
@@ -54,6 +54,7 @@ import { reachOf, tierPickerState } from "./editorTierPayload.ts";
 import { MAX_TIER_BODY_BYTES, tierWriteRequest } from "./editorTierRequest.ts";
 import { editorRoute, type EditorRouteSpec } from "./editorRoute.ts";
 import { relayCause, sendJson } from "./editorTransport.ts";
+import { readOptional } from "./readOptional.ts";
 import { repoRoot } from "./repoRoot.ts";
 import { appendTierOverride, readTierOverrideText } from "./tierOverrideFile.ts";
 
@@ -188,18 +189,15 @@ function record(
   deps.append(appended);
 
   const state = stateFor(deps, date);
-  const standing = new Map(state.standing.map((row) => [row.word, row]));
-  const moved = new Set(state.moved ?? []);
+  const layersOf = layersFrom(
+    new Map(state.standing.map((row) => [row.word, row])),
+    new Set(state.moved ?? []),
+  );
   const measured = deps.measured();
   // The precedence `layeredValue` shares with the build and with the picker's
   // own re-tiering.
-  const valueOf = (candidate: string): number | undefined => {
-    const row = standing.get(candidate);
-    return layeredValue(
-      { verdict: row?.verdict, locked: row?.locked === true, moved: moved.has(candidate) },
-      measured.get(candidate),
-    );
-  };
+  const valueOf = (candidate: string): number | undefined =>
+    layeredValue(layersOf(candidate), measured.get(candidate));
 
   return { state, appended, reach: reachOf(word, deps.openIndex(), valueOf) };
 }
@@ -230,7 +228,7 @@ export function editorTierPlugin(): Plugin {
       measured: measuredPrevalence,
       overrides: () => readTierOverrideText(overridePath),
       // The same read: a missing file is empty text, which moves nothing.
-      moves: () => readTierOverrideText(movesPath),
+      moves: () => readOptional(movesPath),
       append: (row) => appendTierOverride(overridePath, row),
       now: () => new Date().toISOString(),
       knownnessThreshold: builtKnownnessThreshold,

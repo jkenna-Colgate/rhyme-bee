@@ -26,6 +26,7 @@
  */
 
 import { hasOnlyFields, refuse, type Validated } from "./report.ts";
+import { isCalendarDate } from "./schedule.ts";
 
 export interface SessionRecord {
   /** 32 lower-case hex digits, random per Session. */
@@ -58,8 +59,8 @@ export const MAX_RECORD_BYTES = 32 * 1024;
 const MAX_WORD_LENGTH = 45;
 const MAX_RHYME_KEY_LENGTH = 60;
 
-const ID_SHAPE = /^[0-9a-f]{32}$/;
-const DATE_SHAPE = /^(\d{4})-(\d{2})-(\d{2})$/;
+/** A Session's random id: 32 lower-case hex digits. */
+export const SESSION_ID_SHAPE = /^[0-9a-f]{32}$/;
 const INDEX_HASH_SHAPE = /^[0-9a-f]{8,64}$/;
 /** The Seed Word as the engine pins one: letters only. */
 const SEED_SHAPE = /^[a-z]+$/;
@@ -79,15 +80,6 @@ const SEED_FIELDS = new Set(["word", "rhymeKey"]);
 
 export type SessionRecordReport = Validated<"record", SessionRecord>;
 
-/** True for `YYYY-MM-DD` naming a day the calendar has. */
-function isCalendarDate(value: string): boolean {
-  const match = DATE_SHAPE.exec(value);
-  if (match === null) return false;
-  const [, y, m, d] = match.map(Number) as [number, number, number, number];
-  const date = new Date(Date.UTC(y, m - 1, d));
-  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
-}
-
 /**
  * Coerce an untrusted body into a Session Record, or refuse it. Every field is
  * checked rather than trusted, and the date and the id strictly, because both go
@@ -102,7 +94,7 @@ export function recordFromBody(body: unknown): SessionRecordReport {
   const report = body as Record<string, unknown>;
   if (!hasOnlyFields(report, RECORD_FIELDS)) return refuse("Unrecognised field in record.");
 
-  if (typeof report.id !== "string" || !ID_SHAPE.test(report.id)) {
+  if (typeof report.id !== "string" || !SESSION_ID_SHAPE.test(report.id)) {
     return refuse("That is not a Session id.");
   }
   if (typeof report.date !== "string" || !isCalendarDate(report.date)) {

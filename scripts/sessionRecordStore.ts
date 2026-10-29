@@ -14,6 +14,7 @@
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { addDays } from "../src/schedule.ts";
 import {
   parseSessionRecord,
   SESSION_RECORD_KEY_PREFIX,
@@ -33,13 +34,6 @@ function parseKey(key: string): { date: string; id: string } | null {
   return match === null ? null : { date: match[1]!, id: match[2]! };
 }
 
-/** The day before `date`, both `YYYY-MM-DD`. */
-function dayBefore(date: string): string {
-  const day = new Date(`${date}T00:00:00Z`);
-  day.setUTCDate(day.getUTCDate() - 1);
-  return day.toISOString().slice(0, 10);
-}
-
 /**
  * The keys to fetch: every Session Record key not yet pulled, and a pulled one
  * again only while its date may still be in play. A player plays a date only
@@ -53,7 +47,7 @@ export function keysToFetch(
   held: ReadonlySet<string>,
   today: string,
 ): string[] {
-  const stillInPlay = dayBefore(today);
+  const stillInPlay = addDays(today, -1);
   return keys.filter((key) => {
     const parsed = parseKey(key);
     if (parsed === null) return false;

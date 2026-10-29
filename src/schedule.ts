@@ -66,7 +66,8 @@ function hash(text: string): number {
   return h;
 }
 
-function addDays(isoDate: string, days: number): string {
+/** `isoDate` moved by `days` calendar days, either way; both `YYYY-MM-DD`. */
+export function addDays(isoDate: string, days: number): string {
   const date = new Date(`${isoDate}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().slice(0, 10);
@@ -248,7 +249,7 @@ export function parseSchedule(raw: unknown): Schedule | null {
 const MS_PER_DAY = 86_400_000;
 
 /** Whether an ISO-shaped string names a real calendar date (no 30 February). */
-function isCalendarDate(isoDate: string): boolean {
+export function isCalendarDate(isoDate: string): boolean {
   if (!ISO_DATE.test(isoDate)) return false;
   const time = Date.parse(`${isoDate}T00:00:00Z`);
   return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === isoDate;
