@@ -247,6 +247,15 @@ function collisionsIn(
 }
 
 /**
+ * The one-place check on its own, over days that each hold a place: what the
+ * Schedule's growth asks of a Seed Word joining it (#271), against the places
+ * already given and the other words joining with it.
+ */
+export function placeCollisions(days: readonly ScheduleDay[], index: RhymeIndex): PlaceCollision[] {
+  return collisionsIn(days, puzzleReader(index));
+}
+
+/**
  * The day on a new pair, keeping its date, weekday and week. The figures are
  * re-measured the way curation and the Editor's Pass measure a Puzzle, and
  * recorded to the precision the Schedule was dealt with. Exported for the

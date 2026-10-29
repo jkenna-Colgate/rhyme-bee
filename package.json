@@ -13,6 +13,7 @@
     "deploy": "tsx scripts/deploy.ts",
     "build:schedule": "tsx scripts/build-schedule.ts",
     "seeds:test": "tsx scripts/seed-word-test.ts",
+    "schedule:grow": "tsx scripts/grow-schedule.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
     "batch": "tsx scripts/batch.ts",
