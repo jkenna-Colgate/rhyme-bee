@@ -12,6 +12,7 @@
     "build:index": "tsx scripts/build-index.ts",
     "deploy": "tsx scripts/deploy.ts",
     "build:schedule": "tsx scripts/build-schedule.ts",
+    "seeds:test": "tsx scripts/seed-word-test.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
     "editor:read": "tsx scripts/editor.ts read",

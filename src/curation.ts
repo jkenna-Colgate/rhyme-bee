@@ -13,8 +13,8 @@
  * same Puzzle and appear once, under a chosen representative.
  */
 
-import type { RhymeKey } from "./phonology.ts";
-import { splitFamily, type RhymeIndex } from "./rhymeIndex.ts";
+import { lastStressedIndex, stressOf, type RhymeKey } from "./phonology.ts";
+import { matchingPronunciation, splitFamily, type RhymeIndex } from "./rhymeIndex.ts";
 import type { PuzzleFacts } from "./schedule.ts";
 import {
   DEFAULT_SCORING_CONFIG,
@@ -106,9 +106,16 @@ export interface CurationReport {
  * that really matters is that it is a word they recognise.
  *
  * Ranked: **native** first (not an inflection or affixation of a word in another
- * key — ADR-0008), then **unambiguous** (one pronunciation, so ADR-0001's pin to
- * exactly one Rhyme Key is honest), then **best known** (ADR-0003 prevalence),
- * then shortest and alphabetical as a deterministic floor.
+ * key — ADR-0008), then **main stress on the Rhyme Key** (#264), then
+ * **unambiguous** (one pronunciation, so ADR-0001's pin to exactly one Rhyme Key
+ * is honest), then **best known** (ADR-0003 prevalence), then shortest and
+ * alphabetical as a deterministic floor.
+ *
+ * Main stress comes second so the rhyme the player hears in the Seed Word is
+ * the one the Puzzle is about: the family of `cup` is shown as `cup` and not as
+ * `makeup`, which carries `AH P` on its secondary stress. It comes after native
+ * because a family whose only main-stress words are inflections (`taking` in
+ * the family of `breathtaking`) is better named by its native word.
  *
  * Shortest used to lead, which is why 170 members of `EY N` — `gain`, `drain`,
  * `plane`, `complain` — were represented by `ln`: abbreviations and fragments
@@ -125,26 +132,56 @@ export interface CurationReport {
  * listed word is then never a candidate (`curate`) and never a repair's Seed
  * Word (`src/continuity.ts`).
  */
-export function chooseRepresentative(words: string[], index: RhymeIndex): string {
-  const rank = (word: string) => ({
-    unconfirmed: index.isUnconfirmedRhyme(word) ? 1 : 0,
-    derived: index.derivation.isDerived(word) ? 1 : 0,
-    ambiguous: index.isAmbiguous(word) ? 1 : 0,
-    // Absent from the prevalence norms sorts last, not first.
-    knownness: index.tierOf(word).knownness ?? -Infinity,
-  });
+export function chooseRepresentative(words: string[], index: RhymeIndex, rhymeKey: RhymeKey): string {
+  return rankSeedWords(words, index, rhymeKey)[0]!;
+}
+
+/**
+ * Every word of a family in `chooseRepresentative`'s order, best first. The
+ * Seed Word test (`src/seedWord.ts`) walks it to find the best-ranked word
+ * that passes, so a day whose Seed Word fails goes to the word this ranking
+ * would have picked had the failing one not been there.
+ */
+export function rankSeedWords(words: string[], index: RhymeIndex, rhymeKey: RhymeKey): string[] {
+  const ranks = new Map(
+    words.map((word) => [
+      word,
+      {
+        unconfirmed: index.isUnconfirmedRhyme(word) ? 1 : 0,
+        derived: index.derivation.isDerived(word) ? 1 : 0,
+        secondary: carriesMainStress(index, word, rhymeKey) ? 0 : 1,
+        ambiguous: index.isAmbiguous(word) ? 1 : 0,
+        // Absent from the prevalence norms sorts last, not first.
+        knownness: index.tierOf(word).knownness ?? -Infinity,
+      },
+    ]),
+  );
   return [...words].sort((a, b) => {
-    const rankA = rank(a);
-    const rankB = rank(b);
+    const rankA = ranks.get(a)!;
+    const rankB = ranks.get(b)!;
     return (
       rankA.unconfirmed - rankB.unconfirmed ||
       rankA.derived - rankB.derived ||
+      rankA.secondary - rankB.secondary ||
       rankA.ambiguous - rankB.ambiguous ||
       rankB.knownness - rankA.knownness ||
       a.length - b.length ||
       a.localeCompare(b)
     );
-  })[0]!;
+  });
+}
+
+/**
+ * True if one of the word's readings on `rhymeKey` opens the key on the main
+ * stress: `cup` on `AH P`, and not `makeup`, whose `AH P` is its secondary
+ * stress. A reading on the key's Schwa Twin is on the key, as it is for Rhyme.
+ */
+export function carriesMainStress(index: RhymeIndex, word: string, rhymeKey: RhymeKey): boolean {
+  return index.readingsOf(word).some(({ pronunciation }) => {
+    if (matchingPronunciation(rhymeKey, [pronunciation]) === null) return false;
+    const opening = lastStressedIndex(pronunciation);
+    return opening !== null && stressOf(pronunciation[opening]!) === 1;
+  });
 }
 
 /**
@@ -229,6 +266,7 @@ export function curate(index: RhymeIndex, options: CurationOptions): CurationRep
     const representative = chooseRepresentative(
       members.map((member) => member.word),
       index,
+      rhymeKey,
     );
     const { answers, bonusWords } = splitFamily(rhymeFamily, representative);
 
