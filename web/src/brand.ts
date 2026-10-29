@@ -4,7 +4,7 @@
  * (#199).
  *
  * It is deliberately *not* the `rhyme-bee` slug, which names the package, the
- * repository, the R2 bucket, the deployed Worker and both `localStorage` keys.
+ * repository, the R2 bucket, the deployed Worker and every `localStorage` key.
  * The slug is an identifier and moving it would discard live players'
  * in-progress Sessions in exchange for a string no player ever sees; this is a
  * correction to the wordmark alone. The two do not track each other, and the

@@ -1,7 +1,8 @@
 # Deploying, and the daily refine loop
 
 The game is a static bundle plus a 15 MB Rhyme Index, served by one Cloudflare
-Worker that also answers the two reporting endpoints. Judging happens in the
+Worker that also answers the three reporting endpoints (an Appeal, a note, and
+a Session Record). Judging happens in the
 browser, so the deploy is a file upload with a routing table attached — see
 [ADR-0013](./adr/0013-adjudication-never-crosses-the-network.md).
 
@@ -9,7 +10,8 @@ browser, so the deploy is a file upload with a routing table attached — see
 |---|---|
 | Worker | `bramble-bee` |
 | Public URL | `https://bramble-bee.kenna-dev.workers.dev` |
-| R2 binding → bucket | `APPEAL_QUEUE` → `rhyme-bee-flags` |
+| R2 binding → bucket | `APPEAL_QUEUE` → `rhyme-bee-flags` (Appeals under `flags/`, Session Records under `sessions/`) |
+| Rate limiters | `APPEAL_LIMITER`, `FEEDBACK_LIMITER`, `SESSION_RECORD_LIMITER` |
 | Worker secret | `GITHUB_ISSUE_TOKEN` |
 | Config | `web/wrangler.jsonc`, committed |
 | CI workflow | `.github/workflows/deploy.yml` |
@@ -125,7 +127,8 @@ To see what would be uploaded without uploading it,
    first time someone files a note. Re-running overwrites, so recovery is doing
    it again properly.
 3. `credentials.env` at the repo root, holding the read-only R2 token for
-   `npm run appeals:pull`. Git-ignored, and it stays that way.
+   `npm run appeals:pull` and `npm run records:pull`. Git-ignored, and it stays
+   that way.
 
 ### The index sources
 
@@ -158,8 +161,10 @@ Worker's settings page showing nothing beforehand is expected, not a fault.
 - **Nothing is bound in the dashboard.** A binding that lives only there is
   clobbered by the next deploy from a config that does not declare it, so
   `web/wrangler.jsonc` is the only home for bindings. Add them there.
-- **No IP address is logged or stored**, although both write endpoints are now
-  rate limited by one. `CF-Connecting-IP` is read in `worker/http.ts`, handed to
+- **No IP address is logged or stored**, although all three write endpoints are
+  rate limited by one, the Session Record route included (#230): a Session
+  Record carries no IP, no player or browser identifier and no timestamp.
+  `CF-Connecting-IP` is read in `worker/http.ts`, handed to
   the limiter and dropped there. #114 Step 9 decided against any limit while the
   URL was unlisted and the tracker private; publishing the repository ended both
   premises, so the budgets exist now (#213) — one per endpoint, declared as
@@ -169,6 +174,25 @@ Worker's settings page showing nothing beforehand is expected, not a fault.
 - **No secret is in the repository.** `GITHUB_ISSUE_TOKEN` is set on the Worker
   and referenced by name. If a credential ever lands in git history, rotate it
   rather than rewriting history.
+
+### Session Records
+
+A production build sends each stored Daily Puzzle Session to
+`/api/session-record` on load and when the page is hidden
+([ADR-0019](./adr/0019-session-records-are-whole-and-unlinked.md), #230); a
+dev build sends nothing. The route writes `sessions/<date>/<id>.json` to the
+bucket above, overwriting as a Session grows. They are not part of the refine
+loop. Read them when you want them:
+
+```
+npm run records:pull     # into data/session-records/, git-ignored, never committed
+npm run records:replay   # Rank, Score and each rejection, against the current index
+```
+
+`SESSION_RECORD_LIMITER` does not exist until the first deploy after #230
+declares it, and that deploy is also what starts the history arriving: each
+playtester's browser sends every Daily Puzzle Session it has kept since
+2026-08-06 over its next few visits.
 
 ## What is in the deploy
 

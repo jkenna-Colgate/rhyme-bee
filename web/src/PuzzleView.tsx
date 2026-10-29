@@ -790,9 +790,10 @@ function Feedback({ result, seed }: { result: SubmissionResult; seed: SeedWord }
         <span className="feedback__badge">✗</span>
         <b className="feedback__word">{word}</b>
         <span className="feedback__note">{REJECTION_MESSAGE[verdict.reason]}</span>
-        {/* Ships in production (#119). Nothing observes what players submit
-            (ADR-0013), so a rejection the player disagrees with is only ever
-            known because they said so — this control is the sensor. */}
+        {/* Ships in production (#119). A Session Record carries every
+            Submission, rejected ones included (ADR-0019), but only as words:
+            whether the player thinks a rejection is wrong is known only because
+            they said so, and this control is the sensor for that. */}
         <ShouldCountButton
           word={word}
           seed={seed}

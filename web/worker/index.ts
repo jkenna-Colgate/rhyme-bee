@@ -15,10 +15,11 @@
  * handler of its own; the handlers do not know about each other.
  */
 
-import { FEEDBACK_PATH, APPEAL_PATH } from "../src/endpoints.ts";
+import { FEEDBACK_PATH, APPEAL_PATH, SESSION_RECORD_PATH } from "../src/endpoints.ts";
 import { SHARE_PATH_PREFIX, SHARE_PAGE_SUFFIX } from "../src/share/shareTargets.ts";
 import { handleFeedback } from "./feedbackRoute.ts";
 import { handleAppeal } from "./appealRoute.ts";
+import { handleSessionRecord } from "./sessionRecordRoute.ts";
 import type { Env } from "./env.ts";
 
 export default {
@@ -28,6 +29,7 @@ export default {
 
     if (pathname === APPEAL_PATH) return handleAppeal(request, env);
     if (pathname === FEEDBACK_PATH) return handleFeedback(request, env);
+    if (pathname === SESSION_RECORD_PATH) return handleSessionRecord(request, env);
 
     const response = await env.ASSETS.fetch(request);
 
