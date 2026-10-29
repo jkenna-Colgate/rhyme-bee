@@ -15,6 +15,7 @@
     "seeds:test": "tsx scripts/seed-word-test.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
+    "batch": "tsx scripts/batch.ts",
     "editor:read": "tsx scripts/editor.ts read",
     "editor:add": "tsx scripts/editor.ts add",
     "appeals:pull": "tsx scripts/pull-appeals.ts",
