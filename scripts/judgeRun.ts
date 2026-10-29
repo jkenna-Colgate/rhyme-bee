@@ -36,6 +36,9 @@ import { callModel, inParallel, root } from "./modelCall.ts";
 /** The pinned model the Judge was measured on. It moves only in the yearly sitting ADR-0021 describes. */
 export const JUDGE_MODEL = "claude-sonnet-5-5";
 
+/** The Synthetic Player's model is a setting, and starts at Sonnet (#227). */
+export const DEFAULT_PLAYER_MODEL = "claude-sonnet-5-5";
+
 export function loadIndex(): RhymeIndex {
   return loadRhymeIndex(indexArtifactPath(resolve(root, "dist-data")));
 }
@@ -153,7 +156,7 @@ export function rhymeCalls(items: readonly JudgeItem[]): number {
  */
 export async function runJudge(
   items: readonly JudgeItem[],
-  opts: { model: string; run: number; askEvery?: boolean; askWordhood: boolean },
+  opts: { model: string; run: number; askEvery?: boolean; askWordhood: boolean; label?: string },
 ): Promise<JudgeLeg> {
   const calls = { rhyme: 0, wordhood: 0, fromCache: 0 };
   const answeredBy = new Set<string>();
@@ -161,7 +164,7 @@ export async function runJudge(
   const rulings = new Map<JudgeItem, RhymeRuling>();
   const batches = rhymeBatches(sent);
   await inParallel(batches.map((batch) => async () => {
-    const reply = await callModel(opts.model, rhymePrompt(batch), opts.run);
+    const reply = await callModel(opts.model, rhymePrompt(batch), opts.run, opts.label);
     calls.rhyme++;
     if (reply.cached) calls.fromCache++;
     reply.answeredBy.forEach((m) => answeredBy.add(m));
@@ -180,7 +183,7 @@ export async function runJudge(
     const wordhood = new Map<string, WordhoodRuling>();
     const chunks = Array.from({ length: Math.ceil(words.length / WORDHOOD_BATCH) }, (_, i) => words.slice(i * WORDHOOD_BATCH, (i + 1) * WORDHOOD_BATCH));
     await inParallel(chunks.map((chunk) => async () => {
-      const reply = await callModel(opts.model, wordhoodPrompt(chunk), opts.run);
+      const reply = await callModel(opts.model, wordhoodPrompt(chunk), opts.run, opts.label);
       calls.wordhood++;
       if (reply.cached) calls.fromCache++;
       reply.answeredBy.forEach((m) => answeredBy.add(m));

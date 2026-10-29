@@ -10,21 +10,39 @@
  * verbatim from `prototype/223-synthetic-player`.
  */
 
+import { chooseRepresentative } from "./curation.ts";
+import type { RhymeIndex } from "./rhymeIndex.ts";
 import { applySubmission, emptyPlayState, rank, score, type PuzzleContext, type SubmissionResult } from "./session.ts";
 import type { RejectionReason, Verdict } from "./verdict.ts";
 
-export function playerPrompt(seedWord: string, respelling: string): string {
+/**
+ * The prompt. A Batch's player is also given one example rhyme (#252), which
+ * steadied runs that misheard their Seed Word and cost nothing measurable on the
+ * runs that did not.
+ */
+export function playerPrompt(seedWord: string, respelling: string, example?: string | null): string {
   return [
     `You are playing a daily word game called Rhyming Bee. You are an ordinary adult American player:`,
     `not a poet, no rhyming dictionary, no internet. The game shows you one word and reads it aloud:`,
     ``,
     `  "${seedWord}" (pronounced ${respelling})`,
+    ...(example ? [``, `It rhymes with "${example}", for example.`] : []),
     ``,
     `Type in as many real English words as you can that rhyme with it. Names don't count.`,
     `Play the way you really would: write every word you would come up with and type in during a relaxed`,
     `session of about fifteen minutes, and stop when you would run out of ideas.`,
     `Output only the words, one per line, lowercase, nothing else.`,
   ].join("\n");
+}
+
+/**
+ * The example rhyme: the Answer curation would pick to stand for the family
+ * (`chooseRepresentative`), other than the Seed Word. None when the Seed Word is
+ * the only Answer.
+ */
+export function exampleRhyme(context: PuzzleContext, index: RhymeIndex): string | null {
+  const others = context.puzzle.answers.map((a) => a.word).filter((w) => w !== context.seed.word);
+  return others.length ? chooseRepresentative(others, index) : null;
 }
 
 /** The words in a reply: one a line, lower-cased, list marks taken off, anything else dropped. */

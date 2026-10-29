@@ -8,7 +8,7 @@
 import { describe, expect, it } from "vitest";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 import { DEFAULT_SCORING_CONFIG, startSession } from "../session.ts";
-import { parsePlayerReply, playerPrompt, playWords } from "../syntheticPlayer.ts";
+import { exampleRhyme, parsePlayerReply, playerPrompt, playWords } from "../syntheticPlayer.ts";
 
 // Only `defenestrate` is rare at this cutoff, so the maximum Score is 54.
 const context = () => startSession(makeTestIndex(), "ate", { ...DEFAULT_SCORING_CONFIG, rareKnownnessCutoff: 1.55 });
@@ -20,6 +20,32 @@ describe("the player prompt", () => {
     expect(prompt).toContain('\n  "ate" (pronounced AYT)\n');
     expect(prompt).toContain("Names don't count.");
     expect(prompt.endsWith("Output only the words, one per line, lowercase, nothing else.")).toBe(true);
+    expect(prompt).not.toContain("It rhymes with");
+  });
+
+  it("gives a Batch's player one example rhyme after the respelling (#252)", () => {
+    const prompt = playerPrompt("ate", "AYT", "late");
+
+    expect(prompt).toContain('\n  "ate" (pronounced AYT)\n\nIt rhymes with "late", for example.\n\nType in');
+  });
+});
+
+describe("the example rhyme a Batch's player is given", () => {
+  it("is an Answer of the Puzzle, and never the Seed Word", () => {
+    const index = makeTestIndex();
+    for (const seed of ["ate", "late", "eight"]) {
+      const ctx = startSession(index, seed);
+      const example = exampleRhyme(ctx, index);
+      expect(example).not.toBe(seed);
+      expect(ctx.puzzle.answers.map((a) => a.word)).toContain(example);
+    }
+  });
+
+  it("is none when the Seed Word is its Puzzle's only Answer", () => {
+    const index = makeTestIndex();
+    const ctx = startSession(index, "hat");
+    expect(ctx.puzzle.answers.map((a) => a.word).filter((w) => w !== "hat")).toEqual([]);
+    expect(exampleRhyme(ctx, index)).toBeNull();
   });
 });
 

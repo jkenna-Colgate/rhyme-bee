@@ -42,10 +42,14 @@ export interface ModelReply {
   cached: boolean;
 }
 
-/** Call the model once, or read the call back from the cache. */
-export function callModel(model: string, prompt: string, run: number): Promise<ModelReply> {
+/**
+ * Call the model once, or read the call back from the cache. A `label` tells
+ * apart calls one run makes with the same prompt on purpose, as a Batch's looks
+ * at one Seed Word do: without it the second look would read back the first.
+ */
+export function callModel(model: string, prompt: string, run: number, label?: string): Promise<ModelReply> {
   mkdirSync(cacheDir, { recursive: true });
-  const path = resolve(cacheDir, `${model}.${createHash("sha1").update(prompt).digest("hex").slice(0, 16)}.run-${run}.json`);
+  const path = resolve(cacheDir, `${model}.${createHash("sha1").update(prompt).digest("hex").slice(0, 16)}.run-${run}${label ? `.${label}` : ""}.json`);
   if (existsSync(path)) {
     const hit = JSON.parse(readFileSync(path, "utf8"));
     return Promise.resolve({ text: hit.result, answeredBy: hit.answeredBy, costUsd: hit.costUsd, cached: true });
