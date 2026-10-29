@@ -43,7 +43,7 @@ import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import { parseDeclines, type Decline } from "../src/declines.ts";
-import type { Schedule } from "../src/schedule.ts";
+import { localCalendarDate, type Schedule } from "../src/schedule.ts";
 import { parseCandidates, type SupplementCandidate } from "../src/supplementCandidate.ts";
 import { standingTierOf } from "../src/tierOverride.ts";
 import { parseDemotions } from "../src/demotions.ts";
@@ -205,5 +205,9 @@ function queueContext(): CandidateQueueContext {
     moves: readTierOverrideText(movesPath),
     knownnessThreshold: builtKnownnessThreshold(),
   });
-  return { ...pinnedEvidenceContext(), isAnswer: (word) => tierOf(word) === "answer" };
+  return {
+    ...pinnedEvidenceContext(),
+    isAnswer: (word) => tierOf(word) === "answer",
+    today: localCalendarDate(),
+  };
 }

@@ -304,6 +304,25 @@ export function scheduledDayFor(schedule: Schedule, isoDate: string): ScheduleDa
 }
 
 /**
+ * The first date on or after `today` that plays a listed day: the inverse of
+ * `scheduledDayFor`. That is the listed date while it is still ahead, and once
+ * it has gone, the date the lap next brings the day round. Null for a day that
+ * will not play again: a spare in front of the lap, or a day of a Schedule that
+ * does not loop, once its date has gone.
+ */
+export function nextDateOf(
+  schedule: Schedule,
+  day: Pick<ScheduleDay, "date">,
+  today: string,
+): string | null {
+  if (day.date >= today) return day.date;
+  const { lapStart } = schedule;
+  if (lapStart === undefined || day.date < lapStart) return null;
+  const lap = loopDays(schedule.days, lapStart).length;
+  return addDays(day.date, Math.ceil(daysBetween(day.date, today) / lap) * lap);
+}
+
+/**
  * The Seed Word for a calendar date, pinned to the Rhyme Key the schedule
  * records — exactly as the free-play draw pins a Seed to its family's key, so an
  * ambiguous representative cannot misfire into the wrong Puzzle.

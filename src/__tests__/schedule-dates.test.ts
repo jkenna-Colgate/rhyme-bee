@@ -12,7 +12,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { localCalendarDate, parseSchedule, seedForDate } from "../schedule.ts";
+import { localCalendarDate, nextDateOf, parseSchedule, seedForDate } from "../schedule.ts";
 
 const artifact: unknown = JSON.parse(
   readFileSync(fileURLToPath(new URL("../../data/schedule.json", import.meta.url)), "utf8"),
@@ -137,6 +137,35 @@ describe("the Schedule loops: a date past the last listed day repeats a lap earl
     expect(parseSchedule({ startDate: "2026-08-03", lapStart: "2026-08-04", days: eight })).not.toBeNull();
     expect(parseSchedule({ startDate: "2026-08-03", lapStart: "2026-08-03", days: eight })).toBeNull();
     expect(parseSchedule({ startDate: "2026-08-03", lapStart: "2026-09-01", days: eight })).toBeNull();
+  });
+});
+
+describe("a listed day's next date on or after today (#257)", () => {
+  // What the Editor's Pass names for a Rhyme Key: once the first lap has gone,
+  // a listed date is in the past, and the day the editor can still act on is the
+  // next time the lap brings it round.
+  const schedule = parseSchedule(artifact)!;
+  const day = (seed: string) => schedule.days.find((d) => d.seed === seed)!;
+
+  it("is the listed date while that is still ahead, or is today", () => {
+    expect(nextDateOf(schedule, day("boulder"), "2026-08-01")).toBe("2026-08-04");
+    expect(nextDateOf(schedule, day("boulder"), "2026-08-04")).toBe("2026-08-04");
+  });
+
+  it("is a lap or more on once the listed date has gone", () => {
+    expect(nextDateOf(schedule, day("boulder"), "2026-08-05")).toBe("2027-04-20");
+    expect(nextDateOf(schedule, day("smile"), "2027-04-20")).toBe("2028-01-03");
+    expect(nextDateOf(schedule, day("boulder"), "2028-01-04")).toBe("2028-01-04");
+  });
+
+  it("is none for the spare before the lap once its date has gone", () => {
+    expect(nextDateOf(schedule, day("lopsided"), "2026-08-03")).toBe("2026-08-03");
+    expect(nextDateOf(schedule, day("lopsided"), "2026-08-04")).toBeNull();
+  });
+
+  it("is none for a past day of a Schedule that does not loop", () => {
+    const { lapStart: _, ...once } = schedule;
+    expect(nextDateOf(once, day("boulder"), "2026-08-05")).toBeNull();
   });
 });
 

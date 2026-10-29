@@ -243,14 +243,33 @@ describe("the days a correction is rechecked over", () => {
   ]);
 
   it("takes the days on the union of the keys, and no others", () => {
-    expect(daysOnKeys(schedule, ["EY T", "AE T"]).map((day) => day.date)).toEqual([
+    expect(daysOnKeys(schedule, ["EY T", "AE T"], "2026-08-31").map((day) => day.date)).toEqual([
       "2026-09-01",
       "2026-09-02",
     ]);
   });
 
   it("takes no day for a key the schedule never dealt", () => {
-    expect(daysOnKeys(schedule, ["UW L"])).toEqual([]);
+    expect(daysOnKeys(schedule, ["UW L"], "2026-08-31")).toEqual([]);
+  });
+
+  it("names each day by its next date on or after today, once the first lap has gone (#257)", () => {
+    const week = scheduleOf(
+      ["ate", "hat", "bed", "a", "b", "c", "d"].map((seed, i) => ({
+        date: `2026-09-0${i + 1}`,
+        seed,
+        rhymeKey: ["EY T", "AE T", "EH D"][i] ?? `K${i}`,
+      })),
+    );
+    const looping = { ...week, lapStart: "2026-09-01" };
+    expect(daysOnKeys(looping, ["EY T", "AE T"], "2026-09-02").map((day) => day.date)).toEqual([
+      "2026-09-08",
+      "2026-09-02",
+    ]);
+    // A Schedule that does not loop plays a past day never again.
+    expect(daysOnKeys(week, ["EY T", "AE T"], "2026-09-02").map((day) => day.date)).toEqual([
+      "2026-09-02",
+    ]);
   });
 });
 
@@ -342,6 +361,7 @@ describe("applyCorrection", () => {
     return {
       context: () => context({ pronunciations: [["gate", [["G", "EY1", "T"]]]], words: ["gate"] }),
       schedule: () => schedule,
+      today: () => "2026-08-31",
       openIndex: () => (rebuilt ? after : before),
       rebuild: async () => {
         rebuilt = true;
@@ -429,6 +449,7 @@ describe("applyCorrection", () => {
       {
         context: () => context({}),
         schedule: () => schedule,
+        today: () => "2026-08-31",
         openIndex: () => before,
         rebuild: async () => {
           rebuilt = true;
