@@ -8,7 +8,7 @@
 import { describe, expect, it } from "vitest";
 import { addDays, nextDateOf, parseSchedule, seedForDate, type Schedule, type ScheduleDay, type Weekday } from "../schedule.ts";
 import { growSchedule, placeWeeks, weekAfter } from "../scheduleGrowth.ts";
-import type { BatchRecord } from "../batch.ts";
+import type { BatchEntry, BatchRecord } from "../batch.ts";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 
 const WEEKDAYS: Weekday[] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -162,8 +162,16 @@ const grownIndex = makeTestIndex({
   prevalence: FAMILIES.flatMap(([, words]) => words.map((w) => [w, 2.5] as [string, number])),
 });
 
-function batch(rhymeKey: string, trust: "pass" | "fail" | "untested" = "pass", date = "2026-10-20") {
-  return { date, rhymeKey, trust, failuresPerLook: [2, 0], gate: { k: 1, n: 3 }, playerModel: "p", judgeModel: "j", report: "r" };
+function batch(
+  rhymeKey: string,
+  trust: "pass" | "fail" | "untested" = "pass",
+  date = "2026-10-20",
+  noFalseAccepts: "pass" | "fail" | null = "pass",
+): BatchEntry {
+  return {
+    date, rhymeKey, trust, failuresPerLook: [2, 0], gate: { k: 1, n: 3 }, playerModel: "p", judgeModel: "j", report: "r",
+    ...(noFalseAccepts ? { noFalseAccepts: { result: noFalseAccepts, hunted: 1, listed: 0, unruled: [], stillScored: [] } } : {}),
+  };
 }
 
 /** Every family's lead word, passed on its key. */
@@ -221,8 +229,31 @@ describe("a Seed Word refused", () => {
     record.seeds.ten = [batch("EH N", "pass", "2026-10-01"), batch("EH N", "fail", "2026-10-20")];
     const growth = grow(record, ["ten"]);
     expect(growth.refused).toEqual([
-      { seed: "ten", named: true, reasons: ["ten's last Batch (2026-10-20, on EH N) was fail, not a pass."] },
+      { seed: "ten", named: true, reasons: ["ten's last Batch (2026-10-20, on EH N) was fail on Trust, not a pass."] },
     ]);
+  });
+
+  it("whose last Batch passed Trust and not No False Accepts, or has no No False Accepts result", () => {
+    const record = passedAll();
+    record.seeds.ten = [batch("EH N", "pass", "2026-10-20", "fail")];
+    record.seeds.ring = [batch("IH NG", "pass", "2026-10-20", null)];
+    const growth = grow(record, ["ten", "ring"]);
+    expect(growth.refused).toEqual([
+      { seed: "ten", named: true, reasons: ["ten's last Batch (2026-10-20, on EH N) was fail on No False Accepts, not a pass."] },
+      {
+        seed: "ring",
+        named: true,
+        reasons: ["ring's last Batch (2026-10-20, on IH NG) has no No False Accepts result, so it has not been checked for false accepts."],
+      },
+    ]);
+  });
+
+  it("waiting in the record with a Batch that passed Trust only, so it is passed over and said", () => {
+    const record = passedAll();
+    record.seeds.ring = [batch("IH NG", "pass", "2026-10-20", null)];
+    const growth = grow(record, []);
+    expect(growth.refused).toEqual([expect.objectContaining({ seed: "ring", named: false })]);
+    expect([...growth.added.map((d) => d.seed), ...growth.spares]).not.toContain("ring");
   });
 
   it("failing the Seed Word test, with the test's own sentence", () => {

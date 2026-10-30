@@ -31,6 +31,7 @@ import {
   dealSchedule,
   scheduledDayFor,
   weekdayOf,
+  WEEKDAYS,
   type Schedule,
   type ScheduleDay,
   type SizeBand,
@@ -43,7 +44,7 @@ import { seedWordTestLine, testSeedWord } from "./seedWord.ts";
  * the one that Monday begins.
  */
 export function weekAfter(today: string): string {
-  const intoWeek = (["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const).indexOf(weekdayOf(today));
+  const intoWeek = WEEKDAYS.indexOf(weekdayOf(today));
   return addDays(today, DAYS_PER_WEEK - intoWeek);
 }
 
@@ -132,8 +133,10 @@ interface Admitted {
 /**
  * Grow the Schedule from the Seed Words that may join it: those `named`, and
  * every Seed Word the Batch record says passed and that holds no place, which
- * is where the spares of an earlier growth wait. Each must have passed its last
- * Batch, and is dealt on the Rhyme Key that Batch played; it must pin there,
+ * is where the spares of an earlier growth wait. Its last Batch must have
+ * passed both Trust and No False Accepts (a Batch with no No False Accepts
+ * result has not checked the word for false accepts, and is refused with that
+ * reason), and it is dealt on the Rhyme Key that Batch played; it must pin there,
  * pass the Seed Word test, land in the size band, and hold no place another day
  * holds (no Seed Word, Rhyme Key or Puzzle twice). Those that may join are
  * dealt among themselves into whole weeks by the banded deal, and placed after
@@ -154,6 +157,9 @@ export function growSchedule(
 
   // Named first, in the order named; then the spares waiting in the record, by word.
   const asked = [...new Set(named.map(normaliseWord))];
+  // A word waiting whose last Batch passed Trust is considered, and refused
+  // with its reason if No False Accepts did not pass too, so a Batch whose
+  // hunt never ran is said rather than silently passed over.
   const waiting = Object.keys(record.seeds)
     .filter((seed) => !asked.includes(seed) && !holding.has(seed) && batchesOf(record, seed).at(-1)?.trust === "pass")
     .sort();
@@ -204,9 +210,15 @@ function checkOwn(
 ): { reasons: string[] } | { rhymeKey: RhymeKey; answerCount: number; difficulty: number } {
   const last = batchesOf(record, seed).at(-1);
   if (last === undefined) return { reasons: [`${seed} has been through no Batch, so it has not been checked.`] };
-  if (last.trust !== "pass") {
-    return { reasons: [`${seed}'s last Batch (${last.date}, on ${last.rhymeKey}) was ${last.trust}, not a pass.`] };
+  const batch = `${seed}'s last Batch (${last.date}, on ${last.rhymeKey})`;
+  const unchecked: string[] = [];
+  if (last.trust !== "pass") unchecked.push(`${batch} was ${last.trust} on Trust, not a pass.`);
+  if (last.noFalseAccepts === undefined) {
+    unchecked.push(`${batch} has no No False Accepts result, so it has not been checked for false accepts.`);
+  } else if (last.noFalseAccepts.result !== "pass") {
+    unchecked.push(`${batch} was ${last.noFalseAccepts.result} on No False Accepts, not a pass.`);
   }
+  if (unchecked.length > 0) return { reasons: unchecked };
   const { rhymeKey } = last;
   let answers;
   try {
