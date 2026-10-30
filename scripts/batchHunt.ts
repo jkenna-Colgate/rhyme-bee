@@ -19,6 +19,7 @@ import {
   huntAnswers,
   noFalseAcceptsResult,
   parseDecision,
+  rulingPrompt,
   type Decision,
   type HuntedAnswer,
   type HuntRuling,
@@ -162,13 +163,12 @@ export async function settleRulingList(
       console.error(`  sent for: ${item.answer.reasons.join(", ")}`);
       for (const r of index.readingsOf(word)) console.error(`  the game reads: ${r.pronunciation.join(" ")}`);
       for (const ipa of ctx.extract.get(word) ?? []) console.error(`  Wiktionary: ${ipa}`);
-      offered.forEach((r, n) => console.error(`    ${n + 1}. ${r.join(" ")}`));
-      console.error("  c <n> or c <ARPAbet>: correct the reading (replaces the game's)   d / d word: demote as a name / not a word   l: leave it scored   s: skip");
+      for (const line of rulingPrompt(offered)) console.error(`  ${line}`);
       let decision: Decision = { kind: "unruled" };
       while (asking) {
-        const got = parseDecision(await asking.question("  > "), offered);
+        const got = parseDecision(await asking.question("  your ruling > "), offered);
         if (got) { decision = got; break; }
-        console.error("  That does not read. c <n>, c <ARPAbet>, d, d word, l or s.");
+        console.error(`  That does not read. Type ${offered.length ? "c <n>, " : ""}c <ARPAbet>, d, d word, l or s, then Enter.`);
       }
       let wrote: string | null = null;
       if (decision.kind === "correction") {
