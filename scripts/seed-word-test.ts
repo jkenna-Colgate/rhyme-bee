@@ -1,41 +1,32 @@
 /**
- * Run the Seed Word test over every place in the Schedule (#264).
+ * Run the Seed Word test over every place in the Schedule (#264), and repair
+ * the days whose Seed Word fails it.
  *
- *   npm run seeds:test            # say what would change
- *   npm run seeds:test -- --write # and write it to data/schedule.json
+ *   npm run seeds:test                       # say what would change
+ *   npm run seeds:test -- --write            # and write the repairs to data/schedule.json
+ *   npm run seeds:test -- --re-rank [--write]  # also re-rank passing days, as #264 did once
  *
  * Read off the built Rhyme Index, so run `npm run build:index` first. The test
- * is not run at every build (ADR-0012, amended 2026-10-14): it is run once over
- * the Schedule, and again after a reading lands on a scheduled Seed Word, which
- * the Editor's Pass says when it happens. The run is `runSeedWordTest`
- * (`src/seedWordRun.ts`); this file only reads, prints and writes.
+ * is not run at every build (ADR-0012, amended 2026-10-14): it was run once over
+ * the Schedule, and is run again after a reading lands on a scheduled Seed
+ * Word, which the Editor's Pass says when it happens. A run repairs a failing
+ * day and never moves one that passes. The ranking ran once, in #264, and some
+ * of its picks were then corrected by hand, so `--re-rank`, which would undo
+ * them, has to be named. The run is `runSeedWordTest` (`src/seedWordRun.ts`);
+ * this file only reads, prints and writes.
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { parseSchedule } from "../src/schedule.ts";
-import { deserialise, type SerialisedIndex } from "../src/serialise.ts";
 import { runSeedWordTest } from "../src/seedWordRun.ts";
-import { indexArtifactPath } from "./indexArtifact.ts";
+import { loadIndex, readScheduleFile, writeScheduleFile } from "./judgeRun.ts";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const write = process.argv.includes("--write");
-const schedulePath = resolve(root, "data", "schedule.json");
-const raw = JSON.parse(readFileSync(schedulePath, "utf8")) as Record<string, unknown>;
-const schedule = parseSchedule(raw);
-if (schedule === null) {
-  console.error(`${schedulePath} is not a readable schedule.`);
-  process.exit(1);
-}
-const index = deserialise(
-  JSON.parse(readFileSync(indexArtifactPath(resolve(root, "dist-data")), "utf8")) as SerialisedIndex,
-);
+const reRank = process.argv.includes("--re-rank");
+const { raw, schedule } = readScheduleFile();
 
-const run = runSeedWordTest(schedule.days, index);
+const run = runSeedWordTest(schedule.days, loadIndex(), { reRank });
 console.log(
   `Seed Word test: ${schedule.days.length} scheduled days, ${run.changes.length} Seed Word(s) changed, ` +
-    `${run.freePlay.length} Free Play.`,
+    `${run.freePlay.length} Free Play${reRank ? " (re-ranking passing days too)" : ""}.`,
 );
 for (const { date, why, before, after } of run.changes) {
   console.log(
@@ -48,8 +39,7 @@ for (const { date, seed, rhymeKey, detail } of run.freePlay) {
 }
 
 if (write && run.changes.length > 0) {
-  writeFileSync(schedulePath, `${JSON.stringify({ ...raw, days: run.days }, null, 2)}\n`);
-  console.log(`Wrote ${schedulePath}.`);
+  console.log(`Wrote ${writeScheduleFile(raw, { days: run.days })}.`);
 } else if (run.changes.length > 0) {
   console.log("Nothing written. Pass --write to write these to data/schedule.json.");
 }
