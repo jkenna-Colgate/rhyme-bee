@@ -88,7 +88,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Schedule } from "../src/schedule.ts";
-import { checkScheduledSeedWords, daysSeededBy } from "../src/seedWord.ts";
+import { seedWordChecksAfterWrite } from "../src/seedWord.ts";
 import { readScheduledDay } from "../scripts/editorDay.ts";
 import { add, targetIn } from "../scripts/editorAdd.ts";
 import { indexStaleness, type IndexStaleness } from "../scripts/indexArtifact.ts";
@@ -267,9 +267,9 @@ export function editorAddHandler(deps: EditorAddDeps) {
 /**
  * The Seed Word test on every scheduled day whose Seed Word was just given a
  * reading (#264), off the artifact the rebuild wrote. The schedule is read
- * first, so a batch that wrote no Seed Word opens no index. Null when one was
- * written and the test could not run, for the reason `readDay` answers null:
- * the readings are on disk whatever happens here.
+ * first, so a submission that wrote no Seed Word opens no index. Null when one
+ * was written and the test could not run, for the reason `readDay` answers
+ * null: the readings are on disk whatever happens here.
  */
 function testSeedWords(
   deps: EditorAddDeps,
@@ -279,9 +279,7 @@ function testSeedWords(
   const written = (outcome?.words ?? []).filter((w) => w.outcome === "written").map((w) => w.word);
   if (written.length === 0) return [];
   try {
-    const days = deps.schedule().days;
-    if (daysSeededBy(days, written).length === 0) return [];
-    return rebuilt ? checkScheduledSeedWords(days, deps.openIndex(), written) : null;
+    return seedWordChecksAfterWrite(deps.schedule().days, written, rebuilt, deps.openIndex);
   } catch {
     return null;
   }

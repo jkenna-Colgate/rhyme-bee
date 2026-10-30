@@ -441,7 +441,7 @@ describe("a reading written to a scheduled Seed Word", () => {
     ]);
   });
 
-  it("runs nothing for a batch that wrote no Seed Word", async () => {
+  it("runs nothing for a submission that wrote no Seed Word", async () => {
     const { handler, acts } = endpoint();
     const result = JSON.parse((await call(handler, submit(batch))).body) as AddSubmitResult;
 
