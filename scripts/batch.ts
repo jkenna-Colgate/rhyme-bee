@@ -3,13 +3,20 @@
  * checks a block of Seed Words for Trust before their dates. It is run by a
  * person and never by a scheduled job.
  *
- *   npx tsx scripts/batch.ts --from <date> --to <date> [--model <id>] [--k N] [--n N]
- *                            [--off-key-ratio R] [--max-judge-calls N] [--yes]
+ *   npx tsx scripts/batch.ts --from <date> --to <date> [settings] [--yes]
+ *   npx tsx scripts/batch.ts --seeds <word>[=<Rhyme Key>] ... [settings] [--yes]
+ *
+ *   settings: [--model <id>] [--k N] [--n N] [--off-key-ratio R] [--max-judge-calls N]
  *
  * The Seed Words are those the Schedule plays from `--from` to `--to`, in date
- * order with the ones already played last (`batchBlock`). About 30 make a
- * sitting. Without `--yes` the command states the calls it will make and stops
- * there: every call is on the maintainer's subscription.
+ * order with the ones already played last (`batchBlock`), or those named after
+ * `--seeds`, which need hold no place: that is how a word gets the Batch that
+ * growing the Schedule asks of it (#271). A named word is played on the Rhyme
+ * Key given after `=` (`--seeds "tear=IH R"`), or else on its only key, or the
+ * one whose family holds the most Answers (`namedBlock`). About 30 make a
+ * sitting. Without `--yes` the command states the calls it will make on each
+ * model, which is the run's cost, and stops there: every call is on the
+ * maintainer's subscription. A run on an Opus model is refused without it.
  *
  * Each **look** is one Synthetic Player run per Seed Word, on `--model` (an
  * exact id, Sonnet by default), shown the respelling and one example rhyme. A
@@ -23,8 +30,9 @@
  * without one. A day that fails ships anyway.
  *
  * Then the **No False Accepts** half (#268, `scripts/batchHunt.ts`): every scored
- * Answer whose Wiktionary readings (`data/wiktionary.tsv`, fetched with the other
- * sources) all miss the Seed Word's Rhyme Key, or that the names data holds, is
+ * Answer whose Wiktionary readings (`data/wiktionary.tsv`, fetched by name with
+ * `npm run sources:fetch -- wiktionary.tsv`, and checked before anything is
+ * called) all miss the Seed Word's Rhyme Key, or that the names data holds, is
  * put to the Judge, rhyme and wordhood apart. Nothing it rules lands by itself:
  * a high-confidence ruling that an Answer is no Rhyme, a name or not a word goes
  * on a ruling list, and the maintainer rules on each in the sitting (a
@@ -35,15 +43,16 @@
  * to `data/batches.json`, both to be committed with what landed.
  */
 
-import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import {
   batchBlock,
+  batchCost,
   DEFAULT_OFF_KEY_RATIO,
   DEFAULT_TRUST_GATE,
   keyCount,
   lookAttempt,
+  namedBlock,
   parseBatchRecord,
   recordBatches,
   serialiseBatchRecord,
@@ -58,16 +67,19 @@ import {
 } from "../src/batch.ts";
 import { parseDeclines } from "../src/declines.ts";
 import { judgeQuestion, readingReachesKey } from "../src/judge.ts";
-import { planJudging, rulingKey, type JudgeRulingRecord, type Landings } from "../src/judgeLanding.ts";
-import { parseSchedule } from "../src/schedule.ts";
-import { startSession, type PuzzleContext, type ScoringConfig } from "../src/session.ts";
+import { planJudging, rulingKey, type JudgeRulingRecord } from "../src/judgeLanding.ts";
+import type { PuzzleContext } from "../src/session.ts";
 import { exampleRhyme, parsePlayerReply, playerPrompt, playWords, type SyntheticPlay } from "../src/syntheticPlayer.ts";
 import {
+  addCalls,
+  addWrites,
   DEFAULT_PLAYER_MODEL,
   JUDGE_MODEL,
   landJudgeLeg,
   loadIndex,
+  noWrites,
   readRulings,
+  readScheduleFile,
   reportRuling,
   rhymeCalls,
   runJudge,
@@ -76,7 +88,19 @@ import {
   type JudgeItem,
 } from "./judgeRun.ts";
 import { rulingList, type NoFalseAcceptsResult } from "../src/noFalseAccepts.ts";
-import { huntCalls, huntResults, judgeHunt, loadWiktionary, planHunt, rebuild, settleRulingList, type HuntDay, type HuntLeg, type Settled } from "./batchHunt.ts";
+import {
+  huntCalls,
+  huntResults,
+  judgeHunt,
+  loadWiktionary,
+  planHunt,
+  rebuild,
+  sessionOn,
+  settleRulingList,
+  type HuntDay,
+  type HuntLeg,
+  type Settled,
+} from "./batchHunt.ts";
 import { callModel, exactModelId, inParallel, nextRun, root, today, writeRunReport, type ModelReply } from "./modelCall.ts";
 
 // ---- the settings --------------------------------------------------------------
@@ -95,8 +119,21 @@ const number = (name: string, fallback: number) => {
 };
 const from = flag("from");
 const to = flag("to");
-if (!from || !to) {
-  console.error("usage: batch --from <date> --to <date> [--model <id>] [--k N] [--n N] [--off-key-ratio R] [--max-judge-calls N] [--yes]");
+const seedsAt = argv.indexOf("--seeds");
+const named: string[] = [];
+if (seedsAt >= 0) {
+  for (const a of argv.slice(seedsAt + 1)) {
+    if (a.startsWith("--")) break;
+    named.push(a);
+  }
+}
+const byRange = from !== undefined || to !== undefined;
+if (byRange ? !from || !to || seedsAt >= 0 : named.length === 0) {
+  console.error(
+    "usage: batch --from <date> --to <date> [settings] [--yes]\n" +
+    "       batch --seeds <word>[=<Rhyme Key>] ... [settings] [--yes]\n" +
+    "settings: [--model <id>] [--k N] [--n N] [--off-key-ratio R] [--max-judge-calls N]",
+  );
   process.exit(2);
 }
 const playerModel = exactModelId(flag("model") ?? DEFAULT_PLAYER_MODEL);
@@ -106,23 +143,32 @@ const maxJudgeCalls = number("max-judge-calls", 30);
 const confirmed = argv.includes("--yes");
 trustVerdict([0], gate); // refuses an n that leaves no look after a fix, before anything is called
 
-const SCHEDULE = resolve(root, "data/schedule.json");
 const BATCHES = resolve(root, "data/batches.json");
 const DECLINES = resolve(root, "data/declines.txt");
 
 const date = today();
-const scheduleRaw = JSON.parse(readFileSync(SCHEDULE, "utf8")) as { scoring: ScoringConfig };
-const schedule = parseSchedule(scheduleRaw);
-if (!schedule) throw new Error("data/schedule.json does not read as a Schedule");
-const block = batchBlock(schedule, from, to, date);
-const wiktionary = loadWiktionary();
+const { raw: scheduleRaw, schedule } = readScheduleFile();
 let index = loadIndex();
+let block: BatchSeed[];
+try {
+  block = from && to ? batchBlock(schedule, from, to, date) : namedBlock(named, index);
+} catch (e) {
+  console.error(`Batch refused, and nothing was called: ${(e as Error).message}`);
+  process.exit(1);
+}
+const what = from && to ? `${from} to ${to}` : `of ${block.length} named Seed Word(s)`;
+const loaded = loadWiktionary();
+if ("refused" in loaded) {
+  console.error(`Batch ${what}: ${loaded.refused}`);
+  process.exit(1);
+}
+const wiktionary = loaded;
 const huntPlan = huntCalls(planHunt(index, block, scheduleRaw.scoring, wiktionary));
 
 // ---- the plan ------------------------------------------------------------------
 
-console.error(`Batch ${from} to ${to}: ${block.length} Seed Words, ${block.filter((s) => s.played).length} already played and put last`);
-for (const s of block) console.error(`  ${s.date} ${s.seedWord} /${s.rhymeKey}/${s.played ? " (played)" : ""}`);
+console.error(`Batch ${what}: ${block.length} Seed Words, ${block.filter((s) => s.played).length} already played and put last`);
+for (const s of block) console.error(`  ${s.date ?? "(no place)"} ${s.seedWord} /${s.rhymeKey}/${s.played ? " (played)" : ""}`);
 console.error(
   `Calls, all on the maintainer's subscription:\n` +
   `  Synthetic Player (${playerModel}): ${block.length * 2} to ${block.length * gate.n} looks (${gate.n} at most each), plus one re-run per off-key look\n` +
@@ -132,16 +178,26 @@ console.error(
   `  No False Accepts hunt, Judge (${JUDGE_MODEL}): ${huntPlan.sent} scored Answers sent on today's index, ` +
   `${huntPlan.rhyme} rhyme calls and ${huntPlan.wordhood} wordhood calls (recounted after the looks land)`,
 );
-if (/opus/.test(playerModel)) console.error(`  ${playerModel} is an Opus model: state its cost and get a yes before running (#267).`);
+const cost = batchCost({ seeds: block.length, gate, maxJudgeCalls, hunt: huntPlan }, { player: playerModel, judge: JUDGE_MODEL });
+console.error("The cost, in calls:");
+for (const c of cost) console.error(`  ${c.fewest} to ${c.most} calls on ${c.model}${c.opus ? " (an Opus model)" : ""}`);
 if (block.length > 30) console.error(`  ${block.length} Seed Words is more than a sitting of about 30.`);
 if (!confirmed) {
+  const opus = cost.filter((c) => c.opus);
+  if (opus.length > 0) {
+    console.error(
+      `Refusing: ${opus.map((c) => `${c.fewest} to ${c.most} calls on ${c.model}`).join(" and ")} is an Opus run, ` +
+      "which needs the maintainer's yes to that cost (#267). Nothing was called. Run again with --yes once they have agreed.",
+    );
+    process.exit(1);
+  }
   console.error("Nothing was called. Run again with --yes once the maintainer has agreed to the calls.");
   process.exit(0);
 }
 
 // ---- the sitting ---------------------------------------------------------------
 
-const stem = `batch.${from}..${to}.${playerModel}`;
+const stem = from && to ? `batch.${from}..${to}.${playerModel}` : `batch.seeds.${block.map((s) => s.seedWord).join("-").slice(0, 60)}.${playerModel}`;
 const run = nextRun(stem);
 
 interface RunOfLook {
@@ -171,24 +227,26 @@ const days: Day[] = block.map((seed) => ({ seed, rhymeKey: seed.rhymeKey, looks:
 const calls = { player: 0, rhyme: 0, wordhood: 0, fromCache: 0 };
 const answeredBy = new Set<string>();
 const allRulings: (ReturnType<typeof reportRuling> & { look: number; landed: string | null })[] = [];
-const writes: { readings: { word: string; reading: string }[]; unconfirmedRhymes: Landings["unconfirmedRhymes"]; suggestedDemotions: { word: string; rhymeKey: string; reason: string }[] } = {
-  readings: [], unconfirmedRhymes: [], suggestedDemotions: [],
-};
+const writes = noWrites();
 const note = (r: ModelReply) => {
   calls.player++;
   if (r.cached) calls.fromCache++;
   r.answeredBy.forEach((m) => answeredBy.add(m));
 };
+/** Count a Judge leg's calls and answering models into the run's. */
+const noteLeg = (leg: { calls: Parameters<typeof addCalls>[1]; answeredBy: string[] }) => {
+  addCalls(calls, leg.calls);
+  leg.answeredBy.forEach((m) => answeredBy.add(m));
+};
 
 function contextOf(day: Day): PuzzleContext | null {
-  try {
-    const ctx = startSession(index, index.pinSeed(day.seed.seedWord, day.seed.rhymeKey), scheduleRaw.scoring);
-    day.rhymeKey = ctx.seed.rhymeKey;
-    return ctx;
-  } catch (e) {
-    day.notChecked = `does not pin to its Rhyme Key: ${(e as Error).message}`;
+  const ctx = sessionOn(index, day.seed.seedWord, day.seed.rhymeKey, scheduleRaw.scoring);
+  if ("failed" in ctx) {
+    day.notChecked = `does not pin to its Rhyme Key: ${ctx.failed}`;
     return null;
   }
+  day.rhymeKey = ctx.seed.rhymeKey;
+  return ctx;
 }
 
 let stopped: string | null = null;
@@ -246,14 +304,9 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
     break;
   }
   const leg = await runJudge(send, { model: JUDGE_MODEL, run, askWordhood: true, label: `look-${lookNo}` });
-  calls.rhyme += leg.calls.rhyme;
-  calls.wordhood += leg.calls.wordhood;
-  calls.fromCache += leg.calls.fromCache;
-  leg.answeredBy.forEach((m) => answeredBy.add(m));
+  noteLeg(leg);
   const landings = landJudgeLeg(leg, { model: JUDGE_MODEL, date });
-  writes.readings.push(...landings.readings.map((r) => ({ word: r.word, reading: r.phonemes.join(" ") })));
-  writes.unconfirmedRhymes.push(...landings.unconfirmedRhymes);
-  writes.suggestedDemotions.push(...landings.records.filter((r) => r.landed === "suggested-demotion").map((r) => ({ word: r.word, rhymeKey: r.rhymeKey, reason: r.wordhood!.verdict })));
+  addWrites(writes, landings);
   const recorded = new Map<string, JudgeRulingRecord>(landings.records.map((r) => [rulingKey(r.word, r.rhymeKey), r]));
   for (const { record } of ruledBefore) recorded.set(rulingKey(record.word, record.rhymeKey), record);
   const freshClassification = new Map<string, JudgedItem>(leg.items.map((j) => [rulingKey(j.word, j.rhymeKey), j]));
@@ -279,8 +332,8 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
   // Rebuild with what landed, so the next look plays on it.
   if (landings.readings.length || landings.unconfirmedRhymes.length) {
     console.error("rebuilding the index with what landed");
-    const built = spawnSync("npx", ["tsx", "scripts/build-index.ts"], { cwd: root, shell: true, encoding: "utf8" });
-    if (built.status !== 0) throw new Error(`the index build failed:\n${built.stderr}`);
+    const built = rebuild();
+    if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
     index = loadIndex();
   }
 }
@@ -295,10 +348,7 @@ if (!stopped) {
   const planned = huntCalls(huntDays);
   console.error(`\nNo False Accepts: ${planned.sent} scored Answers to the Judge, ${planned.rhyme} rhyme and ${planned.wordhood} wordhood calls`);
   const leg = await judgeHunt(huntDays, { model: JUDGE_MODEL, run });
-  calls.rhyme += leg.calls.rhyme;
-  calls.wordhood += leg.calls.wordhood;
-  calls.fromCache += leg.calls.fromCache;
-  leg.answeredBy.forEach((m) => answeredBy.add(m));
+  noteLeg(leg);
   const settled = await settleRulingList(rulingList(leg.rulings), { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
   if (settled.some((s) => s.decision.kind === "demotion")) {
     console.error("rebuilding the index with the Demotions");

@@ -14,16 +14,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
-import {
-  parseRhymeReply,
-  parseWordhoodReply,
-  rhymeBatches,
-  rhymePrompt,
-  WORDHOOD_BATCH,
-  wordhoodPrompt,
-  type RhymeRuling,
-  type WordhoodRuling,
-} from "../src/judge.ts";
+import { rhymeBatches, WORDHOOD_BATCH, type RhymeRuling } from "../src/judge.ts";
 import {
   huntAnswers,
   noFalseAcceptsResult,
@@ -37,35 +28,51 @@ import {
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Schedule } from "../src/schedule.ts";
-import { startSession, type ScoringConfig } from "../src/session.ts";
+import { seedWordCheckLines } from "../src/seedWord.ts";
+import { startSession, type PuzzleContext, type ScoringConfig } from "../src/session.ts";
 import { ipaReadings, parseWiktionaryExtract, wiktionaryReadings, type WiktionaryExtract } from "../src/wiktionary.ts";
 import { appendDemotion } from "../web/demotionFile.ts";
 import { pinnedEvidenceContext } from "./editorAdd.ts";
 import { applyCorrection } from "./editorCorrection.ts";
-import { callModel, inParallel, root } from "./modelCall.ts";
+import { askBoth, type JudgeCalls } from "./judgeRun.ts";
+import { root } from "./modelCall.ts";
 import { checkLocalSources, WIKTIONARY_SOURCE } from "./sourceMirror.ts";
 
 const dataDir = resolve(root, "data");
 
-/** The pinned extract, refused unless it is the one `data/sources.sha256` pins. */
-export function loadWiktionary(): WiktionaryExtract {
+/**
+ * The pinned extract, or why there is none: missing, or not the one
+ * `data/sources.sha256` pins. A Batch stops on the reason before it calls
+ * anything. CI never fetches the extract, so a clone that has only run
+ * `npm run sources:fetch` lacks it until it is asked for by name.
+ */
+export function loadWiktionary(): WiktionaryExtract | { refused: string } {
   const faults = checkLocalSources(dataDir, [WIKTIONARY_SOURCE]);
   const problem = faults[0]?.problem;
   if (problem) {
     const why = { missing: "is missing", mismatch: "does not match its committed checksum", unpinned: "has no line in data/sources.sha256" }[problem];
     const fix = problem === "unpinned"
       ? `Build it with scripts/extract-wiktionary.ts and pin it:\n  npm run sources:upload -- ${WIKTIONARY_SOURCE}`
-      : "Bring the pinned one from the mirror:\n  npm run sources:fetch";
-    throw new Error(`data/${WIKTIONARY_SOURCE} ${why}, so the No False Accepts hunt has no Wiktionary readings to compare. Nothing was called.\n${fix}`);
+      : `Bring the pinned one from the mirror (the plain fetch leaves it out):\n  npm run sources:fetch -- ${WIKTIONARY_SOURCE}`;
+    return { refused: `data/${WIKTIONARY_SOURCE} ${why}, so the No False Accepts hunt has no Wiktionary readings to compare. Nothing was called.\n${fix}` };
   }
   return parseWiktionaryExtract(readFileSync(resolve(dataDir, WIKTIONARY_SOURCE), "utf8"));
+}
+
+/** The Session a Seed Word starts on its Rhyme Key, or what the index said when it would not pin. */
+export function sessionOn(index: RhymeIndex, seedWord: string, rhymeKey: RhymeKey, scoring: ScoringConfig): PuzzleContext | { failed: string } {
+  try {
+    return startSession(index, index.pinSeed(seedWord, rhymeKey), scoring);
+  } catch (e) {
+    return { failed: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 /** One Seed Word's hunt: its scored Answers and the ones sent to the Judge. */
 export interface HuntDay {
   seedWord: string;
   rhymeKey: RhymeKey;
-  date: string;
+  date: string | null;
   answers: number;
   hunted: HuntedAnswer[];
 }
@@ -73,18 +80,15 @@ export interface HuntDay {
 /** The hunt over the Seed Words that pin, on the index as it stands. Calls nothing. */
 export function planHunt(
   index: RhymeIndex,
-  seeds: readonly { seedWord: string; rhymeKey: RhymeKey; date: string }[],
+  seeds: readonly { seedWord: string; rhymeKey: RhymeKey; date: string | null }[],
   scoring: ScoringConfig,
   extract: WiktionaryExtract,
 ): HuntDay[] {
   const facts = { wiktionaryReadings: (w: string) => wiktionaryReadings(extract, w), isName: (w: string) => index.isName(w) };
   return seeds.flatMap((s) => {
-    let answers: string[];
-    try {
-      answers = [...startSession(index, index.pinSeed(s.seedWord, s.rhymeKey), scoring).answerScores.keys()];
-    } catch {
-      return [];
-    }
+    const session = sessionOn(index, s.seedWord, s.rhymeKey, scoring);
+    if ("failed" in session) return [];
+    const answers = [...session.answerScores.keys()];
     return [{ ...s, answers: answers.length, hunted: huntAnswers(answers, s.rhymeKey, facts) }];
   });
 }
@@ -98,7 +102,7 @@ export function huntCalls(days: readonly HuntDay[]): { sent: number; rhyme: numb
 
 export interface HuntLeg {
   rulings: HuntRuling[];
-  calls: { rhyme: number; wordhood: number; fromCache: number };
+  calls: JudgeCalls;
   answeredBy: string[];
 }
 
@@ -106,33 +110,13 @@ const NO_RULING: RhymeRuling = { verdict: "no-ruling", reading: null, confidence
 
 /** Ask the Judge both questions of every hunted Answer: the rhyme prompt as it was measured, and wordhood apart from it. */
 export async function judgeHunt(days: readonly HuntDay[], opts: { model: string; run: number }): Promise<HuntLeg> {
-  const calls = { rhyme: 0, wordhood: 0, fromCache: 0 };
-  const answeredBy = new Set<string>();
   const pairs = days.flatMap((d) => d.hunted.map((answer) => ({ word: answer.word, seedWord: d.seedWord, rhymeKey: d.rhymeKey, answer })));
-  const rhyme = new Map<(typeof pairs)[number], RhymeRuling>();
-  await inParallel(rhymeBatches(pairs).map((batch) => async () => {
-    const reply = await callModel(opts.model, rhymePrompt(batch), opts.run, "hunt");
-    calls.rhyme++;
-    if (reply.cached) calls.fromCache++;
-    reply.answeredBy.forEach((m) => answeredBy.add(m));
-    parseRhymeReply(reply.text, batch.length).forEach((r, i) => rhyme.set(batch[i]!, r));
-  }));
-  const words = [...new Set(pairs.map((p) => p.word))].sort();
-  const wordhood = new Map<string, WordhoodRuling>();
-  const chunks = Array.from({ length: Math.ceil(words.length / WORDHOOD_BATCH) }, (_, i) => words.slice(i * WORDHOOD_BATCH, (i + 1) * WORDHOOD_BATCH));
-  await inParallel(chunks.map((chunk) => async () => {
-    const reply = await callModel(opts.model, wordhoodPrompt(chunk), opts.run, "hunt");
-    calls.wordhood++;
-    if (reply.cached) calls.fromCache++;
-    reply.answeredBy.forEach((m) => answeredBy.add(m));
-    for (const r of parseWordhoodReply(reply.text, chunk)) wordhood.set(r.word, r);
-  }));
-  process.stderr.write("\n");
+  const { rhyme, wordhood, calls, answeredBy } = await askBoth(pairs, { ...opts, label: "hunt" });
   const rulings: HuntRuling[] = pairs.map((p) => {
     const w = wordhood.get(p.word);
     return { seedWord: p.seedWord, rhymeKey: p.rhymeKey, answer: p.answer, rhyme: rhyme.get(p) ?? NO_RULING, ...(w ? { wordhood: w } : {}) };
   });
-  return { rulings, calls, answeredBy: [...answeredBy].sort() };
+  return { rulings, calls, answeredBy };
 }
 
 /** What the maintainer decided on one listed Answer, and what was written for it. */
@@ -190,9 +174,14 @@ export async function settleRulingList(
       if (decision.kind === "correction") {
         const result = await applyCorrection(
           { word, target: item.rhymeKey, phonemes: decision.reading, mode: "replace" },
-          { context: pinnedEvidenceContext, schedule: () => ctx.schedule, today: () => ctx.today, openIndex: ctx.loadIndex, rebuild: async () => rebuild() },
+          {
+            context: pinnedEvidenceContext, schedule: () => ctx.schedule, today: () => ctx.today,
+            openIndex: ctx.loadIndex, rebuild: async () => rebuild(), source: "batch",
+          },
         );
         wrote = `data/supplement.dict: ${word} ${decision.reading.join(" ")}${result.rebuilt.ok ? "" : " (the rebuild failed)"}`;
+        // A reading given to a scheduled Seed Word runs the Seed Word test (#264), as it does in the Editor's Pass.
+        for (const line of seedWordCheckLines(result.seedWords)) console.error(`  ${line}`);
       } else if (decision.kind === "demotion") {
         appendDemotion(resolve(dataDir, "demotions.txt"), { word, reason: decision.reason });
         wrote = `data/demotions.txt: ${word} ${decision.reason}`;
@@ -216,12 +205,8 @@ export function huntResults(
   const out = new Map<string, NoFalseAcceptsResult>();
   for (const d of days) {
     const mine = settled.filter((s) => s.listed.seedWord === d.seedWord);
-    let scored: ReadonlySet<string>;
-    try {
-      scored = new Set(startSession(index, index.pinSeed(d.seedWord, d.rhymeKey), scoring).answerScores.keys());
-    } catch {
-      scored = new Set();
-    }
+    const session = sessionOn(index, d.seedWord, d.rhymeKey, scoring);
+    const scored: ReadonlySet<string> = new Set("failed" in session ? [] : session.answerScores.keys());
     out.set(d.seedWord, noFalseAcceptsResult(
       mine.map((s) => s.listed.answer.word),
       new Map(mine.map((s) => [s.listed.answer.word, s.decision])),
