@@ -194,6 +194,28 @@ export interface BatchEntry {
   judgeModel: string;
   /** The run report, from the repository root. */
   report: string;
+  /** The No False Accepts hunt's result on the day (#268). Absent when the hunt did not run. */
+  noFalseAccepts?: NoFalseAcceptsEntry;
+}
+
+/** The No False Accepts gate on one Seed Word, as the record keeps it (`src/noFalseAccepts.ts`). */
+export interface NoFalseAcceptsEntry {
+  result: "pass" | "fail";
+  /** Scored Answers the hunt put to the Judge. */
+  hunted: number;
+  /** Of those, how many went on the ruling list. */
+  listed: number;
+  /** Listed Answers the maintainer did not rule on. */
+  unruled: string[];
+  /** Answers corrected or demoted that the rebuilt index still scored. */
+  stillScored: string[];
+}
+
+const strings = (v: unknown): boolean => Array.isArray(v) && v.every((s) => typeof s === "string");
+
+function isNoFalseAccepts(e: unknown): e is NoFalseAcceptsEntry {
+  const x = e as Partial<NoFalseAcceptsEntry> | null;
+  return !!x && (x.result === "pass" || x.result === "fail") && typeof x.hunted === "number" && typeof x.listed === "number" && strings(x.unruled) && strings(x.stillScored);
 }
 
 /** `data/batches.json`: every Seed Word that has been through a Batch, and each Batch's result. */
@@ -218,7 +240,8 @@ function isEntry(e: unknown): e is BatchEntry {
     typeof x.gate?.k === "number" && typeof x.gate.n === "number" &&
     typeof x.playerModel === "string" &&
     typeof x.judgeModel === "string" &&
-    typeof x.report === "string"
+    typeof x.report === "string" &&
+    (x.noFalseAccepts === undefined || isNoFalseAccepts(x.noFalseAccepts))
   );
 }
 

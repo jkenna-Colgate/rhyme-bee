@@ -16,14 +16,25 @@
  * The files' contents are never printed. Everything here reports file names and
  * digests only, because the prevalence norms are licensed for academic use and
  * a log is a publication.
+ *
+ * The mirror holds a fifth file the build does not read: `wiktionary.tsv`, the
+ * Wiktionary extract a Batch's No False Accepts hunt reads (#268). It is fetched,
+ * uploaded and checksummed with the other four, but only the four are checked
+ * before a build, so a build never waits on a file it does not use.
  */
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-/** The four sources the mirror holds, in the order the checksum file lists them. */
-export const SOURCE_FILES = ["cmudict.dict", "words.txt", "names.txt", "prevalence.csv"] as const;
+/** The four sources the Rhyme Index is built from, which `build:index` checks. */
+export const INDEX_SOURCES = ["cmudict.dict", "words.txt", "names.txt", "prevalence.csv"] as const;
+
+/** The pinned Wiktionary extract (#268), read at Batch time and never shipped in the index. */
+export const WIKTIONARY_SOURCE = "wiktionary.tsv";
+
+/** Every source the mirror holds, in the order the checksum file lists them. */
+export const SOURCE_FILES = [...INDEX_SOURCES, WIKTIONARY_SOURCE] as const;
 export type SourceFile = (typeof SOURCE_FILES)[number];
 
 /** The committed checksum file, in `data/`. */
@@ -53,10 +64,11 @@ export function parseChecksums(text: string): Map<string, string> {
 export function sourceFaults(
   checksums: string,
   read: (file: SourceFile) => Uint8Array | null,
+  files: readonly SourceFile[] = SOURCE_FILES,
 ): SourceFault[] {
   const pinned = parseChecksums(checksums);
   const faults: SourceFault[] = [];
-  for (const file of SOURCE_FILES) {
+  for (const file of files) {
     const expected = pinned.get(file);
     if (expected === undefined) {
       faults.push({ file, problem: "unpinned" });
@@ -104,9 +116,13 @@ function readLocal(dataDir: string, file: SourceFile): Uint8Array | null {
   return existsSync(path) ? readFileSync(path) : null;
 }
 
-/** The laptop check: the local copies in `dataDir` against the committed checksums. */
-export function checkLocalSources(dataDir: string): SourceFault[] {
-  return sourceFaults(readChecksums(dataDir), (file) => readLocal(dataDir, file));
+/**
+ * The laptop check: the local copies in `dataDir` against the committed
+ * checksums. The index's four by default, which is the build's check; a Batch
+ * checks the Wiktionary extract the same way.
+ */
+export function checkLocalSources(dataDir: string, files: readonly SourceFile[] = INDEX_SOURCES): SourceFault[] {
+  return sourceFaults(readChecksums(dataDir), (file) => readLocal(dataDir, file), files);
 }
 
 /** Where a source sits in the bucket. Its own prefix, apart from the Appeals under `flags/`. */

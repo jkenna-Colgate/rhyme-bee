@@ -208,6 +208,18 @@ describe("the committed record of which Seed Words have been through a Batch", (
     expect(() => parseBatchRecord('{"seeds": {"trick": [{"date": "2026-10-30"}]}}')).toThrow(/trick/);
     expect(() => parseBatchRecord("not json")).toThrow();
   });
+
+  it("reads back the No False Accepts result beside the Trust one, and refuses one that does not read", () => {
+    const hunted: BatchEntry = {
+      ...passed,
+      noFalseAccepts: { result: "fail", hunted: 6, listed: 2, unruled: ["heinz"], stillScored: [] },
+    };
+    const back = parseBatchRecord(serialiseBatchRecord(recordBatches(parseBatchRecord(null), [{ seedWord: "trick", entry: hunted }])));
+    expect(batchesOf(back, "trick")).toEqual([hunted]);
+    const broken = serialiseBatchRecord(recordBatches(parseBatchRecord(null), [{ seedWord: "trick", entry: passed }]))
+      .replace('"trust":"pass"', '"trust":"pass","noFalseAccepts":{"result":"maybe"}');
+    expect(() => parseBatchRecord(broken)).toThrow(/trick/);
+  });
 });
 
 describe("what a look counts as a Trust failure", () => {

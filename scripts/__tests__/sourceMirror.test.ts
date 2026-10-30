@@ -40,7 +40,8 @@ const PINNED =
   `${ABC}  cmudict.dict\n` +
   `${EMPTY}  words.txt\n` +
   `${ABC}  names.txt\n` +
-  `${EMPTY}  prevalence.csv\n`;
+  `${EMPTY}  prevalence.csv\n` +
+  `${ABC}  wiktionary.tsv\n`;
 
 describe("the laptop check", () => {
   it("passes four sources that match their committed checksums", () => {
@@ -52,6 +53,18 @@ describe("the laptop check", () => {
       "prevalence.csv": "",
     });
     expect(checkLocalSources(dir)).toEqual([]);
+  });
+
+  it("checks only the index's four sources, so a build needs no Wiktionary extract", () => {
+    const dir = dataDir({
+      "sources.sha256": PINNED,
+      "cmudict.dict": "abc",
+      "words.txt": "",
+      "names.txt": "abc",
+      "prevalence.csv": "",
+    });
+    expect(checkLocalSources(dir)).toEqual([]);
+    expect(checkLocalSources(dir, ["wiktionary.tsv"])).toEqual([{ file: "wiktionary.tsv", problem: "missing" }]);
   });
 
   it("names a source whose bytes have changed, a missing one, and an unpinned one", () => {
@@ -99,19 +112,21 @@ describe("the fetch", () => {
     return { asked, download };
   };
 
-  it("writes the four sources from the mirror's prefix when every one matches", async () => {
+  it("writes the four index sources and the Wiktionary extract from the mirror's prefix when every one matches", async () => {
     const dir = dataDir({ "sources.sha256": PINNED });
     const { asked, download } = mirror({
       "sources/cmudict.dict": "abc",
       "sources/words.txt": "",
       "sources/names.txt": "abc",
       "sources/prevalence.csv": "",
+      "sources/wiktionary.tsv": "abc",
     });
 
     const result = await fetchSources(dir, download);
 
+    expect(SOURCE_FILES).toContain("wiktionary.tsv");
     expect(result).toEqual({ fetched: [...SOURCE_FILES], kept: [], faults: [] });
-    expect(asked).toHaveLength(4);
+    expect(asked).toHaveLength(5);
     expect(checkLocalSources(dir)).toEqual([]);
   });
 
@@ -122,6 +137,7 @@ describe("the fetch", () => {
       "sources/words.txt": "",
       "sources/names.txt": "tampered",
       "sources/prevalence.csv": "",
+      "sources/wiktionary.tsv": "abc",
     });
 
     const result = await fetchSources(dir, download);
@@ -133,7 +149,7 @@ describe("the fetch", () => {
   });
 
   it("does not download a source whose local copy already matches", async () => {
-    const dir = dataDir({ "sources.sha256": PINNED, "cmudict.dict": "abc", "names.txt": "abc" });
+    const dir = dataDir({ "sources.sha256": PINNED, "cmudict.dict": "abc", "names.txt": "abc", "wiktionary.tsv": "abc" });
     const { asked, download } = mirror({
       "sources/words.txt": "",
       "sources/prevalence.csv": "",
@@ -143,7 +159,7 @@ describe("the fetch", () => {
 
     expect(result).toEqual({
       fetched: ["words.txt", "prevalence.csv"],
-      kept: ["cmudict.dict", "names.txt"],
+      kept: ["cmudict.dict", "names.txt", "wiktionary.tsv"],
       faults: [],
     });
     expect(asked).toEqual(["sources/words.txt", "sources/prevalence.csv"]);
@@ -155,7 +171,7 @@ describe("the fetch", () => {
 
     const result = await fetchSources(dir, download);
 
-    expect(result.faults.map((fault) => fault.problem)).toEqual(["unpinned", "unpinned", "unpinned"]);
+    expect(result.faults.map((fault) => fault.problem)).toEqual(["unpinned", "unpinned", "unpinned", "unpinned"]);
     expect(asked).toEqual(["sources/cmudict.dict"]);
     expect(existsSync(join(dir, "cmudict.dict"))).toBe(false);
   });
@@ -164,7 +180,7 @@ describe("the fetch", () => {
 describe("the upload's checksum rewrite", () => {
   it("replaces one source's line and leaves the others as they were", () => {
     expect(withChecksum(PINNED, "names.txt", EMPTY)).toBe(
-      `${ABC}  cmudict.dict\n${EMPTY}  words.txt\n${EMPTY}  names.txt\n${EMPTY}  prevalence.csv\n`,
+      `${ABC}  cmudict.dict\n${EMPTY}  words.txt\n${EMPTY}  names.txt\n${EMPTY}  prevalence.csv\n${ABC}  wiktionary.tsv\n`,
     );
   });
 

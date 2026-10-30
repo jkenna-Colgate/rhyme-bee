@@ -2,7 +2,10 @@
  * Upload index sources to the private mirror and pin their checksums.
  *
  *   npm run sources:upload -- prevalence.csv
- *   npm run sources:upload -- cmudict.dict words.txt names.txt prevalence.csv
+ *   npm run sources:upload -- cmudict.dict words.txt names.txt prevalence.csv wiktionary.tsv
+ *
+ * `wiktionary.tsv` is the Batch's Wiktionary extract (#268), built by
+ * `scripts/extract-wiktionary.ts`; the build does not read it.
  *
  * Changing a source is: replace the file in `data/`, run this, commit
  * `data/sources.sha256`, push. Each file is uploaded first and its line in the
