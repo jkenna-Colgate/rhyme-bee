@@ -122,6 +122,27 @@ export type Decision =
   | { kind: "unruled" };
 
 /**
+ * What the maintainer is shown when a ruling is wanted: the readings offered,
+ * labelled and numbered, then that an answer is awaited and one option a line
+ * with its effect. Every option it names is one `parseDecision` reads.
+ */
+export function rulingPrompt(offered: readonly Pronunciation[]): string[] {
+  const readings = offered.length
+    ? ["Readings you can pick (Wiktionary's, in ARPAbet):", ...offered.map((reading, n) => `  ${n + 1}. ${reading.join(" ")}`)]
+    : ["Readings you can pick: none (Wiktionary has none), so a correction must be typed."];
+  return [
+    ...readings,
+    "Waiting for your ruling on this word. Type one of these and press Enter:",
+    ...(offered.length ? ["  c <n>        correct the reading to number <n> above, e.g. c 1 (it replaces the game's reading)"] : []),
+    "  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)",
+    "  d            demote it as a name (the player is told it is a name)",
+    "  d word       demote it as not a word (the player is told it is not a word)",
+    "  l            leave it scored, as the game has it",
+    "  s            skip it: it stays scored unruled, and the day fails its No False Accepts gate",
+  ];
+}
+
+/**
  * A ruling as the maintainer types it: `c <n>` for the nth reading offered, or
  * `c <ARPAbet>` for one typed; `d` for a Demotion as a name, `d word` as not a
  * word; `l` to leave it; `s` to skip it. Null when it does not read.

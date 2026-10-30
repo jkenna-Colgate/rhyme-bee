@@ -12,6 +12,7 @@ import {
   noFalseAcceptsResult,
   parseDecision,
   rulingList,
+  rulingPrompt,
   type HuntedAnswer,
   type HuntRuling,
 } from "../noFalseAccepts.ts";
@@ -124,6 +125,35 @@ describe("reading the maintainer's ruling", () => {
     expect(parseDecision("c 2", offered)).toBeNull();
     expect(parseDecision("c tʃɑk", offered)).toBeNull();
     expect(parseDecision("x", offered)).toBeNull();
+  });
+});
+
+describe("asking the maintainer for a ruling", () => {
+  it("labels the readings it numbers, says it is waiting, and gives one option a line with its effect", () => {
+    expect(rulingPrompt([r("CH AA1 K L AH0 T"), r("CH AO1 K L AH0 T")])).toEqual([
+      "Readings you can pick (Wiktionary's, in ARPAbet):",
+      "  1. CH AA1 K L AH0 T",
+      "  2. CH AO1 K L AH0 T",
+      "Waiting for your ruling on this word. Type one of these and press Enter:",
+      "  c <n>        correct the reading to number <n> above, e.g. c 1 (it replaces the game's reading)",
+      "  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)",
+      "  d            demote it as a name (the player is told it is a name)",
+      "  d word       demote it as not a word (the player is told it is not a word)",
+      "  l            leave it scored, as the game has it",
+      "  s            skip it: it stays scored unruled, and the day fails its No False Accepts gate",
+    ]);
+  });
+
+  it("offers no number to pick when there are no readings to pick from", () => {
+    const prompt = rulingPrompt([]);
+    expect(prompt[0]).toBe("Readings you can pick: none (Wiktionary has none), so a correction must be typed.");
+    expect(prompt.some((line) => line.includes("c <n>"))).toBe(false);
+    expect(prompt).toContain("  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)");
+  });
+
+  it("accepts every option it offers", () => {
+    const offered = [r("CH AA1 K L AH0 T")];
+    expect(["c 1", "c K AE1 T", "d", "d word", "l", "s"].map((input) => parseDecision(input, offered))).not.toContain(null);
   });
 });
 
