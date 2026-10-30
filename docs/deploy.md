@@ -137,12 +137,15 @@ They are mirrored in the private bucket under `sources/`, and their SHA-256s
 are committed in `data/sources.sha256` (#272). `npm run build:index` refuses
 when a local copy does not match, and names the file. A fifth file, the
 Wiktionary extract `wiktionary.tsv` (#268), is mirrored and pinned the same way
-and fetched with them; the build does not read it or check it, and a Batch
-refuses without it.
+but fetched only when named; the build and CI do not read it or check it, and a
+Batch refuses without it.
 
-- `npm run sources:fetch` downloads them, refusing and writing nothing if one
-  fails its checksum. It uses the read-only token above, from `credentials.env`
-  or the same three environment variables, so CI can run it.
+- `npm run sources:fetch` downloads the four, refusing and writing nothing if
+  one fails its checksum. It uses the read-only token above, from
+  `credentials.env` or the same three environment variables, so CI can run it.
+- `npm run sources:fetch -- wiktionary.tsv` downloads the extract alone, and
+  `npm run sources:fetch -- --with-wiktionary` the four and the extract: what
+  the laptop runs before a Batch.
 - `npm run sources:upload -- <file>...` uploads a changed source through
   `wrangler r2 object put` and rewrites its checksum. Commit the checksum file
   and push; that commit is what ships the change.
