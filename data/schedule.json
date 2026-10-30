@@ -677,10 +677,10 @@
       "date": "2026-10-10",
       "weekday": "Sat",
       "week": 10,
-      "seed": "miter",
+      "seed": "typewriter",
       "rhymeKey": "AY T ER",
       "answerCount": 30,
-      "difficulty": 0.1464
+      "difficulty": 0.1733
     },
     {
       "date": "2026-10-11",
@@ -1073,9 +1073,9 @@
       "date": "2026-11-23",
       "weekday": "Mon",
       "week": 17,
-      "seed": "bounds",
-      "rhymeKey": "AW N D Z",
-      "answerCount": 21,
+      "seed": "young",
+      "rhymeKey": "AH NG",
+      "answerCount": 20,
       "difficulty": 0
     },
     {
@@ -1136,10 +1136,10 @@
       "date": "2026-11-30",
       "weekday": "Mon",
       "week": 18,
-      "seed": "mealing",
-      "rhymeKey": "IY L AH NG",
-      "answerCount": 23,
-      "difficulty": 0
+      "seed": "sordid",
+      "rhymeKey": "AO R D AH D",
+      "answerCount": 42,
+      "difficulty": 0.0314
     },
     {
       "date": "2026-12-01",
