@@ -1,5 +1,6 @@
 /**
- * Download the four index sources from the private mirror into `data/`.
+ * Download the four index sources, and the Wiktionary extract a Batch reads
+ * (#268), from the private mirror into `data/`.
  *
  *   npm run sources:fetch
  *

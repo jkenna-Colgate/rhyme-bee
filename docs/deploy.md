@@ -135,7 +135,10 @@ To see what would be uploaded without uploading it,
 `cmudict.dict`, `words.txt`, `names.txt` and `prevalence.csv` are not in git.
 They are mirrored in the private bucket under `sources/`, and their SHA-256s
 are committed in `data/sources.sha256` (#272). `npm run build:index` refuses
-when a local copy does not match, and names the file.
+when a local copy does not match, and names the file. A fifth file, the
+Wiktionary extract `wiktionary.tsv` (#268), is mirrored and pinned the same way
+and fetched with them; the build does not read it or check it, and a Batch
+refuses without it.
 
 - `npm run sources:fetch` downloads them, refusing and writing nothing if one
   fails its checksum. It uses the read-only token above, from `credentials.env`

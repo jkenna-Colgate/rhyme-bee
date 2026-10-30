@@ -22,6 +22,15 @@
  * first that finds at most `--k` Trust failures, and fails if `--n` looks go by
  * without one. A day that fails ships anyway.
  *
+ * Then the **No False Accepts** half (#268, `scripts/batchHunt.ts`): every scored
+ * Answer whose Wiktionary readings (`data/wiktionary.tsv`, fetched with the other
+ * sources) all miss the Seed Word's Rhyme Key, or that the names data holds, is
+ * put to the Judge, rhyme and wordhood apart. Nothing it rules lands by itself:
+ * a high-confidence ruling that an Answer is no Rhyme, a name or not a word goes
+ * on a ruling list, and the maintainer rules on each in the sitting (a
+ * correction, a Demotion, or leave it). The gate passes a day when no listed
+ * Answer is left unruled and none corrected or demoted is still scored.
+ *
  * It writes the run report to `data/judge-runs/` and the result per Seed Word
  * to `data/batches.json`, both to be committed with what landed.
  */
@@ -66,6 +75,8 @@ import {
   type JudgedItem,
   type JudgeItem,
 } from "./judgeRun.ts";
+import { rulingList, type NoFalseAcceptsResult } from "../src/noFalseAccepts.ts";
+import { huntCalls, huntResults, judgeHunt, loadWiktionary, planHunt, rebuild, settleRulingList, type HuntDay, type HuntLeg, type Settled } from "./batchHunt.ts";
 import { callModel, exactModelId, inParallel, nextRun, root, today, writeRunReport, type ModelReply } from "./modelCall.ts";
 
 // ---- the settings --------------------------------------------------------------
@@ -104,6 +115,9 @@ const scheduleRaw = JSON.parse(readFileSync(SCHEDULE, "utf8")) as { scoring: Sco
 const schedule = parseSchedule(scheduleRaw);
 if (!schedule) throw new Error("data/schedule.json does not read as a Schedule");
 const block = batchBlock(schedule, from, to, date);
+const wiktionary = loadWiktionary();
+let index = loadIndex();
+const huntPlan = huntCalls(planHunt(index, block, scheduleRaw.scoring, wiktionary));
 
 // ---- the plan ------------------------------------------------------------------
 
@@ -114,7 +128,9 @@ console.error(
   `  Synthetic Player (${playerModel}): ${block.length * 2} to ${block.length * gate.n} looks (${gate.n} at most each), plus one re-run per off-key look\n` +
   `  Judge (${JUDGE_MODEL}): one rhyme call per 8 new Candidates and one wordhood call per 20 that would act, on every look;\n` +
   `    about 1 to 3 a look for 3 Seed Words, and at most ${maxJudgeCalls} rhyme calls a look (--max-judge-calls)\n` +
-  `  Trust gate: k = ${gate.k} within n = ${gate.n} looks; off key above ${offKeyRatio} to 1`,
+  `  Trust gate: k = ${gate.k} within n = ${gate.n} looks; off key above ${offKeyRatio} to 1\n` +
+  `  No False Accepts hunt, Judge (${JUDGE_MODEL}): ${huntPlan.sent} scored Answers sent on today's index, ` +
+  `${huntPlan.rhyme} rhyme calls and ${huntPlan.wordhood} wordhood calls (recounted after the looks land)`,
 );
 if (/opus/.test(playerModel)) console.error(`  ${playerModel} is an Opus model: state its cost and get a yes before running (#267).`);
 if (block.length > 30) console.error(`  ${block.length} Seed Words is more than a sitting of about 30.`);
@@ -127,7 +143,6 @@ if (!confirmed) {
 
 const stem = `batch.${from}..${to}.${playerModel}`;
 const run = nextRun(stem);
-let index = loadIndex();
 
 interface RunOfLook {
   attempt: number;
@@ -272,6 +287,28 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
 
 for (const d of days) if (!d.result && !d.notChecked) d.notChecked = stopped ? "the Batch stopped before its verdict" : "no verdict was reached";
 
+// ---- No False Accepts ----------------------------------------------------------
+
+let hunt: { days: HuntDay[]; leg: HuntLeg; settled: Settled[]; results: Map<string, NoFalseAcceptsResult> } | null = null;
+if (!stopped) {
+  const huntDays = planHunt(index, days.filter((d) => !d.notChecked).map((d) => ({ ...d.seed, rhymeKey: d.rhymeKey })), scheduleRaw.scoring, wiktionary);
+  const planned = huntCalls(huntDays);
+  console.error(`\nNo False Accepts: ${planned.sent} scored Answers to the Judge, ${planned.rhyme} rhyme and ${planned.wordhood} wordhood calls`);
+  const leg = await judgeHunt(huntDays, { model: JUDGE_MODEL, run });
+  calls.rhyme += leg.calls.rhyme;
+  calls.wordhood += leg.calls.wordhood;
+  calls.fromCache += leg.calls.fromCache;
+  leg.answeredBy.forEach((m) => answeredBy.add(m));
+  const settled = await settleRulingList(rulingList(leg.rulings), { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
+  if (settled.some((s) => s.decision.kind === "demotion")) {
+    console.error("rebuilding the index with the Demotions");
+    const built = rebuild();
+    if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
+  }
+  if (settled.some((s) => s.wrote)) index = loadIndex();
+  hunt = { days: huntDays, leg, settled, results: huntResults(huntDays, settled, index, scheduleRaw.scoring) };
+}
+
 // ---- the report and the record -------------------------------------------------
 
 const result = (d: Day) => d.result ?? null;
@@ -320,24 +357,62 @@ const reportPath = writeRunReport(date, stem, run, {
   })),
   writes,
   rulings: allRulings,
+  noFalseAccepts: hunt
+    ? {
+        note:
+          "The hunt (#268): scored Answers with no Wiktionary reading on the Seed Word's Rhyme Key, or in the names data, " +
+          "put to the Judge. Nothing it ruled landed by itself; what landed is what the maintainer decided.",
+        seeds: hunt.days.map((d) => ({
+          seedWord: d.seedWord,
+          rhymeKey: d.rhymeKey,
+          answers: d.answers,
+          ...hunt!.results.get(d.seedWord),
+          sent: d.hunted,
+        })),
+        rulings: hunt.leg.rulings.map((r) => ({
+          word: r.answer.word, seedWord: r.seedWord, rhymeKey: r.rhymeKey, reasons: r.answer.reasons,
+          verdict: r.rhyme.verdict, reading: r.rhyme.reading, confidence: r.rhyme.confidence, why: r.rhyme.why,
+          ...(r.wordhood ? { wordhood: r.wordhood.verdict, wordhoodConfidence: r.wordhood.confidence, wordhoodWhy: r.wordhood.why } : {}),
+        })),
+        decided: hunt.settled.map((s) => ({ word: s.listed.answer.word, seedWord: s.listed.seedWord, doubts: s.listed.doubts, decision: s.decision, wrote: s.wrote })),
+      }
+    : null,
 });
 
 const reportFromRoot = relative(root, reportPath).replace(/\\/g, "/");
-const entries = days.filter((d) => d.result).map((d) => ({
-  seedWord: d.seed.seedWord,
-  entry: {
-    date, rhymeKey: d.rhymeKey, trust: d.result!, failuresPerLook: d.failuresPerLook, gate,
-    playerModel, judgeModel: JUDGE_MODEL, report: reportFromRoot,
-  } satisfies BatchEntry,
-}));
+/** The day's No False Accepts result as the record keeps it, when the hunt ran on it. */
+function huntEntry(seedWord: string): BatchEntry["noFalseAccepts"] {
+  const r = hunt?.results.get(seedWord);
+  const day = hunt?.days.find((h) => h.seedWord === seedWord);
+  if (!r || !day) return undefined;
+  const listed = hunt!.settled.filter((s) => s.listed.seedWord === seedWord).length;
+  return { result: r.result, hunted: day.hunted.length, listed, unruled: r.unruled, stillScored: r.stillScored };
+}
+const entries = days.filter((d) => d.result).map((d) => {
+  const noFalseAccepts = huntEntry(d.seed.seedWord);
+  return {
+    seedWord: d.seed.seedWord,
+    entry: {
+      date, rhymeKey: d.rhymeKey, trust: d.result!, failuresPerLook: d.failuresPerLook, gate,
+      playerModel, judgeModel: JUDGE_MODEL, report: reportFromRoot,
+      ...(noFalseAccepts ? { noFalseAccepts } : {}),
+    } satisfies BatchEntry,
+  };
+});
 const record = recordBatches(parseBatchRecord(existsSync(BATCHES) ? readFileSync(BATCHES, "utf8") : null), entries);
 writeFileSync(BATCHES, serialiseBatchRecord(record));
 
 console.log(`\n## Batch ${from} to ${to}, run ${run}`);
 for (const d of days) {
   console.log(`${d.seed.date} ${d.seed.seedWord} /${d.rhymeKey}/: ${d.result ?? `not checked (${d.notChecked})`}, Trust failures per look ${JSON.stringify(d.failuresPerLook)}`);
+  const h = huntEntry(d.seed.seedWord);
+  if (h) {
+    console.log(`  No False Accepts: ${h.result}, ${h.hunted} Answers sent, ${h.listed} listed` +
+      `${h.unruled.length ? `, unruled ${h.unruled.join(", ")}` : ""}${h.stillScored.length ? `, still scored ${h.stillScored.join(", ")}` : ""}`);
+  }
 }
 console.log(`calls: ${JSON.stringify(calls)}`);
 console.log(`writes: ${writes.readings.length} readings, ${writes.unconfirmedRhymes.length} Unconfirmed Rhymes, ${writes.suggestedDemotions.length} suggested Demotions`);
+if (hunt) console.log(`ruled in the sitting: ${hunt.settled.filter((s) => s.wrote).map((s) => s.wrote).join("; ") || "nothing written"}`);
 if (stopped) console.log(`stopped: ${stopped}`);
-console.log(`report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl`);
+console.log(`report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/demotions.txt, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl`);

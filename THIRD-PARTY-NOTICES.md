@@ -75,6 +75,24 @@ The bulk data is not committed to this repository, and
 [ADR-0013](./docs/adr/0013-adjudication-never-crosses-the-network.md) keeps it
 out of any public repository or bucket.
 
+## Wiktionary, through Kaikki's Wiktextract dump
+
+Used for General American transcriptions independent of CMUdict, which a
+Batch reads offline to choose the scored Answers it puts to the Judge (#268).
+The extract (`data/wiktionary.tsv`) is pinned in the private mirror and never
+committed, and nothing from it is compiled into the Rhyme Index or served to
+players. A pronunciation correction the maintainer writes after reading it is
+an ARPAbet reading of a fact about a word, not Wiktionary text.
+
+Wiktionary's text is licensed under the
+[Creative Commons Attribution-ShareAlike 4.0 licence](https://creativecommons.org/licenses/by-sa/4.0/)
+and the [GNU Free Documentation License](https://www.gnu.org/licenses/fdl-1.3.html)
+([Wiktionary:Copyrights](https://en.wiktionary.org/wiki/Wiktionary:Copyrights)).
+Attribution: the contributors to the English Wiktionary, https://en.wiktionary.org/.
+The machine-readable extraction is Kaikki.org's, by Tatu Ylonen: "Wiktextract:
+Wiktionary as Machine-Readable Structured Data", LREC 2022
+(https://kaikki.org/dictionary/rawdata.html).
+
 ## Cinzel (font)
 
 Bundled in the shared-badge renderer as `web/badge/font/Cinzel-Variable.ttf`
