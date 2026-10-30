@@ -32,8 +32,17 @@ describe("the run over the Schedule", () => {
     expect(run.changes).toEqual([]);
   });
 
+  it("repairs only a failing day unless the re-rank is asked for by name, so a hand fix stands", () => {
+    // The ranking ran once over the Schedule, in #264. A later run is a repair:
+    // a passing day on a secondary stress is not the run's to move.
+    const days = [day("2026-10-22", "makeup", "AH P"), day("2026-09-07", "objurgate", "EY T")];
+    const run = runSeedWordTest(days, index);
+    expect(run.days[0]).toEqual(days[0]);
+    expect(run.changes.map((c) => [c.date, c.why])).toEqual([["2026-09-07", "not-an-answer"]]);
+  });
+
   it("re-seeds a secondary-stress Seed Word in its own family, keeping its key and place", () => {
-    const run = runSeedWordTest([day("2026-10-22", "makeup", "AH P")], index);
+    const run = runSeedWordTest([day("2026-10-22", "makeup", "AH P")], index, { reRank: true });
     expect(run.days[0]).toMatchObject({ date: "2026-10-22", seed: "cup", rhymeKey: "AH P" });
     expect(run.changes).toEqual([
       expect.objectContaining({ date: "2026-10-22", why: "re-ranked", before: expect.objectContaining({ seed: "makeup" }) }),
@@ -51,7 +60,7 @@ describe("the run over the Schedule", () => {
       prevalence: [["take", 2.5], ["taking", 2.5], ["breathtaking", 2.0]],
     });
     const days = [day("2026-11-03", "breathtaking", "EY K AH NG")];
-    const run = runSeedWordTest(days, takings);
+    const run = runSeedWordTest(days, takings, { reRank: true });
     expect(run.days).toEqual(days);
     expect(run.changes).toEqual([]);
   });
@@ -59,7 +68,7 @@ describe("the run over the Schedule", () => {
   it("does not re-seed onto a word another day holds as its Seed Word", () => {
     // Two days on one key is #228's one-place collision, reported elsewhere;
     // the re-seed does not add a second one by taking `cup`.
-    const run = runSeedWordTest([day("2026-10-01", "cup", "AH P"), day("2026-10-22", "makeup", "AH P")], index);
+    const run = runSeedWordTest([day("2026-10-01", "cup", "AH P"), day("2026-10-22", "makeup", "AH P")], index, { reRank: true });
     expect(run.days[1]).toMatchObject({ seed: "pup", rhymeKey: "AH P" });
   });
 

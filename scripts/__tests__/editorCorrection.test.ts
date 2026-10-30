@@ -468,6 +468,48 @@ describe("applyCorrection", () => {
     expect(result.days).toEqual([]);
   });
 
+  /**
+   * #264: a reading given to a scheduled Seed Word is one of the times the Seed
+   * Word test runs, and a correction is such a reading as much as an add is.
+   * Run off the rebuilt index, because that is the one holding the reading.
+   */
+  it("runs the Seed Word test when it gives a scheduled Seed Word a reading", async () => {
+    const lines = correctionLines({
+      word: "gate",
+      mode: "join",
+      target: hatKey,
+      readings: [["G", "EY1", "T"], ["G", "AE1", "T"]],
+    });
+    const gateDay = scheduleOf([{ date: "2026-09-04", seed: "gate", rhymeKey: ateKey }]);
+    const result = await applyCorrection(joinAsk, { ...deps(lines), schedule: () => gateDay });
+    // Joined, `gate` is heard two ways: on AE T it rhymes with `hat`, which EY T does not.
+    expect(result.seedWords).toEqual([
+      expect.objectContaining({ date: "2026-09-04", seed: "gate", passes: false }),
+    ]);
+  });
+
+  it("runs no Seed Word test for a word no day holds as its Seed Word", async () => {
+    const result = await applyCorrection(joinAsk, deps(""));
+    expect(result.seedWords).toEqual([]);
+  });
+
+  it("says the test could not run when the rebuild failed, rather than testing the old index", async () => {
+    const gateDay = scheduleOf([{ date: "2026-09-04", seed: "gate", rhymeKey: ateKey }]);
+    const result = await applyCorrection(joinAsk, {
+      ...deps(""),
+      schedule: () => gateDay,
+      rebuild: async () => ({ ok: false as const, error: "npm run build:index exited 1." }),
+    });
+    expect(result.seedWords).toBeNull();
+  });
+
+  it("names where the correction was approved in the supplement's comment", async () => {
+    await applyCorrection({ ...joinAsk, mode: "replace" }, { ...deps(""), source: "batch" });
+    const written = readFileSync(supplementPath, "utf8");
+    expect(written).toContain("correction approved on a Batch's No False Accepts ruling list");
+    expect(written).not.toContain("approved in the Editor's Pass");
+  });
+
   it("repairs a supplement whose last newline was trimmed rather than fusing onto it", async () => {
     writeFileSync(supplementPath, "# a hand edit that lost its newline\nhat HH AE1 T");
     await applyCorrection(joinAsk, deps(""));

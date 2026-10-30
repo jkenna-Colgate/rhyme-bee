@@ -379,9 +379,9 @@ export interface AddSubmitResult {
   rebuilt: RebuildResult;
   readout: DayReadout | null;
   /**
-   * The Seed Word test on every scheduled day whose Seed Word the batch wrote
-   * a reading for (#264), run on the rebuilt index because that is the one
-   * holding the reading. Empty when the batch wrote no Seed Word. **Null when
+   * The Seed Word test on every scheduled day whose Seed Word the submission
+   * wrote a reading for (#264), run on the rebuilt index because that is the one
+   * holding the reading. Empty when it wrote no Seed Word. **Null when
    * it did and the test could not run** (the rebuild failed, or the artifact
    * would not open): a verdict read off the index from before the reading
    * would be about a word that no longer exists.

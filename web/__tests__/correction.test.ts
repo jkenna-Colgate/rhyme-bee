@@ -114,6 +114,7 @@ describe("which days a correction reports as moved", () => {
     rechecked: ["EY T", "AE T"],
     rebuilt: { ok: true },
     days: [still, shifted],
+    seedWords: [],
   };
 
   it("names the days that moved, out of every day the recheck reached", () => {

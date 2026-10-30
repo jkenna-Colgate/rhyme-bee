@@ -13,8 +13,11 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   buildRefusal,
   checkLocalSources,
+  fetchedFiles,
   fetchSources,
+  INDEX_SOURCES,
   SOURCE_FILES,
+  WIKTIONARY_SOURCE,
   withChecksum,
 } from "../sourceMirror.ts";
 
@@ -112,22 +115,41 @@ describe("the fetch", () => {
     return { asked, download };
   };
 
-  it("writes the four index sources and the Wiktionary extract from the mirror's prefix when every one matches", async () => {
+  it("writes the four index sources from the mirror's prefix when every one matches, and nothing else", async () => {
+    // CI fetches before every deploy and monthly run, and builds from the four
+    // alone: it must not need, or download, the Wiktionary extract.
     const dir = dataDir({ "sources.sha256": PINNED });
     const { asked, download } = mirror({
       "sources/cmudict.dict": "abc",
       "sources/words.txt": "",
       "sources/names.txt": "abc",
       "sources/prevalence.csv": "",
-      "sources/wiktionary.tsv": "abc",
     });
 
     const result = await fetchSources(dir, download);
 
-    expect(SOURCE_FILES).toContain("wiktionary.tsv");
-    expect(result).toEqual({ fetched: [...SOURCE_FILES], kept: [], faults: [] });
-    expect(asked).toHaveLength(5);
+    expect(result).toEqual({ fetched: [...INDEX_SOURCES], kept: [], faults: [] });
+    expect(asked).toHaveLength(4);
     expect(checkLocalSources(dir)).toEqual([]);
+  });
+
+  it("fetches the Wiktionary extract only when it is asked for", async () => {
+    const dir = dataDir({ "sources.sha256": PINNED, "cmudict.dict": "abc", "words.txt": "", "names.txt": "abc", "prevalence.csv": "" });
+    const { asked, download } = mirror({ "sources/wiktionary.tsv": "abc" });
+
+    const result = await fetchSources(dir, download, [WIKTIONARY_SOURCE]);
+
+    expect(SOURCE_FILES).toContain("wiktionary.tsv");
+    expect(result).toEqual({ fetched: ["wiktionary.tsv"], kept: [], faults: [] });
+    expect(asked).toEqual(["sources/wiktionary.tsv"]);
+    expect(checkLocalSources(dir, [WIKTIONARY_SOURCE])).toEqual([]);
+  });
+
+  it("names the sources a fetch is asked for, refusing a name the mirror does not hold", () => {
+    expect(fetchedFiles([])).toEqual([...INDEX_SOURCES]);
+    expect(fetchedFiles(["wiktionary.tsv"])).toEqual(["wiktionary.tsv"]);
+    expect(fetchedFiles(["--with-wiktionary"])).toEqual([...INDEX_SOURCES, "wiktionary.tsv"]);
+    expect(() => fetchedFiles(["wiktionary.csv"])).toThrow(/wiktionary\.csv/);
   });
 
   it("refuses, and writes nothing, when any one fails its checksum", async () => {
@@ -159,7 +181,7 @@ describe("the fetch", () => {
 
     expect(result).toEqual({
       fetched: ["words.txt", "prevalence.csv"],
-      kept: ["cmudict.dict", "names.txt", "wiktionary.tsv"],
+      kept: ["cmudict.dict", "names.txt"],
       faults: [],
     });
     expect(asked).toEqual(["sources/words.txt", "sources/prevalence.csv"]);
@@ -171,7 +193,7 @@ describe("the fetch", () => {
 
     const result = await fetchSources(dir, download);
 
-    expect(result.faults.map((fault) => fault.problem)).toEqual(["unpinned", "unpinned", "unpinned", "unpinned"]);
+    expect(result.faults.map((fault) => fault.problem)).toEqual(["unpinned", "unpinned", "unpinned"]);
     expect(asked).toEqual(["sources/cmudict.dict"]);
     expect(existsSync(join(dir, "cmudict.dict"))).toBe(false);
   });

@@ -104,11 +104,11 @@ export function daysSeededBy(days: readonly ScheduleDay[], words: readonly strin
 
 /**
  * Run the test on every scheduled day whose Seed Word is one of `words`. The
- * Editor's Pass calls it after an add's rebuild, because a reading added to a
- * scheduled Seed Word is one of the three times the test runs (#264). It says
- * what the day would become and writes nothing: the Schedule is changed by
- * the Seed Word run (`npm run seeds:test -- --write`), on the same repair path
- * as every other day.
+ * Editor's Pass calls it after an add's or a correction's rebuild, because a
+ * reading given to a scheduled Seed Word is one of the three times the test
+ * runs (#264). It says what the day would become and writes nothing: the
+ * Schedule is changed by the Seed Word run (`npm run seeds:test -- --write`),
+ * on the same repair path as every other day.
  */
 export function checkScheduledSeedWords(
   days: readonly ScheduleDay[],
@@ -126,6 +126,48 @@ export function checkScheduledSeedWords(
       line: seedWordTestLine(seed, rhymeKey, test),
       next: test.passes ? null : seedWordFor(family, index, rhymeKey),
     };
+  });
+}
+
+/**
+ * The test after readings were written for `written`, as the add path and the
+ * correction path both report it: off the index the rebuild wrote, opened only
+ * when a written word is a scheduled Seed Word. Empty when none is. **Null when
+ * one is and the test could not run** (the rebuild failed, or the index would
+ * not open): a verdict read off the index from before the reading would be
+ * about a word that no longer exists.
+ */
+export function seedWordChecksAfterWrite(
+  days: readonly ScheduleDay[],
+  written: readonly string[],
+  rebuilt: boolean,
+  openIndex: () => RhymeIndex,
+): ScheduledSeedWordCheck[] | null {
+  if (daysSeededBy(days, written).length === 0) return [];
+  if (!rebuilt) return null;
+  try {
+    return checkScheduledSeedWords(days, openIndex(), written);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * `seedWordChecksAfterWrite`'s result as lines for a terminal, saying what the
+ * Editor's Pass panel says: each day's verdict, where a failing day would go,
+ * and the command that writes it. None when no scheduled Seed Word was written.
+ */
+export function seedWordCheckLines(checks: readonly ScheduledSeedWordCheck[] | null): string[] {
+  if (checks === null) {
+    return ["A reading was written to a scheduled Seed Word, but the Seed Word test could not run on the rebuilt index. Run npm run build:index, then npm run seeds:test."];
+  }
+  return checks.map((check) => {
+    const head = `${check.date}, Seed Word ${check.seed}: ${check.line}`;
+    if (check.passes) return head;
+    const next = check.next === null
+      ? "No word of its family passes, so the day would be Free Play."
+      : `The day would keep ${check.rhymeKey} and go to ${check.next}.`;
+    return `${head} ${next} Run npm run seeds:test -- --write to write it.`;
   });
 }
 

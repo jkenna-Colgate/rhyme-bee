@@ -7,7 +7,7 @@
 import { describe, expect, it } from "vitest";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 import { chooseRepresentative } from "../curation.ts";
-import { checkScheduledSeedWords, seedWordFor, testSeedWord } from "../seedWord.ts";
+import { checkScheduledSeedWords, seedWordCheckLines, seedWordChecksAfterWrite, seedWordFor, testSeedWord } from "../seedWord.ts";
 import { serialiseUnconfirmedRhyme } from "../unconfirmedRhymes.ts";
 
 const index = makeTestIndex();
@@ -116,5 +116,23 @@ describe("the test on a word the Editor's Pass gave a reading", () => {
     expect(checkScheduledSeedWords(days, index, ["ate"])).toEqual([
       { date: "2026-09-08", seed: "ate", rhymeKey: "EY T", passes: true, line: "ate passes the Seed Word test on EY T.", next: null },
     ]);
+  });
+
+  it("opens no index for a write to no Seed Word, and gives no verdict off an index the rebuild did not write", () => {
+    const opened: string[] = [];
+    const open = () => {
+      opened.push("index");
+      return index;
+    };
+    expect(seedWordChecksAfterWrite(days, ["hair"], true, open)).toEqual([]);
+    expect(seedWordChecksAfterWrite(days, ["tear"], false, open)).toBeNull();
+    expect(opened).toEqual([]);
+    expect(seedWordChecksAfterWrite(days, ["tear"], true, open)).toHaveLength(1);
+  });
+
+  it("says in a line where a failing day would go and the command that writes it", () => {
+    const [line] = seedWordCheckLines(checkScheduledSeedWords(days, index, ["tear"]));
+    expect(line).toMatch(/^2026-09-07, Seed Word tear: tear is not heard one way/);
+    expect(line).toContain("The day would keep IH R and go to beer. Run npm run seeds:test -- --write to write it.");
   });
 });

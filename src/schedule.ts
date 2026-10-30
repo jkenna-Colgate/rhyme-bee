@@ -20,7 +20,8 @@
 
 import type { SeedWord } from "./rhymeIndex.ts";
 
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+/** A week's days in order, Monday first, as the ramp runs. */
+export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 export type Weekday = (typeof WEEKDAYS)[number];
 
 /** The days of one week, in the order the deal fills them. */

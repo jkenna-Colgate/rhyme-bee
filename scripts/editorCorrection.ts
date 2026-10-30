@@ -70,6 +70,7 @@ import { normaliseWord } from "../src/cmudict.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "../src/phonology.ts";
 import { respell } from "../src/respelling.ts";
 import { nextDateOf, type PuzzleFacts, type Schedule, type ScheduleDay } from "../src/schedule.ts";
+import { seedWordChecksAfterWrite } from "../src/seedWord.ts";
 import { gatherEvidence, type EvidenceContext } from "../src/supplementEvidence.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { RebuildResult } from "../web/src/editor/add.ts";
@@ -158,7 +159,21 @@ export interface CorrectionDeps {
   rebuild: () => Promise<RebuildResult>;
   /** Where the reading lands. `data/supplement.dict`, live. */
   supplementPath?: string;
+  /** Where the editor approved it, which the supplement's comment names. The Editor's Pass unless said. */
+  source?: CorrectionSource;
 }
+
+/**
+ * The two places an editor approves a correction: the Editor's Pass, on an
+ * agent's proposal, and a Batch's No False Accepts ruling list (#268), on a
+ * reading from Wiktionary or typed in the sitting.
+ */
+export type CorrectionSource = "editors-pass" | "batch";
+
+const APPROVED_IN: Record<CorrectionSource, string> = {
+  "editors-pass": "in the Editor's Pass",
+  batch: "on a Batch's No False Accepts ruling list (#268)",
+};
 
 /**
  * Approve a correction: write it, rebuild the Rhyme Index, and report what moved
@@ -194,7 +209,7 @@ export async function applyCorrection(
 
   appendCorrection(
     deps.supplementPath ?? resolve(root, "data", SUPPLEMENT),
-    { word, mode: ask.mode, target: ask.target, readings: written },
+    { word, mode: ask.mode, target: ask.target, readings: written, source: deps.source },
   );
   const rebuilt = await deps.rebuild();
   const after = days.map((day) => readDay(deps.openIndex, schedule, day.date));
@@ -208,6 +223,9 @@ export async function applyCorrection(
     rechecked,
     rebuilt,
     days: days.map((day, i) => movementOf(word, day, before[i]!, after[i]!)),
+    // A reading given to a scheduled Seed Word is one of the times the Seed
+    // Word test runs (#264), whichever path gave it.
+    seedWords: seedWordChecksAfterWrite(schedule.days, [word], rebuilt.ok, deps.openIndex),
   };
 }
 
@@ -368,14 +386,16 @@ const SUPPLEMENT = "supplement.dict";
  * same reason.
  */
 const CORRECTION_SECTION =
-  "# --- Corrections approved in the Editor's Pass: an agent proposed the reading and\n" +
-  "# the editor approved it against the engine's own (ADR-0009, ADR-0017). ---";
+  "# --- Corrections the editor approved against the engine's own reading, in the\n" +
+  "# Editor's Pass or on a Batch's ruling list; each comment says which (ADR-0009, ADR-0017). ---";
 
 interface CorrectionEntry {
   word: string;
   mode: CorrectionMode;
   target: RhymeKey;
   readings: Pronunciation[];
+  /** The Editor's Pass when absent. */
+  source?: CorrectionSource;
 }
 
 /**
@@ -404,14 +424,13 @@ function appendCorrection(path: string, entry: CorrectionEntry): void {
 }
 
 /** The comment and the entries for one correction, as text. */
-export function correctionLines({ word, mode, target, readings }: CorrectionEntry): string {
+export function correctionLines({ word, mode, target, readings, source = "editors-pass" }: CorrectionEntry): string {
+  const approved = `# ${word}: correction approved ${APPROVED_IN[source]}, against ${target}`;
   const note =
     mode === "join"
-      ? `# ${word}: correction approved in the Editor's Pass, against ${target} — joins the ` +
-        `engine's reading as an alternate rather than replacing it, so the word is accepted on ` +
-        `either pronunciation (ADR-0017).`
-      : `# ${word}: correction approved in the Editor's Pass, against ${target} — replaces every ` +
-        `reading the pinned sources hold for this word (ADR-0009).`;
+      ? `${approved} — joins the engine's reading as an alternate rather than replacing it, so ` +
+        `the word is accepted on either pronunciation (ADR-0017).`
+      : `${approved} — replaces every reading the pinned sources hold for this word (ADR-0009).`;
   const entries = readings.map(
     (phonemes, i) => `${word}${i === 0 ? "" : `(${i + 1})`} ${phonemes.join(" ")}`,
   );

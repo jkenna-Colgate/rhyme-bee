@@ -110,7 +110,7 @@
       "date": "2026-08-08",
       "weekday": "Sat",
       "week": 1,
-      "seed": "eater",
+      "seed": "meter",
       "rhymeKey": "IY D ER",
       "answerCount": 46,
       "difficulty": 0.158
@@ -515,10 +515,10 @@
       "date": "2026-09-22",
       "weekday": "Tue",
       "week": 8,
-      "seed": "bestselling",
+      "seed": "storytelling",
       "rhymeKey": "EH L AH NG",
       "answerCount": 29,
-      "difficulty": 0.0455
+      "difficulty": 0.0456
     },
     {
       "date": "2026-09-23",
@@ -677,10 +677,10 @@
       "date": "2026-10-10",
       "weekday": "Sat",
       "week": 10,
-      "seed": "lighter",
+      "seed": "miter",
       "rhymeKey": "AY T ER",
       "answerCount": 30,
-      "difficulty": 0.1714
+      "difficulty": 0.1464
     },
     {
       "date": "2026-10-11",
@@ -947,7 +947,7 @@
       "date": "2026-11-09",
       "weekday": "Mon",
       "week": 15,
-      "seed": "notwithstanding",
+      "seed": "longstanding",
       "rhymeKey": "AE N D AH NG",
       "answerCount": 22,
       "difficulty": 0
@@ -1316,7 +1316,7 @@
       "date": "2026-12-20",
       "weekday": "Sun",
       "week": 20,
-      "seed": "gone",
+      "seed": "lawn",
       "rhymeKey": "AA N",
       "answerCount": 100,
       "difficulty": 0.2675
@@ -1649,10 +1649,10 @@
       "date": "2027-01-26",
       "weekday": "Tue",
       "week": 26,
-      "seed": "keeper",
+      "seed": "gatekeeper",
       "rhymeKey": "IY P ER",
       "answerCount": 23,
-      "difficulty": 0.0402
+      "difficulty": 0.041
     },
     {
       "date": "2027-01-27",
@@ -1712,10 +1712,10 @@
       "date": "2027-02-02",
       "weekday": "Tue",
       "week": 27,
-      "seed": "easygoing",
+      "seed": "ongoing",
       "rhymeKey": "OW AH NG",
       "answerCount": 39,
-      "difficulty": 0.0361
+      "difficulty": 0.0358
     },
     {
       "date": "2027-02-03",
@@ -2045,7 +2045,7 @@
       "date": "2027-03-11",
       "weekday": "Thu",
       "week": 32,
-      "seed": "wiser",
+      "seed": "visor",
       "rhymeKey": "AY Z ER",
       "answerCount": 103,
       "difficulty": 0.1152
@@ -2315,10 +2315,10 @@
       "date": "2027-04-10",
       "weekday": "Sat",
       "week": 36,
-      "seed": "creative",
+      "seed": "native",
       "rhymeKey": "EY D AH V",
       "answerCount": 34,
-      "difficulty": 0.1646
+      "difficulty": 0.1637
     },
     {
       "date": "2027-04-11",

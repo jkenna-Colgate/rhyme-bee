@@ -69,15 +69,15 @@ export interface ContinuityReport {
   collisions: PlaceCollision[];
 }
 
-/** Null when the test is off or the day's Seed Word passes it; otherwise the test's sentence. */
-function testFailure(index: RhymeIndex, day: ScheduleDay, options: ContinuityOptions): string | null {
+/** Null when the test is off or the Seed Word passes it on the key; otherwise the test's sentence. */
+function testFailure(index: RhymeIndex, seed: string, rhymeKey: RhymeKey, options: ContinuityOptions): string | null {
   if (!options.seedWordTest) return null;
-  const test = testSeedWord(index, day.seed, day.rhymeKey);
-  return test.passes ? null : seedWordTestLine(day.seed, day.rhymeKey, test);
+  const test = testSeedWord(index, seed, rhymeKey);
+  return test.passes ? null : seedWordTestLine(seed, rhymeKey, test);
 }
 
 /** Null when the pair pins; otherwise what the index said, verbatim. */
-function pinFailure(index: RhymeIndex, seed: string, rhymeKey: RhymeKey): string | null {
+export function pinFailure(index: RhymeIndex, seed: string, rhymeKey: RhymeKey): string | null {
   try {
     index.pinSeed(seed, rhymeKey);
     return null;
@@ -115,12 +115,10 @@ export function checkContinuity(
   const repairs: DayRepair[] = [];
   const freePlay: FreePlayDay[] = [];
   const puzzleOf = puzzleReader(index);
-  const passes = (seed: string, rhymeKey: RhymeKey) =>
-    !options.seedWordTest || testSeedWord(index, seed, rhymeKey).passes;
   const holdsPlace = (day: ScheduleDay) => options.lapStart === undefined || day.date >= options.lapStart;
 
   repaired.forEach((day, i) => {
-    const failure = pinFailure(index, day.seed, day.rhymeKey) ?? testFailure(index, day, options);
+    const failure = pinFailure(index, day.seed, day.rhymeKey) ?? testFailure(index, day.seed, day.rhymeKey, options);
     if (failure === null) return;
 
     // Every family the Seed Word is in now, the most Answers first. A word may
@@ -152,7 +150,7 @@ export function checkContinuity(
         return seed === null ? [] : [{ step: 2 as const, seed, rhymeKey: f.rhymeKey }];
       }),
     ]
-      .filter((c) => c.step === 2 || passes(c.seed, c.rhymeKey))
+      .filter((c) => c.step === 2 || testFailure(index, c.seed, c.rhymeKey, options) === null)
       .filter((c) => pinFailure(index, c.seed, c.rhymeKey) === null);
 
     // The one-place rule is reported and never blocks (ADR-0012, 2026-10-27):

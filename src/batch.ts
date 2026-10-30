@@ -26,17 +26,19 @@
  * without one. A day that fails ships anyway, counted as failed.
  */
 
-import type { RhymeVerdict } from "./judge.ts";
+import { normaliseWord } from "./cmudict.ts";
+import { RHYME_BATCH, WORDHOOD_BATCH, type RhymeVerdict } from "./judge.ts";
 import type { Landed } from "./judgeLanding.ts";
 import type { RhymeKey } from "./phonology.ts";
+import type { RhymeIndex } from "./rhymeIndex.ts";
 import { addDays, isCalendarDate, scheduledDayFor, type Schedule } from "./schedule.ts";
 
 // ---- the block -----------------------------------------------------------------
 
 /** One Seed Word of a Batch. */
 export interface BatchSeed {
-  /** The first date in the range that plays it. */
-  date: string;
+  /** The first date in the range that plays it. Null for a word named rather than scheduled. */
+  date: string | null;
   seedWord: string;
   rhymeKey: RhymeKey;
   /** Whether players have had it already: its listed date is before today. */
@@ -63,6 +65,32 @@ export function batchBlock(schedule: Schedule, from: string, to: string, today: 
     block.push({ date, seedWord: day.seed, rhymeKey: day.rhymeKey, played: day.date < today });
   }
   return [...block.filter((s) => !s.played), ...block.filter((s) => s.played)];
+}
+
+/**
+ * The Seed Words of a Batch named by the maintainer rather than read off the
+ * Schedule: the way a word that holds no place gets a Batch at all, which is
+ * what growing the Schedule asks of every word joining it (#271). Each is
+ * written `word` or `word=RHYME KEY`. A word with one Rhyme Key is played on
+ * it; one with several on the key stated, or else on the one whose family holds
+ * the most Answers, as the Continuity repair ranks a word's keys. A word that
+ * does not pin there is refused before anything is called. It has no date and
+ * has not been played.
+ */
+export function namedBlock(asked: readonly string[], index: RhymeIndex): BatchSeed[] {
+  const block: BatchSeed[] = [];
+  for (const entry of asked) {
+    const at = entry.indexOf("=");
+    const seedWord = normaliseWord(at < 0 ? entry : entry.slice(0, at));
+    const stated = at < 0 ? undefined : entry.slice(at + 1).trim();
+    if (block.some((s) => s.seedWord === seedWord)) continue;
+    const answersOn = (key: RhymeKey) => index.familyOf(key).members.filter((m) => m.tier === "answer").length;
+    const rhymeKey = stated ?? [...index.rhymeKeysOf(seedWord)].sort((a, b) => answersOn(b) - answersOn(a))[0];
+    if (rhymeKey === undefined) throw new Error(`${seedWord} has no reading, so it has no Rhyme Key to play a Batch on`);
+    index.pinSeed(seedWord, rhymeKey); // throws, naming the word, when it does not pin there
+    block.push({ date: null, seedWord, rhymeKey, played: false });
+  }
+  return block;
 }
 
 // ---- off key -------------------------------------------------------------------
@@ -172,6 +200,57 @@ export function trustVerdict(failuresPerLook: readonly number[], gate: TrustGate
   if (failuresPerLook.length === 1) return "look-again";
   if (failuresPerLook[failuresPerLook.length - 1]! <= gate.k) return "pass";
   return failuresPerLook.length === gate.n ? "fail" : "look-again";
+}
+
+// ---- the cost ------------------------------------------------------------------
+
+/** What a Batch's calls depend on, known before any is made. */
+export interface BatchCallPlan {
+  seeds: number;
+  gate: TrustGate;
+  /** The most rhyme calls the Judge may make on one look before the Batch stops. */
+  maxJudgeCalls: number;
+  /** The No False Accepts hunt's calls, as counted on the index before the looks. */
+  hunt: { rhyme: number; wordhood: number };
+}
+
+/** The calls a Batch makes on one model, at fewest and at most. */
+export interface ModelCost {
+  model: string;
+  fewest: number;
+  most: number;
+  /** An Opus run needs its cost stated and the maintainer's yes (#267). */
+  opus: boolean;
+}
+
+export const isOpus = (model: string): boolean => /opus/.test(model);
+
+/**
+ * The calls a Batch will make, per model: every call is on the maintainer's
+ * subscription, so this is its cost. The Synthetic Player plays every Seed
+ * Word at least twice (the gate needs a look after the first) and at most `n`
+ * looks of two runs each. The Judge may be asked nothing on the looks, and at
+ * most `maxJudgeCalls` rhyme calls a look with a wordhood call per 20 of the
+ * Candidates those hold; the hunt's calls come on top.
+ */
+export function batchCost(plan: BatchCallPlan, models: { player: string; judge: string }): ModelCost[] {
+  const hunt = plan.hunt.rhyme + plan.hunt.wordhood;
+  const perLook = plan.maxJudgeCalls + Math.ceil((plan.maxJudgeCalls * RHYME_BATCH) / WORDHOOD_BATCH);
+  const legs = [
+    { model: models.player, fewest: plan.seeds * 2, most: plan.seeds * plan.gate.n * 2 },
+    { model: models.judge, fewest: hunt, most: hunt + plan.gate.n * perLook },
+  ];
+  const costs: ModelCost[] = [];
+  for (const leg of legs) {
+    const same = costs.find((c) => c.model === leg.model);
+    if (same) {
+      same.fewest += leg.fewest;
+      same.most += leg.most;
+    } else {
+      costs.push({ ...leg, opus: isOpus(leg.model) });
+    }
+  }
+  return costs;
 }
 
 // ---- the record ----------------------------------------------------------------

@@ -7,9 +7,11 @@
 import { describe, expect, it } from "vitest";
 import {
   batchBlock,
+  batchCost,
   batchesOf,
   keyCount,
   lookAttempt,
+  namedBlock,
   parseBatchRecord,
   recordBatches,
   serialiseBatchRecord,
@@ -18,6 +20,7 @@ import {
   type BatchEntry,
 } from "../batch.ts";
 import type { Schedule } from "../schedule.ts";
+import { makeTestIndex } from "../__fixtures__/index.ts";
 
 /** A tiny lexicon: each word's Rhyme Keys, as the index would read them. */
 const KEYS: Record<string, string[]> = {
@@ -171,6 +174,61 @@ describe("the Seed Words of a Batch, from a date range", () => {
 
   it("refuses a date the Schedule does not reach, rather than leave a gap in the Batch", () => {
     expect(() => batchBlock(schedule, "2026-10-30", "2026-11-03", "2026-10-01")).toThrow(/2026-10-30/);
+  });
+});
+
+describe("the Seed Words of a Batch, named rather than scheduled", () => {
+  // #271 grows the Schedule from Seed Words that passed a Batch and hold no
+  // place, so a Batch has to be able to take a word the Schedule does not hold.
+  const index = makeTestIndex({
+    pronunciations: [
+      ["deer", [["D", "IH1", "R"]]],
+      ["fear", [["F", "IH1", "R"]]],
+      ["near", [["N", "IH1", "R"]]],
+      ["peer", [["P", "IH1", "R"]]],
+      ["clear", [["K", "L", "IH1", "R"]]],
+    ],
+    words: ["deer", "fear", "near", "peer", "clear"],
+    prevalence: [["deer", 2.5], ["fear", 2.5], ["near", 2.5], ["peer", 2.5], ["clear", 2.5]],
+  });
+
+  it("plays a word with one Rhyme Key on it, with no date and as not yet played", () => {
+    expect(namedBlock(["ate"], index)).toEqual([{ date: null, seedWord: "ate", rhymeKey: "EY T", played: false }]);
+  });
+
+  it("plays a word with several on the one whose family holds the most Answers, unless one is stated", () => {
+    expect(index.rhymeKeysOf("tear")).toEqual(expect.arrayContaining(["IH R", "EH R"]));
+    expect(namedBlock(["tear"], index)[0]!.rhymeKey).toBe("IH R");
+    expect(namedBlock(["tear=EH R"], index)[0]!.rhymeKey).toBe("EH R");
+  });
+
+  it("refuses a word that does not pin, before anything is called", () => {
+    expect(() => namedBlock(["zzxq"], index)).toThrow(/zzxq/);
+    expect(() => namedBlock(["ate=IH R"], index)).toThrow(/ate/);
+  });
+
+  it("names each word once", () => {
+    expect(namedBlock(["ate", "Ate", "ate"], index).map((s) => s.seedWord)).toEqual(["ate"]);
+  });
+});
+
+describe("what a Batch costs, before any call is made", () => {
+  const plan = { seeds: 3, gate: { k: 1, n: 3 }, maxJudgeCalls: 30, hunt: { rhyme: 2, wordhood: 1 } };
+
+  it("counts the calls on each model, at fewest and at most", () => {
+    expect(batchCost(plan, { player: "claude-sonnet-5-5", judge: "claude-haiku-5-5" })).toEqual([
+      // Two looks at least, three at most, each played again once when off key.
+      { model: "claude-sonnet-5-5", fewest: 6, most: 18, opus: false },
+      // At fewest the looks need no Judge and the hunt's three calls are made;
+      // at most every look takes 30 rhyme calls and a wordhood call per 20 of its 240 Candidates.
+      { model: "claude-haiku-5-5", fewest: 3, most: 3 + 3 * (30 + 12), opus: false },
+    ]);
+  });
+
+  it("puts both on one line when the player and the Judge are one model, and says when it is an Opus model", () => {
+    expect(batchCost(plan, { player: "claude-opus-5-5", judge: "claude-opus-5-5" })).toEqual([
+      { model: "claude-opus-5-5", fewest: 6 + 3, most: 18 + 3 + 3 * 42, opus: true },
+    ]);
   });
 });
 

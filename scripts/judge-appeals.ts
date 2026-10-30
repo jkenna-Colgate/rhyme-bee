@@ -25,11 +25,17 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseDeclines } from "../src/declines.ts";
 import { judgeQuestion } from "../src/judge.ts";
+import { rulingKey } from "../src/judgeLanding.ts";
 import { parseCandidates } from "../src/supplementCandidate.ts";
 import {
+  addWrites,
+  candidatePair,
   JUDGE_MODEL,
   landJudgeLeg,
   loadIndex,
+  noCalls,
+  noWrites,
+  pairLine,
   readRulings,
   reportRuling,
   rhymeCalls,
@@ -69,39 +75,34 @@ console.error(
 
 const leg: JudgeLeg = plan.send.length > 0
   ? await runJudge(plan.send, { model, run, askWordhood: true })
-  : { items: [], calls: { rhyme: 0, wordhood: 0, fromCache: 0 }, answeredBy: [] };
+  : { items: [], calls: noCalls(), answeredBy: [] };
 const landings = landJudgeLeg(leg, { model, date });
-const recorded = new Map(landings.records.map((r) => [`${r.word} ${r.rhymeKey}`, r]));
+const recorded = new Map(landings.records.map((r) => [rulingKey(r.word, r.rhymeKey), r]));
 
 const landed: Record<string, number> = {};
 for (const r of landings.records) landed[r.landed] = (landed[r.landed] ?? 0) + 1;
 
-const pair = (i: { word: string; seedWord: string; rhymeKey: string }) => `${i.word} for ${i.seedWord} /${i.rhymeKey}/`;
+const keyGone = plan.keyGone.map((c) => ({ word: c.word, seedWord: c.seedWord, rhymeKey: c.seedRhymeKey }));
 for (const j of leg.items) {
-  const r = recorded.get(`${j.word} ${j.rhymeKey}`);
-  console.log(`${pair(j)}: ${r ? `${r.knew}, ${r.verdict} (${r.confidence}), landed ${r.landed}${r.heldBack ? ` (held back: ${r.heldBack})` : ""}` : "no ruling could be read, so it is sent again next run"}`);
+  const r = recorded.get(rulingKey(j.word, j.rhymeKey));
+  console.log(`${pairLine(j)}: ${r ? `${r.knew}, ${r.verdict} (${r.confidence}), landed ${r.landed}${r.heldBack ? ` (held back: ${r.heldBack})` : ""}` : "no ruling could be read, so it is sent again next run"}`);
 }
-for (const i of plan.waiting) console.log(`${pair(i)}: waits for the next run (over the limit)`);
-for (const i of plan.setAside) console.log(`${pair(i)}: not sent (${"setAside" in i.question ? i.question.setAside : ""})`);
-for (const i of plan.declined) console.log(`${pair(i)}: not sent (Declined by the editor)`);
-for (const { item, record } of plan.ruledBefore) console.log(`${pair(item)}: not sent (ruled on ${record.date}, landed ${record.landed})`);
-for (const c of plan.keyGone) console.log(`${c.word} for ${c.seedWord} /${c.seedRhymeKey}/: not sent (${c.seedWord} no longer reads on that Rhyme Key)`);
+for (const i of plan.waiting) console.log(`${pairLine(i)}: waits for the next run (over the limit)`);
+for (const i of plan.setAside) console.log(`${pairLine(i)}: not sent (${"setAside" in i.question ? i.question.setAside : ""})`);
+for (const i of plan.declined) console.log(`${pairLine(i)}: not sent (Declined by the editor)`);
+for (const { item, record } of plan.ruledBefore) console.log(`${pairLine(item)}: not sent (ruled on ${record.date}, landed ${record.landed})`);
+for (const c of keyGone) console.log(`${pairLine(c)}: not sent (${c.seedWord} no longer reads on that Rhyme Key)`);
 
-const named = (i: { word: string; seedWord: string; rhymeKey: string }) => ({ word: i.word, seedWord: i.seedWord, rhymeKey: i.rhymeKey });
 const part: AppealsPart = {
   date, model, run, limit, answeredBy: leg.answeredBy, calls: leg.calls,
   candidatesJudged: landings.records.length, landed,
-  writes: {
-    readings: landings.readings.map((r) => ({ word: r.word, reading: r.phonemes.join(" ") })),
-    unconfirmedRhymes: landings.unconfirmedRhymes,
-    suggestedDemotions: landings.records.filter((r) => r.landed === "suggested-demotion").map((r) => ({ word: r.word, rhymeKey: r.rhymeKey, reason: r.wordhood!.verdict })),
-  },
-  rulings: leg.items.map((j) => ({ ...reportRuling(j), landed: recorded.get(`${j.word} ${j.rhymeKey}`)?.landed ?? null })),
-  waiting: plan.waiting.map(named),
-  setAside: plan.setAside.map((i) => ({ ...named(i), why: "setAside" in i.question ? i.question.setAside : "" })),
-  ruledBefore: plan.ruledBefore.map(({ item, record }) => ({ ...named(item), ruledOn: record.date, landed: record.landed })),
-  declined: plan.declined.map(named),
-  keyGone: plan.keyGone.map((c) => ({ word: c.word, seedWord: c.seedWord, rhymeKey: c.seedRhymeKey })),
+  writes: addWrites(noWrites(), landings),
+  rulings: leg.items.map((j) => ({ ...reportRuling(j), landed: recorded.get(rulingKey(j.word, j.rhymeKey))?.landed ?? null })),
+  waiting: plan.waiting.map(candidatePair),
+  setAside: plan.setAside.map((i) => ({ ...candidatePair(i), why: "setAside" in i.question ? i.question.setAside : "" })),
+  ruledBefore: plan.ruledBefore.map(({ item, record }) => ({ ...candidatePair(item), ruledOn: record.date, landed: record.landed })),
+  declined: plan.declined.map(candidatePair),
+  keyGone,
 };
 const dir = resolve(root, MONTHLY_RUN_DIR);
 mkdirSync(dir, { recursive: true });
