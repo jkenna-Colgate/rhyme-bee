@@ -3,5 +3,6 @@
   "prevalence": "https://osf.io/g4xrt/files/nbu9e (Brysbaert et al. 2019)",
   "words": "https://github.com/dwyl/english-words/blob/master/words_alpha.txt",
   "names": "SSA baby names 1880–2023",
-  "supplement": "data/supplement.dict (committed human override layer, ADR-0009)"
+  "supplement": "data/supplement.dict (committed human override layer, ADR-0009)",
+  "wiktionary": "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl.gz, dump of 2026-10-25, General American and US transcriptions (data/wiktionary.tsv, read by a Batch only, #268)"
 }

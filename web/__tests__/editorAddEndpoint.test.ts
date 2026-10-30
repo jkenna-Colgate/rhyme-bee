@@ -31,6 +31,7 @@ import type { AddSubmitRequest, AddSubmitResult, RebuildResult } from "../src/ed
 import type { AddOutcome, AddTarget } from "../src/editor/addOutcome.ts";
 import { MAX_ADD_BODY_BYTES, addWriteRequest } from "../editorAddRequest.ts";
 import { MAX_SUBMITTED_WORDS } from "../src/editor/add.ts";
+import { makeTestIndex } from "../../src/__fixtures__/index.ts";
 
 /** `n` distinct spellings, in letters — the shape the parser admits. */
 function spellings(n: number): string[] {
@@ -391,6 +392,74 @@ describe("submitting a queue", () => {
     expect(result.readout).toBeNull();
     expect(result.rebuilt).toEqual({ ok: true });
     expect(result.outcome!.words).toHaveLength(1);
+  });
+});
+
+/**
+ * #264: a reading added to a scheduled Seed Word is one of the three times the
+ * Seed Word test runs, and the Editor's Pass shows the result. It is run on the
+ * index the rebuild produced, since that is the one holding the new reading,
+ * and only for a word that was written: a word that already read correctly
+ * changed nothing.
+ */
+describe("a reading written to a scheduled Seed Word", () => {
+  const tearDay: Schedule = {
+    startDate: "2026-08-10",
+    days: [{ ...SCHEDULE.days[0]!, date: "2026-09-07", seed: "tear", rhymeKey: "IH R" }],
+  };
+  const writtenTear = (_words: string[], aim: AddTarget): Promise<AddOutcome> =>
+    Promise.resolve({
+      target: aim.target,
+      provenance: aim.provenance,
+      words: [{ outcome: "written", word: "tear", phonemes: ["T", "EH1", "R"], composed: null }],
+    });
+
+  it("runs the Seed Word test on the rebuilt index and answers with its verdict", async () => {
+    const acts: string[] = [];
+    const handler = editorMiddleware(
+      editorAddSpec({
+        schedule: () => tearDay,
+        runAdds: writtenTear,
+        rebuild: () => {
+          acts.push("rebuild");
+          return Promise.resolve({ ok: true });
+        },
+        openIndex: () => {
+          acts.push("open-index");
+          return makeTestIndex();
+        },
+        staleness: () => ({ stale: false, reason: null }),
+      }),
+    );
+    const result = JSON.parse(
+      (await call(handler, submit({ date: "2026-09-07", words: ["tear"], appealed: [] }))).body,
+    ) as AddSubmitResult;
+
+    expect(acts[0]).toBe("rebuild");
+    expect(result.seedWords).toEqual([
+      expect.objectContaining({ date: "2026-09-07", seed: "tear", passes: false, next: "beer" }),
+    ]);
+  });
+
+  it("runs nothing for a submission that wrote no Seed Word", async () => {
+    const { handler, acts } = endpoint();
+    const result = JSON.parse((await call(handler, submit(batch))).body) as AddSubmitResult;
+
+    expect(result.seedWords).toEqual([]);
+    expect(acts).toEqual(["add", "rebuild", "open-index"]);
+  });
+
+  it("says the test could not run when the rebuild failed, rather than testing the old index", async () => {
+    const { handler } = endpoint({
+      schedule: () => tearDay,
+      runAdds: writtenTear,
+      rebuild: () => Promise.resolve({ ok: false, error: "npm run build:index exited 1." }),
+    });
+    const result = JSON.parse(
+      (await call(handler, submit({ date: "2026-09-07", words: ["tear"], appealed: [] }))).body,
+    ) as AddSubmitResult;
+
+    expect(result.seedWords).toBeNull();
   });
 });
 

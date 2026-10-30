@@ -689,3 +689,66 @@ musicianship M Y UW0 Z IH1 SH AH0 N SH IH2 P
 township T AW1 N SH IH2 P
 # townships (#253): -ships carries a beat; joins IH P S with `ships`.
 townships T AW1 N SH IH2 P S
+
+# --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
+# reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
+# amended 2026-10-14). Written with nobody reviewing them; see data/judge-runs/. ---
+# penmanship (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `ship` on IH P at high confidence.
+penmanship P EH1 N M AH0 N SH IH2 P
+# filmstrip (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `ship` on IH P at high confidence.
+filmstrip F IH1 L M S T R IH2 P
+# paperclip (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `ship` on IH P at high confidence.
+paperclip P EY1 P ER0 K L IH2 P
+# ladyship (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `ship` on IH P at high confidence.
+ladyship L EY1 D IY0 SH IH2 P
+# blaspheme (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+blaspheme B L AE2 S F IY1 M
+# overseam (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+overseam OW1 V ER0 S IY2 M
+# teardrop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+teardrop T IH1 R D R AA2 P
+# dewdrop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+dewdrop D UW1 D R AA2 P
+# tiptop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+tiptop T IH1 P T AA1 P
+# whop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+whop W AA1 P
+# clop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+clop K L AA1 P
+# swop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+swop S W AA1 P
+# gumdrop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+gumdrop G AH1 M D R AA2 P
+# snowdrop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+snowdrop S N OW1 D R AA2 P
+# doorstop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+doorstop D AO1 R S T AA2 P
+# flipflop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+flipflop F L IH1 P F L AA2 P
+# horsewhip (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `ship` on IH P at high confidence.
+horsewhip HH AO1 R S W IH2 P
+# landslip (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `ship` on IH P at high confidence.
+landslip L AE1 N D S L IH2 P
+# crossbeam (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+crossbeam K R AO1 S B IY2 M
+# airstream (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+airstream EH1 R S T R IY2 M
+# unseam (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+unseam AH0 N S IY1 M
+# redream (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+redream R IY2 D R IY1 M
+# strop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+strop S T R AA1 P
+# flattop (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `hop` on AA P at high confidence.
+flattop F L AE1 T T AA2 P
+# bullwhip (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `ship` on IH P at high confidence.
+bullwhip B UH1 L W IH2 P
+# misdeem (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+misdeem M IH0 S D IY1 M
+# slipstream (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-10-30) ruled it a Rhyme for `steam` on IY M at high confidence.
+slipstream S L IH1 P S T R IY2 M
+
+# --- Corrections the editor approved against the engine's own reading, in the
+# Editor's Pass or on a Batch's ruling list; each comment says which (ADR-0009, ADR-0017). ---
+# seraphim: correction approved on a Batch's No False Accepts ruling list (#268), against IY M — replaces every reading the pinned sources hold for this word (ADR-0009).
+seraphim S EH1 R AH0 F IH0 M

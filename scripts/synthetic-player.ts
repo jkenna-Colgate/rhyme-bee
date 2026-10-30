@@ -20,11 +20,8 @@ import { resolve } from "node:path";
 import { judgeQuestion } from "../src/judge.ts";
 import { startSession, type ScoringConfig } from "../src/session.ts";
 import { parsePlayerReply, playerPrompt, playWords } from "../src/syntheticPlayer.ts";
-import { JUDGE_MODEL, landingCounts, loadIndex, reportRuling, rhymeCalls, runJudge, scheduledKey, wordFacts, type JudgeItem } from "./judgeRun.ts";
+import { DEFAULT_PLAYER_MODEL, JUDGE_MODEL, landingCounts, loadIndex, reportRuling, rhymeCalls, runJudge, scheduledKey, wordFacts, type JudgeItem } from "./judgeRun.ts";
 import { callModel, exactModelId, inParallel, nextRun, root, today, writeRunReport } from "./modelCall.ts";
-
-/** The Synthetic Player's model is a setting, and starts at Sonnet (#227). */
-const DEFAULT_PLAYER_MODEL = "claude-sonnet-5-5";
 
 const argv = process.argv.slice(2);
 const flag = (name: string) => {

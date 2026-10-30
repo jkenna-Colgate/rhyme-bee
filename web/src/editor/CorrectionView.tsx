@@ -31,6 +31,7 @@ import {
   type CorrectionProposal,
   type CorrectionWriteResult,
 } from "./correction.ts";
+import { SeedWordChecks } from "./SeedWordChecks.tsx";
 import type { Corrector } from "./useCorrector.ts";
 
 /**
@@ -301,6 +302,8 @@ function Landed({ result }: { result: CorrectionWriteResult }) {
           )}
         </p>
       ))}
+
+      <SeedWordChecks checks={result.seedWords} />
     </div>
   );
 }

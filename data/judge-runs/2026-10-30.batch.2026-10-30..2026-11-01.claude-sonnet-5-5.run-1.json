@@ -1,0 +1,3120 @@
+{
+  "date": "2026-10-30",
+  "command": "batch --from 2026-10-30 --to 2026-11-01",
+  "run": 1,
+  "model": "claude-sonnet-5-5",
+  "playerModel": "claude-sonnet-5-5",
+  "answeredBy": [
+    "claude-sonnet-5-5"
+  ],
+  "calls": {
+    "player": 9,
+    "rhyme": 14,
+    "wordhood": 5,
+    "fromCache": 0
+  },
+  "settings": {
+    "gate": {
+      "k": 1,
+      "n": 3
+    },
+    "offKeyRatio": 5,
+    "maxJudgeCalls": 30
+  },
+  "candidatesJudged": 57,
+  "note": "A Batch (#267). Trust failures are Candidates the Judge rules a Rhyme with a reading that reaches the key, leaving out Unconfirmed Rhymes and suggested Demotions. Every write is listed under writes; the index was rebuilt after each look that landed one.",
+  "seedsPlayed": [
+    {
+      "seedWord": "ship",
+      "date": "2026-10-30",
+      "rhymeKey": "IH P",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        4,
+        2,
+        1
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "trip",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 59,
+                "onKey": 57,
+                "topOther": {
+                  "rhymeKey": "ER SH AH P",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 67,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "trip",
+                "lip",
+                "dip",
+                "tip",
+                "hip",
+                "zip",
+                "chip",
+                "clip",
+                "flip",
+                "grip",
+                "drip",
+                "slip",
+                "strip",
+                "whip",
+                "snip",
+                "sip",
+                "rip",
+                "nip",
+                "skip",
+                "quip",
+                "equip",
+                "unzip",
+                "airship",
+                "friendship",
+                "relationship",
+                "leadership",
+                "ownership",
+                "partnership",
+                "championship",
+                "membership",
+                "hardship",
+                "worship",
+                "kinship",
+                "censorship",
+                "scholarship",
+                "citizenship",
+                "fellowship",
+                "township",
+                "battleship",
+                "courtship",
+                "sponsorship",
+                "internship",
+                "authorship",
+                "apprenticeship",
+                "workmanship",
+                "penmanship",
+                "sportsmanship",
+                "showmanship",
+                "craftsmanship",
+                "statesmanship",
+                "dictatorship",
+                "flagship",
+                "gunship",
+                "warship",
+                "starship",
+                "spaceship",
+                "steamship",
+                "tulip",
+                "filmstrip",
+                "airstrip",
+                "paperclip",
+                "courtship",
+                "courtship",
+                "heirship",
+                "lordship",
+                "ladyship",
+                "trip"
+              ]
+            }
+          ],
+          "score": 430,
+          "maxScore": 1042,
+          "share": 0.4127,
+          "rank": "Bard",
+          "candidates": [
+            "worship",
+            "penmanship",
+            "tulip",
+            "filmstrip",
+            "paperclip",
+            "heirship",
+            "ladyship"
+          ],
+          "trustFailures": [
+            "penmanship",
+            "filmstrip",
+            "paperclip",
+            "ladyship"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "trip",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 57,
+                "onKey": 49,
+                "topOther": {
+                  "rhymeKey": "AA P",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 62,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "trip",
+                "grip",
+                "chip",
+                "dip",
+                "drip",
+                "flip",
+                "hip",
+                "lip",
+                "nip",
+                "rip",
+                "sip",
+                "tip",
+                "zip",
+                "clip",
+                "slip",
+                "skip",
+                "strip",
+                "whip",
+                "snip",
+                "quip",
+                "blip",
+                "equip",
+                "script",
+                "gossip",
+                "courtship",
+                "friendship",
+                "worship",
+                "hardship",
+                "airship",
+                "partnership",
+                "relationship",
+                "internship",
+                "leadership",
+                "ownership",
+                "censorship",
+                "citizenship",
+                "championship",
+                "scholarship",
+                "membership",
+                "fellowship",
+                "township",
+                "kinship",
+                "battleship",
+                "warship",
+                "spaceship",
+                "filmmaker",
+                "tulip",
+                "catnip",
+                "turnip",
+                "hip",
+                "chip",
+                "equip",
+                "unzip",
+                "eclipse",
+                "fingertip",
+                "paperclip",
+                "microchip",
+                "horsewhip",
+                "outstrip",
+                "airstrip",
+                "landslip",
+                "bellhop"
+              ]
+            }
+          ],
+          "score": 327,
+          "maxScore": 1078,
+          "share": 0.3033,
+          "rank": "Troubadour",
+          "candidates": [
+            "script",
+            "gossip",
+            "worship",
+            "filmmaker",
+            "tulip",
+            "turnip",
+            "eclipse",
+            "horsewhip",
+            "landslip",
+            "bellhop"
+          ],
+          "trustFailures": [
+            "horsewhip",
+            "landslip"
+          ]
+        },
+        {
+          "look": 3,
+          "example": "trip",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 74,
+                "onKey": 68,
+                "topOther": {
+                  "rhymeKey": "IH L AH P",
+                  "words": 2
+                },
+                "offKey": false
+              },
+              "wordsTyped": 81,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "trip",
+                "grip",
+                "drip",
+                "chip",
+                "dip",
+                "hip",
+                "lip",
+                "nip",
+                "rip",
+                "sip",
+                "tip",
+                "zip",
+                "flip",
+                "slip",
+                "clip",
+                "skip",
+                "strip",
+                "whip",
+                "snip",
+                "quip",
+                "blip",
+                "equip",
+                "flip",
+                "slip",
+                "grip",
+                "script",
+                "crip",
+                "pip",
+                "sip",
+                "tulip",
+                "airship",
+                "worship",
+                "friendship",
+                "hardship",
+                "leadership",
+                "ownership",
+                "membership",
+                "relationship",
+                "championship",
+                "citizenship",
+                "fellowship",
+                "internship",
+                "scholarship",
+                "partnership",
+                "kinship",
+                "courtship",
+                "township",
+                "battleship",
+                "censorship",
+                "dictatorship",
+                "flagship",
+                "penmanship",
+                "sponsorship",
+                "workmanship",
+                "showmanship",
+                "statesmanship",
+                "apprenticeship",
+                "readership",
+                "starship",
+                "spaceship",
+                "warship",
+                "gossip",
+                "filip",
+                "unzip",
+                "catnip",
+                "hairclip",
+                "paperclip",
+                "bullwhip",
+                "fillip",
+                "horsewhip",
+                "eldership",
+                "guardianship",
+                "stewardship",
+                "sportsmanship",
+                "craftsmanship",
+                "musicianship",
+                "salesmanship",
+                "brinkmanship",
+                "trusteeship",
+                "lordship",
+                "ladyship"
+              ]
+            }
+          ],
+          "score": 527,
+          "maxScore": 1097,
+          "share": 0.4804,
+          "rank": "Bard",
+          "candidates": [
+            "script",
+            "crip",
+            "tulip",
+            "worship",
+            "gossip",
+            "filip",
+            "hairclip",
+            "bullwhip",
+            "fillip",
+            "eldership"
+          ],
+          "trustFailures": [
+            "bullwhip"
+          ]
+        }
+      ]
+    },
+    {
+      "seedWord": "steam",
+      "date": "2026-10-31",
+      "rhymeKey": "IY M",
+      "played": false,
+      "trust": "fail",
+      "failuresPerLook": [
+        2,
+        4,
+        2
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "scheme",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 25,
+                "onKey": 25,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 30,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "team",
+                "scheme",
+                "dream",
+                "cream",
+                "beam",
+                "seam",
+                "gleam",
+                "stream",
+                "theme",
+                "extreme",
+                "supreme",
+                "redeem",
+                "esteem",
+                "seem",
+                "teem",
+                "beam",
+                "ream",
+                "deem",
+                "bream",
+                "regime",
+                "mainstream",
+                "upstream",
+                "downstream",
+                "daydream",
+                "moonbeam",
+                "sunbeam",
+                "ice cream",
+                "blaspheme",
+                "overseam",
+                "undeem"
+              ]
+            }
+          ],
+          "score": 152,
+          "maxScore": 218,
+          "share": 0.6972,
+          "rank": "Wordsmith",
+          "candidates": [
+            "blaspheme",
+            "overseam",
+            "undeem"
+          ],
+          "trustFailures": [
+            "blaspheme",
+            "overseam"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "scheme",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 40,
+                "onKey": 31,
+                "topOther": {
+                  "rhymeKey": "IY N",
+                  "words": 7
+                },
+                "offKey": false
+              },
+              "wordsTyped": 52,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "scheme",
+                "dream",
+                "team",
+                "beam",
+                "cream",
+                "seem",
+                "gleam",
+                "stream",
+                "theme",
+                "extreme",
+                "supreme",
+                "redeem",
+                "esteem",
+                "beam",
+                "seam",
+                "steam",
+                "deem",
+                "teem",
+                "ream",
+                "dream",
+                "screen",
+                "mean",
+                "clean",
+                "lean",
+                "bean",
+                "green",
+                "queen",
+                "ream",
+                "regime",
+                "blaspheme",
+                "creme",
+                "seem",
+                "agleam",
+                "upstream",
+                "downstream",
+                "mainstream",
+                "daydream",
+                "moonbeam",
+                "sunbeam",
+                "centimeter",
+                "crossbeam",
+                "bloodstream",
+                "airstream",
+                "jetstream",
+                "self-esteem",
+                "wiseacre",
+                "meme",
+                "sublime",
+                "unseam",
+                "off-team",
+                "ice cream",
+                "redream"
+              ]
+            }
+          ],
+          "score": 165,
+          "maxScore": 227,
+          "share": 0.7269,
+          "rank": "Laureate",
+          "candidates": [
+            "screen",
+            "mean",
+            "clean",
+            "lean",
+            "bean",
+            "green",
+            "queen",
+            "creme",
+            "agleam",
+            "centimeter",
+            "crossbeam",
+            "airstream",
+            "jetstream",
+            "wiseacre",
+            "meme",
+            "sublime",
+            "unseam",
+            "redream"
+          ],
+          "trustFailures": [
+            "crossbeam",
+            "airstream",
+            "unseam",
+            "redream"
+          ]
+        },
+        {
+          "look": 3,
+          "example": "scheme",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 39,
+                "onKey": 29,
+                "topOther": {
+                  "rhymeKey": "IY N",
+                  "words": 10
+                },
+                "offKey": false
+              },
+              "wordsTyped": 45,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "scheme",
+                "dream",
+                "team",
+                "beam",
+                "cream",
+                "seam",
+                "stream",
+                "gleam",
+                "steam",
+                "theme",
+                "seem",
+                "deem",
+                "teem",
+                "beam",
+                "ream",
+                "esteem",
+                "redeem",
+                "extreme",
+                "supreme",
+                "regime",
+                "blaspheme",
+                "mean",
+                "bean",
+                "lean",
+                "clean",
+                "green",
+                "queen",
+                "seen",
+                "screen",
+                "dean",
+                "glean",
+                "steam",
+                "agleam",
+                "upstream",
+                "downstream",
+                "mainstream",
+                "daydream",
+                "moonbeam",
+                "sunbeam",
+                "bloodstream",
+                "casteem",
+                "misdeem",
+                "airstream",
+                "slipstream",
+                "centimeme"
+              ]
+            }
+          ],
+          "score": 174,
+          "maxScore": 245,
+          "share": 0.7102,
+          "rank": "Laureate",
+          "candidates": [
+            "mean",
+            "bean",
+            "lean",
+            "clean",
+            "green",
+            "queen",
+            "seen",
+            "screen",
+            "dean",
+            "glean",
+            "agleam",
+            "casteem",
+            "misdeem",
+            "slipstream",
+            "centimeme"
+          ],
+          "trustFailures": [
+            "misdeem",
+            "slipstream"
+          ]
+        }
+      ]
+    },
+    {
+      "seedWord": "hop",
+      "date": "2026-11-01",
+      "rhymeKey": "AA P",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        10,
+        2,
+        0
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "chop",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 40,
+                "onKey": 38,
+                "topOther": {
+                  "rhymeKey": "AA CH",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 63,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "chop",
+                "shop",
+                "top",
+                "stop",
+                "drop",
+                "pop",
+                "mop",
+                "crop",
+                "flop",
+                "prop",
+                "swap",
+                "cop",
+                "bop",
+                "plop",
+                "slop",
+                "atop",
+                "laptop",
+                "desktop",
+                "hilltop",
+                "rooftop",
+                "treetop",
+                "backdrop",
+                "raindrop",
+                "teardrop",
+                "dewdrop",
+                "lollipop",
+                "nonstop",
+                "workshop",
+                "bookshop",
+                "tiptop",
+                "crabcrop",
+                "whop",
+                "sop",
+                "fop",
+                "glop",
+                "clop",
+                "stopwatch",
+                "eavesdrop",
+                "wop",
+                "swop",
+                "chop-shop",
+                "gumdrop",
+                "snowdrop",
+                "lamppost",
+                "doorstop",
+                "backstop",
+                "pitstop",
+                "beanstalk",
+                "hip-hop",
+                "bebop",
+                "sock hop",
+                "cough drop",
+                "flipflop",
+                "turnip top",
+                "bartop",
+                "countertop",
+                "tabletop",
+                "mountaintop",
+                "shoptalk",
+                "offtop",
+                "workshop",
+                "payshop",
+                "hotshop"
+              ]
+            }
+          ],
+          "score": 204,
+          "maxScore": 325,
+          "share": 0.6277,
+          "rank": "Wordsmith",
+          "candidates": [
+            "teardrop",
+            "dewdrop",
+            "tiptop",
+            "crabcrop",
+            "whop",
+            "clop",
+            "stopwatch",
+            "swop",
+            "gumdrop",
+            "snowdrop",
+            "lamppost",
+            "doorstop",
+            "pitstop",
+            "beanstalk",
+            "flipflop",
+            "bartop",
+            "countertop",
+            "shoptalk",
+            "offtop",
+            "payshop",
+            "hotshop"
+          ],
+          "trustFailures": [
+            "teardrop",
+            "dewdrop",
+            "tiptop",
+            "whop",
+            "clop",
+            "swop",
+            "gumdrop",
+            "snowdrop",
+            "doorstop",
+            "flipflop"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "chop",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 39,
+                "onKey": 39,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 45,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "chop",
+                "drop",
+                "shop",
+                "stop",
+                "top",
+                "pop",
+                "mop",
+                "crop",
+                "flop",
+                "prop",
+                "swap",
+                "cop",
+                "bop",
+                "atop",
+                "chop",
+                "plop",
+                "slop",
+                "sop",
+                "strop",
+                "lop",
+                "workshop",
+                "backdrop",
+                "raindrop",
+                "teardrop",
+                "snowdrop",
+                "lollipop",
+                "desktop",
+                "laptop",
+                "rooftop",
+                "treetop",
+                "hilltop",
+                "tabletop",
+                "nonstop",
+                "bellhop",
+                "earshop",
+                "gumdrop",
+                "dewdrop",
+                "pawnshop",
+                "flattop",
+                "doorstop",
+                "backstop",
+                "hip-hop",
+                "fop",
+                "kerplop",
+                "crawdad"
+              ]
+            }
+          ],
+          "score": 214,
+          "maxScore": 379,
+          "share": 0.5646,
+          "rank": "Wordsmith",
+          "candidates": [
+            "strop",
+            "earshop",
+            "flattop",
+            "kerplop",
+            "crawdad"
+          ],
+          "trustFailures": [
+            "strop",
+            "flattop"
+          ]
+        },
+        {
+          "look": 3,
+          "example": "chop",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 40,
+                "onKey": 38,
+                "topOther": {
+                  "rhymeKey": "IY",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 41,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "chop",
+                "top",
+                "stop",
+                "shop",
+                "drop",
+                "pop",
+                "mop",
+                "crop",
+                "flop",
+                "cop",
+                "prop",
+                "swap",
+                "slop",
+                "plop",
+                "atop",
+                "bop",
+                "lop",
+                "sop",
+                "hop",
+                "strop",
+                "backdrop",
+                "desktop",
+                "laptop",
+                "rooftop",
+                "tabletop",
+                "lollipop",
+                "nonstop",
+                "workshop",
+                "cdesktop",
+                "bellhop",
+                "non-stop",
+                "treetop",
+                "hilltop",
+                "eavesdrop",
+                "raindrop",
+                "teardrop",
+                "gumdrop",
+                "dewdrop",
+                "snowdrop",
+                "payroll",
+                "wannabe"
+              ]
+            }
+          ],
+          "score": 201,
+          "maxScore": 393,
+          "share": 0.5115,
+          "rank": "Wordsmith",
+          "candidates": [
+            "cdesktop",
+            "payroll",
+            "wannabe"
+          ],
+          "trustFailures": []
+        }
+      ]
+    }
+  ],
+  "untested": [],
+  "writes": {
+    "readings": [
+      {
+        "word": "penmanship",
+        "reading": "P EH1 N M AH0 N SH IH2 P"
+      },
+      {
+        "word": "filmstrip",
+        "reading": "F IH1 L M S T R IH2 P"
+      },
+      {
+        "word": "paperclip",
+        "reading": "P EY1 P ER0 K L IH2 P"
+      },
+      {
+        "word": "ladyship",
+        "reading": "L EY1 D IY0 SH IH2 P"
+      },
+      {
+        "word": "blaspheme",
+        "reading": "B L AE2 S F IY1 M"
+      },
+      {
+        "word": "overseam",
+        "reading": "OW1 V ER0 S IY2 M"
+      },
+      {
+        "word": "teardrop",
+        "reading": "T IH1 R D R AA2 P"
+      },
+      {
+        "word": "dewdrop",
+        "reading": "D UW1 D R AA2 P"
+      },
+      {
+        "word": "tiptop",
+        "reading": "T IH1 P T AA1 P"
+      },
+      {
+        "word": "whop",
+        "reading": "W AA1 P"
+      },
+      {
+        "word": "clop",
+        "reading": "K L AA1 P"
+      },
+      {
+        "word": "swop",
+        "reading": "S W AA1 P"
+      },
+      {
+        "word": "gumdrop",
+        "reading": "G AH1 M D R AA2 P"
+      },
+      {
+        "word": "snowdrop",
+        "reading": "S N OW1 D R AA2 P"
+      },
+      {
+        "word": "doorstop",
+        "reading": "D AO1 R S T AA2 P"
+      },
+      {
+        "word": "flipflop",
+        "reading": "F L IH1 P F L AA2 P"
+      },
+      {
+        "word": "horsewhip",
+        "reading": "HH AO1 R S W IH2 P"
+      },
+      {
+        "word": "landslip",
+        "reading": "L AE1 N D S L IH2 P"
+      },
+      {
+        "word": "crossbeam",
+        "reading": "K R AO1 S B IY2 M"
+      },
+      {
+        "word": "airstream",
+        "reading": "EH1 R S T R IY2 M"
+      },
+      {
+        "word": "unseam",
+        "reading": "AH0 N S IY1 M"
+      },
+      {
+        "word": "redream",
+        "reading": "R IY2 D R IY1 M"
+      },
+      {
+        "word": "strop",
+        "reading": "S T R AA1 P"
+      },
+      {
+        "word": "flattop",
+        "reading": "F L AE1 T T AA2 P"
+      },
+      {
+        "word": "bullwhip",
+        "reading": "B UH1 L W IH2 P"
+      },
+      {
+        "word": "misdeem",
+        "reading": "M IH0 S D IY1 M"
+      },
+      {
+        "word": "slipstream",
+        "reading": "S L IH1 P S T R IY2 M"
+      }
+    ],
+    "unconfirmedRhymes": [
+      {
+        "word": "heirship",
+        "rhymeKey": "IH P",
+        "writer": "judge:claude-sonnet-5-5",
+        "ruling": "missing-reading",
+        "confidence": "medium"
+      },
+      {
+        "word": "eldership",
+        "rhymeKey": "IH P",
+        "writer": "judge:claude-sonnet-5-5",
+        "ruling": "missing-reading",
+        "confidence": "medium"
+      }
+    ],
+    "suggestedDemotions": []
+  },
+  "rulings": [
+    {
+      "word": "worship",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "medium",
+      "why": "The stress is on ER, and the final -ship is weak, so the Rhyme Key is ER-SH-AH-P, not IH-P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "penmanship",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "P EH1 N M AH0 N SH IH2 P",
+      "confidence": "high",
+      "why": "The suffix -ship carries secondary stress, giving the rime IH-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard noun for handwriting skill.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "tulip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "The last stressed syllable is 'tu' (UW), and the final -lip is weak, so the rime is not IH-P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "filmstrip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F IH1 L M S T R IH2 P",
+      "confidence": "high",
+      "why": "Compound ending in 'strip' with secondary stress, so the key is IH-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard compound noun for a strip of film.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "paperclip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "P EY1 P ER0 K L IH2 P",
+      "confidence": "high",
+      "why": "The compound's last part 'clip' keeps secondary stress, and its rime IH-P matches 'ship' because the onset is ignored.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard compound noun, also spelled paper clip.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "heirship",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "EH1 R SH IH2 P",
+      "confidence": "medium",
+      "why": "'-ship' keeps a full IH vowel with secondary stress in this compound, so the key is IH-P.",
+      "reachesKey": true,
+      "wouldLand": "unconfirmed-rhyme",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Dictionary noun for the state of being an heir.",
+      "look": 1,
+      "landed": "unconfirmed-rhyme"
+    },
+    {
+      "word": "ladyship",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "L EY1 D IY0 SH IH2 P",
+      "confidence": "high",
+      "why": "The suffix -ship keeps secondary stress, so the last stressed rime is IH-P, the same as 'ship'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Dictionary noun, as in 'Your Ladyship'.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "blaspheme",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "B L AE2 S F IY1 M",
+      "confidence": "high",
+      "why": "The stressed final syllable is IY-M, the same as 'steam'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard English verb meaning to speak irreverently about sacred things.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "overseam",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "OW1 V ER0 S IY2 M",
+      "confidence": "high",
+      "why": "The compound's last part 'seam' keeps secondary stress, giving the rime IY-M.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Sewing term for an overcast seam, found in larger dictionaries.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "undeem",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "teardrop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "T IH1 R D R AA2 P",
+      "confidence": "high",
+      "why": "Compound ending in 'drop' with secondary stress, so the key is AA-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Common compound noun for a falling tear.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "dewdrop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "D UW1 D R AA2 P",
+      "confidence": "high",
+      "why": "Compound whose last part keeps secondary stress on AA-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Compound noun for a drop of dew.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "tiptop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "T IH1 P T AA1 P",
+      "confidence": "high",
+      "why": "Final stressed syllable 'top' has the key AA-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Dictionary adjective/noun meaning the very best or highest point.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "crabcrop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "whop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "W AA1 P",
+      "confidence": "high",
+      "why": "Simple AA-P rime.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Informal English verb meaning to hit or defeat.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "clop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "K L AA1 P",
+      "confidence": "high",
+      "why": "Same rime AA-P as hop.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "English word for the sound of hooves.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "stopwatch",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "It ends in 'watch' (AA-CH), not AA-P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "swop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S W AA1 P",
+      "confidence": "high",
+      "why": "Variant of 'swap', pronounced with AA-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Recognized British variant spelling of swap.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "gumdrop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "G AH1 M D R AA2 P",
+      "confidence": "high",
+      "why": "Compound ending in secondary-stressed AA-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Common compound noun for a gum candy.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "snowdrop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S N OW1 D R AA2 P",
+      "confidence": "high",
+      "why": "Compound ending in 'drop' with secondary stress, so the key is AA-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Name of a flowering plant.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "lamppost",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in OW-S-T, not AA-P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "doorstop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "D AO1 R S T AA2 P",
+      "confidence": "high",
+      "why": "Compound ending in stressed AA-P.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Common compound noun for a device that holds a door.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "pitstop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "beanstalk",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in AO-K, not AA-P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "flipflop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F L IH1 P F L AA2 P",
+      "confidence": "high",
+      "why": "Final syllable -flop has the AA-P rime.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Variant spelling of flip-flop (sandal or reversal), listed in dictionaries as a compound.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "bartop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "countertop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "shoptalk",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Last stressed syllable is AO-K (talk), not AA-P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "offtop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "payshop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "hotshop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "script",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Rime is IH-P-T, which has an extra final T compared with IH-P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "gossip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Stressed vowel is AA, and the final IH/AH P syllable is unstressed.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "filmmaker",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in EY K ER, nothing like IH P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "turnip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Stress falls on the first syllable (ER1), so the key is ER-N-IH-P, and the weak final syllable alone doesn't match.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "eclipse",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in IH P S, with an extra final s that ship lacks.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "horsewhip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "HH AO1 R S W IH2 P",
+      "confidence": "high",
+      "why": "Compound whose last part -whip keeps secondary stress on IH P, matching ship.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "A whip for horses, also a verb meaning to flog.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "landslip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "L AE1 N D S L IH2 P",
+      "confidence": "high",
+      "why": "Compound whose last part 'slip' keeps secondary stress and has the rime IH-P, the same as 'ship'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "British term for a landslide.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "bellhop",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in AA P, not the IH P of ship.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "screen",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in IY N, not IY M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "mean",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in IY N, not IY M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "clean",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Rime is IY-N, which differs from IY-M in the final consonant.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "lean",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in IY N, not IY M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "bean",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Rime is IY-N, which differs from IY-M in the final consonant.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "green",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in IY N, not IY M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "queen",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in IY N, not IY M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "creme",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "agleam",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "centimeter",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "The last stressed syllable is 'cen' (EH1 N), and the word ends in an unstressed -ER, so it doesn't have the key IY-M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "crossbeam",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "K R AO1 S B IY2 M",
+      "confidence": "high",
+      "why": "Compound whose last part 'beam' keeps secondary stress and has the rime IY-M, the same as 'steam'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "A beam laid across others; standard compound noun.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "airstream",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "EH1 R S T R IY2 M",
+      "confidence": "high",
+      "why": "Compound whose last part 'stream' keeps secondary stress and has the rime IY-M, the same as 'steam'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Airstream is a common noun for a current of air, though also a trailer brand.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "jetstream",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "wiseacre",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Wiseacre ends in unstressed 'er' (EY1 K ER0), so its Rhyme Key is 'ayker', not the 'eem' of steam.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "meme",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "sublime",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Ends in AY M, a different vowel.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "unseam",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "AH0 N S IY1 M",
+      "confidence": "high",
+      "why": "Ends in stressed IY M, the same as steam.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "A rare verb meaning to rip open a seam; found in Shakespeare and dictionaries.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "redream",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "R IY2 D R IY1 M",
+      "confidence": "high",
+      "why": "Stressed final syllable is IY M, the same as steam.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Regular re- prefix formation meaning to dream again; listed in Collins and Wiktionary.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "strop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S T R AA1 P",
+      "confidence": "high",
+      "why": "Stressed AA P with only the onset differing from hop.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "A strap for sharpening razors, or British slang for a sulk.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "earshop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "flattop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F L AE1 T T AA2 P",
+      "confidence": "high",
+      "why": "Compound whose last part keeps secondary stress on AA P, matching hop.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "A flat-topped haircut or aircraft carrier; listed in dictionaries.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "kerplop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "crawdad",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "missing-reading",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Rhyme Key is AO/AA + D (with AE2 D after), not AA P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "crip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "filip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "hairclip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "bullwhip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "B UH1 L W IH2 P",
+      "confidence": "high",
+      "why": "This compound keeps a secondary-stressed IH P in its last syllable, which matches ship.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "A long heavy whip, also used as a verb; a standard dictionary word.",
+      "look": 3,
+      "landed": "reading"
+    },
+    {
+      "word": "fillip",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Its Rhyme Key is IH L AH P, which has an extra syllable compared with IH P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 3,
+      "landed": "nothing"
+    },
+    {
+      "word": "eldership",
+      "seedWord": "ship",
+      "rhymeKey": "IH P",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "EH1 L D ER0 SH IH2 P",
+      "confidence": "medium",
+      "why": "The suffix -ship keeps a secondary-stressed IH P, as in leadership.",
+      "reachesKey": true,
+      "wouldLand": "unconfirmed-rhyme",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "The office or position of an elder, found in standard dictionaries.",
+      "look": 3,
+      "landed": "unconfirmed-rhyme"
+    },
+    {
+      "word": "seen",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "It ends in N, while steam ends in M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 3,
+      "landed": "nothing"
+    },
+    {
+      "word": "dean",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "It ends in N, while steam ends in M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 3,
+      "landed": "nothing"
+    },
+    {
+      "word": "glean",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "It ends in N, while steam ends in M.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 3,
+      "landed": "nothing"
+    },
+    {
+      "word": "agleam",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "casteem",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "misdeem",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "M IH0 S D IY1 M",
+      "confidence": "high",
+      "why": "Its stressed syllable is IY M, the same as steam.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "A rare archaic verb meaning to judge wrongly, listed in large dictionaries.",
+      "look": 3,
+      "landed": "reading"
+    },
+    {
+      "word": "slipstream",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S L IH1 P S T R IY2 M",
+      "confidence": "high",
+      "why": "Compound whose last part 'stream' keeps secondary stress and has the rime IY-M, matching 'steam'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "The current of air or water behind a moving object; a standard word and verb.",
+      "look": 3,
+      "landed": "reading"
+    },
+    {
+      "word": "centimeme",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "cdesktop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "payroll",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Its Rhyme Key is OW L, not AA P.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 3,
+      "landed": "nothing"
+    },
+    {
+      "word": "wannabe",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    }
+  ],
+  "noFalseAccepts": {
+    "note": "The hunt (#268): scored Answers with no Wiktionary reading on the Seed Word's Rhyme Key, or in the names data, put to the Judge. Nothing it ruled landed by itself; what landed is what the maintainer decided.",
+    "seeds": [
+      {
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "answers": 121,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": [
+          {
+            "word": "censorship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "EH N S ER SH AH P"
+            ]
+          },
+          {
+            "word": "chip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "courtship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AO R T SH AH P"
+            ]
+          },
+          {
+            "word": "craftsmanship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AE F T S M AH N SH AH P"
+            ]
+          },
+          {
+            "word": "dictatorship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "IH K T EY D ER SH AH P"
+            ]
+          },
+          {
+            "word": "entrepreneurship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "ER SH AH P",
+              "UH R SH AH P"
+            ]
+          },
+          {
+            "word": "fellowship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "EH L OW SH AH P",
+              "EH L AH SH AH P"
+            ]
+          },
+          {
+            "word": "flip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "internship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "IH N T ER N SH AH P"
+            ]
+          },
+          {
+            "word": "interrelationship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "EY SH AH N SH AH P"
+            ]
+          },
+          {
+            "word": "kingship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "IH NG SH AH P"
+            ]
+          },
+          {
+            "word": "kinship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "IH N SH AH P"
+            ]
+          },
+          {
+            "word": "kip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "ladyship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "EY D IY SH AH P"
+            ]
+          },
+          {
+            "word": "lordship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AO R D SH AH P"
+            ]
+          },
+          {
+            "word": "marksmanship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AA R K S M AH N SH AH P"
+            ]
+          },
+          {
+            "word": "ownership",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "OW N ER SH AH P"
+            ]
+          },
+          {
+            "word": "partnership",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AA R T N ER SH AH P"
+            ]
+          },
+          {
+            "word": "rip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "scholarship",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AA L ER SH AH P"
+            ]
+          },
+          {
+            "word": "sip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "skip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "tip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "IH P"
+            ]
+          },
+          {
+            "word": "trip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "IH P"
+            ]
+          },
+          {
+            "word": "whip",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          }
+        ]
+      },
+      {
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "answers": 37,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": [
+          {
+            "word": "deem",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "IY M"
+            ]
+          },
+          {
+            "word": "diem",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "dream",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "IY M"
+            ]
+          },
+          {
+            "word": "episteme",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "IY M IY"
+            ]
+          },
+          {
+            "word": "ream",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "redeem",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "seam",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "seraphim",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "sunbeam",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "supreme",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "IY M"
+            ]
+          }
+        ]
+      },
+      {
+        "seedWord": "hop",
+        "rhymeKey": "AA P",
+        "answers": 62,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": []
+      }
+    ],
+    "rulings": [
+      {
+        "word": "censorship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "S EH1 N S ER0 SH IH2 P",
+        "confidence": "high",
+        "why": "The -ship ending keeps a full vowel with secondary stress, so the key is IH P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun."
+      },
+      {
+        "word": "chip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "CH IH1 P",
+        "confidence": "high",
+        "why": "Same rime IH P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English word."
+      },
+      {
+        "word": "courtship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "K AO1 R T SH IH2 P",
+        "confidence": "high",
+        "why": "This is a compound whose last part is -ship, with secondary stress.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "craftsmanship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "K R AE1 F T S M AH0 N SH IH2 P",
+        "confidence": "high",
+        "why": "The final -ship has a full vowel with secondary stress, giving the key IH P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "dictatorship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "D IH0 K T EY1 T ER0 SH IH2 P",
+        "confidence": "high",
+        "why": "The final -ship has a full vowel with secondary stress, giving the key IH P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "entrepreneurship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "AA2 N T R AH0 P R AH1 N ER0 SH IH2 P",
+        "confidence": "high",
+        "why": "The final -ship has a full vowel with secondary stress, giving the key IH P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "fellowship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "F EH1 L OW0 SH IH2 P",
+        "confidence": "high",
+        "why": "The final -ship has a full vowel with secondary stress, giving the key IH P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "flip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "F L IH1 P",
+        "confidence": "high",
+        "why": "Same rime IH P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English word."
+      },
+      {
+        "word": "internship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "IH1 N T ER0 N SH IH2 P",
+        "confidence": "high",
+        "why": "Compound ending in -ship, which keeps secondary stress, so the Rhyme Key is IH-P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "interrelationship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "IH2 N T ER0 R IH0 L EY1 SH AH0 N SH IH2 P",
+        "confidence": "high",
+        "why": "The final -ship has a full vowel in a closed syllable, so it carries secondary stress and the key is IH-P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun in dictionaries."
+      },
+      {
+        "word": "kingship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "K IH1 NG SH IH2 P",
+        "confidence": "high",
+        "why": "Ends in -ship with secondary stress, so the key is IH-P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "kinship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "K IH1 N SH IH2 P",
+        "confidence": "high",
+        "why": "Ends in -ship with secondary stress, so the key is IH-P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "kip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "K IH1 P",
+        "confidence": "high",
+        "why": "Same IH-P rime as ship.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "British slang for sleep, also a hide and a currency unit."
+      },
+      {
+        "word": "ladyship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "L EY1 D IY0 SH IH2 P",
+        "confidence": "high",
+        "why": "Ends in -ship with secondary stress, so the key is IH-P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun, as in 'her ladyship'."
+      },
+      {
+        "word": "lordship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "L AO1 R D SH IH2 P",
+        "confidence": "high",
+        "why": "Ends in -ship with secondary stress, so the key is IH-P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "marksmanship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "M AA1 R K S M AH0 N SH IH2 P",
+        "confidence": "high",
+        "why": "Ends in -ship with secondary stress, so the key is IH-P.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English noun."
+      },
+      {
+        "word": "ownership",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "R IH1 P",
+        "confidence": "high",
+        "why": "Same rime IH-P as ship, only the onset differs.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun meaning the state of owning something."
+      },
+      {
+        "word": "partnership",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "no-ruling",
+        "reading": null,
+        "confidence": "low",
+        "why": "unparseable reply",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun for a joint business or cooperative relationship."
+      },
+      {
+        "word": "rip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "no-ruling",
+        "reading": null,
+        "confidence": "low",
+        "why": "unparseable reply",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English verb and noun meaning to tear."
+      },
+      {
+        "word": "scholarship",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "no-ruling",
+        "reading": null,
+        "confidence": "low",
+        "why": "unparseable reply",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun for academic study or a grant for education."
+      },
+      {
+        "word": "sip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "no-ruling",
+        "reading": null,
+        "confidence": "low",
+        "why": "unparseable reply",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English verb and noun for drinking in small mouthfuls."
+      },
+      {
+        "word": "skip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "no-ruling",
+        "reading": null,
+        "confidence": "low",
+        "why": "unparseable reply",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English verb meaning to leap lightly or pass over, and a noun for a large waste container."
+      },
+      {
+        "word": "tip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "no-ruling",
+        "reading": null,
+        "confidence": "low",
+        "why": "unparseable reply",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun and verb for a point, a gratuity, or a hint."
+      },
+      {
+        "word": "trip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "no-ruling",
+        "reading": null,
+        "confidence": "low",
+        "why": "unparseable reply",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun and verb for a journey or a stumble."
+      },
+      {
+        "word": "whip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "W IH1 P",
+        "confidence": "high",
+        "why": "Same rime IH-P as ship.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun and verb for a lash or to beat into a froth."
+      },
+      {
+        "word": "deem",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "D IY1 M",
+        "confidence": "high",
+        "why": "Rime IY-M matches steam.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English verb."
+      },
+      {
+        "word": "diem",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "Two syllables (D IY1 AH0 M), so the extra syllable after the vowel breaks the Rhyme Key.",
+        "wordhood": "not-a-word",
+        "wordhoodConfidence": "medium",
+        "wordhoodWhy": "Latin word, found only in 'carpe diem' and 'per diem', not a standalone English word."
+      },
+      {
+        "word": "dream",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "D R IY1 M",
+        "confidence": "high",
+        "why": "Rime IY-M matches steam.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English word."
+      },
+      {
+        "word": "episteme",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "EH1 P IH0 S T IY2 M",
+        "confidence": "medium",
+        "why": "Final syllable carries secondary stress with IY-M.",
+        "wordhood": "word",
+        "wordhoodConfidence": "medium",
+        "wordhoodWhy": "Philosophical term for knowledge, listed in major dictionaries."
+      },
+      {
+        "word": "ream",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "R IY1 M",
+        "confidence": "high",
+        "why": "Rime IY-M matches steam.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "English noun for 500 sheets of paper, and a verb meaning to widen a hole."
+      },
+      {
+        "word": "redeem",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "R IH0 D IY1 M",
+        "confidence": "high",
+        "why": "Last stressed syllable is IY-M.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English verb meaning to buy back or make amends."
+      },
+      {
+        "word": "seam",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "S IY1 M",
+        "confidence": "high",
+        "why": "Rime IY-M matches steam.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun for a line where two pieces are joined."
+      },
+      {
+        "word": "seraphim",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "Stressed rime is EH1 R AH0 F IH0 M, so the last stressed syllable is not IY M and the key differs; 'im' ends in a weak vowel.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Plural of seraph, an angelic being, listed in standard dictionaries."
+      },
+      {
+        "word": "sunbeam",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "S AH1 N B IY2 M",
+        "confidence": "high",
+        "why": "Compound whose last part 'beam' keeps secondary stress and has the key IY M.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Standard English compound noun for a ray of sunlight."
+      },
+      {
+        "word": "supreme",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "S AH0 P R IY1 M",
+        "confidence": "high",
+        "why": "Final syllable is stressed IY1 M, the same Rhyme Key as steam.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English adjective meaning highest in authority or degree."
+      }
+    ],
+    "decided": [
+      {
+        "word": "seraphim",
+        "seedWord": "steam",
+        "doubts": [
+          "no-rhyme"
+        ],
+        "decision": {
+          "kind": "correction",
+          "reading": [
+            "S",
+            "EH1",
+            "R",
+            "AH0",
+            "F",
+            "IH0",
+            "M"
+          ]
+        },
+        "wrote": "data/supplement.dict: seraphim S EH1 R AH0 F IH0 M"
+      }
+    ]
+  }
+}

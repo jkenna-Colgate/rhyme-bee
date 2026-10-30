@@ -93,6 +93,62 @@ describe("step 2: the family's lead word on that Rhyme Key", () => {
     ]);
     expect(report.freePlay).toEqual([]);
   });
+
+  it("swaps in the family's best-ranked word that passes the Seed Word test (#264)", () => {
+    // `frob` carries `AA B` on its main stress and ranks first, but it is a
+    // Bonus Word, so the day goes to `doorknob`.
+    const knobs = makeTestIndex({
+      pronunciations: [
+        ["frob", [["F", "R", "AA1", "B"]]],
+        ["doorknob", [["D", "AO1", "R", "N", "AA2", "B"]]],
+        ["heartthrob", [["HH", "AA1", "R", "T", "TH", "R", "AA2", "B"]]],
+      ],
+      words: ["frob", "doorknob", "heartthrob"],
+      prevalence: [["doorknob", 2.0], ["heartthrob", 1.5]],
+    });
+    const lost = day("2026-09-08", "knobbish", "AA B");
+    const report = checkContinuity([lost], knobs);
+
+    expect(report.days[0]).toMatchObject({ seed: "doorknob", rhymeKey: "AA B" });
+    expect(report.repairs.map((r) => r.step)).toEqual([2]);
+  });
+});
+
+describe("the Seed Word test, when the caller asks for it (#264)", () => {
+  it("is not run unless asked, since it is not run at every build", () => {
+    const days = [day("2026-09-07", "objurgate", "EY T")];
+    expect(checkContinuity(days, index).repairs).toEqual([]);
+  });
+
+  it("gives the day of a Seed Word that is not an Answer to its family's lead word, keeping its key", () => {
+    const bonus = day("2026-09-07", "objurgate", "EY T");
+    const report = checkContinuity([bonus], index, { seedWordTest: true });
+
+    expect(report.days).toEqual([{ ...bonus, seed: "ate", ...figuresOf("ate", "EY T") }]);
+    expect(report.repairs).toEqual([{ date: "2026-09-07", step: 2, before: bonus, after: report.days[0] }]);
+  });
+
+  it("gives the day of a Seed Word not heard one way to the next word, passing over the one that failed", () => {
+    const heardTwoWays = day("2026-09-07", "tear", "IH R");
+    const report = checkContinuity([heardTwoWays], index, { seedWordTest: true });
+
+    expect(report.days[0]).toMatchObject({ seed: "beer", rhymeKey: "IH R" });
+    expect(report.repairs.map((r) => r.step)).toEqual([2]);
+  });
+
+  it("makes the day Free Play, and counts it, when no word of the family passes", () => {
+    const alone = makeTestIndex({
+      pronunciations: [["zounds", [["Z", "AW1", "N", "D", "Z"]]]],
+      words: ["zounds"],
+      prevalence: [["zounds", -0.21]],
+    });
+    const report = checkContinuity([day("2026-11-23", "zounds", "AW N D Z")], alone, { seedWordTest: true });
+
+    expect(report.repairs).toEqual([]);
+    expect(report.freePlay).toEqual([
+      expect.objectContaining({ date: "2026-11-23", seed: "zounds", detail: expect.stringContaining("not an Answer") }),
+    ]);
+  });
 });
 
 describe("the one-place rule is reported and never blocks a repair (2026-10-27)", () => {
@@ -134,6 +190,19 @@ describe("the one-place rule is reported and never blocks a repair (2026-10-27)"
     const report = checkContinuity([stale, other], index);
 
     expect(report.repairs[0]).toMatchObject({ date: "2026-09-07", step: 2, after: { seed: "ate", rhymeKey: "EY T" } });
+  });
+
+  it("does not count a spare in front of the lap as holding a place", () => {
+    // As in the case above, but the other `eight` is a spare: step 1 is free to
+    // take. The spare is listed after the stale day so that it is still `eight`
+    // when the stale day is repaired (it does not pin, and is repaired in turn).
+    const stale = day("2026-09-07", "eight", "EY AH T");
+    const spare = day("2026-08-03", "eight", "AE T");
+    const repairOf = (lapStart?: string) =>
+      checkContinuity([stale, spare], index, { lapStart }).repairs.find((r) => r.date === "2026-09-07");
+
+    expect(repairOf()).toMatchObject({ step: 2 });
+    expect(repairOf("2026-08-04")).toMatchObject({ step: 1, after: { seed: "eight", rhymeKey: "EY T" } });
   });
 
   it("is Free Play only when nothing pins, whatever the other days hold", () => {
@@ -185,6 +254,25 @@ describe("the one-place check", () => {
     expect(continuityLines(report).join("\n")).toMatch(
       /one-place: the same Answers, on AW ER \/ AW R, hold 2 places: 2026-11-04 \(hour\), 2026-11-05 \(flour\)/,
     );
+  });
+
+  it("counts no place for a spare in front of the lap, which never plays again (#265)", () => {
+    // `lopsided` was the spare on 2026-08-03 and fills a place in the loop.
+    const spare = day("2026-08-03", "ate", "EY T");
+    const placed = day("2027-03-29", "ate", "EY T");
+    const loop = day("2026-08-04", "hat", "AE T");
+    const days = [spare, loop, placed];
+
+    expect(checkContinuity(days, index).collisions).not.toEqual([]);
+    expect(checkContinuity(days, index, { lapStart: "2026-08-04" }).collisions).toEqual([]);
+  });
+
+  it("still reports two places held inside the lap when a lap start is given", () => {
+    const days = [day("2026-08-04", "ate", "EY T"), day("2026-08-11", "ate", "EY T")];
+    expect(checkContinuity(days, index, { lapStart: "2026-08-04" }).collisions).toEqual([
+      { kind: "seed", value: "ate", dates: ["2026-08-04", "2026-08-11"] },
+      { kind: "rhymeKey", value: "EY T", dates: ["2026-08-04", "2026-08-11"] },
+    ]);
   });
 
   it("finds none in a Schedule that keeps the rule", () => {

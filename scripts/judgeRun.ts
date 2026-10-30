@@ -3,10 +3,11 @@
  * read what the index knows about each word, send the rhyme prompt, ask the
  * wordhood question of the rulings that would act, and classify where each would
  * land. `landJudgeLeg` writes what the rulings earn (#266); the caller writes the
- * run report.
+ * run report. The No False Accepts hunt asks the same two questions through
+ * `askBoth` (#268), and so every call to the Judge is made and counted here.
  */
 
-import { appendFileSync, existsSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { loadRhymeIndex } from "../src/loader.ts";
 import {
@@ -19,6 +20,7 @@ import {
   WORDHOOD_BATCH,
   wordhoodPrompt,
   type Classification,
+  type JudgedPair,
   type JudgeQuestion,
   type RhymeRuling,
   type WordFacts,
@@ -29,12 +31,17 @@ import type { RulesLexicon } from "../src/judgeRules.ts";
 import { applyNormalisation } from "../src/normalise.ts";
 import { rhymeKeyOf, type RhymeKey } from "../src/phonology.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
+import { parseSchedule, type Schedule } from "../src/schedule.ts";
+import type { ScoringConfig } from "../src/session.ts";
 import { serialiseUnconfirmedRhyme } from "../src/unconfirmedRhymes.ts";
 import { indexArtifactPath } from "./indexArtifact.ts";
 import { callModel, inParallel, root } from "./modelCall.ts";
 
 /** The pinned model the Judge was measured on. It moves only in the yearly sitting ADR-0021 describes. */
 export const JUDGE_MODEL = "claude-sonnet-5-5";
+
+/** The Synthetic Player's model is a setting, and starts at Sonnet (#227). */
+export const DEFAULT_PLAYER_MODEL = "claude-sonnet-5-5";
 
 export function loadIndex(): RhymeIndex {
   return loadRhymeIndex(indexArtifactPath(resolve(root, "dist-data")));
@@ -75,8 +82,30 @@ export function seedKeyNow(index: RhymeIndex, seedWord: string, seedReading: str
   throw new Error(`cannot tell which Rhyme Key ${seedWord} is pinned to now (it has ${keys.join(", ") || "none"})`);
 }
 
+const SCHEDULE = resolve(root, "data/schedule.json");
+
+/** `data/schedule.json` as written, which a rewrite carries through, and as a Schedule. */
+export interface ScheduleFile {
+  raw: Record<string, unknown> & { scoring: ScoringConfig };
+  schedule: Schedule;
+}
+
+/** Read `data/schedule.json`, refusing a file that does not read as a Schedule. */
+export function readScheduleFile(): ScheduleFile {
+  const raw = JSON.parse(readFileSync(SCHEDULE, "utf8")) as ScheduleFile["raw"];
+  const schedule = parseSchedule(raw);
+  if (schedule === null) throw new Error(`${SCHEDULE} does not read as a Schedule`);
+  return { raw, schedule };
+}
+
+/** Write `data/schedule.json` with `changes` over the fields it was read with. Returns the path. */
+export function writeScheduleFile(raw: ScheduleFile["raw"], changes: Partial<Schedule>): string {
+  writeFileSync(SCHEDULE, `${JSON.stringify({ ...raw, ...changes }, null, 2)}\n`);
+  return SCHEDULE;
+}
+
 function scheduledDays(): { seed: string; rhymeKey: string }[] {
-  return (JSON.parse(readFileSync(resolve(root, "data/schedule.json"), "utf8")) as { days: { seed: string; rhymeKey: string }[] }).days;
+  return readScheduleFile().schedule.days;
 }
 
 /** The Seed Word's key on the Schedule, where it has a day. */
@@ -111,6 +140,39 @@ export function landJudgeLeg(leg: JudgeLeg, opts: { model: string; date: string 
   return landings;
 }
 
+/** What a leg's landings wrote, as every run report lists it under `writes`. */
+export interface LandedWrites {
+  readings: { word: string; reading: string }[];
+  unconfirmedRhymes: Landings["unconfirmedRhymes"];
+  suggestedDemotions: { word: string; rhymeKey: string; reason: string }[];
+}
+
+export const noWrites = (): LandedWrites => ({ readings: [], unconfirmedRhymes: [], suggestedDemotions: [] });
+
+/** Add what one leg's landings wrote to a run's `writes`. */
+export function addWrites(into: LandedWrites, landings: Landings): LandedWrites {
+  into.readings.push(...landings.readings.map((r) => ({ word: r.word, reading: r.phonemes.join(" ") })));
+  into.unconfirmedRhymes.push(...landings.unconfirmedRhymes);
+  into.suggestedDemotions.push(
+    ...landings.records
+      .filter((r) => r.landed === "suggested-demotion")
+      .map((r) => ({ word: r.word, rhymeKey: r.rhymeKey, reason: r.wordhood!.verdict })),
+  );
+  return into;
+}
+
+/** A Candidate's word, the Seed Word it was entered for and that word's Rhyme Key: what names one in a report. */
+export interface CandidatePair {
+  word: string;
+  seedWord: string;
+  rhymeKey: RhymeKey;
+}
+
+export const candidatePair = ({ word, seedWord, rhymeKey }: CandidatePair): CandidatePair => ({ word, seedWord, rhymeKey });
+
+/** A Candidate as one line names it: `snored for bored /AO R D/`. */
+export const pairLine = (p: CandidatePair): string => `${p.word} for ${p.seedWord} /${p.rhymeKey}/`;
+
 /** Append whole lines, starting a fresh line if the file's last one was left open. */
 function appendLines(path: string, lines: readonly string[]): void {
   if (lines.length === 0) return;
@@ -118,10 +180,7 @@ function appendLines(path: string, lines: readonly string[]): void {
   appendFileSync(path, `${open ? "\n" : ""}${lines.join("")}`);
 }
 
-export interface JudgeItem {
-  word: string;
-  seedWord: string;
-  rhymeKey: RhymeKey;
+export interface JudgeItem extends CandidatePair {
   question: JudgeQuestion;
 }
 
@@ -132,10 +191,88 @@ export interface JudgedItem extends JudgeItem {
   classification?: Classification;
 }
 
+/** The calls a run made to the model, by question, and how many the cache answered. */
+export interface JudgeCalls {
+  rhyme: number;
+  wordhood: number;
+  fromCache: number;
+}
+
+export const noCalls = (): JudgeCalls => ({ rhyme: 0, wordhood: 0, fromCache: 0 });
+
+/** Add one leg's calls into a run's total. */
+export function addCalls(into: JudgeCalls, more: JudgeCalls): void {
+  into.rhyme += more.rhyme;
+  into.wordhood += more.wordhood;
+  into.fromCache += more.fromCache;
+}
+
 export interface JudgeLeg {
   items: JudgedItem[];
-  calls: { rhyme: number; wordhood: number; fromCache: number };
+  calls: JudgeCalls;
   answeredBy: string[];
+}
+
+/** What a leg's calls are counted into as they are made. */
+interface Tally {
+  calls: JudgeCalls;
+  answeredBy: Set<string>;
+}
+
+interface CallOptions {
+  model: string;
+  run: number;
+  label?: string;
+}
+
+async function ask(prompt: string, kind: "rhyme" | "wordhood", opts: CallOptions, tally: Tally): Promise<string> {
+  const reply = await callModel(opts.model, prompt, opts.run, opts.label);
+  tally.calls[kind]++;
+  if (reply.cached) tally.calls.fromCache++;
+  reply.answeredBy.forEach((m) => tally.answeredBy.add(m));
+  return reply.text;
+}
+
+/** The rhyme prompt, as it was measured, over `pairs` in batches. A pair whose reply did not read is absent. */
+async function askRhyme<T extends JudgedPair & { rhymeKey: RhymeKey }>(
+  pairs: readonly T[],
+  opts: CallOptions,
+  tally: Tally,
+): Promise<Map<T, RhymeRuling>> {
+  const rulings = new Map<T, RhymeRuling>();
+  await inParallel(rhymeBatches(pairs).map((batch) => async () => {
+    const text = await ask(rhymePrompt(batch), "rhyme", opts, tally);
+    parseRhymeReply(text, batch.length).forEach((r, i) => rulings.set(batch[i]!, r));
+  }));
+  return rulings;
+}
+
+/** The wordhood question, apart from the rhyme one, of each word once, `WORDHOOD_BATCH` words a call. */
+async function askWordhood(words: readonly string[], opts: CallOptions, tally: Tally): Promise<Map<string, WordhoodRuling>> {
+  const sorted = [...new Set(words)].sort();
+  const wordhood = new Map<string, WordhoodRuling>();
+  const chunks = Array.from({ length: Math.ceil(sorted.length / WORDHOOD_BATCH) }, (_, i) => sorted.slice(i * WORDHOOD_BATCH, (i + 1) * WORDHOOD_BATCH));
+  await inParallel(chunks.map((chunk) => async () => {
+    const text = await ask(wordhoodPrompt(chunk), "wordhood", opts, tally);
+    for (const r of parseWordhoodReply(text, chunk)) wordhood.set(r.word, r);
+  }));
+  return wordhood;
+}
+
+/**
+ * Both of the Judge's questions, of every pair and every word, with no ruling
+ * classified: what the No False Accepts hunt asks of a scored Answer (#268),
+ * where nothing the Judge rules lands by itself.
+ */
+export async function askBoth<T extends JudgedPair & { rhymeKey: RhymeKey }>(
+  pairs: readonly T[],
+  opts: CallOptions,
+): Promise<{ rhyme: Map<T, RhymeRuling>; wordhood: Map<string, WordhoodRuling>; calls: JudgeCalls; answeredBy: string[] }> {
+  const tally: Tally = { calls: noCalls(), answeredBy: new Set() };
+  const rhyme = await askRhyme(pairs, opts, tally);
+  const wordhood = await askWordhood(pairs.map((p) => p.word), opts, tally);
+  process.stderr.write("\n");
+  return { rhyme, wordhood, calls: tally.calls, answeredBy: [...tally.answeredBy].sort() };
 }
 
 const NOT_ASKED: RhymeRuling = { verdict: "no-ruling", reading: null, confidence: "low", why: "not sent to the Judge" };
@@ -153,20 +290,10 @@ export function rhymeCalls(items: readonly JudgeItem[]): number {
  */
 export async function runJudge(
   items: readonly JudgeItem[],
-  opts: { model: string; run: number; askEvery?: boolean; askWordhood: boolean },
+  opts: CallOptions & { askEvery?: boolean; askWordhood: boolean },
 ): Promise<JudgeLeg> {
-  const calls = { rhyme: 0, wordhood: 0, fromCache: 0 };
-  const answeredBy = new Set<string>();
-  const sent = items.filter((i) => opts.askEvery || "ask" in i.question);
-  const rulings = new Map<JudgeItem, RhymeRuling>();
-  const batches = rhymeBatches(sent);
-  await inParallel(batches.map((batch) => async () => {
-    const reply = await callModel(opts.model, rhymePrompt(batch), opts.run);
-    calls.rhyme++;
-    if (reply.cached) calls.fromCache++;
-    reply.answeredBy.forEach((m) => answeredBy.add(m));
-    parseRhymeReply(reply.text, batch.length).forEach((r, i) => rulings.set(batch[i]!, r));
-  }));
+  const tally: Tally = { calls: noCalls(), answeredBy: new Set() };
+  const rulings = await askRhyme(items.filter((i) => opts.askEvery || "ask" in i.question), opts, tally);
 
   const judged: JudgedItem[] = items.map((item) => {
     const ruling = rulings.get(item) ?? NOT_ASKED;
@@ -176,16 +303,7 @@ export async function runJudge(
   });
 
   if (opts.askWordhood) {
-    const words = [...new Set(judged.filter((j) => j.classification?.needsWordhood).map((j) => j.word))].sort();
-    const wordhood = new Map<string, WordhoodRuling>();
-    const chunks = Array.from({ length: Math.ceil(words.length / WORDHOOD_BATCH) }, (_, i) => words.slice(i * WORDHOOD_BATCH, (i + 1) * WORDHOOD_BATCH));
-    await inParallel(chunks.map((chunk) => async () => {
-      const reply = await callModel(opts.model, wordhoodPrompt(chunk), opts.run);
-      calls.wordhood++;
-      if (reply.cached) calls.fromCache++;
-      reply.answeredBy.forEach((m) => answeredBy.add(m));
-      for (const r of parseWordhoodReply(reply.text, chunk)) wordhood.set(r.word, r);
-    }));
+    const wordhood = await askWordhood(judged.filter((j) => j.classification?.needsWordhood).map((j) => j.word), opts, tally);
     for (const j of judged) {
       const w = wordhood.get(j.word);
       if (j.classification?.needsWordhood && w && "ask" in j.question) {
@@ -195,7 +313,7 @@ export async function runJudge(
     }
   }
   process.stderr.write("\n");
-  return { items: judged, calls, answeredBy: [...answeredBy].sort() };
+  return { items: judged, calls: tally.calls, answeredBy: [...tally.answeredBy].sort() };
 }
 
 /** One ruling as a run report lists it. */

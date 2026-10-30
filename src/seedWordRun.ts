@@ -1,0 +1,100 @@
+/**
+ * The Seed Word test over every place in the Schedule (#264). It waited for
+ * the Normalisations and the hand-written readings, because all of them change
+ * readings and nothing re-runs the test after they land.
+ *
+ *  1. **The test is a gate.** A day whose Seed Word fails it goes through the
+ *     Continuity repair (`checkContinuity`, with the test switched on), which
+ *     keeps its Rhyme Key and gives it the family's best-ranked word that
+ *     passes, or makes it Free Play and counts it. There is no second path.
+ *     This is all a run does unless the re-rank is asked for.
+ *  2. **The ranking is not a gate, and ran once.** #264 re-seeded every day
+ *     whose Seed Word passes but carries its Rhyme Key on a secondary stress
+ *     when the family's best-ranked passing word carries it on the main stress
+ *     (`makeup` to `cup`), keeping its Rhyme Key, place and weekday, and some
+ *     of those picks were then corrected by hand. A later run that re-ranked
+ *     would undo the corrections, so the re-rank runs only when it is named
+ *     (`reRank`). When the ranking still picks a secondary-stress word, because
+ *     the family's main-stress words are inflections (`breathtaking`), the day
+ *     keeps its Seed Word. A word another day holds as its Seed Word is passed
+ *     over, so a re-seed adds no collision to the one-place check.
+ */
+
+import { checkContinuity, pinFailure, rePin, type FreePlayDay } from "./continuity.ts";
+import { carriesMainStress, rankSeedWords } from "./curation.ts";
+import type { RhymeIndex } from "./rhymeIndex.ts";
+import type { ScheduleDay } from "./schedule.ts";
+import { testSeedWord } from "./seedWord.ts";
+
+/** Why a day's Seed Word changed. */
+export type SeedWordChangeReason =
+  | "re-ranked"
+  | "not-heard-one-way"
+  | "not-an-answer"
+  | "unconfirmed-rhyme"
+  | "did-not-pin";
+
+export interface SeedWordChange {
+  date: string;
+  why: SeedWordChangeReason;
+  before: ScheduleDay;
+  after: ScheduleDay;
+}
+
+export interface SeedWordRun {
+  /** Every day, with each change applied. */
+  days: ScheduleDay[];
+  changes: SeedWordChange[];
+  /** Days nothing could repair, counted against Continuity. */
+  freePlay: FreePlayDay[];
+}
+
+export interface SeedWordRunOptions {
+  /** Also re-seed a passing day on a secondary stress, as #264's one run did. Off unless named. */
+  reRank?: boolean;
+}
+
+export function runSeedWordTest(
+  days: readonly ScheduleDay[],
+  index: RhymeIndex,
+  options: SeedWordRunOptions = {},
+): SeedWordRun {
+  const repaired = checkContinuity(days, index, { seedWordTest: true });
+  const changes: SeedWordChange[] = repaired.repairs.map(({ date, before, after }) => ({
+    date,
+    why: failureOf(index, before),
+    before,
+    after,
+  }));
+
+  const result = [...repaired.days];
+  if (options.reRank) {
+    result.forEach((day, i) => {
+      if (repaired.repairs.some((r) => r.date === day.date)) return;
+      if (repaired.freePlay.some((f) => f.date === day.date)) return;
+      if (carriesMainStress(index, day.seed, day.rhymeKey)) return;
+
+      const heldElsewhere = new Set(result.filter((_, j) => j !== i).map((d) => d.seed));
+      const words = index.familyOf(day.rhymeKey).members.map((m) => m.word);
+      const pick = rankSeedWords(words, index, day.rhymeKey).find(
+        (w) => !heldElsewhere.has(w) && testSeedWord(index, w, day.rhymeKey).passes,
+      );
+      if (pick === undefined || pick === day.seed || !carriesMainStress(index, pick, day.rhymeKey)) return;
+
+      const after = rePin(index, day, pick, day.rhymeKey);
+      result[i] = after;
+      changes.push({ date: day.date, why: "re-ranked", before: day, after });
+    });
+  }
+
+  changes.sort((a, b) => a.date.localeCompare(b.date));
+  return { days: result, changes, freePlay: repaired.freePlay };
+}
+
+/** The part of the test the day's recorded Seed Word failed, or that it no longer pinned. */
+function failureOf(index: RhymeIndex, day: ScheduleDay): SeedWordChangeReason {
+  if (pinFailure(index, day.seed, day.rhymeKey) !== null) return "did-not-pin";
+  const test = testSeedWord(index, day.seed, day.rhymeKey);
+  // A repair is made only for a day that failed, so a pass here cannot happen.
+  return test.passes ? "did-not-pin" : test.reason;
+}

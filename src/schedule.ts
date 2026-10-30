@@ -20,7 +20,8 @@
 
 import type { SeedWord } from "./rhymeIndex.ts";
 
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+/** A week's days in order, Monday first, as the ramp runs. */
+export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 export type Weekday = (typeof WEEKDAYS)[number];
 
 /** The days of one week, in the order the deal fills them. */
@@ -73,7 +74,7 @@ export function addDays(isoDate: string, days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
-function weekdayOf(isoDate: string): Weekday {
+export function weekdayOf(isoDate: string): Weekday {
   // getUTCDay is Sunday-based; the schedule is Monday-based.
   const day = new Date(`${isoDate}T00:00:00Z`).getUTCDay();
   return WEEKDAYS[(day + 6) % DAYS_PER_WEEK]!;
@@ -256,7 +257,7 @@ export function isCalendarDate(isoDate: string): boolean {
 }
 
 /** Whole days from one ISO date to another; negative when `to` is earlier. */
-function daysBetween(from: string, to: string): number {
+export function daysBetween(from: string, to: string): number {
   return Math.round(
     (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / MS_PER_DAY,
   );

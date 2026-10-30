@@ -1,9 +1,13 @@
 /**
- * Download the four index sources from the private mirror into `data/`.
+ * Download the four index sources from the private mirror into `data/`, and the
+ * Wiktionary extract a Batch reads (#268) when it is asked for.
  *
- *   npm run sources:fetch
+ *   npm run sources:fetch                          # the four the build reads
+ *   npm run sources:fetch -- wiktionary.tsv        # only the files named
+ *   npm run sources:fetch -- --with-wiktionary     # the four and the extract
  *
- * What a fresh clone, or CI (#273), runs before `npm run build:index`. Each file
+ * What a fresh clone, or CI (#273), runs before `npm run build:index`. CI runs
+ * it bare, so it never needs the extract the build does not read. Each file
  * is checked against `data/sources.sha256`, the committed checksums, and if any
  * one fails the fetch refuses and writes nothing. A local copy that already
  * matches is kept, so a repeat run downloads nothing.
@@ -22,7 +26,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnvFile, readCredentials } from "./appealPull.ts";
 import { getObjectBytes } from "./r2Bucket.ts";
-import { CHECKSUM_FILE, fetchSources, type SourceFault } from "./sourceMirror.ts";
+import { CHECKSUM_FILE, fetchedFiles, fetchSources, type SourceFault } from "./sourceMirror.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
@@ -40,8 +44,9 @@ const PROBLEM: Record<SourceFault["problem"], string> = {
 };
 
 async function main(): Promise<void> {
+  const files = fetchedFiles(process.argv.slice(2));
   const credentials = readCredentials(settings);
-  console.log(`Fetching the index sources from ${credentials.bucket}…`);
+  console.log(`Fetching ${files.join(", ")} from ${credentials.bucket}…`);
 
   const result = await fetchSources(dataDir, async (key) => {
     try {
@@ -53,7 +58,7 @@ async function main(): Promise<void> {
           "there by `npm run sources:upload`, from the machine that holds the source.",
       );
     }
-  });
+  }, files);
 
   if (result.faults.length > 0) {
     throw new Error(

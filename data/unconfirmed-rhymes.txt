@@ -22,3 +22,5 @@
 # supplement.dict), after which the build drops it as stale and says so, or
 # Declines it. A scheduled Seed Word is never listed, and the build reports one
 # that is.
+heirship judge:claude-sonnet-5-5 missing-reading medium IH P
+eldership judge:claude-sonnet-5-5 missing-reading medium IH P

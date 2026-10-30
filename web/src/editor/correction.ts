@@ -40,6 +40,7 @@
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "../../../src/phonology.ts";
 import { respell } from "../../../src/respelling.ts";
 import type { PuzzleFacts } from "../../../src/schedule.ts";
+import type { ScheduledSeedWordCheck } from "../../../src/seedWord.ts";
 import type { ReadingEvidence } from "../../../src/supplementEvidence.ts";
 import type { RebuildResult } from "./add.ts";
 
@@ -158,6 +159,12 @@ export interface CorrectionWriteResult {
   rebuilt: RebuildResult;
   /** Every scheduled day on a rechecked key. Days with nothing on them included. */
   days: DayMovement[];
+  /**
+   * The Seed Word test on every scheduled day whose Seed Word is the corrected
+   * word (#264), as the add path reports it (`AddSubmitResult.seedWords`):
+   * empty when no day holds it, null when one does and the test could not run.
+   */
+  seedWords: ScheduledSeedWordCheck[] | null;
 }
 
 /**

@@ -38,6 +38,7 @@ import {
 import { InFlight } from "./InFlight.tsx";
 import { failureFor } from "./disagreement.ts";
 import { ReadsElsewhere } from "./ReadsElsewhere.tsx";
+import { SeedWordChecks } from "./SeedWordChecks.tsx";
 import { pendingWork, type EditorStatus } from "./status.ts";
 import type { Adder } from "./useAdder.ts";
 import type { Disagreer } from "./useDisagreement.ts";
@@ -419,6 +420,8 @@ function Submitted({
           ))}
         </ul>
       )}
+
+      <SeedWordChecks checks={result.seedWords} />
     </section>
   );
 }

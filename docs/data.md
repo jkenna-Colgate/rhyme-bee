@@ -108,6 +108,7 @@ ordinary pronunciations.
 | `supplement.dict` | CMUdict text, `#` comments | **committed** human adds + stress corrections (ADR-0009) |
 | `demotions.txt` | `<word> <reason>`, `#` comments | **committed** human wordhood corrections (#90) |
 | `unconfirmed-rhymes.txt` | `<word> <writer> <ruling> <confidence> <rhyme key>`, `#` comments | **committed** Unconfirmed Rhymes the Judge writes, accepted without Points on their key (#259) |
+| `wiktionary.tsv` | `<word><TAB><IPA>`, `#` header | General American transcriptions from Wiktionary, read by a Batch's No False Accepts hunt only and **not** by the build (#268, `scripts/extract-wiktionary.ts`) |
 
 `words.txt` is the wordhood authority and must exclude proper nouns, so CMUdict's
 surnames do not leak in (ADR-0003). `names.txt` only affects the *reason* a
@@ -128,6 +129,7 @@ receive.
 | Word prevalence norms (Brysbaert et al. 2019) | https://osf.io/5fk8d/ | **Unconfirmed** ⚠️ |
 | Common-word list (dwyl/english-words) | pin in `sources.json` | Unlicense (declared); provenance contested upstream ⚠️ |
 | Names list (SSA baby names) | pin in `sources.json` | CC0 1.0 ✅ |
+| Wiktionary, via Kaikki's Wiktextract dump | pin in `sources.json` | CC BY-SA 4.0 and GFDL; Batch-time only, never shipped ✅ |
 
 ✅ CMUdict's BSD-2-Clause notice must be retained wherever its material is
 redistributed, which here means the committed ARPAbet in `supplement.dict` and
