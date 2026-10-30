@@ -1,0 +1,14 @@
+{
+  "note": "Which Seed Words have been through a Batch, and with what result (#267). Written by the batch command; a Seed Word with no entry has not been checked. Each Batch's run report is in data/judge-runs/.",
+  "seeds": {
+    "hop": [
+      {"date":"2026-10-30","rhymeKey":"AA P","trust":"pass","failuresPerLook":[10,2,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-10-30.batch.2026-10-30..2026-11-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "ship": [
+      {"date":"2026-10-30","rhymeKey":"IH P","trust":"pass","failuresPerLook":[4,2,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-10-30.batch.2026-10-30..2026-11-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":25,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "steam": [
+      {"date":"2026-10-30","rhymeKey":"IY M","trust":"fail","failuresPerLook":[2,4,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-10-30.batch.2026-10-30..2026-11-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":10,"listed":1,"unruled":[],"stillScored":[]}}
+    ]
+  }
+}
