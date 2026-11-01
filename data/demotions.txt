@@ -67,3 +67,4 @@ preceeding not-a-known-word  # misspelling of `preceding`
 nepal proper-noun
 neptune proper-noun       # the planet and the Roman god
 tudor proper-noun         # the English royal house
+scott proper-noun

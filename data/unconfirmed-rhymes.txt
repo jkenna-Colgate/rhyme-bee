@@ -24,3 +24,18 @@
 # that is.
 heirship judge:claude-sonnet-5-5 missing-reading medium IH P
 eldership judge:claude-sonnet-5-5 missing-reading medium IH P
+sisterhood judge:claude-sonnet-5-5 overrule high UH D
+priesthood judge:claude-sonnet-5-5 overrule high UH D
+hussar judge:claude-sonnet-5-5 overrule high AA R
+scimitar judge:claude-sonnet-5-5 missing-reading medium AA R
+pulsar judge:claude-sonnet-5-5 overrule high AA R
+traject judge:claude-sonnet-5-5 missing-reading medium EH K T
+seesaws judge:claude-sonnet-5-5 missing-reading medium AA Z
+yod judge:claude-sonnet-5-5 missing-reading medium AA D
+hierarch judge:claude-sonnet-5-5 missing-reading medium AA R K
+petard judge:claude-sonnet-5-5 overrule high AA R D
+despited judge:claude-sonnet-5-5 missing-reading medium AY T AH D
+consorted judge:claude-sonnet-5-5 missing-reading medium AO R D AH D
+bluegown judge:claude-sonnet-5-5 missing-reading medium AW N
+undersighted judge:claude-sonnet-5-5 missing-reading medium AY T AH D
+coleslaws judge:claude-sonnet-5-5 missing-reading medium AA Z
