@@ -41,6 +41,18 @@
  *
  * It writes the run report to `data/judge-runs/` and the result per Seed Word
  * to `data/batches.json`, both to be committed with what landed.
+ *
+ * **At the usage limit** (#286) the Batch stops cleanly. Once a call reports
+ * either usage window at 90% or over (`USAGE_STOP_AT` in `modelCall.ts`), or a
+ * call is refused for the limit, no new call starts, the calls in flight finish
+ * and are cached, and the command exits non-zero having written neither the run
+ * report nor `data/batches.json`. That leaves the run number unused, and the
+ * cache is keyed by it, so the same command run again after the reset replays
+ * every call that finished for free and goes on from there. What already landed
+ * stays in `data/` and is not sent to the Judge again. To resume, leave every
+ * file as it is, commit nothing, and run the command it prints. It cannot stop
+ * during the ruling list: the hunt makes all its calls before the list is put.
+ * The `--max-judge-calls` stop is a different path, and writes a report.
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -101,7 +113,7 @@ import {
   type HuntLeg,
   type Settled,
 } from "./batchHunt.ts";
-import { callModel, exactModelId, inParallel, nextRun, root, today, writeRunReport, type ModelReply } from "./modelCall.ts";
+import { callModel, exactModelId, inParallel, nextRun, root, today, UsageStopError, writeRunReport, type ModelReply } from "./modelCall.ts";
 
 // ---- the settings --------------------------------------------------------------
 
@@ -200,6 +212,25 @@ if (!confirmed) {
 const stem = from && to ? `batch.${from}..${to}.${playerModel}` : `batch.seeds.${block.map((s) => s.seedWord).join("-").slice(0, 60)}.${playerModel}`;
 const run = nextRun(stem);
 
+/** The command that resumes this run, as typed: the same one, whose run number nothing has used yet. */
+const resume = `npx tsx scripts/batch.ts ${argv.map((a) => (/[\s"]/.test(a) ? `"${a.replace(/"/g, '\\"')}"` : a)).join(" ")}`;
+/**
+ * Await calls to the model, and at the usage stop end the sitting with nothing
+ * written that would use up the run number (#286): no report and no record.
+ */
+async function orUsageStop<T>(calls: Promise<T>): Promise<T> {
+  try {
+    return await calls;
+  } catch (e) {
+    if (!(e instanceof UsageStopError)) throw e;
+    console.error(
+      `\n${e.message}. Nothing is lost: the calls made so far are cached and what landed is in data/. ` +
+      `Leave the files as they are, don't commit, and run the same command again after the reset to resume:\n  ${resume}`,
+    );
+    process.exit(1);
+  }
+}
+
 interface RunOfLook {
   attempt: number;
   words: string[];
@@ -265,11 +296,11 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
   for (const d of playing) d.looks.push({ look: lookNo, runs: [], example: exampleRhyme(contexts.get(d)!, index) });
   let toPlay = playing;
   for (let attempt = 1; toPlay.length > 0; attempt++) {
-    const replies = await inParallel(toPlay.map((d) => () => {
+    const replies = await orUsageStop(inParallel(toPlay.map((d) => () => {
       const ctx = contexts.get(d)!;
       const look = d.looks.at(-1)!;
       return callModel(playerModel, playerPrompt(ctx.seed.word, ctx.puzzle.seedRespelling, look.example), run, `look-${lookNo}.try-${attempt}`);
-    }));
+    })));
     process.stderr.write("\n");
     const again: Day[] = [];
     toPlay.forEach((d, i) => {
@@ -303,7 +334,7 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
     for (const d of looked) d.notChecked = `the Batch stopped before judging look ${lookNo}`;
     break;
   }
-  const leg = await runJudge(send, { model: JUDGE_MODEL, run, askWordhood: true, label: `look-${lookNo}` });
+  const leg = await orUsageStop(runJudge(send, { model: JUDGE_MODEL, run, askWordhood: true, label: `look-${lookNo}` }));
   noteLeg(leg);
   const landings = landJudgeLeg(leg, { model: JUDGE_MODEL, date });
   addWrites(writes, landings);
@@ -347,7 +378,7 @@ if (!stopped) {
   const huntDays = planHunt(index, days.filter((d) => !d.notChecked).map((d) => ({ ...d.seed, rhymeKey: d.rhymeKey })), scheduleRaw.scoring, wiktionary);
   const planned = huntCalls(huntDays);
   console.error(`\nNo False Accepts: ${planned.sent} scored Answers to the Judge, ${planned.rhyme} rhyme and ${planned.wordhood} wordhood calls`);
-  const leg = await judgeHunt(huntDays, { model: JUDGE_MODEL, run });
+  const leg = await orUsageStop(judgeHunt(huntDays, { model: JUDGE_MODEL, run }));
   noteLeg(leg);
   const settled = await settleRulingList(rulingList(leg.rulings), { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
   if (settled.some((s) => s.decision.kind === "demotion")) {
