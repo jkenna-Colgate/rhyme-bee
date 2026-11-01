@@ -26,9 +26,8 @@ function graphemeFor(phoneme: string): string {
 }
 
 /**
- * A vowel and the `r` closing its syllable, spelled as one unit (#240). Spelled
- * a sound at a time, `beard` read "BIH-rd", which a player reads cold as
- * "bird", and one vowel showed two ways (`here` "HEE-r", `beer` "BIH-r").
+ * A vowel and the `r` after it, spelled as one unit (#240), so `beard` reads
+ * "BEER-d" and not "BIH-rd" (read cold, "bird"), and one vowel shows one way.
  * A vowel missing here keeps its own spelling with the `r` after it.
  */
 const BEFORE_R: Record<string, string> = {
@@ -36,10 +35,19 @@ const BEFORE_R: Record<string, string> = {
   AO: "or", OW: "or", UH: "oor", UW: "oor", AY: "ire", AW: "our",
 };
 
-/** True when the `r` at `index` closes a syllable: no vowel follows it. */
-function closesSyllable(pronunciation: Pronunciation, index: number): boolean {
-  const next = pronunciation[index + 1];
-  return pronunciation[index] === "R" && (next === undefined || !isVowel(next));
+/**
+ * True when the vowel at `index` and the `r` after it spell one unit. An `r`
+ * with no vowel after it always joins. An `r` before a vowel joins a stressed
+ * vowel from `BEFORE_R` (`story` "STOR-ee"), but not `IH`: the data spells
+ * `spirit` and `period` with the same IH R, and only one of them is "eer".
+ */
+function joinsItsR(pronunciation: Pronunciation, index: number): boolean {
+  if (pronunciation[index + 1] !== "R") return false;
+  const after = pronunciation[index + 2];
+  if (after === undefined || !isVowel(after)) return true;
+  const vowel = pronunciation[index]!;
+  const sound = bareSound(vowel);
+  return (stressOf(vowel) ?? 0) > 0 && sound !== "IH" && sound in BEFORE_R;
 }
 
 /**
@@ -63,7 +71,7 @@ export function respell(pronunciation: Pronunciation): string {
       current += graphemeFor(phoneme);
       continue;
     }
-    if (closesSyllable(pronunciation, i + 1)) {
+    if (joinsItsR(pronunciation, i)) {
       current += BEFORE_R[bareSound(phoneme)] ?? `${graphemeFor(phoneme)}r`;
       i++;
     } else {

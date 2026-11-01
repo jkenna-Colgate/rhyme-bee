@@ -44,9 +44,26 @@ describe("respelling", () => {
       expect(respell(phonemes)).toBe(expected);
     });
 
-    it("leaves an r before a vowel at the start of the next syllable", () => {
+    it.each([
+      ["story", ["S", "T", "AO1", "R", "IY0"], "STOR-ee"],
+      ["fairy", ["F", "EH1", "R", "IY0"], "FAIR-ee"],
+      ["jury", ["JH", "UH1", "R", "IY0"], "JOOR-ee"],
+      ["sorry", ["S", "AA1", "R", "IY0"], "SAR-ee"],
+      ["irony", ["AY1", "R", "AH0", "N", "IY0"], "IRE-uh-nee"],
+      ["nares", ["N", "EH1", "R", "IY0", "Z"], "NAIR-ee-z"],
+    ])("keeps a stressed vowel with an r before a vowel too: %s", (_, phonemes, expected) => {
+      // Otherwise `store` is STOR and `story` STAW-ree, one vowel two ways.
+      expect(respell(phonemes)).toBe(expected);
+    });
+
+    it("splits IH from an r before a vowel, which the data spells one way for two vowels", () => {
+      // `spirit` and `period` are both IH R in the data; only one of them is "eer".
       expect(respell(["S", "P", "IH1", "R", "AH0", "T"])).toBe("SPIH-ruh-t");
-      expect(respell(["V", "EH1", "R", "IY0"])).toBe("VEH-ree");
+      expect(respell(["P", "IH1", "R", "IY0", "AH0", "D"])).toBe("PIH-ree-uh-d");
+    });
+
+    it("splits an unstressed vowel from an r before a vowel", () => {
+      expect(respell(["IH0", "R", "OW1", "D"])).toBe("ih-ROH-d");
     });
   });
 });
