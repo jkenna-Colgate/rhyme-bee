@@ -700,6 +700,13 @@ tern T ER1 N
 clique K L IY1 K
 clique(1) K L IH1 K
 
+# voyeur, raconteur (#240): upstream ends both in "oor", which the before-r Normalisation
+# would score for `cure`; both end in "er", with `fur`.
+voyeur V OY2 Y ER1
+raconteur R AE2 K AA0 N T ER1
+# doer (#240): upstream `D UW1 R` is one syllable, "door"; it is "DOO-er", like `doers`.
+doer D UW1 ER0
+
 # --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
 # reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
 # amended 2026-10-14). Written with nobody reviewing them; see data/judge-runs/. ---
