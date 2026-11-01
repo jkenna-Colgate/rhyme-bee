@@ -717,6 +717,45 @@ nares N EH1 R IY0 Z
 # amniotic (#240): upstream stresses the first syllable; it is "am-nee-OT-ik", with `hypnotic`.
 amniotic AE2 M N IY0 AA1 T IH0 K
 
+# -ity words (#240): CMUdict marks the final "-ty" of these with secondary stress
+# (IY2), so each had the bare Rhyme Key IY: `ability` scored for `tree` and was
+# refused for `facility`. No English -ity word puts a beat on its "-ty", so the
+# final vowel is IY0 on every reading. Three also carried a second upstream
+# error, corrected here because this entry replaces the reading: `concavity`
+# had AA for AE, and `intrepidity` and `servility` stressed the wrong syllable.
+# The other words ending in an IY2 (`company`, `thirty`, adverbs in -ly, about
+# 160) are not -ity words and include some said with a real beat (`bumblebee`).
+ability AH0 B IH1 L AH0 T IY0
+actuality AE2 K CH UW0 AE1 L AH0 T IY0
+adversity AE0 D V ER1 S IH0 T IY0
+adversity(1) AH0 D V ER1 S IH0 T IY0
+comparability K AA2 M P ER0 AH0 B IH1 L IH0 T IY0
+compatibility K AH0 M P AE2 T AH0 B IH1 L AH0 T IY0
+concavity K AA0 N K AE1 V AH0 T IY0
+homosexuality HH OW2 M OW0 S EH2 K SH UW0 AE1 L AH0 T IY0
+hypersensitivity HH AY2 P ER0 S EH1 N S IH0 T IH2 V IH0 T IY0
+identity AY0 D EH1 N T IH0 T IY0
+indignity IH2 N D IH1 G N AH0 T IY0
+inferiority IH2 N F IH0 R IY0 AO1 R IH0 T IY0
+infertility IH2 N F ER0 T IH1 L IH0 T IY0
+ingenuity IH2 N JH AH0 N UW1 AH0 T IY0
+intrepidity IH2 N T R AH0 P IH1 D AH0 T IY0
+liberality L IH2 B ER2 AE1 L AH0 T IY0
+lubricity L UW0 B R IH1 S IH0 T IY0
+paucity P AO1 S AH0 T IY0
+possibility P AA2 S AH0 B IH1 L AH0 T IY0
+probability P R AA2 B AH0 B IH1 L AH0 T IY0
+radioactivity R EY1 D IY0 OW0 AE2 K T IH2 V AH0 T IY0
+radioactivity(1) R EY2 D IY0 OW0 AE2 K T IH1 V AH0 T IY0
+salinity S AH0 L IH1 N AH0 T IY0
+sensuality S EH2 N SH UW2 AE1 L AH0 T IY0
+servility S ER0 V IH1 L AH0 T IY0
+solubility S AA2 L Y AH0 B IH1 L AH0 T IY0
+spirituality S P IH2 R IH0 CH UW2 AE1 L AH0 T IY0
+stupidity S T UW0 P IH1 D IH0 T IY0
+theatricality TH IY0 AE2 T R AH0 K AE1 L AH0 T IY0
+triviality T R IH2 V IY0 AE1 L AH0 T IY0
+
 # --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
 # reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
 # amended 2026-10-14). Written with nobody reviewing them; see data/judge-runs/. ---
