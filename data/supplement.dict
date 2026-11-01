@@ -711,6 +711,9 @@ doer D UW1 ER0
 # scored for `calm` and `bomb`; it is "AHSH-rum", the last vowel a schwa.
 ashram AA1 SH R AH0 M
 
+# nares (#240): upstream `N AE1 R Z` is one syllable; it is two, "NAIR-eez".
+nares N EH1 R IY0 Z
+
 # --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
 # reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
 # amended 2026-10-14). Written with nobody reviewing them; see data/judge-runs/. ---
