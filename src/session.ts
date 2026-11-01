@@ -80,8 +80,8 @@ export interface PlayState {
 export const emptyPlayState: PlayState = { foundAnswers: [], foundBonus: [], ended: false };
 
 /**
- * A resolved Rank: which rung of the ladder the player is on, plus its label and
- * threshold. `tier` is the zero-based rung index (named to match the Rank shape
+ * A resolved Rank: which Rank on the ladder the player holds, with its label and
+ * threshold. `tier` is its zero-based index on the ladder (named to match the Rank shape
  * the session issue pins, `{ tier, label, threshold }`).
  */
 export interface Rank {
@@ -113,7 +113,7 @@ export interface Progress {
  */
 export type SessionOutcome = "in-progress" | "complete" | "given-up";
 
-/** A Rank crossing: the rung left and the rung reached. */
+/** A Rank crossing: the Rank left and the Rank reached. */
 export interface RankChange {
   from: Rank;
   to: Rank;
@@ -225,9 +225,9 @@ export function score(context: PuzzleContext, state: PlayState): number {
 
 /**
  * The player's Rank: `Score ÷ maxScore` as a percentage, resolved to the highest
- * rung whose threshold it has reached (`>= threshold` triggers). Percentage of
+ * Rank whose threshold it has reached (`>= threshold` triggers). Percentage of
  * the maximum self-normalises across Puzzle sizes. When `maxScore` is 0 (cannot
- * occur for a banded Puzzle) the bottom rung is returned rather than dividing by
+ * occur for a banded Puzzle) the bottom Rank is returned rather than dividing by
  * zero.
  */
 export function rank(context: PuzzleContext, state: PlayState): Rank {
@@ -236,13 +236,13 @@ export function rank(context: PuzzleContext, state: PlayState): Rank {
 
   let chosen = 0;
   for (let i = 0; i < ladder.length; i++) {
-    const rung = ladder[i];
-    if (rung === undefined) break;
-    if (pct >= rung.threshold) chosen = i;
+    const next = ladder[i];
+    if (next === undefined) break;
+    if (pct >= next.threshold) chosen = i;
     else break;
   }
-  const rung = ladder[chosen] ?? { threshold: 0, label: "" };
-  return { tier: chosen, label: rung.label, threshold: rung.threshold };
+  const reached = ladder[chosen] ?? { threshold: 0, label: "" };
+  return { tier: chosen, label: reached.label, threshold: reached.threshold };
 }
 
 /** How far through the Puzzle: Answers found of the total, and Bonus Words collected. */

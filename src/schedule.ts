@@ -368,7 +368,7 @@ export interface Reviewable extends Schedulable {
   nativeCount: number;
 }
 
-/** One weekday's Difficulty band across the whole run: the ramp, one rung. */
+/** One weekday's Difficulty band across the whole run: the ramp, one step. */
 export interface WeekdayBand {
   weekday: Weekday;
   min: number;
@@ -399,7 +399,7 @@ export interface ScheduleReview<T extends Reviewable> {
 }
 
 /**
- * The Difficulty range each weekday actually spans — the ramp, one rung per
+ * The Difficulty range each weekday actually spans: the ramp, one step per
  * weekday, in Monday-to-Sunday order. Shared by the review of a fresh deal and
  * by the Editor's Pass reading the committed artifact months later, because the
  * band a day was dealt from is the same band either way round.
@@ -534,7 +534,7 @@ const DIFFICULTY_TOLERANCE = 5e-5;
  *
  * The review binds the calendar (ADR-0012) but not what a Puzzle contains: a
  * rebuild can move a Seed's Answer count out of the size band or shift its
- * Difficulty off the weekday rung it was dealt for, and after review band
+ * Difficulty off the weekday step it was dealt for, and after review band
  * membership is only advisory. This is what surfaces that.
  *
  * Both sets of figures are reported whether or not the day drifted. A day that

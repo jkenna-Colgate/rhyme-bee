@@ -26,6 +26,31 @@ function graphemeFor(phoneme: string): string {
 }
 
 /**
+ * A vowel and the `r` after it, spelled as one unit (#240), so `beard` reads
+ * "BEER-d" and not "BIH-rd" (read cold, "bird"), and one vowel shows one way.
+ * A vowel missing here keeps its own spelling with the `r` after it.
+ */
+const BEFORE_R: Record<string, string> = {
+  IH: "eer", IY: "eer", EH: "air", EY: "air", AA: "ar",
+  AO: "or", OW: "or", UH: "oor", UW: "oor", AY: "ire", AW: "our",
+};
+
+/**
+ * True when the vowel at `index` and the `r` after it spell one unit. An `r`
+ * with no vowel after it always joins. An `r` before a vowel joins a stressed
+ * vowel from `BEFORE_R` (`story` "STOR-ee"), but not `IH`: the data spells
+ * `spirit` and `period` with the same IH R, and only one of them is "eer".
+ */
+function joinsItsR(pronunciation: Pronunciation, index: number): boolean {
+  if (pronunciation[index + 1] !== "R") return false;
+  const after = pronunciation[index + 2];
+  if (after === undefined || !isVowel(after)) return true;
+  const vowel = pronunciation[index]!;
+  const sound = bareSound(vowel);
+  return (stressOf(vowel) ?? 0) > 0 && sound !== "IH" && sound in BEFORE_R;
+}
+
+/**
  * Respell a pronunciation, grouping sounds into rough syllables (one per vowel)
  * and upper-casing the syllable that carries primary stress.
  */
@@ -40,12 +65,20 @@ export function respell(pronunciation: Pronunciation): string {
     currentStress = 0;
   };
 
-  for (const phoneme of pronunciation) {
-    current += graphemeFor(phoneme);
-    if (isVowel(phoneme)) {
-      currentStress = stressOf(phoneme) ?? 0;
-      flush();
+  for (let i = 0; i < pronunciation.length; i++) {
+    const phoneme = pronunciation[i]!;
+    if (!isVowel(phoneme)) {
+      current += graphemeFor(phoneme);
+      continue;
     }
+    if (joinsItsR(pronunciation, i)) {
+      current += BEFORE_R[bareSound(phoneme)] ?? `${graphemeFor(phoneme)}r`;
+      i++;
+    } else {
+      current += graphemeFor(phoneme);
+    }
+    currentStress = stressOf(phoneme) ?? 0;
+    flush();
   }
   flush();
 

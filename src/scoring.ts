@@ -10,7 +10,7 @@
  * game scores with, not a parallel re-implementation.
  */
 
-/** One rung of the Rank ladder: the percentage-of-maximum it triggers at. */
+/** One Rank on the ladder: the percentage-of-maximum it triggers at. */
 export interface RankTier {
   threshold: number;
   label: string;
@@ -25,26 +25,26 @@ export interface ScoringConfig {
   rareKnownnessCutoff: number;
   /** Flat points a rare Answer earns on top of its length. */
   rareBonus: number;
-  /** Ordered rungs (ascending threshold); Rank is the highest rung reached. */
+  /** Ordered Ranks (ascending threshold); the player's Rank is the highest reached. */
   rankLadder: RankTier[];
 }
 
 /**
- * The default Rank ladder. Thresholds mirror Spelling Bee — the top *named* tier
- * sits at 70% so it is aspirational, and the 100% tier is reached only by finding
+ * The default Rank ladder. Thresholds mirror Spelling Bee: the top *named* Rank
+ * sits at 70% so it is aspirational, and the 100% Rank is reached only by finding
  * every Answer (every Answer scores positive, so 100% means a perfect game).
  *
  * The labels are a rhymer's career, from a standing start to the name that ends
  * the argument. Seniority in a craft is a dimension that sorts without being
  * taught, which a scale of vague approval ("Good, Solid, Nice") is not. The
- * bottom rung states a fact rather than passing a verdict — everyone begins a
- * beginner — and the top one scans as a brag outside the game. Two things that read as
+ * bottom Rank states a fact rather than passing a verdict (everyone begins a
+ * beginner), and the top one scans as a brag outside the game. Two things that read as
  * mistakes are not: `Rhymster` is coined and has no second `e`, and Shakespeare
  * is a Proper Noun, which the game refuses as a Submission but not as praise.
- * No rung may reach for bee imagery, or for any vocabulary of rhyme *quality* —
+ * No Rank may reach for bee imagery, or for any vocabulary of rhyme *quality*:
  * the game has exactly one kind of rhyme and the ladder must not imply others.
  *
- * They stay pure config data: nothing outside this array knows a rung by name.
+ * They stay pure config data: nothing outside this array knows a Rank by name.
  */
 export const DEFAULT_RANK_LADDER: RankTier[] = [
   { threshold: 0, label: "Beginner" },
