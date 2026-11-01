@@ -695,6 +695,11 @@ townships T AW1 N SH IH2 P S
 # tern (#240): upstream `T ER1 N Z` is the plural; the bird is "turn", with `burn`.
 tern T ER1 N
 
+# clique (#240): upstream holds only "kleek". "Click" is said too (Merriam-Webster lists it
+# first; ruled 2026-10-13), so it rhymes with `trick` and with `week`.
+clique K L IY1 K
+clique(1) K L IH1 K
+
 # --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
 # reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
 # amended 2026-10-14). Written with nobody reviewing them; see data/judge-runs/. ---
