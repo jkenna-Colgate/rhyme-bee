@@ -1,5 +1,7 @@
 # The unattended loop calls a model in one place, and the Playability Bar does not depend on it
 
+**Status:** amended 2026-10-26. The one job that calls a model still judges Appeals and nothing else, and Trust and No False Accepts are still checked only in Batches. What its writes reach players by changed: CI builds the index from a private source mirror and deploys on every push to main, and one monthly workflow judges Appeals, runs the Tier moves, commits its report and deploys, with the Appeals step free to fail without stopping the rest.
+
 The two parts of the Playability Bar that need a model, Trust and No False
 Accepts, are checked by the maintainer in **Batches** before they leave, and by
 nothing afterwards. Once the game runs with nobody attending, exactly one job
