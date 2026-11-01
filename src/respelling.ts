@@ -26,6 +26,23 @@ function graphemeFor(phoneme: string): string {
 }
 
 /**
+ * A vowel and the `r` closing its syllable, spelled as one unit (#240). Spelled
+ * a sound at a time, `beard` read "BIH-rd", which a player reads cold as
+ * "bird", and one vowel showed two ways (`here` "HEE-r", `beer` "BIH-r").
+ * A vowel missing here keeps its own spelling with the `r` after it.
+ */
+const BEFORE_R: Record<string, string> = {
+  IH: "eer", IY: "eer", EH: "air", EY: "air", AA: "ar",
+  AO: "or", OW: "or", UH: "oor", UW: "oor", AY: "ire", AW: "our",
+};
+
+/** True when the `r` at `index` closes a syllable: no vowel follows it. */
+function closesSyllable(pronunciation: Pronunciation, index: number): boolean {
+  const next = pronunciation[index + 1];
+  return pronunciation[index] === "R" && (next === undefined || !isVowel(next));
+}
+
+/**
  * Respell a pronunciation, grouping sounds into rough syllables (one per vowel)
  * and upper-casing the syllable that carries primary stress.
  */
@@ -40,12 +57,20 @@ export function respell(pronunciation: Pronunciation): string {
     currentStress = 0;
   };
 
-  for (const phoneme of pronunciation) {
-    current += graphemeFor(phoneme);
-    if (isVowel(phoneme)) {
-      currentStress = stressOf(phoneme) ?? 0;
-      flush();
+  for (let i = 0; i < pronunciation.length; i++) {
+    const phoneme = pronunciation[i]!;
+    if (!isVowel(phoneme)) {
+      current += graphemeFor(phoneme);
+      continue;
     }
+    if (closesSyllable(pronunciation, i + 1)) {
+      current += BEFORE_R[bareSound(phoneme)] ?? `${graphemeFor(phoneme)}r`;
+      i++;
+    } else {
+      current += graphemeFor(phoneme);
+    }
+    currentStress = stressOf(phoneme) ?? 0;
+    flush();
   }
   flush();
 

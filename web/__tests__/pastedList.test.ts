@@ -674,8 +674,8 @@ describe("joinPastedList: the day's Answers the list omits", () => {
       {
         word: "tear",
         readings: [
-          { respelling: "TIH-r", key: "IH R" },
-          { respelling: "TEH-r", key: "EH R" },
+          { respelling: "TEER", key: "IH R" },
+          { respelling: "TAIR", key: "EH R" },
         ],
       },
     ]);
