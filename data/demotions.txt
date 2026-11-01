@@ -65,5 +65,5 @@ lbs not-a-known-word         # abbreviation of `pounds`
 oct not-a-known-word         # abbreviation of `October`
 preceeding not-a-known-word  # misspelling of `preceding`
 nepal proper-noun
-neptune proper-noun       # #240: the planet and the god; a Tier verdict had made it an Answer
-tudor proper-noun         # #240: the royal house; it was an Answer for `ruder`
+neptune proper-noun       # the planet and the Roman god
+tudor proper-noun         # the English royal house
