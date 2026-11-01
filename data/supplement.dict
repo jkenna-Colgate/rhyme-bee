@@ -690,6 +690,11 @@ township T AW1 N SH IH2 P
 # townships (#253): -ships carries a beat; joins IH P S with `ships`.
 townships T AW1 N SH IH2 P S
 
+# --- Corrections (small reading fixes found during #218, listed on #240) ---
+
+# tern (#240): upstream `T ER1 N Z` is the plural; the bird is "turn", with `burn`.
+tern T ER1 N
+
 # --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
 # reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
 # amended 2026-10-14). Written with nobody reviewing them; see data/judge-runs/. ---
