@@ -15,7 +15,7 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -93,6 +93,16 @@ describe("the Rhyme Index input list", () => {
         "/data/tier-moves.csv",
       ]),
     );
+  });
+
+  it("holds every data file build-index.ts names, read from the script itself", () => {
+    // The hand list above has missed an input three times (`sources.sha256`,
+    // `tier-moves.csv`, `unconfirmed-rhymes.txt`), each a fix that never
+    // shipped. Reading the names off the script closes that route.
+    const script = readFileSync(resolve(repoRoot, "scripts/build-index.ts"), "utf8");
+    const read = [...script.matchAll(/\bread(?:Optional)?\("([^"]+)"\)/g)].map((m) => `/data/${m[1]}`);
+    expect(read).toContain("/data/unconfirmed-rhymes.txt");
+    expect(inputs).toEqual(expect.arrayContaining(read));
   });
 
   it("can commit the two Tier layers despite the blanket csv ignore", () => {

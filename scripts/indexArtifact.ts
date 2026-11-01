@@ -144,6 +144,10 @@ export function indexArtifactPath(outDir: string): string {
  * the manufacture, and is here for that reason: a pulled commit that re-pins a
  * source touches no source file, so without it the deploy would skip the
  * rebuild and ship the index built from the old bytes.
+ *
+ * `unconfirmed-rhymes.txt` (#259) was read by the build for weeks before it was
+ * listed here, so a change to it alone shipped the old index (#240). A test now
+ * reads the file names off `build-index.ts` itself.
  */
 const DATA_INPUTS = [
   "sources.json",
@@ -156,6 +160,7 @@ const DATA_INPUTS = [
   "supplement.dict",
   "tier-overrides.csv",
   "tier-moves.csv",
+  "unconfirmed-rhymes.txt",
 ];
 
 /**
