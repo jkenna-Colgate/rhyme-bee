@@ -26,6 +26,8 @@ const dictionary = new Set<string>([
   "ups", "up", "has", "ha", "gas", "ga",
   // `inn` reaches `in` by de-doubling, a candidate the plural rule never made.
   "inn", "in",
+  // `-ie` verbs turn `ie` to `y` before `-ing` (#240).
+  "vie", "hogtie",
 ]);
 
 // Readings, for the words whose derivation turns on sound. A word with no entry
@@ -83,6 +85,15 @@ describe("isDerived — inflection pass", () => {
   it("treats a progressive inflection as derived (aiding ← aid)", () => {
     expect(derivation.isDerived("aiding")).toBe(true);
   });
+
+  it.each(["vying", "hogtying"])(
+    "treats %j as derived from its -ie verb, ie turned to y (#240)",
+    (word) => {
+      // Read as native, `vying` outranked `highflying` as the Seed Word of
+      // its key, and a re-rank would have moved that day.
+      expect(derivation.isDerived(word)).toBe(true);
+    },
+  );
 });
 
 describe("isDerived — prefix pass", () => {

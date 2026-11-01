@@ -37,6 +37,8 @@ export function lemmaCandidates(word: string): string[] {
     candidates.push(w.slice(0, -2)); // walked -> walk
     candidates.push(w.slice(0, -1)); // waded -> wade
   }
+  // -ying -> -ie first, the more specific rule: dying is `die`, not `dye` (#240)
+  if (w.endsWith("ying") && w.length > 4) candidates.push(w.slice(0, -4) + "ie");
   if (w.endsWith("ing") && w.length > 4) {
     candidates.push(w.slice(0, -3)); // walking -> walk
     candidates.push(w.slice(0, -3) + "e"); // rating -> rate
