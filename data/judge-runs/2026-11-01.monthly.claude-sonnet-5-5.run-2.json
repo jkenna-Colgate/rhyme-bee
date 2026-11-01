@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-01",
+  "command": "monthly",
+  "run": 2,
+  "model": "claude-sonnet-5-5",
+  "answeredBy": [],
+  "calls": {
+    "rhyme": 0,
+    "wordhood": 0,
+    "fromCache": 0
+  },
+  "candidatesJudged": 0,
+  "landed": {},
+  "writes": {
+    "readings": [],
+    "unconfirmedRhymes": [],
+    "suggestedDemotions": []
+  },
+  "note": "The Appeals step failed and left no record, so nothing was judged and nothing was written for it. The Tier moves and the Continuity check ran without it (#274).",
+  "appeals": {
+    "step": "failure"
+  },
+  "rulings": [],
+  "tierMoves": [
+    "Session Records: 65 read, 54 replayed, 11 could not be.",
+    "  cannot replay 2026-08-15 idiotic (AA T IH K): Cannot pin seed \"idiotic\" to AA T IH K: not one of its Rhyme Keys (AA D AH K).",
+    "  cannot replay 2026-08-15 idiotic (AA T IH K): Cannot pin seed \"idiotic\" to AA T IH K: not one of its Rhyme Keys (AA D AH K).",
+    "  cannot replay 2026-08-18 taxpaying (EY IH NG): Cannot pin seed \"taxpaying\" to EY IH NG: not one of its Rhyme Keys (EY AH NG).",
+    "  cannot replay 2026-08-27 idealistic (IH S T IH K): Cannot pin seed \"idealistic\" to IH S T IH K: not one of its Rhyme Keys (IH S T AH K).",
+    "  cannot replay 2026-08-27 idealistic (IH S T IH K): Cannot pin seed \"idealistic\" to IH S T IH K: not one of its Rhyme Keys (IH S T AH K).",
+    "  cannot replay 2026-09-06 water (AA T ER): Cannot pin seed \"water\" to AA T ER: not one of its Rhyme Keys (AA D ER).",
+    "  cannot replay 2026-09-22 storytelling (EH L IH NG): Cannot pin seed \"storytelling\" to EH L IH NG: not one of its Rhyme Keys (EH L AH NG).",
+    "  cannot replay 2026-10-01 microbiologist (AA L AH JH IH S T): Cannot pin seed \"microbiologist\" to AA L AH JH IH S T: not one of its Rhyme Keys (AA L AH JH AH S T).",
+    "  cannot replay 2026-10-05 facility (IH L IH T IY): Cannot pin seed \"facility\" to IH L IH T IY: not one of its Rhyme Keys (IH L AH D IY).",
+    "  cannot replay 2026-10-13 sincerity (EH R AH T IY): Cannot pin seed \"sincerity\" to EH R AH T IY: not one of its Rhyme Keys (EH R AH D IY).",
+    "  cannot replay 2026-10-20 corrective (EH K T IH V): Cannot pin seed \"corrective\" to EH K T IH V: not one of its Rhyme Keys (EH K T AH V).",
+    "Settings (unclaimed placeholders): share 0.2, Reachability floor 0.1, fewest Sessions a day 20.",
+    "Moved nothing to Answer.",
+    "Held back: 1.",
+    "  frocked: no prevalence row (2 of 2 Sessions, lower bound 0.224)",
+    "No day under the Reachability floor.",
+    "data/tier-moves.csv unchanged."
+  ],
+  "continuity": [
+    "Continuity: all 260 scheduled days pin; no Seed Word or Rhyme Key holds two places."
+  ]
+}
