@@ -399,7 +399,7 @@ export interface ScheduleReview<T extends Reviewable> {
 }
 
 /**
- * The Difficulty range each weekday actually spans — the ramp, one step per
+ * The Difficulty range each weekday actually spans: the ramp, one step per
  * weekday, in Monday-to-Sunday order. Shared by the review of a fresh deal and
  * by the Editor's Pass reading the committed artifact months later, because the
  * band a day was dealt from is the same band either way round.

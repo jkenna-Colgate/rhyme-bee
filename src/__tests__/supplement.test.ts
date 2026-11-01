@@ -11,7 +11,7 @@ import { applySupplement } from "../supplement.ts";
 import { parseCmudict } from "../cmudict.ts";
 import type { RhymeIndex } from "../rhymeIndex.ts";
 import { makeTestData, makeTestIndex, type TestInputs } from "../__fixtures__/index.ts";
-import type { Pronunciation } from "../phonology.ts";
+import { isVowelSound, type Pronunciation } from "../phonology.ts";
 
 function target(overrides: {
   pronunciations?: [string, Pronunciation[]][];
@@ -336,15 +336,12 @@ describe("the committed supplement", () => {
     // A malformed reading can still reach its Rhyme Key by luck, as `effaced`,
     // `absume` and `kumkum` did, so nothing downstream notices it. The Batches
     // now write this file unattended, which is the route a new one arrives by.
-    const VOWELS = "AA AE AH AO AW AY EH ER EY IH IY OW OY UH UW".split(" ");
-    const CONSONANTS = "B CH D DH F G HH JH K L M N NG P R S SH T TH V W Y Z ZH".split(" ");
-    const phoneme = new Set([
-      ...VOWELS.flatMap((v) => [`${v}0`, `${v}1`, `${v}2`]),
-      ...CONSONANTS,
-    ]);
+    const CONSONANTS = new Set("B CH D DH F G HH JH K L M N NG P R S SH T TH V W Y Z ZH".split(" "));
+    const wellFormed = (p: string) =>
+      CONSONANTS.has(p) || (/^[A-Z]{2}[012]$/.test(p) && isVowelSound(p.slice(0, 2)));
     const malformed = [...entries].flatMap(([word, readings]) =>
       readings
-        .filter((reading) => !reading.every((p) => phoneme.has(p)))
+        .filter((reading) => !reading.every(wellFormed))
         .map((reading) => `${word} ${reading.join(" ")}`),
     );
     expect(malformed).toEqual([]);

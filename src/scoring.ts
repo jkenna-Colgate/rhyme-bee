@@ -30,18 +30,18 @@ export interface ScoringConfig {
 }
 
 /**
- * The default Rank ladder. Thresholds mirror Spelling Bee — the top *named* Rank
+ * The default Rank ladder. Thresholds mirror Spelling Bee: the top *named* Rank
  * sits at 70% so it is aspirational, and the 100% Rank is reached only by finding
  * every Answer (every Answer scores positive, so 100% means a perfect game).
  *
  * The labels are a rhymer's career, from a standing start to the name that ends
  * the argument. Seniority in a craft is a dimension that sorts without being
  * taught, which a scale of vague approval ("Good, Solid, Nice") is not. The
- * bottom Rank states a fact rather than passing a verdict — everyone begins a
- * beginner — and the top one scans as a brag outside the game. Two things that read as
+ * bottom Rank states a fact rather than passing a verdict (everyone begins a
+ * beginner), and the top one scans as a brag outside the game. Two things that read as
  * mistakes are not: `Rhymster` is coined and has no second `e`, and Shakespeare
  * is a Proper Noun, which the game refuses as a Submission but not as praise.
- * No Rank may reach for bee imagery, or for any vocabulary of rhyme *quality* —
+ * No Rank may reach for bee imagery, or for any vocabulary of rhyme *quality*:
  * the game has exactly one kind of rhyme and the ladder must not imply others.
  *
  * They stay pure config data: nothing outside this array knows a Rank by name.

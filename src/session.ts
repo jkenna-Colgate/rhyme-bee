@@ -80,8 +80,8 @@ export interface PlayState {
 export const emptyPlayState: PlayState = { foundAnswers: [], foundBonus: [], ended: false };
 
 /**
- * A resolved Rank: which step of the ladder the player is on, plus its label and
- * threshold. `tier` is the Rank's zero-based index on the ladder (named to match the Rank shape
+ * A resolved Rank: which Rank on the ladder the player holds, with its label and
+ * threshold. `tier` is its zero-based index on the ladder (named to match the Rank shape
  * the session issue pins, `{ tier, label, threshold }`).
  */
 export interface Rank {
@@ -236,9 +236,9 @@ export function rank(context: PuzzleContext, state: PlayState): Rank {
 
   let chosen = 0;
   for (let i = 0; i < ladder.length; i++) {
-    const step = ladder[i];
-    if (step === undefined) break;
-    if (pct >= step.threshold) chosen = i;
+    const next = ladder[i];
+    if (next === undefined) break;
+    if (pct >= next.threshold) chosen = i;
     else break;
   }
   const reached = ladder[chosen] ?? { threshold: 0, label: "" };

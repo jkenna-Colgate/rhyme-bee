@@ -145,9 +145,8 @@ export function indexArtifactPath(outDir: string): string {
  * source touches no source file, so without it the deploy would skip the
  * rebuild and ship the index built from the old bytes.
  *
- * `unconfirmed-rhymes.txt` (#259) was read by the build for weeks before it was
- * listed here, so a change to it alone shipped the old index (#240). A test now
- * reads the file names off `build-index.ts` itself.
+ * A test reads the file names off `build-index.ts` and fails when one is missing
+ * here, because a missing one is a fix that never ships.
  */
 const DATA_INPUTS = [
   "sources.json",
