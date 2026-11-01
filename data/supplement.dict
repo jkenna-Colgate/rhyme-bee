@@ -752,3 +752,13 @@ slipstream S L IH1 P S T R IY2 M
 # Editor's Pass or on a Batch's ruling list; each comment says which (ADR-0009, ADR-0017). ---
 # seraphim: correction approved on a Batch's No False Accepts ruling list (#268), against IY M — replaces every reading the pinned sources hold for this word (ADR-0009).
 seraphim S EH1 R AH0 F IH0 M
+# teared (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-01) ruled it a Rhyme for `beard` on IH R D at high confidence.
+teared T IH1 R D
+# drat (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-01) ruled it a Rhyme for `cat` on AE T at high confidence.
+drat D R AE1 T
+# frat (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-01) ruled it a Rhyme for `cat` on AE T at high confidence.
+frat F R AE1 T
+# gawked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-01) ruled it a Rhyme for `shellshocked` on AA K T at high confidence.
+gawked G AO1 K T
+# caulked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-01) ruled it a Rhyme for `shellshocked` on AA K T at high confidence.
+caulked K AO1 K T

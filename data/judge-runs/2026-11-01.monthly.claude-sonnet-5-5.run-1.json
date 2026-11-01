@@ -1,0 +1,1045 @@
+{
+  "date": "2026-11-01",
+  "command": "monthly",
+  "run": 1,
+  "model": "claude-sonnet-5-5",
+  "answeredBy": [
+    "claude-sonnet-5-5"
+  ],
+  "calls": {
+    "rhyme": 1,
+    "wordhood": 1,
+    "fromCache": 0
+  },
+  "candidatesJudged": 5,
+  "landed": {
+    "reading": 5
+  },
+  "writes": {
+    "readings": [
+      {
+        "word": "teared",
+        "reading": "T IH1 R D"
+      },
+      {
+        "word": "drat",
+        "reading": "D R AE1 T"
+      },
+      {
+        "word": "frat",
+        "reading": "F R AE1 T"
+      },
+      {
+        "word": "gawked",
+        "reading": "G AO1 K T"
+      },
+      {
+        "word": "caulked",
+        "reading": "K AO1 K T"
+      }
+    ],
+    "unconfirmedRhymes": [],
+    "suggestedDemotions": []
+  },
+  "note": "Every write is listed under writes, and every ruling is recorded in data/judge-rulings.jsonl. Appeals over the limit wait for the next run (#274).",
+  "appeals": {
+    "step": "success",
+    "limit": 5,
+    "waiting": [
+      {
+        "word": "pepped",
+        "seedWord": "slept",
+        "rhymeKey": "EH P T"
+      },
+      {
+        "word": "suscept",
+        "seedWord": "slept",
+        "rhymeKey": "EH P T"
+      },
+      {
+        "word": "pawl",
+        "seedWord": "wall",
+        "rhymeKey": "AA L"
+      },
+      {
+        "word": "kickball",
+        "seedWord": "wall",
+        "rhymeKey": "AA L"
+      },
+      {
+        "word": "awl",
+        "seedWord": "wall",
+        "rhymeKey": "AA L"
+      },
+      {
+        "word": "sterol",
+        "seedWord": "wall",
+        "rhymeKey": "AA L"
+      },
+      {
+        "word": "trawl",
+        "seedWord": "wall",
+        "rhymeKey": "AA L"
+      },
+      {
+        "word": "googol",
+        "seedWord": "wall",
+        "rhymeKey": "AA L"
+      },
+      {
+        "word": "isopropanol",
+        "seedWord": "wall",
+        "rhymeKey": "AA L"
+      },
+      {
+        "word": "sawhorse",
+        "seedWord": "horse",
+        "rhymeKey": "AO R S"
+      },
+      {
+        "word": "sacramental",
+        "seedWord": "sentimental",
+        "rhymeKey": "EH N T AH L"
+      },
+      {
+        "word": "snored",
+        "seedWord": "landlord",
+        "rhymeKey": "AO R D"
+      },
+      {
+        "word": "cored",
+        "seedWord": "landlord",
+        "rhymeKey": "AO R D"
+      },
+      {
+        "word": "moored",
+        "seedWord": "landlord",
+        "rhymeKey": "AO R D"
+      },
+      {
+        "word": "unmoored",
+        "seedWord": "landlord",
+        "rhymeKey": "AO R D"
+      },
+      {
+        "word": "toured",
+        "seedWord": "landlord",
+        "rhymeKey": "AO R D"
+      },
+      {
+        "word": "unrestored",
+        "seedWord": "landlord",
+        "rhymeKey": "AO R D"
+      },
+      {
+        "word": "seaward",
+        "seedWord": "landlord",
+        "rhymeKey": "AO R D"
+      },
+      {
+        "word": "wort",
+        "seedWord": "import",
+        "rhymeKey": "AO R T"
+      },
+      {
+        "word": "cartography",
+        "seedWord": "pornography",
+        "rhymeKey": "AA G R AH F IY"
+      },
+      {
+        "word": "filmography",
+        "seedWord": "pornography",
+        "rhymeKey": "AA G R AH F IY"
+      },
+      {
+        "word": "gobstopper",
+        "seedWord": "grasshopper",
+        "rhymeKey": "AA P ER"
+      },
+      {
+        "word": "dander",
+        "seedWord": "commander",
+        "rhymeKey": "AE N D ER"
+      },
+      {
+        "word": "islander",
+        "seedWord": "commander",
+        "rhymeKey": "AE N D ER"
+      },
+      {
+        "word": "teared",
+        "seedWord": "laird",
+        "rhymeKey": "EH R D"
+      },
+      {
+        "word": "tared",
+        "seedWord": "laird",
+        "rhymeKey": "EH R D"
+      },
+      {
+        "word": "reshared",
+        "seedWord": "laird",
+        "rhymeKey": "EH R D"
+      },
+      {
+        "word": "subdues",
+        "seedWord": "booze",
+        "rhymeKey": "UW Z"
+      },
+      {
+        "word": "coos",
+        "seedWord": "booze",
+        "rhymeKey": "UW Z"
+      },
+      {
+        "word": "flues",
+        "seedWord": "booze",
+        "rhymeKey": "UW Z"
+      },
+      {
+        "word": "gnus",
+        "seedWord": "booze",
+        "rhymeKey": "UW Z"
+      },
+      {
+        "word": "imbues",
+        "seedWord": "booze",
+        "rhymeKey": "UW Z"
+      },
+      {
+        "word": "trues",
+        "seedWord": "booze",
+        "rhymeKey": "UW Z"
+      },
+      {
+        "word": "spearmint",
+        "seedWord": "sprint",
+        "rhymeKey": "IH N T"
+      },
+      {
+        "word": "chocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "crocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "unlocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "unblocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "hocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "undocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "smocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "caulks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "restocks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "lummox",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "auks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "beanstalks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S"
+      },
+      {
+        "word": "nares",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z"
+      },
+      {
+        "word": "tares",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z"
+      },
+      {
+        "word": "lairs",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z"
+      },
+      {
+        "word": "fanfares",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z"
+      },
+      {
+        "word": "highchairs",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z"
+      },
+      {
+        "word": "sprayers",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z"
+      },
+      {
+        "word": "layers",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z"
+      },
+      {
+        "word": "clowned",
+        "seedWord": "ground",
+        "rhymeKey": "AW N D"
+      },
+      {
+        "word": "dragoon",
+        "seedWord": "noon",
+        "rhymeKey": "UW N"
+      },
+      {
+        "word": "refaced",
+        "seedWord": "toothpaste",
+        "rhymeKey": "EY S T"
+      },
+      {
+        "word": "maced",
+        "seedWord": "toothpaste",
+        "rhymeKey": "EY S T"
+      },
+      {
+        "word": "relaced",
+        "seedWord": "toothpaste",
+        "rhymeKey": "EY S T"
+      },
+      {
+        "word": "gunwale",
+        "seedWord": "male",
+        "rhymeKey": "EY L"
+      },
+      {
+        "word": "rale",
+        "seedWord": "male",
+        "rhymeKey": "EY L"
+      },
+      {
+        "word": "swale",
+        "seedWord": "male",
+        "rhymeKey": "EY L"
+      },
+      {
+        "word": "plaice",
+        "seedWord": "base",
+        "rhymeKey": "EY S"
+      },
+      {
+        "word": "enlace",
+        "seedWord": "base",
+        "rhymeKey": "EY S"
+      },
+      {
+        "word": "defiled",
+        "seedWord": "wild",
+        "rhymeKey": "AY L D"
+      },
+      {
+        "word": "recompiled",
+        "seedWord": "wild",
+        "rhymeKey": "AY L D"
+      },
+      {
+        "word": "spiled",
+        "seedWord": "wild",
+        "rhymeKey": "AY L D"
+      },
+      {
+        "word": "uncompiled",
+        "seedWord": "wild",
+        "rhymeKey": "AY L D"
+      },
+      {
+        "word": "basin",
+        "seedWord": "win",
+        "rhymeKey": "IH N"
+      },
+      {
+        "word": "lanolin",
+        "seedWord": "win",
+        "rhymeKey": "IH N"
+      },
+      {
+        "word": "bobbin",
+        "seedWord": "win",
+        "rhymeKey": "IH N"
+      },
+      {
+        "word": "sculpin",
+        "seedWord": "win",
+        "rhymeKey": "IH N"
+      },
+      {
+        "word": "muffin",
+        "seedWord": "win",
+        "rhymeKey": "IH N"
+      },
+      {
+        "word": "latin",
+        "seedWord": "win",
+        "rhymeKey": "IH N"
+      },
+      {
+        "word": "galoot",
+        "seedWord": "shoot",
+        "rhymeKey": "UW T"
+      },
+      {
+        "word": "snoot",
+        "seedWord": "shoot",
+        "rhymeKey": "UW T"
+      },
+      {
+        "word": "elute",
+        "seedWord": "shoot",
+        "rhymeKey": "UW T"
+      },
+      {
+        "word": "bumbershoot",
+        "seedWord": "shoot",
+        "rhymeKey": "UW T"
+      },
+      {
+        "word": "cheroot",
+        "seedWord": "shoot",
+        "rhymeKey": "UW T"
+      },
+      {
+        "word": "recane",
+        "seedWord": "gain",
+        "rhymeKey": "EY N"
+      },
+      {
+        "word": "entrain",
+        "seedWord": "gain",
+        "rhymeKey": "EY N"
+      },
+      {
+        "word": "ingrain",
+        "seedWord": "gain",
+        "rhymeKey": "EY N"
+      },
+      {
+        "word": "coxswain",
+        "seedWord": "gain",
+        "rhymeKey": "EY N"
+      },
+      {
+        "word": "tendril",
+        "seedWord": "bill",
+        "rhymeKey": "IH L"
+      },
+      {
+        "word": "mandrill",
+        "seedWord": "bill",
+        "rhymeKey": "IH L"
+      },
+      {
+        "word": "magic",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "atlantic",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "chronic",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "derrick",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "cleric",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "tantric",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "gimmick",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "lovesick",
+        "seedWord": "trick",
+        "rhymeKey": "IH K"
+      },
+      {
+        "word": "supe",
+        "seedWord": "group",
+        "rhymeKey": "UW P"
+      },
+      {
+        "word": "regressed",
+        "seedWord": "suggest",
+        "rhymeKey": "EH S T"
+      },
+      {
+        "word": "tempest",
+        "seedWord": "suggest",
+        "rhymeKey": "EH S T"
+      },
+      {
+        "word": "unconfessed",
+        "seedWord": "suggest",
+        "rhymeKey": "EH S T"
+      },
+      {
+        "word": "occlude",
+        "seedWord": "exclude",
+        "rhymeKey": "UW D"
+      },
+      {
+        "word": "quaalude",
+        "seedWord": "exclude",
+        "rhymeKey": "UW D"
+      },
+      {
+        "word": "pulchritude",
+        "seedWord": "exclude",
+        "rhymeKey": "UW D"
+      },
+      {
+        "word": "crewed",
+        "seedWord": "exclude",
+        "rhymeKey": "UW D"
+      },
+      {
+        "word": "tilled",
+        "seedWord": "build",
+        "rhymeKey": "IH L D"
+      },
+      {
+        "word": "dosed",
+        "seedWord": "ghost",
+        "rhymeKey": "OW S T"
+      },
+      {
+        "word": "resigner",
+        "seedWord": "diner",
+        "rhymeKey": "AY N ER"
+      },
+      {
+        "word": "underliner",
+        "seedWord": "diner",
+        "rhymeKey": "AY N ER"
+      },
+      {
+        "word": "undersigner",
+        "seedWord": "diner",
+        "rhymeKey": "AY N ER"
+      },
+      {
+        "word": "bandsaw",
+        "seedWord": "jaw",
+        "rhymeKey": "AA"
+      },
+      {
+        "word": "shutterbug",
+        "seedWord": "mug",
+        "rhymeKey": "AH G"
+      },
+      {
+        "word": "garish",
+        "seedWord": "dish",
+        "rhymeKey": "IH SH"
+      },
+      {
+        "word": "squish",
+        "seedWord": "dish",
+        "rhymeKey": "IH SH"
+      },
+      {
+        "word": "garnish",
+        "seedWord": "dish",
+        "rhymeKey": "IH SH"
+      },
+      {
+        "word": "freakish",
+        "seedWord": "dish",
+        "rhymeKey": "IH SH"
+      },
+      {
+        "word": "subduction",
+        "seedWord": "seduction",
+        "rhymeKey": "AH K SH AH N"
+      },
+      {
+        "word": "edict",
+        "seedWord": "addict",
+        "rhymeKey": "IH K T"
+      },
+      {
+        "word": "bricked",
+        "seedWord": "addict",
+        "rhymeKey": "IH K T"
+      },
+      {
+        "word": "flicked",
+        "seedWord": "addict",
+        "rhymeKey": "IH K T"
+      },
+      {
+        "word": "district",
+        "seedWord": "addict",
+        "rhymeKey": "IH K T"
+      },
+      {
+        "word": "untuck",
+        "seedWord": "suck",
+        "rhymeKey": "AH K"
+      },
+      {
+        "word": "parsnip",
+        "seedWord": "ship",
+        "rhymeKey": "IH P"
+      }
+    ],
+    "setAside": [
+      {
+        "word": "relocked",
+        "seedWord": "shellshocked",
+        "rhymeKey": "AA K T",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "albuterol",
+        "seedWord": "wall",
+        "rhymeKey": "AA L",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "gumball",
+        "seedWord": "wall",
+        "rhymeKey": "AA L",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "wonderwall",
+        "seedWord": "wall",
+        "rhymeKey": "AA L",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "outsource",
+        "seedWord": "horse",
+        "rhymeKey": "AO R S",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "recues",
+        "seedWord": "booze",
+        "rhymeKey": "UW Z",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "skinflint",
+        "seedWord": "sprint",
+        "rhymeKey": "IH N T",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "backtalks",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "kickbox",
+        "seedWord": "smallpox",
+        "rhymeKey": "AA K S",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "spayers",
+        "seedWord": "housewares",
+        "rhymeKey": "EH R Z",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "spittoon",
+        "seedWord": "noon",
+        "rhymeKey": "UW N",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "macaroon",
+        "seedWord": "noon",
+        "rhymeKey": "UW N",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "cased",
+        "seedWord": "toothpaste",
+        "rhymeKey": "EY S T",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "unfaced",
+        "seedWord": "toothpaste",
+        "rhymeKey": "EY S T",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "retrace",
+        "seedWord": "base",
+        "rhymeKey": "EY S",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "dialed",
+        "seedWord": "wild",
+        "rhymeKey": "AY L D",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "freestyled",
+        "seedWord": "wild",
+        "rhymeKey": "AY L D",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "redialed",
+        "seedWord": "wild",
+        "rhymeKey": "AY L D",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "statin",
+        "seedWord": "win",
+        "rhymeKey": "IH N",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "kaboom",
+        "seedWord": "tomb",
+        "rhymeKey": "UW M",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "subsume",
+        "seedWord": "tomb",
+        "rhymeKey": "UW M",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "enroute",
+        "seedWord": "shoot",
+        "rhymeKey": "UW T",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "pernil",
+        "seedWord": "bill",
+        "rhymeKey": "IH L",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "heretic",
+        "seedWord": "trick",
+        "rhymeKey": "IH K",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "limerick",
+        "seedWord": "trick",
+        "rhymeKey": "IH K",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "digest",
+        "seedWord": "suggest",
+        "rhymeKey": "EH S T",
+        "why": "already-rhymes"
+      },
+      {
+        "word": "terpitude",
+        "seedWord": "exclude",
+        "rhymeKey": "UW D",
+        "why": "not-on-word-list"
+      },
+      {
+        "word": "tablesaw",
+        "seedWord": "jaw",
+        "rhymeKey": "AA",
+        "why": "not-on-word-list"
+      }
+    ],
+    "ruledBefore": [],
+    "declined": [],
+    "keyGone": [
+      {
+        "word": "abiotic",
+        "seedWord": "idiotic",
+        "rhymeKey": "AA T IH K"
+      },
+      {
+        "word": "amniotic",
+        "seedWord": "idiotic",
+        "rhymeKey": "AA T IH K"
+      },
+      {
+        "word": "synoptic",
+        "seedWord": "idiotic",
+        "rhymeKey": "AA T IH K"
+      },
+      {
+        "word": "braying",
+        "seedWord": "taxpaying",
+        "rhymeKey": "EY IH NG"
+      },
+      {
+        "word": "neighing",
+        "seedWord": "taxpaying",
+        "rhymeKey": "EY IH NG"
+      },
+      {
+        "word": "splaying",
+        "seedWord": "taxpaying",
+        "rhymeKey": "EY IH NG"
+      },
+      {
+        "word": "defraying",
+        "seedWord": "taxpaying",
+        "rhymeKey": "EY IH NG"
+      },
+      {
+        "word": "flaying",
+        "seedWord": "taxpaying",
+        "rhymeKey": "EY IH NG"
+      },
+      {
+        "word": "inveighing",
+        "seedWord": "taxpaying",
+        "rhymeKey": "EY IH NG"
+      },
+      {
+        "word": "belaying",
+        "seedWord": "taxpaying",
+        "rhymeKey": "EY IH NG"
+      },
+      {
+        "word": "masochistic",
+        "seedWord": "idealistic",
+        "rhymeKey": "IH S T IH K"
+      },
+      {
+        "word": "masochistic",
+        "seedWord": "idealistic",
+        "rhymeKey": "IH S T IH K"
+      },
+      {
+        "word": "shearwater",
+        "seedWord": "water",
+        "rhymeKey": "AA T ER"
+      },
+      {
+        "word": "globetrotter",
+        "seedWord": "water",
+        "rhymeKey": "AA T ER"
+      },
+      {
+        "word": "upwelling",
+        "seedWord": "storytelling",
+        "rhymeKey": "EH L IH NG"
+      },
+      {
+        "word": "downwelling",
+        "seedWord": "storytelling",
+        "rhymeKey": "EH L IH NG"
+      },
+      {
+        "word": "tautological",
+        "seedWord": "technological",
+        "rhymeKey": "AA JH IH K AH L"
+      },
+      {
+        "word": "paleontological",
+        "seedWord": "technological",
+        "rhymeKey": "AA JH IH K AH L"
+      },
+      {
+        "word": "geologist",
+        "seedWord": "microbiologist",
+        "rhymeKey": "AA L AH JH IH S T"
+      },
+      {
+        "word": "mycologist",
+        "seedWord": "microbiologist",
+        "rhymeKey": "AA L AH JH IH S T"
+      },
+      {
+        "word": "expletive",
+        "seedWord": "corrective",
+        "rhymeKey": "EH K T IH V"
+      },
+      {
+        "word": "speculative",
+        "seedWord": "corrective",
+        "rhymeKey": "EH K T IH V"
+      },
+      {
+        "word": "relative",
+        "seedWord": "corrective",
+        "rhymeKey": "EH K T IH V"
+      },
+      {
+        "word": "elective",
+        "seedWord": "corrective",
+        "rhymeKey": "EH K T IH V"
+      },
+      {
+        "word": "reflexive",
+        "seedWord": "corrective",
+        "rhymeKey": "EH K T IH V"
+      }
+    ]
+  },
+  "rulings": [
+    {
+      "word": "teared",
+      "seedWord": "beard",
+      "rhymeKey": "IH R D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "T IH1 R D",
+      "confidence": "high",
+      "why": "Teared (shed tears) is pronounced like 'tier'd', with the rime IH-R-D, the same as beard.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Regular past tense of 'tear' meaning to well up with tears, as in 'her eyes teared up'. Dictionaries list it.",
+      "landed": "reading"
+    },
+    {
+      "word": "drat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "D R AE1 T",
+      "confidence": "high",
+      "why": "Drat has the stressed rime AE-T, the same as cat.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "A standard mild interjection in English.",
+      "landed": "reading"
+    },
+    {
+      "word": "frat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F R AE1 T",
+      "confidence": "high",
+      "why": "Frat has the stressed rime AE-T, the same as cat.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Common informal word for a college fraternity, listed in dictionaries.",
+      "landed": "reading"
+    },
+    {
+      "word": "gawked",
+      "seedWord": "shellshocked",
+      "rhymeKey": "AA K T",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "G AO1 K T",
+      "confidence": "high",
+      "why": "With the cot/caught merger, gawked ends in AA-K-T, the same as shellshocked.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Past tense of 'gawk', to stare stupidly.",
+      "landed": "reading"
+    },
+    {
+      "word": "caulked",
+      "seedWord": "shellshocked",
+      "rhymeKey": "AA K T",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "K AO1 K T",
+      "confidence": "high",
+      "why": "AO and AA are the same vowel in merged General American, so caulked has the rime AA-K-T like shellshocked.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Past tense of 'caulk', to seal gaps.",
+      "landed": "reading"
+    }
+  ],
+  "tierMoves": [
+    "Session Records: 65 read, 54 replayed, 11 could not be.",
+    "  cannot replay 2026-08-15 idiotic (AA T IH K): Cannot pin seed \"idiotic\" to AA T IH K: not one of its Rhyme Keys (AA D AH K).",
+    "  cannot replay 2026-08-15 idiotic (AA T IH K): Cannot pin seed \"idiotic\" to AA T IH K: not one of its Rhyme Keys (AA D AH K).",
+    "  cannot replay 2026-08-18 taxpaying (EY IH NG): Cannot pin seed \"taxpaying\" to EY IH NG: not one of its Rhyme Keys (EY AH NG).",
+    "  cannot replay 2026-08-27 idealistic (IH S T IH K): Cannot pin seed \"idealistic\" to IH S T IH K: not one of its Rhyme Keys (IH S T AH K).",
+    "  cannot replay 2026-08-27 idealistic (IH S T IH K): Cannot pin seed \"idealistic\" to IH S T IH K: not one of its Rhyme Keys (IH S T AH K).",
+    "  cannot replay 2026-09-06 water (AA T ER): Cannot pin seed \"water\" to AA T ER: not one of its Rhyme Keys (AA D ER).",
+    "  cannot replay 2026-09-22 storytelling (EH L IH NG): Cannot pin seed \"storytelling\" to EH L IH NG: not one of its Rhyme Keys (EH L AH NG).",
+    "  cannot replay 2026-10-01 microbiologist (AA L AH JH IH S T): Cannot pin seed \"microbiologist\" to AA L AH JH IH S T: not one of its Rhyme Keys (AA L AH JH AH S T).",
+    "  cannot replay 2026-10-05 facility (IH L IH T IY): Cannot pin seed \"facility\" to IH L IH T IY: not one of its Rhyme Keys (IH L AH D IY).",
+    "  cannot replay 2026-10-13 sincerity (EH R AH T IY): Cannot pin seed \"sincerity\" to EH R AH T IY: not one of its Rhyme Keys (EH R AH D IY).",
+    "  cannot replay 2026-10-20 corrective (EH K T IH V): Cannot pin seed \"corrective\" to EH K T IH V: not one of its Rhyme Keys (EH K T AH V).",
+    "Settings (unclaimed placeholders): share 0.2, Reachability floor 0.1, fewest Sessions a day 20.",
+    "Moved nothing to Answer.",
+    "Held back: 1.",
+    "  frocked: no prevalence row (2 of 2 Sessions, lower bound 0.224)",
+    "No day under the Reachability floor.",
+    "data/tier-moves.csv unchanged."
+  ],
+  "continuity": [
+    "Continuity: all 260 scheduled days pin; no Seed Word or Rhyme Key holds two places."
+  ]
+}
