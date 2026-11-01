@@ -263,7 +263,7 @@ rigadoon R IH2 G AH0 D UW1 N
 leucocytozoon L UW0 K OW0 S AY1 T OW0 Z UW2 N
 cased K EY1 S T
 abased AH0 B EY2 S T
-effaced AH F EY1 S T
+effaced IH0 F EY1 S T
 emplaced EH1 M P L EY2 S T
 mayst M EY1 S T
 unbraced AH1 N B R EY2 S T
@@ -419,7 +419,7 @@ transume T R AE0 N S UW1 M
 introsume IH2 N T R OW0 S UW1 M
 kokerboom K OW1 K ER0 B UW2 M
 displume D IH1 S P L UW2 M
-kumkum KAH0 M K UW1 M
+kumkum K AH0 M K UW1 M
 overconsume OW1 V ER0 K AH0 N S UW2 M
 fireroom F AY1 ER0 R UW2 M
 foreroom F AO1 R R UW2 M
@@ -430,7 +430,7 @@ replume R EY1 P L UW2 M
 impostume IH0 M P AA1 S T UW2 M
 reillume R IY0 IH0 L UW1 M
 filoplume F IY1 L OW0 P L UW2 M
-absume AH B0 S UW1 M
+absume AH0 B S UW1 M
 
 # --- Corrections (a reading the syllabic-consonant rule no longer reaches) ---
 

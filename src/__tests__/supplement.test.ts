@@ -331,6 +331,24 @@ describe("the committed supplement", () => {
     expect(entries.get("anglos")).toHaveLength(1);
     expect(entries.get("altos")).toHaveLength(2);
   });
+
+  it("holds only ARPAbet: a stress digit on every vowel and on no consonant (#240)", () => {
+    // A malformed reading can still reach its Rhyme Key by luck, as `effaced`,
+    // `absume` and `kumkum` did, so nothing downstream notices it. The Batches
+    // now write this file unattended, which is the route a new one arrives by.
+    const VOWELS = "AA AE AH AO AW AY EH ER EY IH IY OW OY UH UW".split(" ");
+    const CONSONANTS = "B CH D DH F G HH JH K L M N NG P R S SH T TH V W Y Z ZH".split(" ");
+    const phoneme = new Set([
+      ...VOWELS.flatMap((v) => [`${v}0`, `${v}1`, `${v}2`]),
+      ...CONSONANTS,
+    ]);
+    const malformed = [...entries].flatMap(([word, readings]) =>
+      readings
+        .filter((reading) => !reading.every((p) => phoneme.has(p)))
+        .map((reading) => `${word} ${reading.join(" ")}`),
+    );
+    expect(malformed).toEqual([]);
+  });
 });
 
 describe("the hand-written readings of #253", () => {
