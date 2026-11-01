@@ -71,9 +71,9 @@ interface PlayRow {
   scoreDelta: number;
   /** Cumulative Score after this Submission. */
   score: number;
-  /** Resolved Rank tier (rung index) after this Submission. */
+  /** Resolved Rank (its index on the ladder) after this Submission. */
   rankTier: number;
-  /** Rank change this Submission triggered, by rung index, if any. */
+  /** Rank change this Submission triggered, by index on the ladder, if any. */
   rankChange?: { from: number; to: number };
   /** Answers found and Bonus Words collected after this Submission. */
   found: number;
@@ -81,7 +81,7 @@ interface PlayRow {
   note: string;
 }
 
-// Default ladder rung indices used below: 0 Beginner(0%), 2 Budding Poet(5%),
+// Default ladder indices used below: 0 Beginner(0%), 2 Budding Poet(5%),
 // 5 Troubadour(25%), 6 Bard(40%), 7 Wordsmith(50%), 8 Laureate(70%),
 // 9 Shakespeare(100%).
 const script: PlayRow[] = [
@@ -93,7 +93,7 @@ const script: PlayRow[] = [
   { submission: "kate", verdict: { outcome: "rejected", reason: "proper-noun" }, scoreDelta: 0, score: 18, rankTier: 5, found: 2, foundBonus: 1, note: "proper-noun rejection" },
   { submission: "eight", verdict: { outcome: "answer" }, scoreDelta: 5, score: 23, rankTier: 6, rankChange: { from: 5, to: 6 }, found: 3, foundBonus: 1, note: "crosses a Rank threshold" },
   { submission: "collate", verdict: { outcome: "answer" }, scoreDelta: 7, score: 30, rankTier: 7, rankChange: { from: 6, to: 7 }, found: 4, foundBonus: 1, note: "crosses another threshold" },
-  { submission: "gate", verdict: { outcome: "answer" }, scoreDelta: 4, score: 34, rankTier: 7, found: 5, foundBonus: 1, note: "Score rises within the same rung" },
+  { submission: "gate", verdict: { outcome: "answer" }, scoreDelta: 4, score: 34, rankTier: 7, found: 5, foundBonus: 1, note: "Score rises within the same Rank" },
   { submission: "impregnate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 44, rankTier: 8, rankChange: { from: 7, to: 8 }, found: 6, foundBonus: 1, note: "reaches the top named tier (Laureate, 70%)" },
   { submission: "adjudicate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 54, rankTier: 9, rankChange: { from: 8, to: 9 }, found: 7, foundBonus: 1, note: "every Answer found -> perfect-game tier (100%)" },
 ];
@@ -394,11 +394,11 @@ interface RankRow {
 }
 
 const rankRows: RankRow[] = [
-  { found: [], pct: 0, tier: 0, label: "bottom", note: "0% resolves to the bottom rung" },
+  { found: [], pct: 0, tier: 0, label: "bottom", note: "0% resolves to the bottom Rank" },
   { found: ["a"], pct: 24, tier: 0, label: "bottom", note: "just below a threshold does not trigger" },
   { found: ["a", "b"], pct: 25, tier: 1, label: "quarter", note: ">= threshold triggers exactly at the line" },
-  { found: ["a", "b", "c"], pct: 50, tier: 2, label: "half", note: "next rung at its threshold" },
-  { found: ["a", "b", "c", "d"], pct: 100, tier: 3, label: "all", note: "every Answer -> top rung" },
+  { found: ["a", "b", "c"], pct: 50, tier: 2, label: "half", note: "next Rank at its threshold" },
+  { found: ["a", "b", "c", "d"], pct: 100, tier: 3, label: "all", note: "every Answer -> top Rank" },
 ];
 
 describe("rank ladder boundaries (synthetic context)", () => {
@@ -414,7 +414,7 @@ describe("rank ladder boundaries (synthetic context)", () => {
     });
   }
 
-  it("returns the bottom rung when maxScore is 0 (no divide-by-zero)", () => {
+  it("returns the bottom Rank when maxScore is 0 (no divide-by-zero)", () => {
     const degenerate = synthContext([], 0);
     const resolved = rank(degenerate, emptyPlayState);
     expect(resolved).toEqual({ tier: 0, label: "bottom", threshold: 0 });

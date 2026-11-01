@@ -137,7 +137,7 @@ describe("the days flagged as worth reading first", () => {
 /**
  * The other half of ADR-0012: review binds the calendar, not what a Puzzle
  * contains. A rebuild can move a scheduled Seed's Answer count out of the size
- * band or shift its Difficulty off the weekday rung it was dealt for, and the
+ * band or shift its Difficulty off the weekday step it was dealt for, and the
  * Editor's Pass is what surfaces that the night before it ships.
  *
  * The bands come from the real committed artifact, as `schedule-dates.test.ts`
