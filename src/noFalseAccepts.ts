@@ -44,7 +44,7 @@
  * on nobody's word.
  */
 
-import type { UndecidedRhyme } from "./batch.ts";
+import type { UndecidedRhyme, UntieredWord } from "./batch.ts";
 import type { DemotionReason } from "./demotions.ts";
 import { phonemesOf, readingsReachKey, type RhymeRuling, type WordhoodRuling } from "./judge.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
@@ -158,9 +158,12 @@ export function shownReadings(
  * On a rhyme the Judge left undecided (#293), confirm writes a reading beside
  * the word's others (`data/supplement.dict`, a join), decline records a Decline
  * for the word and the Rhyme Key (`data/declines.txt`), and unruled is a rhyme
- * skipped. Each kind of item is read by its own parser (`parseDecision`,
- * `parseUndecided`), which returns only its own kinds; a later kind of item
- * (#294's Tiering) adds kinds of its own here rather than stretching these.
+ * skipped.
+ *
+ * On a written-in word with no knownness (#294), tier writes a Tier verdict
+ * (`data/tier-overrides.csv`, as the Editor's Pass writes one), and unruled is
+ * a word skipped. Each kind of item is read by its own parser (`parseDecision`,
+ * `parseUndecided`, `parseTier`), which returns only its own kinds.
  */
 export type Decision =
   | { kind: "correction"; reading: Pronunciation }
@@ -169,17 +172,18 @@ export type Decision =
   | { kind: "leave" }
   | { kind: "confirm"; reading: Pronunciation }
   | { kind: "decline" }
+  | { kind: "tier"; tier: "answer" | "bonus" }
   | { kind: "unruled" };
 
 /**
  * One item of the sitting's ruling list, all put after the Batch's last model
- * call: a hunted Answer the Judge doubts (#268), or a rhyme it left undecided
- * (#293). The Tiering of a written-in word with no knownness (#294) joins as a
- * third kind.
+ * call: a hunted Answer the Judge doubts (#268), a rhyme it left undecided
+ * (#293), or a word the Batch wrote in that has no knownness, to Tier (#294).
  */
 export type RulingItem =
   | { kind: "hunted"; listed: ListedAnswer }
-  | { kind: "undecided"; rhyme: UndecidedRhyme };
+  | { kind: "undecided"; rhyme: UndecidedRhyme }
+  | { kind: "tier"; untiered: UntieredWord };
 
 /** One command a line: what is typed, padded, then its effect. */
 const commandLine = (typed: string, effect: string): string => `  ${typed.padEnd(20)} ${effect}`;
@@ -325,6 +329,45 @@ export function parseUndecided(input: string, rhyme: UndecidedRhyme): Decision |
       return rest.length ? null : { kind: "decline" };
     case "s":
       return rest.length ? null : { kind: "unruled" };
+    default:
+      return null;
+  }
+}
+
+// ---- a written-in word with no knownness ---------------------------------------
+
+/**
+ * What the maintainer is shown to Tier a word the Batch wrote in that has no
+ * knownness (#294): why it is asked, the question as Retrieval puts it (would a
+ * player produce it, naming the Seed Word; ADR-0015), that an answer is
+ * awaited, then one command a line with its effect. Its letters are none of the
+ * other items', so a `d` or a `y` meant for one never Tiers here. Every command
+ * it names is one `parseTier` reads.
+ */
+export function tierPrompt(untiered: UntieredWord): string[] {
+  return [
+    "Nothing measures how well known it is, so it is a Bonus Word until you Tier it.",
+    `Would an ordinary player think of ${untiered.word} when hunting rhymes for ${untiered.seedWord}?`,
+    "Waiting for your Tier ruling on this word. Type one of these and press Enter:",
+    commandLine("a", "Answer: a Tier verdict is written to data/tier-overrides.csv, so it scores from the next build"),
+    commandLine("b", "Bonus Word: a Tier verdict is written to data/tier-overrides.csv, so it stays accepted and unscored"),
+    commandLine("s", "skip it: nothing is written, and the run report lists it"),
+  ];
+}
+
+/**
+ * A Tier ruling as the maintainer types it: `a` for Answer, `b` for Bonus
+ * Word, `s` to skip. Null when it does not read, so the caller asks again and
+ * writes nothing.
+ */
+export function parseTier(input: string): Decision | null {
+  switch (input.trim().toLowerCase()) {
+    case "a":
+      return { kind: "tier", tier: "answer" };
+    case "b":
+      return { kind: "tier", tier: "bonus" };
+    case "s":
+      return { kind: "unruled" };
     default:
       return null;
   }

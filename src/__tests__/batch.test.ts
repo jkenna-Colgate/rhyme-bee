@@ -19,6 +19,7 @@ import {
   trustFailures,
   trustVerdict,
   undecidedRhymes,
+  untieredWrittenIn,
   type BatchEntry,
 } from "../batch.ts";
 import type { JudgeRulingRecord } from "../judgeLanding.ts";
@@ -420,5 +421,43 @@ describe("the Judge's undecided rhymes, put to the maintainer in the sitting", (
       ruling({ word: "mum", seedWord: "home", rhymeKey: "OW M", reading: null }),
     ]);
     expect(listed.map((u) => [u.word, u.heard, u.reading])).toEqual([["fine", "F AY1 N", null], ["glum", "/ɡlʌm/", null], ["mum", null, null]]);
+  });
+});
+
+describe("the written-in words with no knownness, put to the maintainer to Tier", () => {
+  const landed = (word: string, seedWord: string, rhymeKey: string, l: JudgeRulingRecord["landed"] = "reading"): JudgeRulingRecord => ({
+    date: "2026-11-01", model: "claude-sonnet-5-5", word, seedWord, rhymeKey, knew: "missing-reading", verdict: "rhyme",
+    reading: null, confidence: "high", why: "rhymes", landed: l,
+  });
+  /** Knownness as the index gives it: `nightgown` and `takedown` have a value, the rest none. */
+  const KNOWNNESS: Record<string, number> = { nightgown: 1.4, takedown: -0.8 };
+  const knownness = (word: string) => KNOWNNESS[word] ?? null;
+
+  it("lists each word the Batch wrote a reading for that has no knownness, with the Rhyme Key it was found on", () => {
+    expect(untieredWrittenIn([
+      landed("throwdown", "down", "AW N"),
+      landed("nightgown", "down", "AW N"),
+      landed("hotrod", "god", "AA D"),
+      landed("takedown", "down", "AW N"),
+    ], knownness)).toEqual([
+      { word: "throwdown", seedWord: "down", rhymeKey: "AW N" },
+      { word: "hotrod", seedWord: "god", rhymeKey: "AA D" },
+    ]);
+  });
+
+  it("lists a word once, though several looks or keys wrote it in", () => {
+    expect(untieredWrittenIn([
+      landed("meathook", "book", "UH K"),
+      landed("meathook", "book", "UH K"),
+      landed("meathook", "crook", "UH K"),
+    ], knownness)).toEqual([{ word: "meathook", seedWord: "book", rhymeKey: "UH K" }]);
+  });
+
+  it("lists no word whose ruling wrote no reading", () => {
+    expect(untieredWrittenIn([
+      landed("clique", "trick", "IH K", "unconfirmed-rhyme"),
+      landed("marx", "parks", "AA R K S", "suggested-demotion"),
+      landed("barbar", "guitar", "AA R", "nothing"),
+    ], knownness)).toEqual([]);
   });
 });

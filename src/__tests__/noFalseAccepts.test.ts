@@ -15,11 +15,13 @@ import {
   rulingList,
   rulingPrompt,
   shownReadings,
+  parseTier,
+  tierPrompt,
   undecidedPrompt,
   type HuntedAnswer,
   type HuntRuling,
 } from "../noFalseAccepts.ts";
-import type { UndecidedRhyme } from "../batch.ts";
+import type { UndecidedRhyme, UntieredWord } from "../batch.ts";
 import type { Pronunciation } from "../phonology.ts";
 
 const r = (s: string): Pronunciation => s.split(" ");
@@ -295,6 +297,43 @@ describe("asking the maintainer about a rhyme the Judge left undecided", () => {
         expect(parseUndecided(typed, rhyme), line).not.toBeNull();
       }
     }
+  });
+});
+
+describe("asking the maintainer to Tier a written-in word with no knownness", () => {
+  const throwdown: UntieredWord = { word: "throwdown", seedWord: "down", rhymeKey: "AW N" };
+
+  it("says why it is asked, names the Seed Word, says it is waiting, and gives one command a line with its effect", () => {
+    expect(tierPrompt(throwdown)).toEqual([
+      "Nothing measures how well known it is, so it is a Bonus Word until you Tier it.",
+      "Would an ordinary player think of throwdown when hunting rhymes for down?",
+      "Waiting for your Tier ruling on this word. Type one of these and press Enter:",
+      "  a                    Answer: a Tier verdict is written to data/tier-overrides.csv, so it scores from the next build",
+      "  b                    Bonus Word: a Tier verdict is written to data/tier-overrides.csv, so it stays accepted and unscored",
+      "  s                    skip it: nothing is written, and the run report lists it",
+    ]);
+  });
+
+  it("reads an Answer, a Bonus Word, and skipping it unruled", () => {
+    expect(parseTier("a")).toEqual({ kind: "tier", tier: "answer" });
+    expect(parseTier(" B ")).toEqual({ kind: "tier", tier: "bonus" });
+    expect(parseTier("s")).toEqual({ kind: "unruled" });
+  });
+
+  it("reads nothing it cannot act on, so the caller asks again and writes nothing", () => {
+    expect(parseTier("")).toBeNull();
+    expect(parseTier("a b")).toBeNull();
+    expect(parseTier("answer")).toBeNull();
+    // Other items' commands are not this one's.
+    expect(parseTier("y")).toBeNull();
+    expect(parseTier("d")).toBeNull();
+    expect(parseTier("l")).toBeNull();
+  });
+
+  it("accepts every command it names", () => {
+    const commands = tierPrompt(throwdown).filter((line) => /^ {2}[a-z]/.test(line));
+    expect(commands.length).toBeGreaterThan(0);
+    for (const line of commands) expect(parseTier(line.trim().split(/\s{2,}/)[0]!), line).not.toBeNull();
   });
 });
 

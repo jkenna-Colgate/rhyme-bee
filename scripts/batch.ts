@@ -44,6 +44,10 @@
  * amendment): the maintainer confirms it, which writes the reading beside the
  * word's others, declines it, which records a Decline for the word and the
  * Rhyme Key, or skips it, which writes nothing and is listed in the run report.
+ * Last come the words the looks wrote in that have no knownness, each once with
+ * the Rhyme Key it was found on (#294): the maintainer Tiers it as an Answer or
+ * a Bonus Word, which writes a Tier verdict to `data/tier-overrides.csv` as the
+ * Editor's Pass does, or skips it, which writes nothing and is reported.
  * The whole list is put after the Batch's last model call.
  *
  * It writes the run report to `data/judge-runs/` and the result per Seed Word
@@ -81,6 +85,7 @@ import {
   trustFailures,
   trustVerdict,
   undecidedRhymes,
+  untieredWrittenIn,
   type BatchEntry,
   type BatchSeed,
   type KeyCount,
@@ -276,6 +281,8 @@ const answeredBy = new Set<string>();
 const allRulings: (ReturnType<typeof reportRuling> & { look: number; landed: string | null })[] = [];
 /** Every ruling the looks made or met, from its record: where the Judge's undecided rhymes are picked from (#293). */
 const lookRulings: JudgeRulingRecord[] = [];
+/** The rulings this Batch's looks made, not met: where the written-in words to Tier are picked from (#294). */
+const writtenIn: JudgeRulingRecord[] = [];
 const readDeclines = () => parseDeclines(existsSync(DECLINES) ? readFileSync(DECLINES, "utf8") : "");
 const writes = noWrites();
 const note = (r: ModelReply) => {
@@ -360,6 +367,7 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
   const recorded = new Map<string, JudgeRulingRecord>(landings.records.map((r) => [rulingKey(r.word, r.rhymeKey), r]));
   for (const { record } of ruledBefore) recorded.set(rulingKey(record.word, record.rhymeKey), record);
   lookRulings.push(...recorded.values());
+  writtenIn.push(...landings.records);
   const freshClassification = new Map<string, JudgedItem>(leg.items.map((j) => [rulingKey(j.word, j.rhymeKey), j]));
   for (const j of leg.items) allRulings.push({ ...reportRuling(j), look: lookNo, landed: recorded.get(rulingKey(j.word, j.rhymeKey))?.landed ?? null });
 
@@ -419,16 +427,19 @@ if (!stopped) {
 //
 // Put only now, after the Batch's last model call, so a usage stop never lands
 // while the maintainer is typing (#293): the hunted Answers the Judge doubts,
-// then the rhymes it ruled in the looks and left undecided.
+// then the rhymes it ruled in the looks and left undecided, then the words the
+// looks wrote in that have no knownness, to Tier (#294).
 
 const undecided = undecidedRhymes(lookRulings, readDeclines());
+const untiered = untieredWrittenIn(writtenIn, (word) => index.tierOf(word).knownness);
 const rulingItems: RulingItem[] = [
   ...(hunted ? rulingList(hunted.leg.rulings).map((listed): RulingItem => ({ kind: "hunted", listed })) : []),
   ...undecided.map((rhyme): RulingItem => ({ kind: "undecided", rhyme })),
+  ...untiered.map((word): RulingItem => ({ kind: "tier", untiered: word })),
 ];
 const settled = await settleRulingList(rulingItems, { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
-if (settled.some((s) => s.decision.kind === "demotion")) {
-  console.error("rebuilding the index with the Demotions");
+if (settled.some((s) => s.decision.kind === "demotion" || s.decision.kind === "tier")) {
+  console.error("rebuilding the index with the Demotions and Tier verdicts");
   const built = rebuild();
   if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
 }
@@ -438,6 +449,8 @@ const hunt: { days: HuntDay[]; leg: HuntLeg; settled: ReturnType<typeof settledH
   : null;
 const undecidedSettled = settled.flatMap((s) => (s.item.kind === "undecided" ? [{ rhyme: s.item.rhyme, decision: s.decision, wrote: s.wrote }] : []));
 const undecidedSkipped = undecidedSettled.filter((s) => s.decision.kind === "unruled").map((s) => `${s.rhyme.word} /${s.rhyme.rhymeKey}/`);
+const tierSettled = settled.flatMap((s) => (s.item.kind === "tier" ? [{ untiered: s.item.untiered, decision: s.decision, wrote: s.wrote }] : []));
+const tierSkipped = tierSettled.filter((s) => s.decision.kind === "unruled").map((s) => `${s.untiered.word} /${s.untiered.rhymeKey}/`);
 
 // ---- the report and the record -------------------------------------------------
 
@@ -521,6 +534,15 @@ const reportPath = writeRunReport(date, stem, run, {
     })),
     skipped: undecidedSkipped,
   },
+  tiered: {
+    note:
+      "Words the looks wrote in that have no knownness, so each was a Bonus Word whatever it is, put to the maintainer to Tier " +
+      "in the sitting (#294). An Answer or a Bonus Word wrote an unlocked Tier verdict to data/tier-overrides.csv, which the next " +
+      "build applies; a skip wrote nothing and is listed under skipped.",
+    listed: tierSettled.length,
+    decided: tierSettled.map(({ untiered: u, decision, wrote }) => ({ word: u.word, seedWord: u.seedWord, rhymeKey: u.rhymeKey, decision, wrote })),
+    skipped: tierSkipped,
+  },
 });
 
 const reportFromRoot = relative(root, reportPath).replace(/\\/g, "/");
@@ -563,5 +585,13 @@ if (undecidedSettled.length) {
   console.log(`rhymes the Judge left undecided: ${undecidedSettled.length}, confirmed ${count("confirm")}, declined ${count("decline")}` +
     `${undecidedSkipped.length ? `, skipped ${undecidedSkipped.join(", ")}` : ""}`);
 }
+if (tierSettled.length) {
+  const tiered = (tier: string) => tierSettled.filter((s) => s.decision.kind === "tier" && s.decision.tier === tier).length;
+  console.log(`written-in words with no knownness: ${tierSettled.length}, Tiered Answer ${tiered("answer")}, Bonus Word ${tiered("bonus")}` +
+    `${tierSkipped.length ? `, skipped ${tierSkipped.join(", ")}` : ""}`);
+}
 if (stopped) console.log(`stopped: ${stopped}`);
-console.log(`report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/demotions.txt, data/declines.txt, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl`);
+console.log(
+  `report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/demotions.txt, data/declines.txt, ` +
+  "data/tier-overrides.csv, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl",
+);

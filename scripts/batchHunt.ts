@@ -5,14 +5,16 @@
  * calls the model, asks the maintainer and writes what they decide.
  *
  * The same sitting puts the rhymes the Judge ruled in the looks and left
- * undecided (#293), so one ruling list holds both kinds of item.
+ * undecided (#293), and the words the looks wrote in that have no knownness,
+ * to Tier (#294), so one ruling list holds all three kinds of item.
  *
  * Every write goes through a path the Editor's Pass already uses: a correction
  * or a keep through `applyCorrection` (`data/supplement.dict`, replacing the
  * readings the game holds with the one corrected or the several kept), and a
  * confirmed rhyme the same way as a join beside them; a Demotion through
  * `appendDemotion` (`data/demotions.txt`); a Decline through `appendDecline`
- * (`data/declines.txt`). There is no fourth.
+ * (`data/declines.txt`); a Tier verdict through `appendTierOverride`
+ * (`data/tier-overrides.csv`). There is no fifth.
  */
 
 import { spawnSync } from "node:child_process";
@@ -24,9 +26,11 @@ import {
   huntAnswers,
   noFalseAcceptsResult,
   parseDecision,
+  parseTier,
   parseUndecided,
   rulingPrompt,
   shownReadings,
+  tierPrompt,
   undecidedPrompt,
   type Decision,
   type HuntedAnswer,
@@ -39,10 +43,12 @@ import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Schedule } from "../src/schedule.ts";
 import { seedWordCheckLines } from "../src/seedWord.ts";
+import type { TierVerdict } from "../src/tierOverride.ts";
 import { startSession, type PuzzleContext, type ScoringConfig } from "../src/session.ts";
 import { ipaReadings, parseWiktionaryExtract, wiktionaryReadings, type WiktionaryExtract } from "../src/wiktionary.ts";
 import { appendDecline, DECLINES_PATH } from "../web/declinesFile.ts";
 import { appendDemotion } from "../web/demotionFile.ts";
+import { appendTierOverride } from "../web/tierOverrideFile.ts";
 import { pinnedEvidenceContext } from "./editorAdd.ts";
 import { applyCorrection, type CorrectionAsk, type CorrectionSource } from "./editorCorrection.ts";
 import { askBoth, type JudgeCalls } from "./judgeRun.ts";
@@ -153,17 +159,39 @@ export function rebuild(): { ok: true } | { ok: false; error: string } {
   return built.status === 0 ? { ok: true } : { ok: false, error: built.stderr };
 }
 
-type SittingContext = { index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex };
+const TIER_OVERRIDES_PATH = resolve(dataDir, "tier-overrides.csv");
+
+/**
+ * The Tier verdict each ruling writes. An Answer is `answer-common`: the word
+ * is Tiered because a player would think of it (Retrieval), and with no
+ * knownness there is no measure that would make it rare.
+ */
+const BATCH_TIER_VERDICT = { answer: "answer-common", bonus: "bonus" } as const satisfies Record<"answer" | "bonus", TierVerdict>;
+
+type SittingContext ={ index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex };
 
 /** The item's word and the Rhyme Key it is ruled on. */
 const itemPair = (item: RulingItem): { word: string; rhymeKey: RhymeKey } =>
-  item.kind === "hunted" ? { word: item.listed.answer.word, rhymeKey: item.listed.rhymeKey } : item.rhyme;
+  item.kind === "hunted" ? { word: item.listed.answer.word, rhymeKey: item.listed.rhymeKey }
+  : item.kind === "undecided" ? item.rhyme
+  : item.untiered;
 
 /**
  * What the maintainer is shown for one item before the prompt, and the parser
  * that reads their answer. Each kind of item has its own prompt and parser.
  */
 function presentItem(item: RulingItem, index: RhymeIndex, extract: WiktionaryExtract): { lines: string[]; parse: (input: string) => Decision | null } {
+  if (item.kind === "tier") {
+    const { untiered } = item;
+    return {
+      lines: [
+        `${untiered.word} for ${untiered.seedWord} /${untiered.rhymeKey}/: written in by this Batch, with no knownness`,
+        ...index.readingsOf(untiered.word).map((r) => `  the game reads: ${r.pronunciation.join(" ")}`),
+        ...tierPrompt(untiered).map((line) => `  ${line}`),
+      ],
+      parse: parseTier,
+    };
+  }
   if (item.kind === "undecided") {
     const { rhyme } = item;
     return {
@@ -196,17 +224,18 @@ function presentItem(item: RulingItem, index: RhymeIndex, extract: WiktionaryExt
  * ruling as it is made. It is called after the Batch's last model call, so a
  * usage stop never lands mid-sitting. With no terminal to ask, the list is
  * printed and every item is left unruled: a hunted Answer then fails the day's
- * gate, and a rhyme the Judge left undecided is listed as skipped.
+ * gate, and a rhyme the Judge left undecided or a word to Tier is listed as
+ * skipped.
  */
 export async function settleRulingList(items: readonly RulingItem[], ctx: SittingContext): Promise<Settled[]> {
   const settled: Settled[] = [];
   const asking = process.stdin.isTTY ? createInterface({ input: process.stdin, output: process.stderr }) : null;
-  const hunted = items.filter((i) => i.kind === "hunted").length;
-  const undecided = items.filter((i) => i.kind === "undecided").length;
+  const count = (kind: RulingItem["kind"]) => items.filter((i) => i.kind === kind).length;
   if (items.length) {
     console.error(
-      `\nThe ruling list: ${hunted} scored Answers the Judge doubts at high confidence, each scored until you rule, ` +
-      `and ${undecided} rhymes the Judge ruled and left undecided, each landing nothing until you rule.`,
+      `\nThe ruling list: ${count("hunted")} scored Answers the Judge doubts at high confidence, each scored until you rule; ` +
+      `${count("undecided")} rhymes the Judge ruled and left undecided, each landing nothing until you rule; ` +
+      `and ${count("tier")} words this Batch wrote in with no knownness, each a Bonus Word until you Tier it.`,
     );
   }
   if (!asking && items.length) console.error("No terminal to ask on, so every one is left unruled.");
@@ -247,6 +276,14 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
       } else if (decision.kind === "decline") {
         appendDecline(DECLINES_PATH, { word, rhymeKey });
         wrote = `data/declines.txt: ${word} ${rhymeKey}`;
+      } else if (decision.kind === "tier" && item.kind === "tier") {
+        // Written as the Editor's Pass writes a Tier verdict: no measured value (the word has none), unlocked.
+        const verdict = BATCH_TIER_VERDICT[decision.tier];
+        appendTierOverride(TIER_OVERRIDES_PATH, {
+          word, verdict, measured: null, decided: new Date().toISOString(),
+          note: `Batch ${ctx.today}: written in on /${rhymeKey}/ for ${item.untiered.seedWord}`,
+        });
+        wrote = `data/tier-overrides.csv: ${word} ${verdict}`;
       }
       if (wrote) console.error(`  wrote ${wrote}`);
       settled.push({ item, decision, wrote });

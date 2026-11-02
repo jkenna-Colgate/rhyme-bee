@@ -264,6 +264,40 @@ export function undecidedRhymes(rulings: readonly JudgeRulingRecord[], declines:
   return out;
 }
 
+// ---- the written-in words with no knownness ------------------------------------
+
+/**
+ * A word the Batch wrote a reading for that has no knownness, so it is a Bonus
+ * Word whatever it is (#294): put to the maintainer to Tier, with the Seed Word
+ * and the Rhyme Key it was found on.
+ */
+export interface UntieredWord {
+  word: string;
+  seedWord: string;
+  rhymeKey: RhymeKey;
+}
+
+/**
+ * The words this Batch's looks wrote in that have no knownness, each once, in
+ * the order given and with the first Rhyme Key it was found on. A word with a
+ * knownness, measured or an editor's Tier verdict already, is Tiered and is not
+ * listed. The rulings are the ones this Batch made, not ones met from an earlier
+ * Batch: a word written in then was listed then.
+ */
+export function untieredWrittenIn(
+  rulings: readonly JudgeRulingRecord[],
+  knownness: (word: string) => number | null,
+): UntieredWord[] {
+  const seen = new Set<string>();
+  const out: UntieredWord[] = [];
+  for (const r of rulings) {
+    if (r.landed !== "reading" || seen.has(r.word)) continue;
+    seen.add(r.word);
+    if (knownness(r.word) === null) out.push({ word: r.word, seedWord: r.seedWord, rhymeKey: r.rhymeKey });
+  }
+  return out;
+}
+
 /** The gate's two settings. No value is claimed for either (#225): they are tuned over Batches. */
 export interface TrustGate {
   /** The most Trust failures a passing look may find. */
