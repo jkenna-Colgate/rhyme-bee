@@ -4,10 +4,15 @@
  * sitting. The rules are `src/noFalseAccepts.ts`; this file reads the extract,
  * calls the model, asks the maintainer and writes what they decide.
  *
+ * The same sitting puts the rhymes the Judge ruled in the looks and left
+ * undecided (#293), so one ruling list holds both kinds of item.
+ *
  * Every write goes through a path the Editor's Pass already uses: a correction
  * or a keep through `applyCorrection` (`data/supplement.dict`, replacing the
- * readings the game holds with the one corrected or the several kept), a Demotion through `appendDemotion` (`data/demotions.txt`). There
- * is no third.
+ * readings the game holds with the one corrected or the several kept), and a
+ * confirmed rhyme the same way as a join beside them; a Demotion through
+ * `appendDemotion` (`data/demotions.txt`); a Decline through `appendDecline`
+ * (`data/declines.txt`). There is no fourth.
  */
 
 import { spawnSync } from "node:child_process";
@@ -19,13 +24,16 @@ import {
   huntAnswers,
   noFalseAcceptsResult,
   parseDecision,
+  parseUndecided,
   rulingPrompt,
   shownReadings,
+  undecidedPrompt,
   type Decision,
   type HuntedAnswer,
   type HuntRuling,
   type ListedAnswer,
   type NoFalseAcceptsResult,
+  type RulingItem,
 } from "../src/noFalseAccepts.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
@@ -33,9 +41,10 @@ import type { Schedule } from "../src/schedule.ts";
 import { seedWordCheckLines } from "../src/seedWord.ts";
 import { startSession, type PuzzleContext, type ScoringConfig } from "../src/session.ts";
 import { ipaReadings, parseWiktionaryExtract, wiktionaryReadings, type WiktionaryExtract } from "../src/wiktionary.ts";
+import { appendDecline, DECLINES_PATH } from "../web/declinesFile.ts";
 import { appendDemotion } from "../web/demotionFile.ts";
 import { pinnedEvidenceContext } from "./editorAdd.ts";
-import { applyCorrection } from "./editorCorrection.ts";
+import { applyCorrection, type CorrectionAsk, type CorrectionSource } from "./editorCorrection.ts";
 import { askBoth, type JudgeCalls } from "./judgeRun.ts";
 import { root } from "./modelCall.ts";
 import { checkLocalSources, WIKTIONARY_SOURCE } from "./sourceMirror.ts";
@@ -121,11 +130,16 @@ export async function judgeHunt(days: readonly HuntDay[], opts: { model: string;
   return { rulings, calls, answeredBy };
 }
 
-/** What the maintainer decided on one listed Answer, and what was written for it. */
+/** What the maintainer decided on one item of the ruling list, and what was written for it. */
 export interface Settled {
-  listed: ListedAnswer;
+  item: RulingItem;
   decision: Decision;
   wrote: string | null;
+}
+
+/** The hunted Answers settled, each with its listing, which is what the gate reads. */
+export function settledHunted(settled: readonly Settled[]): { listed: ListedAnswer; decision: Decision; wrote: string | null }[] {
+  return settled.flatMap((s) => (s.item.kind === "hunted" ? [{ listed: s.item.listed, decision: s.decision, wrote: s.wrote }] : []));
 }
 
 /** Wiktionary's readings of a word, as ARPAbet before Normalisation, which the build applies. */
@@ -139,48 +153,90 @@ export function rebuild(): { ok: true } | { ok: false; error: string } {
   return built.status === 0 ? { ok: true } : { ok: false, error: built.stderr };
 }
 
+type SittingContext = { index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex };
+
+/** The item's word and the Rhyme Key it is ruled on. */
+const itemPair = (item: RulingItem): { word: string; rhymeKey: RhymeKey } =>
+  item.kind === "hunted" ? { word: item.listed.answer.word, rhymeKey: item.listed.rhymeKey } : item.rhyme;
+
 /**
- * Put the ruling list to the maintainer, one Answer at a time, and write each
- * ruling as it is made. With no terminal to ask, the list is printed and every
- * Answer on it is left unruled, which fails the day's gate.
+ * What the maintainer is shown for one item before the prompt, and the parser
+ * that reads their answer. Each kind of item has its own prompt and parser.
  */
-export async function settleRulingList(
-  list: readonly ListedAnswer[],
-  ctx: { index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex },
-): Promise<Settled[]> {
+function presentItem(item: RulingItem, index: RhymeIndex, extract: WiktionaryExtract): { lines: string[]; parse: (input: string) => Decision | null } {
+  if (item.kind === "undecided") {
+    const { rhyme } = item;
+    return {
+      lines: [
+        `${rhyme.word} for ${rhyme.seedWord} /${rhyme.rhymeKey}/: a rhyme the Judge left undecided`,
+        ...index.readingsOf(rhyme.word).map((r) => `  the game reads: ${r.pronunciation.join(" ")}`),
+        ...undecidedPrompt(rhyme).map((line) => `  ${line}`),
+      ],
+      parse: (input) => parseUndecided(input, rhyme),
+    };
+  }
+  const listed = item.listed;
+  const word = listed.answer.word;
+  const shown = shownReadings(index.readingsOf(word), wiktionaryOffered(extract, word));
+  return {
+    lines: [
+      `${word} for ${listed.seedWord} /${listed.rhymeKey}/: ${listed.doubts.join(", ")}`,
+      `  Judge, rhyme: ${listed.rhyme.verdict} (${listed.rhyme.confidence}) ${listed.rhyme.why}`,
+      ...(listed.wordhood ? [`  Judge, wordhood: ${listed.wordhood.verdict} (${listed.wordhood.confidence}) ${listed.wordhood.why}`] : []),
+      `  sent for: ${listed.answer.reasons.join(", ")}`,
+      ...(extract.get(word) ?? []).map((ipa) => `  Wiktionary (IPA): ${ipa}`),
+      ...rulingPrompt(shown).map((line) => `  ${line}`),
+    ],
+    parse: (input) => parseDecision(input, shown),
+  };
+}
+
+/**
+ * Put the ruling list to the maintainer, one item at a time, and write each
+ * ruling as it is made. It is called after the Batch's last model call, so a
+ * usage stop never lands mid-sitting. With no terminal to ask, the list is
+ * printed and every item is left unruled: a hunted Answer then fails the day's
+ * gate, and a rhyme the Judge left undecided is listed as skipped.
+ */
+export async function settleRulingList(items: readonly RulingItem[], ctx: SittingContext): Promise<Settled[]> {
   const settled: Settled[] = [];
   const asking = process.stdin.isTTY ? createInterface({ input: process.stdin, output: process.stderr }) : null;
-  if (list.length) console.error(`\nThe ruling list: ${list.length} scored Answers the Judge doubts at high confidence. Each stays scored until you rule.`);
-  if (!asking && list.length) console.error("No terminal to ask on, so every one is left unruled.");
+  const hunted = items.filter((i) => i.kind === "hunted").length;
+  const undecided = items.filter((i) => i.kind === "undecided").length;
+  if (items.length) {
+    console.error(
+      `\nThe ruling list: ${hunted} scored Answers the Judge doubts at high confidence, each scored until you rule, ` +
+      `and ${undecided} rhymes the Judge ruled and left undecided, each landing nothing until you rule.`,
+    );
+  }
+  if (!asking && items.length) console.error("No terminal to ask on, so every one is left unruled.");
   // Reloaded after each reading written, so a word listed twice shows what it holds now.
   let index = ctx.index();
+  const correctionDeps = (source: CorrectionSource) => ({
+    context: pinnedEvidenceContext, schedule: () => ctx.schedule, today: () => ctx.today,
+    openIndex: ctx.loadIndex, rebuild: async () => rebuild(), source,
+  });
   try {
-    for (const [i, item] of list.entries()) {
-      const word = item.answer.word;
-      const shown = shownReadings(index.readingsOf(word), wiktionaryOffered(ctx.extract, word));
-      console.error(`\n[${i + 1}/${list.length}] ${word} for ${item.seedWord} /${item.rhymeKey}/: ${item.doubts.join(", ")}`);
-      console.error(`  Judge, rhyme: ${item.rhyme.verdict} (${item.rhyme.confidence}) ${item.rhyme.why}`);
-      if (item.wordhood) console.error(`  Judge, wordhood: ${item.wordhood.verdict} (${item.wordhood.confidence}) ${item.wordhood.why}`);
-      console.error(`  sent for: ${item.answer.reasons.join(", ")}`);
-      for (const ipa of ctx.extract.get(word) ?? []) console.error(`  Wiktionary (IPA): ${ipa}`);
-      for (const line of rulingPrompt(shown)) console.error(`  ${line}`);
+    for (const [i, item] of items.entries()) {
+      const { word, rhymeKey } = itemPair(item);
+      const { lines, parse } = presentItem(item, index, ctx.extract);
+      console.error(`\n[${i + 1}/${items.length}] ${lines[0]}`);
+      for (const line of lines.slice(1)) console.error(line);
       let decision: Decision = { kind: "unruled" };
       while (asking) {
-        const got = parseDecision(await asking.question("  your ruling > "), shown);
+        const got = parse(await asking.question("  your ruling > "));
         if (got) { decision = got; break; }
         console.error("  That does not read, and nothing was written. Type one of the commands above, then Enter.");
       }
       let wrote: string | null = null;
-      // A correction writes one reading, a keep the several kept: both replace every reading the word had.
-      const readings = decision.kind === "correction" ? [decision.reading] : decision.kind === "keep" ? decision.readings : [];
-      if (readings.length) {
-        const result = await applyCorrection(
-          { word, target: item.rhymeKey, phonemes: readings.at(-1)!, kept: readings.slice(0, -1), mode: "replace" },
-          {
-            context: pinnedEvidenceContext, schedule: () => ctx.schedule, today: () => ctx.today,
-            openIndex: ctx.loadIndex, rebuild: async () => rebuild(), source: "batch",
-          },
-        );
+      // A correction writes one reading and a keep the several kept, both replacing every reading
+      // the word had; a confirm writes one beside them.
+      const replacing = decision.kind === "correction" ? [decision.reading] : decision.kind === "keep" ? decision.readings : [];
+      const correction: CorrectionAsk | null = replacing.length
+        ? { word, target: rhymeKey, phonemes: replacing.at(-1)!, kept: replacing.slice(0, -1), mode: "replace" }
+        : decision.kind === "confirm" ? { word, target: rhymeKey, phonemes: decision.reading, mode: "join" } : null;
+      if (correction) {
+        const result = await applyCorrection(correction, correctionDeps(item.kind === "hunted" ? "batch" : "batch-undecided"));
         wrote = `data/supplement.dict: ${result.written.map((r) => `${word} ${r.join(" ")}`).join("; ")}${result.rebuilt.ok ? "" : " (the rebuild failed)"}`;
         if (result.rebuilt.ok) index = ctx.loadIndex();
         // A reading given to a scheduled Seed Word runs the Seed Word test (#264), as it does in the Editor's Pass.
@@ -188,9 +244,12 @@ export async function settleRulingList(
       } else if (decision.kind === "demotion") {
         appendDemotion(resolve(dataDir, "demotions.txt"), { word, reason: decision.reason });
         wrote = `data/demotions.txt: ${word} ${decision.reason}`;
+      } else if (decision.kind === "decline") {
+        appendDecline(DECLINES_PATH, { word, rhymeKey });
+        wrote = `data/declines.txt: ${word} ${rhymeKey}`;
       }
       if (wrote) console.error(`  wrote ${wrote}`);
-      settled.push({ listed: item, decision, wrote });
+      settled.push({ item, decision, wrote });
     }
   } finally {
     asking?.close();
@@ -206,8 +265,9 @@ export function huntResults(
   scoring: ScoringConfig,
 ): Map<string, NoFalseAcceptsResult> {
   const out = new Map<string, NoFalseAcceptsResult>();
+  const hunted = settledHunted(settled);
   for (const d of days) {
-    const mine = settled.filter((s) => s.listed.seedWord === d.seedWord);
+    const mine = hunted.filter((s) => s.listed.seedWord === d.seedWord);
     const session = sessionOn(index, d.seedWord, d.rhymeKey, scoring);
     const scored: ReadonlySet<string> = new Set("failed" in session ? [] : session.answerScores.keys());
     out.set(d.seedWord, noFalseAcceptsResult(

@@ -44,6 +44,7 @@
  * on nobody's word.
  */
 
+import type { UndecidedRhyme } from "./batch.ts";
 import type { DemotionReason } from "./demotions.ts";
 import { phonemesOf, readingsReachKey, type RhymeRuling, type WordhoodRuling } from "./judge.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
@@ -154,15 +155,31 @@ export function shownReadings(
  * leave it keeps it scored on the maintainer's word; unruled is an Answer
  * skipped.
  *
- * A later kind of item on the ruling list (#293's undecided rhymes, #294's
- * Tiering) adds kinds of its own here rather than stretching these.
+ * On a rhyme the Judge left undecided (#293), confirm writes a reading beside
+ * the word's others (`data/supplement.dict`, a join), decline records a Decline
+ * for the word and the Rhyme Key (`data/declines.txt`), and unruled is a rhyme
+ * skipped. Each kind of item is read by its own parser (`parseDecision`,
+ * `parseUndecided`), which returns only its own kinds; a later kind of item
+ * (#294's Tiering) adds kinds of its own here rather than stretching these.
  */
 export type Decision =
   | { kind: "correction"; reading: Pronunciation }
   | { kind: "keep"; readings: Pronunciation[] }
   | { kind: "demotion"; reason: DemotionReason }
   | { kind: "leave" }
+  | { kind: "confirm"; reading: Pronunciation }
+  | { kind: "decline" }
   | { kind: "unruled" };
+
+/**
+ * One item of the sitting's ruling list, all put after the Batch's last model
+ * call: a hunted Answer the Judge doubts (#268), or a rhyme it left undecided
+ * (#293). The Tiering of a written-in word with no knownness (#294) joins as a
+ * third kind.
+ */
+export type RulingItem =
+  | { kind: "hunted"; listed: ListedAnswer }
+  | { kind: "undecided"; rhyme: UndecidedRhyme };
 
 /** One command a line: what is typed, padded, then its effect. */
 const commandLine = (typed: string, effect: string): string => `  ${typed.padEnd(20)} ${effect}`;
@@ -251,6 +268,61 @@ export function parseDecision(input: string, shown: readonly ShownReading[]): De
       return arg === "" || arg === "name" ? { kind: "demotion", reason: "proper-noun" } : arg === "word" ? { kind: "demotion", reason: "not-a-known-word" } : null;
     case "l":
       return rest.length ? null : { kind: "leave" };
+    case "s":
+      return rest.length ? null : { kind: "unruled" };
+    default:
+      return null;
+  }
+}
+
+// ---- a rhyme the Judge left undecided ------------------------------------------
+
+const KNEW: Record<UndecidedRhyme["knew"], (key: RhymeKey) => string> = {
+  "missing-reading": () => "the game has no reading of it (a Missing Reading)",
+  overrule: (key) => `the game's readings miss /${key}/ (an Overrule)`,
+};
+
+/**
+ * What the maintainer is shown for a rhyme the Judge left undecided (#293): what
+ * the Judge ruled and what the game knew, the Judge's reading and reasoning, then
+ * that an answer is awaited and one command a line with its effect. Confirming
+ * the Judge's own reading is offered only when it reaches the Rhyme Key. Its
+ * letters are none of a hunted Answer's, so a `d` meant for a Demotion there
+ * never declines here. Every command it names is one `parseUndecided` reads.
+ */
+export function undecidedPrompt(rhyme: UndecidedRhyme): string[] {
+  const { word, rhymeKey: key, reading } = rhyme;
+  const heard = rhyme.heard ?? "none given";
+  return [
+    `The Judge ruled it a Rhyme at ${rhyme.confidence} confidence, and nothing landed: ${KNEW[rhyme.knew](key)}.`,
+    reading ? `  The Judge's reading: ${heard}` : `  The Judge's reading: ${heard}, which misses /${key}/, so confirming needs a reading typed`,
+    `  The Judge's reasoning: ${rhyme.why}`,
+    "Waiting for your ruling on this rhyme. Type one of these and press Enter:",
+    ...(reading
+      ? [
+          commandLine("y", `confirm it: ${reading.join(" ")} is written beside the word's readings, so it rhymes on /${key}/ from then on`),
+          commandLine("y <ARPAbet>", `confirm it with a reading you type instead, e.g. y ${reading.join(" ")} (written beside the word's readings)`),
+        ]
+      : [commandLine("y <ARPAbet>", "confirm it with a reading you type, e.g. y K AE1 T (written beside the word's readings)")]),
+    commandLine("n", `decline it: a Decline is recorded for ${word} on /${key}/, so it is not raised again`),
+    commandLine("s", "skip it: nothing is written, and the run report lists it"),
+  ];
+}
+
+/**
+ * A ruling on an undecided rhyme as the maintainer types it: `y` to confirm the
+ * Judge's reading, `y <ARPAbet>` to confirm one typed; `n` to decline; `s` to
+ * skip. Null when it does not read, so the caller asks again and writes nothing.
+ */
+export function parseUndecided(input: string, rhyme: UndecidedRhyme): Decision | null {
+  const [command, ...rest] = input.trim().split(/\s+/);
+  switch (command?.toLowerCase()) {
+    case "y": {
+      const reading = rest.length ? phonemesOf(rest.join(" ")) : rhyme.reading;
+      return reading ? { kind: "confirm", reading: [...reading] } : null;
+    }
+    case "n":
+      return rest.length ? null : { kind: "decline" };
     case "s":
       return rest.length ? null : { kind: "unruled" };
     default:

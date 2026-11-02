@@ -11,12 +11,15 @@ import {
   huntAnswers,
   noFalseAcceptsResult,
   parseDecision,
+  parseUndecided,
   rulingList,
   rulingPrompt,
   shownReadings,
+  undecidedPrompt,
   type HuntedAnswer,
   type HuntRuling,
 } from "../noFalseAccepts.ts";
+import type { UndecidedRhyme } from "../batch.ts";
 import type { Pronunciation } from "../phonology.ts";
 
 const r = (s: string): Pronunciation => s.split(" ");
@@ -222,6 +225,74 @@ describe("asking the maintainer for a ruling", () => {
         // The example the line gives, or else the command as written.
         const typed = /e\.g\. (.+?)(?: \(|$)/.exec(line)?.[1] ?? line.trim().split(/\s{2,}/)[0]!;
         expect(parseDecision(typed, readings), line).not.toBeNull();
+      }
+    }
+  });
+});
+
+describe("asking the maintainer about a rhyme the Judge left undecided", () => {
+  const house: UndecidedRhyme = {
+    word: "house", seedWord: "arouse", rhymeKey: "AW Z", knew: "overrule", confidence: "medium",
+    why: "the verb, /haʊz/", heard: "HH AW1 Z", reading: r("HH AW1 Z"),
+  };
+  // The Judge's reading misses the key, so there is none to confirm as it stands.
+  const barbar: UndecidedRhyme = {
+    word: "barbar", seedWord: "guitar", rhymeKey: "AA R", knew: "missing-reading", confidence: "low",
+    why: "probably", heard: "B AA1 R B AH0 R", reading: null,
+  };
+
+  it("shows what the Judge heard and why nothing landed, says it is waiting, and gives one command a line with its effect", () => {
+    expect(undecidedPrompt(house)).toEqual([
+      "The Judge ruled it a Rhyme at medium confidence, and nothing landed: the game's readings miss /AW Z/ (an Overrule).",
+      "  The Judge's reading: HH AW1 Z",
+      "  The Judge's reasoning: the verb, /haʊz/",
+      "Waiting for your ruling on this rhyme. Type one of these and press Enter:",
+      "  y                    confirm it: HH AW1 Z is written beside the word's readings, so it rhymes on /AW Z/ from then on",
+      "  y <ARPAbet>          confirm it with a reading you type instead, e.g. y HH AW1 Z (written beside the word's readings)",
+      "  n                    decline it: a Decline is recorded for house on /AW Z/, so it is not raised again",
+      "  s                    skip it: nothing is written, and the run report lists it",
+    ]);
+  });
+
+  it("offers no confirming of the Judge's reading when it misses the key, only of one typed", () => {
+    const prompt = undecidedPrompt(barbar);
+    expect(prompt.slice(0, 2)).toEqual([
+      "The Judge ruled it a Rhyme at low confidence, and nothing landed: the game has no reading of it (a Missing Reading).",
+      "  The Judge's reading: B AA1 R B AH0 R, which misses /AA R/, so confirming needs a reading typed",
+    ]);
+    expect(prompt.some((line) => /^ {2}y {2,}/.test(line))).toBe(false);
+    expect(prompt).toContain("  y <ARPAbet>          confirm it with a reading you type, e.g. y K AE1 T (written beside the word's readings)");
+  });
+
+  it("reads confirming as the Judge's reading, or as one typed in ARPAbet", () => {
+    expect(parseUndecided("y", house)).toEqual({ kind: "confirm", reading: r("HH AW1 Z") });
+    expect(parseUndecided("Y hh aw1 z", house)).toEqual({ kind: "confirm", reading: r("HH AW1 Z") });
+    expect(parseUndecided("y B AA1 R B AA2 R", barbar)).toEqual({ kind: "confirm", reading: r("B AA1 R B AA2 R") });
+  });
+
+  it("reads declining, and skipping it unruled", () => {
+    expect(parseUndecided("n", house)).toEqual({ kind: "decline" });
+    expect(parseUndecided("s", house)).toEqual({ kind: "unruled" });
+  });
+
+  it("reads nothing it cannot act on, so the caller asks again and writes nothing", () => {
+    // No Judge's reading to confirm.
+    expect(parseUndecided("y", barbar)).toBeNull();
+    expect(parseUndecided("y haʊz", house)).toBeNull();
+    expect(parseUndecided("n word", house)).toBeNull();
+    // A hunted Answer's commands are not this item's: `d` would read as a Demotion there.
+    expect(parseUndecided("d", house)).toBeNull();
+    expect(parseUndecided("c 1", house)).toBeNull();
+    expect(parseUndecided("", house)).toBeNull();
+  });
+
+  it("accepts every command it names", () => {
+    for (const rhyme of [house, barbar]) {
+      const commands = undecidedPrompt(rhyme).filter((line) => /^ {2}[a-z]/.test(line));
+      expect(commands.length).toBeGreaterThan(0);
+      for (const line of commands) {
+        const typed = /e\.g\. (.+?)(?: \(|$)/.exec(line)?.[1] ?? line.trim().split(/\s{2,}/)[0]!;
+        expect(parseUndecided(typed, rhyme), line).not.toBeNull();
       }
     }
   });

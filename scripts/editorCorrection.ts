@@ -169,15 +169,17 @@ export interface CorrectionDeps {
 }
 
 /**
- * The two places an editor approves a correction: the Editor's Pass, on an
- * agent's proposal, and a Batch's No False Accepts ruling list (#268), on a
- * reading from Wiktionary or typed in the sitting.
+ * Where an editor approves a correction: the Editor's Pass, on an agent's
+ * proposal; a Batch's No False Accepts ruling list (#268), on a reading from
+ * Wiktionary or typed in the sitting; and the same list's rhymes the Judge left
+ * undecided (#293), on the Judge's reading or one typed.
  */
-export type CorrectionSource = "editors-pass" | "batch";
+export type CorrectionSource = "editors-pass" | "batch" | "batch-undecided";
 
 const APPROVED_IN: Record<CorrectionSource, string> = {
   "editors-pass": "in the Editor's Pass",
   batch: "on a Batch's No False Accepts ruling list (#268)",
+  "batch-undecided": "on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293)",
 };
 
 /**

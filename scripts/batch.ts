@@ -39,6 +39,13 @@
  * correction, a Demotion, or leave it). The gate passes a day when no listed
  * Answer is left unruled and none corrected or demoted is still scored.
  *
+ * The same list then puts every ruling the looks made or met that said Rhyme
+ * and landed nothing, whatever its confidence (#293; ADR-0021, 2026-11-02
+ * amendment): the maintainer confirms it, which writes the reading beside the
+ * word's others, declines it, which records a Decline for the word and the
+ * Rhyme Key, or skips it, which writes nothing and is listed in the run report.
+ * The whole list is put after the Batch's last model call.
+ *
  * It writes the run report to `data/judge-runs/` and the result per Seed Word
  * to `data/batches.json`, both to be committed with what landed.
  *
@@ -73,6 +80,7 @@ import {
   serialiseBatchRecord,
   trustFailures,
   trustVerdict,
+  undecidedRhymes,
   type BatchEntry,
   type BatchSeed,
   type KeyCount,
@@ -102,7 +110,7 @@ import {
   type JudgedItem,
   type JudgeItem,
 } from "./judgeRun.ts";
-import { rulingList, type NoFalseAcceptsResult } from "../src/noFalseAccepts.ts";
+import { rulingList, type NoFalseAcceptsResult, type RulingItem } from "../src/noFalseAccepts.ts";
 import {
   huntCalls,
   huntResults,
@@ -111,10 +119,10 @@ import {
   planHunt,
   rebuild,
   sessionOn,
+  settledHunted,
   settleRulingList,
   type HuntDay,
   type HuntLeg,
-  type Settled,
 } from "./batchHunt.ts";
 import { callModel, exactModelId, inParallel, nextRun, root, today, UsageStopError, writeRunReport, type ModelReply } from "./modelCall.ts";
 
@@ -266,6 +274,9 @@ const days: Day[] = block.map((seed) => ({ seed, rhymeKey: seed.rhymeKey, looks:
 const calls = { player: 0, rhyme: 0, wordhood: 0, fromCache: 0 };
 const answeredBy = new Set<string>();
 const allRulings: (ReturnType<typeof reportRuling> & { look: number; landed: string | null })[] = [];
+/** Every ruling the looks made or met, from its record: where the Judge's undecided rhymes are picked from (#293). */
+const lookRulings: JudgeRulingRecord[] = [];
+const readDeclines = () => parseDeclines(existsSync(DECLINES) ? readFileSync(DECLINES, "utf8") : "");
 const writes = noWrites();
 const note = (r: ModelReply) => {
   calls.player++;
@@ -334,7 +345,7 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
       const word = c.word.trim().toLowerCase();
       return { day: d, word, seedWord: d.seed.seedWord, rhymeKey: d.rhymeKey, question: judgeQuestion(wordFacts(index, word), d.rhymeKey) };
     }));
-  const { send, ruledBefore } = planJudging(items, readRulings(), parseDeclines(existsSync(DECLINES) ? readFileSync(DECLINES, "utf8") : ""));
+  const { send, ruledBefore } = planJudging(items, readRulings(), readDeclines());
   const rhymeCallCount = rhymeCalls(send);
   console.error(`${items.length} Candidates, ${send.filter((i) => "ask" in i.question).length} for the Judge (${ruledBefore.length} ruled on before): ${rhymeCallCount} rhyme calls, then the wordhood question for any that would act`);
   if (rhymeCallCount > maxJudgeCalls) {
@@ -348,6 +359,7 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
   addWrites(writes, landings);
   const recorded = new Map<string, JudgeRulingRecord>(landings.records.map((r) => [rulingKey(r.word, r.rhymeKey), r]));
   for (const { record } of ruledBefore) recorded.set(rulingKey(record.word, record.rhymeKey), record);
+  lookRulings.push(...recorded.values());
   const freshClassification = new Map<string, JudgedItem>(leg.items.map((j) => [rulingKey(j.word, j.rhymeKey), j]));
   for (const j of leg.items) allRulings.push({ ...reportRuling(j), look: lookNo, landed: recorded.get(rulingKey(j.word, j.rhymeKey))?.landed ?? null });
 
@@ -393,22 +405,39 @@ for (const d of days) if (!d.result && !d.notChecked) d.notChecked = stopped ? "
 
 // ---- No False Accepts ----------------------------------------------------------
 
-let hunt: { days: HuntDay[]; leg: HuntLeg; settled: Settled[]; results: Map<string, NoFalseAcceptsResult> } | null = null;
+let hunted: { days: HuntDay[]; leg: HuntLeg } | null = null;
 if (!stopped) {
   const huntDays = planHunt(index, days.filter((d) => !d.notChecked).map((d) => ({ ...d.seed, rhymeKey: d.rhymeKey })), scheduleRaw.scoring, wiktionary);
   const planned = huntCalls(huntDays);
   console.error(`\nNo False Accepts: ${planned.sent} scored Answers to the Judge, ${planned.rhyme} rhyme and ${planned.wordhood} wordhood calls`);
   const leg = await orUsageStop(judgeHunt(huntDays, { model: JUDGE_MODEL, run }));
   noteLeg(leg);
-  const settled = await settleRulingList(rulingList(leg.rulings), { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
-  if (settled.some((s) => s.decision.kind === "demotion")) {
-    console.error("rebuilding the index with the Demotions");
-    const built = rebuild();
-    if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
-  }
-  if (settled.some((s) => s.wrote)) index = loadIndex();
-  hunt = { days: huntDays, leg, settled, results: huntResults(huntDays, settled, index, scheduleRaw.scoring) };
+  hunted = { days: huntDays, leg };
 }
+
+// ---- the ruling list -----------------------------------------------------------
+//
+// Put only now, after the Batch's last model call, so a usage stop never lands
+// while the maintainer is typing (#293): the hunted Answers the Judge doubts,
+// then the rhymes it ruled in the looks and left undecided.
+
+const undecided = undecidedRhymes(lookRulings, readDeclines());
+const rulingItems: RulingItem[] = [
+  ...(hunted ? rulingList(hunted.leg.rulings).map((listed): RulingItem => ({ kind: "hunted", listed })) : []),
+  ...undecided.map((rhyme): RulingItem => ({ kind: "undecided", rhyme })),
+];
+const settled = await settleRulingList(rulingItems, { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
+if (settled.some((s) => s.decision.kind === "demotion")) {
+  console.error("rebuilding the index with the Demotions");
+  const built = rebuild();
+  if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
+}
+if (settled.some((s) => s.wrote)) index = loadIndex();
+const hunt: { days: HuntDay[]; leg: HuntLeg; settled: ReturnType<typeof settledHunted>; results: Map<string, NoFalseAcceptsResult> } | null = hunted
+  ? { ...hunted, settled: settledHunted(settled), results: huntResults(hunted.days, settled, index, scheduleRaw.scoring) }
+  : null;
+const undecidedSettled = settled.flatMap((s) => (s.item.kind === "undecided" ? [{ rhyme: s.item.rhyme, decision: s.decision, wrote: s.wrote }] : []));
+const undecidedSkipped = undecidedSettled.filter((s) => s.decision.kind === "unruled").map((s) => `${s.rhyme.word} /${s.rhyme.rhymeKey}/`);
 
 // ---- the report and the record -------------------------------------------------
 
@@ -480,6 +509,18 @@ const reportPath = writeRunReport(date, stem, run, {
         decided: hunt.settled.map((s) => ({ word: s.listed.answer.word, seedWord: s.listed.seedWord, doubts: s.listed.doubts, decision: s.decision, wrote: s.wrote })),
       }
     : null,
+  undecidedRhymes: {
+    note:
+      "Rulings of the Judge's in the looks that said Rhyme and landed nothing, whatever their confidence, put to the maintainer " +
+      "in the sitting (#293). A confirm wrote its reading beside the word's others, a decline a Decline for the word and the Rhyme Key; " +
+      "a skip wrote nothing and is listed under skipped.",
+    listed: undecidedSettled.length,
+    decided: undecidedSettled.map(({ rhyme, decision, wrote }) => ({
+      word: rhyme.word, seedWord: rhyme.seedWord, rhymeKey: rhyme.rhymeKey, knew: rhyme.knew, confidence: rhyme.confidence,
+      reading: rhyme.heard, why: rhyme.why, decision, wrote,
+    })),
+    skipped: undecidedSkipped,
+  },
 });
 
 const reportFromRoot = relative(root, reportPath).replace(/\\/g, "/");
@@ -516,6 +557,11 @@ for (const d of days) {
 }
 console.log(`calls: ${JSON.stringify(calls)}`);
 console.log(`writes: ${writes.readings.length} readings, ${writes.unconfirmedRhymes.length} Unconfirmed Rhymes, ${writes.suggestedDemotions.length} suggested Demotions`);
-if (hunt) console.log(`ruled in the sitting: ${hunt.settled.filter((s) => s.wrote).map((s) => s.wrote).join("; ") || "nothing written"}`);
+if (settled.length) console.log(`ruled in the sitting: ${settled.filter((s) => s.wrote).map((s) => s.wrote).join("; ") || "nothing written"}`);
+if (undecidedSettled.length) {
+  const count = (kind: string) => undecidedSettled.filter((s) => s.decision.kind === kind).length;
+  console.log(`rhymes the Judge left undecided: ${undecidedSettled.length}, confirmed ${count("confirm")}, declined ${count("decline")}` +
+    `${undecidedSkipped.length ? `, skipped ${undecidedSkipped.join(", ")}` : ""}`);
+}
 if (stopped) console.log(`stopped: ${stopped}`);
-console.log(`report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/demotions.txt, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl`);
+console.log(`report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/demotions.txt, data/declines.txt, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl`);

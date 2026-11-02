@@ -543,6 +543,13 @@ describe("applyCorrection", () => {
     expect(written).not.toContain("approved in the Editor's Pass");
   });
 
+  it("names a rhyme the Judge left undecided, confirmed in a Batch's sitting, as its own approval", async () => {
+    await applyCorrection(joinAsk, { ...deps(""), source: "batch-undecided" });
+    const written = readFileSync(supplementPath, "utf8");
+    expect(written).toContain("correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293)");
+    expect(written).not.toContain("No False Accepts");
+  });
+
   it("repairs a supplement whose last newline was trimmed rather than fusing onto it", async () => {
     writeFileSync(supplementPath, "# a hand edit that lost its newline\nhat HH AE1 T");
     await applyCorrection(joinAsk, deps(""));

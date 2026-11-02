@@ -27,9 +27,18 @@
  */
 
 import { normaliseWord } from "./cmudict.ts";
-import { RHYME_BATCH, WORDHOOD_BATCH, type RhymeVerdict } from "./judge.ts";
-import type { Landed } from "./judgeLanding.ts";
-import type { RhymeKey } from "./phonology.ts";
+import { declineKey, declinedPairs, type Decline } from "./declines.ts";
+import {
+  phonemesOf,
+  readingReachesKey,
+  RHYME_BATCH,
+  WORDHOOD_BATCH,
+  type Confidence,
+  type RhymeVerdict,
+  type WhatTheGameKnew,
+} from "./judge.ts";
+import { rulingKey, type JudgeRulingRecord, type Landed } from "./judgeLanding.ts";
+import type { Pronunciation, RhymeKey } from "./phonology.ts";
 import type { RhymeIndex } from "./rhymeIndex.ts";
 import { addDays, isCalendarDate, scheduledDayFor, type Schedule } from "./schedule.ts";
 import type { Verdict } from "./verdict.ts";
@@ -205,6 +214,54 @@ export function trustFailures(candidates: readonly LookCandidate[], answerLine: 
     (rare ? trust.excusedAsRare : trust.failures).push(word);
   }
   return trust;
+}
+
+// ---- the Judge's undecided rhymes ----------------------------------------------
+
+/**
+ * A ruling of the Judge's that said Rhyme and landed nothing, put to the
+ * maintainer in the sitting (#293; ADR-0021, 2026-11-02 amendment): a
+ * medium-confidence Overrule (`house` for `arouse`), any low-confidence ruling
+ * (`barbar`), or one held back because the word is a scheduled Seed Word.
+ */
+export interface UndecidedRhyme {
+  word: string;
+  seedWord: string;
+  rhymeKey: RhymeKey;
+  knew: WhatTheGameKnew;
+  confidence: Confidence;
+  why: string;
+  /** The reading the Judge heard, as it wrote it. */
+  heard: string | null;
+  /**
+   * That reading as ARPAbet, which is what confirming writes: null when it does
+   * not read as ARPAbet or misses the Rhyme Key, so confirming needs one typed.
+   */
+  reading: Pronunciation | null;
+}
+
+/**
+ * The rulings a Batch's looks made or met that said Rhyme and landed nothing,
+ * whatever their confidence, each pair once in the order given. A ruling met
+ * from an earlier Batch counts as it does at the gate, so a rhyme skipped once
+ * comes back when a look types it again; a pair the editor has Declined does
+ * not, since the Decline is a ruling already made.
+ */
+export function undecidedRhymes(rulings: readonly JudgeRulingRecord[], declines: readonly Decline[] = []): UndecidedRhyme[] {
+  const declined = declinedPairs(declines);
+  const seen = new Set<string>();
+  const out: UndecidedRhyme[] = [];
+  for (const r of rulings) {
+    const key = rulingKey(r.word, r.rhymeKey);
+    if (r.verdict !== "rhyme" || r.landed !== "nothing" || seen.has(key) || declined.has(declineKey(r.word, r.rhymeKey))) continue;
+    seen.add(key);
+    out.push({
+      word: r.word, seedWord: r.seedWord, rhymeKey: r.rhymeKey, knew: r.knew, confidence: r.confidence, why: r.why,
+      heard: r.reading,
+      reading: readingReachesKey(r.reading, r.rhymeKey) ? phonemesOf(r.reading) : null,
+    });
+  }
+  return out;
 }
 
 /** The gate's two settings. No value is claimed for either (#225): they are tuned over Batches. */

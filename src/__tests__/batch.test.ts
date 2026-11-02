@@ -18,8 +18,10 @@ import {
   serialiseBatchRecord,
   trustFailures,
   trustVerdict,
+  undecidedRhymes,
   type BatchEntry,
 } from "../batch.ts";
+import type { JudgeRulingRecord } from "../judgeLanding.ts";
 import type { Schedule } from "../schedule.ts";
 import { makeTestIndex } from "../__fixtures__/index.ts";
 
@@ -370,5 +372,53 @@ describe("what a look counts as a Trust failure", () => {
       { word: "clique", ruling: { verdict: "rhyme", reachesKey: true, landed: "unconfirmed-rhyme" }, game: { outcome: "unconfirmed" } },
       { word: "marx", ruling: { verdict: "rhyme", reachesKey: true, landed: "suggested-demotion" }, game: { outcome: "bonus", knownness: 0.1 } },
     ], LINE)).toEqual({ failures: [], excusedAsRare: [] });
+  });
+});
+
+describe("the Judge's undecided rhymes, put to the maintainer in the sitting", () => {
+  /** A ruling as `data/judge-rulings.jsonl` records it, with what a test does not care about filled in. */
+  const ruling = (r: Partial<JudgeRulingRecord> & Pick<JudgeRulingRecord, "word" | "seedWord" | "rhymeKey">): JudgeRulingRecord => ({
+    date: "2026-11-01", model: "claude-sonnet-5-5", knew: "overrule", verdict: "rhyme",
+    reading: null, confidence: "medium", why: "rhymes", landed: "nothing", ...r,
+  });
+  const house = ruling({ word: "house", seedWord: "arouse", rhymeKey: "AW Z", reading: "HH AW1 Z", why: "the verb, /haʊz/" });
+
+  it("lists every Rhyme ruling that landed nothing, whatever its confidence, with what the maintainer is shown", () => {
+    const barbar = ruling({ word: "barbar", seedWord: "guitar", rhymeKey: "AA R", knew: "missing-reading", confidence: "low", reading: "B AA1 R B AA2 R" });
+    // A high-confidence Overrule held back because the word is a scheduled Seed Word landed nothing too.
+    const heldBack = ruling({ word: "cause", seedWord: "bras", rhymeKey: "AA Z", confidence: "high", reading: "K AA1 Z", heldBack: "scheduled-seed-word" });
+    expect(undecidedRhymes([house, barbar, heldBack])).toEqual([
+      { word: "house", seedWord: "arouse", rhymeKey: "AW Z", knew: "overrule", confidence: "medium", heard: "HH AW1 Z", reading: ["HH", "AW1", "Z"], why: "the verb, /haʊz/" },
+      { word: "barbar", seedWord: "guitar", rhymeKey: "AA R", knew: "missing-reading", confidence: "low", heard: "B AA1 R B AA2 R", reading: ["B", "AA1", "R", "B", "AA2", "R"], why: "rhymes" },
+      { word: "cause", seedWord: "bras", rhymeKey: "AA Z", knew: "overrule", confidence: "high", heard: "K AA1 Z", reading: ["K", "AA1", "Z"], why: "rhymes" },
+    ]);
+  });
+
+  it("lists none that landed anything, and no ruling of no Rhyme", () => {
+    expect(undecidedRhymes([
+      ruling({ word: "nightgown", seedWord: "down", rhymeKey: "AW N", confidence: "high", reading: "N AY1 T G AW2 N", landed: "reading" }),
+      ruling({ word: "clique", seedWord: "trick", rhymeKey: "IH K", confidence: "high", reading: "K L IH1 K", landed: "unconfirmed-rhyme" }),
+      ruling({ word: "marx", seedWord: "parks", rhymeKey: "AA R K S", confidence: "high", reading: "M AA1 R K S", landed: "suggested-demotion" }),
+      ruling({ word: "time", seedWord: "fine", rhymeKey: "AY N", verdict: "no-rhyme", confidence: "high", reading: "T AY1 M" }),
+    ])).toEqual([]);
+  });
+
+  it("lists a pair once, though looks and Batches before met it, and a word again on another Rhyme Key", () => {
+    const houseOnAws = ruling({ word: "house", seedWord: "mouse", rhymeKey: "AW S", reading: "HH AW1 S" });
+    expect(undecidedRhymes([house, house, houseOnAws]).map((u) => `${u.word} ${u.rhymeKey}`)).toEqual(["house AW Z", "house AW S"]);
+  });
+
+  it("lists no pair the editor has Declined, since a Decline is a ruling already made", () => {
+    const douse = ruling({ word: "douse", seedWord: "arouse", rhymeKey: "AW Z", reading: "D AW1 Z" });
+    expect(undecidedRhymes([house, douse], [{ word: "house", rhymeKey: "AW Z" }]).map((u) => u.word)).toEqual(["douse"]);
+  });
+
+  it("offers no reading to confirm when the Judge's misses the key or does not read as ARPAbet", () => {
+    const listed = undecidedRhymes([
+      ruling({ word: "fine", seedWord: "time", rhymeKey: "AY M", reading: "F AY1 N" }),
+      ruling({ word: "glum", seedWord: "home", rhymeKey: "OW M", reading: "/ɡlʌm/" }),
+      ruling({ word: "mum", seedWord: "home", rhymeKey: "OW M", reading: null }),
+    ]);
+    expect(listed.map((u) => [u.word, u.heard, u.reading])).toEqual([["fine", "F AY1 N", null], ["glum", "/ɡlʌm/", null], ["mum", null, null]]);
   });
 });
