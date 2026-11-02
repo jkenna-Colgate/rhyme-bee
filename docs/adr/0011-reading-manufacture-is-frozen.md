@@ -1,6 +1,6 @@
 # Reading manufacture is frozen; a correction lands in the data, not in a new rule
 
-**Status:** amended 2026-07-30, 2026-10-07, 2026-10-14, 2026-10-16 and 2026-10-26. Reading manufacture is still frozen, now at seven normalisation rules, all built, and thirty affix rules. A name or a non-word the word list holds is corrected by a Demotion in `data/demotions.txt`, not in `data/names.txt` or `data/words.txt`, and the Judge writes a reading unattended only for a Missing Reading, never a Demotion.
+**Status:** amended 2026-07-30, 2026-10-07, 2026-10-14, 2026-10-16, 2026-10-26 and 2026-11-02. Reading manufacture is still frozen, now at seven normalisation rules, all built, and thirty affix rules. Stress promotion no longer stresses a vowel the syllabic consonant rule exposed (decided, not built). A name or a non-word the word list holds is corrected by a Demotion in `data/demotions.txt`, not in `data/names.txt` or `data/words.txt`, and the Judge writes a reading unattended only for a Missing Reading, never a Demotion.
 
 The build manufactures readings in two stages — coverage derivation
 (`src/coverage.ts`, `src/affixes.ts`) composes a reading for a known word that
@@ -481,3 +481,59 @@ runs, all rejected (`here`, `hear`, `tier` for `engineer`; `hearing`,
 `peering` for `bioengineering`; `engineered` for `beard`; `poor` for
 `cure`). The rule is admitted on the maintainer's ruling, as the t and d rule
 was.
+
+## Amendment, 2026-11-02: stress promotion stops at a vowel the syllabic consonant exposed
+
+Settled in a review of the second Batch (2026-11-02 to 2026-12-01), which
+found the `cool` Puzzle holding `annual`, `manual`, `usual` and `virtual` as
+Answers. The freeze stands at **seven normalisation rules** and thirty affix
+rules: this narrows rule 3 and adds nothing. It is decided and not built. The
+Rhyme rule is unchanged.
+
+### Promotion needs a syllable the dictionary closed
+
+Stress promotion appends a reading that stresses an unstressed full vowel in a
+closed final syllable. It ran after the syllabic consonant rule, so it also
+stressed a vowel that rule had *exposed*: `manual` is `M AE1 N Y UW0 AH0 L`,
+the syllabic consonant drops the schwa to give `UW0 L`, and promotion makes it
+`UW2 L`, a Rhyme for `cool`. From now on rule 3 promotes only a vowel the
+reading closed before rule 2 ran. `module`, `nodule` and `schedule` keep
+"ool" (their dictionary readings end `UW0 L`), and `-ual` words do not.
+
+This reverses part of rule 3's own case. Its docblock names `ritual` among the
+four words it was written for, and
+[#86](https://github.com/jkenna-Colgate/rhyme-bee/issues/86) required that
+`ritual` keep `UW L`. The maintainer ruled on 2026-11-02 that `ritual` does not
+rhyme with `cool`, any more than `annual` does: nothing in the readings tells
+the two apart, so they go together. With `ritual` out, the option #86 rejected
+only because it lost `ritual` (rule 3 judging the reading before rule 2) is
+this amendment, and it also removes #86's own cases (`clergyman`, `dutiful`,
+`wearisome`).
+
+- **Reach.** Measured approximately on the built index: about 33 words lose
+  a Rhyme Key on three keys, 31 of them `-ual` words leaving `cool` (`annual`,
+  `gradual`, `intellectual`, `ritual`), plus `habitual` and `ailurophile`. The
+  approximation does not see #86's shapes, about 16 words more, all of them
+  ones #86 wants gone. `cool` (2026-11-13) keeps about 55 of 88 Answers, in
+  band, and no other scheduled day loses one. The build reproduces the figure
+  before it lands.
+- **Guardrails.** The committed set must survive untouched.
+
+### What was not made a rule
+
+**Promotion's own errors on a weak ending.** The same review found
+`gutless`, `flavorless` and `thankfulness` scored for `chess`, and `comment`
+and `document` for `event`. No other rule is involved: CMUdict marks the
+ending with a full vowel and promotion stresses it. The maintainer ruled those
+no Rhyme, and ruled promotion right on `tribute` for `shoot`, `neon` for
+`lawn` and `admire` for `hire`. A limit drawn from a handful of words is the
+mistake [#211](https://github.com/jkenna-Colgate/rhyme-bee/issues/211) warns
+against, so the rule's error rate is measured over every word it promotes
+before anything is decided.
+
+**Readings with the t dropped.** CMUdict holds `gentle`, `dental` and
+`environmental` with their t dropped, and those readings put about 20 `-ental`
+words in the `kennel` family. The maintainer ruled that they do not rhyme with
+`kennel`. They are removed word by word in `data/supplement.dict`, which is
+where this ADR says a wrong reading is corrected. Whether every t-dropped
+reading should go (`twenty`, `winter`) is measured separately.

@@ -1,6 +1,6 @@
 # The unattended loop calls a model in one place, and the Playability Bar does not depend on it
 
-**Status:** amended 2026-10-26. The one job that calls a model still judges Appeals and nothing else, and Trust and No False Accepts are still checked only in Batches. What its writes reach players by changed: CI builds the index from a private source mirror and deploys on every push to main, and one monthly workflow judges Appeals, runs the Tier moves, commits its report and deploys, with the Appeals step free to fail without stopping the rest.
+**Status:** amended 2026-10-26 and 2026-11-02. A Batch no longer counts a rare Bonus Word as a Trust failure, puts the Judge's undecided rhymes to the maintainer in the same sitting, and sends the Judge Answers that only Normalisation puts on the Rhyme Key (decided, not built). The one job that calls a model still judges Appeals and nothing else, and Trust and No False Accepts are still checked only in Batches. What its writes reach players by changed: CI builds the index from a private source mirror and deploys on every push to main, and one monthly workflow judges Appeals, runs the Tier moves, commits its report and deploys, with the Appeals step free to fail without stopping the rest.
 
 The two parts of the Playability Bar that need a model, Trust and No False
 Accepts, are checked by the maintainer in **Batches** before they leave, and by
@@ -169,3 +169,48 @@ Three consequences above change.
   repository with no other activity tests both, and nothing waits on its answer:
   a job that stops leaves the game at the bar, and the deploy on push keeps
   working.
+
+## Amendment (2026-11-02): what a Batch counts, and what it puts to the maintainer
+
+Settled in a review of the second Batch (2026-11-02 to 2026-12-01: 19 days
+passed Trust, 10 failed, 1 untested). Batches stay where this ADR put them:
+run by the maintainer, and the only check on Trust and No False Accepts. What
+changes is what a look counts, what the sitting asks of the maintainer, and
+what the No False Accepts hunt sends. It is decided and not built.
+
+- **A rare Bonus Word is no Trust failure.** A look used to count every
+  rhyme the game did not score as an Answer, so `hod`, `pard` and `hawse`
+  failed their days in every look while the game accepted them as the Bonus
+  Words they are. Whether a word scores is its Tier's question
+  ([ADR-0015](./0015-tier-overrides-record-retrieval-not-recognition.md)), not
+  Trust's. Now a rhyme the game accepts as a Bonus Word is not counted when its
+  knownness measures it as rare. One with no knownness at all still counts,
+  because that is the only way a common word (`fool` for `cool`) ends up a
+  Bonus Word by accident, and the maintainer ruled that one a Trust failure.
+  Counting it costs noise and nothing more, since a failing day still ships.
+  Against this Batch, 4 of the 10 failed days pass. Not counting unmeasured
+  words either would have passed 8, and was rejected for the `fool` case.
+- **The sitting puts to the maintainer what it would otherwise leave
+  behind.** Seven of this Batch's Judge rulings said Rhyme and landed nothing,
+  most of them medium-confidence Overrules (`house` and `douse` for `arouse`,
+  `bras` for `cause`). That is by design, since an Overrule loses a confidence
+  level, but nothing put them in front of anyone. Now the ruling list shows
+  every such ruling in the same sitting. Two other routes were considered:
+  making a medium Overrule an Unconfirmed Rhyme (rejected, because the lost
+  level was measured against the maintainer's rulings), and the Editor's Pass
+  (rejected, because the maintainer would read the same words later instead of
+  now). [ADR-0017](./0017-candidates-are-judged-in-the-editors-pass.md) still
+  governs Appeals. The list also asks the maintainer to Tier each word the
+  Batch wrote in that has no knownness (25 of 131 this time), with the Judge's
+  answer filled in. The Judge's Tier answer lands alone only once it has been
+  measured against the maintainer's rulings. And a correction may keep several
+  of a word's readings rather than replace them all with one.
+- **The No False Accepts hunt sees what Normalisation makes.** The hunt sends
+  an Answer to the Judge when its Wiktionary readings miss the Seed Word's
+  Rhyme Key. Those readings go through the same Normalisation as the game's
+  own, so a false accept that a Normalisation rule makes is confirmed by its
+  own rule: `annual` was never sent for `cool`. Now an Answer that reaches the
+  key only through a reading Normalisation appended is sent too. Over the whole
+  Schedule that is 312 words, none on 175 days. It starts with one trial over
+  those 312, compared with the maintainer's rulings, which already say `chess`
+  and `event`'s words are false and `shoot`, `lawn` and `hire`'s are not.
