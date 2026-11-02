@@ -6,7 +6,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { RhymeRuling, WordhoodRuling } from "../judge.ts";
+import type { RhymeRuling, TierRuling, WordhoodRuling } from "../judge.ts";
 import {
   huntAnswers,
   noFalseAcceptsResult,
@@ -15,6 +15,7 @@ import {
   rulingList,
   rulingPrompt,
   shownReadings,
+  tierAgreement,
   parseTier,
   tierPrompt,
   undecidedPrompt,
@@ -330,10 +331,60 @@ describe("asking the maintainer to Tier a written-in word with no knownness", ()
     expect(parseTier("l")).toBeNull();
   });
 
+  const judgeSays = (verdict: TierRuling["verdict"], confidence: TierRuling["confidence"] = "medium"): TierRuling =>
+    ({ word: "throwdown", verdict, confidence, why: "a common compound of down" });
+
+  it("fills in the Judge's answer, with its confidence, as what Enter accepts", () => {
+    expect(tierPrompt(throwdown, judgeSays("answer"))).toEqual([
+      "Nothing measures how well known it is, so it is a Bonus Word until you Tier it.",
+      "Would an ordinary player think of throwdown when hunting rhymes for down?",
+      "The Judge's answer: Answer, at medium confidence: a common compound of down",
+      "Waiting for your Tier ruling on this word. Type one of these and press Enter:",
+      "  Enter                accept the Judge's answer, Answer: a Tier verdict is written to data/tier-overrides.csv, so it scores from the next build",
+      "  a                    Answer: a Tier verdict is written to data/tier-overrides.csv, so it scores from the next build",
+      "  b                    Bonus Word: a Tier verdict is written to data/tier-overrides.csv, so it stays accepted and unscored",
+      "  s                    skip it: nothing is written, and the run report lists it",
+    ]);
+  });
+
+  it("says when the Judge gave no answer, and offers nothing for Enter to accept", () => {
+    const prompt = tierPrompt(throwdown, judgeSays("no-ruling", "low"));
+    expect(prompt[2]).toBe("The Judge's answer: none it could read, so there is nothing to accept with Enter.");
+    expect(prompt.some((line) => line.startsWith("  Enter"))).toBe(false);
+  });
+
+  it("reads Enter as the Judge's answer, and a or b as the maintainer's own over it", () => {
+    expect(parseTier("", judgeSays("answer"))).toEqual({ kind: "tier", tier: "answer" });
+    expect(parseTier("  ", judgeSays("bonus", "high"))).toEqual({ kind: "tier", tier: "bonus" });
+    expect(parseTier("b", judgeSays("answer"))).toEqual({ kind: "tier", tier: "bonus" });
+    expect(parseTier("a", judgeSays("bonus"))).toEqual({ kind: "tier", tier: "answer" });
+    expect(parseTier("s", judgeSays("answer"))).toEqual({ kind: "unruled" });
+    // No answer from the Judge leaves Enter nothing to accept.
+    expect(parseTier("", judgeSays("no-ruling", "low"))).toBeNull();
+  });
+
+  it("counts how often the maintainer's ruling agreed with the Judge's answer, over the words both answered", () => {
+    expect(tierAgreement([
+      { judge: judgeSays("answer"), decision: { kind: "tier", tier: "answer" } },
+      { judge: judgeSays("bonus"), decision: { kind: "tier", tier: "answer" } },
+      { judge: judgeSays("bonus", "high"), decision: { kind: "tier", tier: "bonus" } },
+      // A word skipped, and one the Judge gave no answer on, are counted apart and agree with nothing.
+      { judge: judgeSays("answer"), decision: { kind: "unruled" } },
+      { judge: judgeSays("no-ruling", "low"), decision: { kind: "tier", tier: "bonus" } },
+      { decision: { kind: "tier", tier: "bonus" } },
+    ])).toEqual({ words: 6, compared: 3, agreed: 2, rate: 2 / 3, byConfidence: { high: [1, 1], medium: [1, 2], low: [0, 0] } });
+    expect(tierAgreement([])).toEqual({ words: 0, compared: 0, agreed: 0, rate: null, byConfidence: { high: [0, 0], medium: [0, 0], low: [0, 0] } });
+  });
+
   it("accepts every command it names", () => {
-    const commands = tierPrompt(throwdown).filter((line) => /^ {2}[a-z]/.test(line));
-    expect(commands.length).toBeGreaterThan(0);
-    for (const line of commands) expect(parseTier(line.trim().split(/\s{2,}/)[0]!), line).not.toBeNull();
+    for (const judge of [undefined, judgeSays("answer"), judgeSays("bonus"), judgeSays("no-ruling", "low")]) {
+      const commands = tierPrompt(throwdown, judge).filter((line) => /^ {2}\S/.test(line));
+      expect(commands.length).toBeGreaterThan(0);
+      for (const line of commands) {
+        const typed = line.trim().split(/\s{2,}/)[0]!;
+        expect(parseTier(typed === "Enter" ? "" : typed, judge), line).not.toBeNull();
+      }
+    }
   });
 });
 

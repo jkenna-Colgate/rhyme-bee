@@ -11,9 +11,11 @@ import {
   judgeQuestion,
   NORMALISATION_LINES,
   parseRhymeReply,
+  parseTierReply,
   parseWordhoodReply,
   readingReachesKey,
   rhymePrompt,
+  tierQuestionPrompt,
   wordhoodPrompt,
   type RhymeRuling,
 } from "../judge.ts";
@@ -110,6 +112,47 @@ describe("the wordhood question", () => {
       { word: "heinz", verdict: "name", confidence: "high", why: "a brand" },
       { word: "sue", verdict: "no-ruling", confidence: "low", why: "unparseable reply" },
     ]);
+  });
+});
+
+describe("the Tier question", () => {
+  it("asks about Retrieval, naming each word's Seed Word, and asks for JSON", () => {
+    const prompt = tierQuestionPrompt([
+      { word: "throwdown", seedWord: "down" },
+      { word: "unignited", seedWord: "excited" },
+    ]);
+
+    expect(prompt.startsWith("You are helping Tier words for Rhyming Bee")).toBe(true);
+    expect(prompt).toContain("would an ordinary player think of this word, unprompted, when hunting rhymes for that Seed Word?");
+    // Recognition is named as the thing not asked about, with the compound it over-promotes.
+    expect(prompt).toContain("producing the word, not recognising it");
+    expect(prompt).toContain('"unignited"');
+    expect(prompt).toContain('"verdict": "answer" | "bonus"');
+    expect(prompt.endsWith('\nWords:\n- "throwdown" for the Seed Word "down"\n- "unignited" for the Seed Word "excited"')).toBe(true);
+  });
+
+  it("reads each ruling against the word it was asked about, and no other", () => {
+    const raw = `[{"word": "throwdown", "verdict": "answer", "confidence": "medium", "why": "a common compound of down"},
+      {"word": "hotrod", "verdict": "bonus", "confidence": "high", "why": "few would think of it"}]`;
+
+    expect(parseTierReply(raw, ["throwdown", "unignited"])).toEqual([
+      { word: "throwdown", verdict: "answer", confidence: "medium", why: "a common compound of down" },
+      { word: "unignited", verdict: "no-ruling", confidence: "low", why: "unparseable reply" },
+    ]);
+  });
+
+  it("reads the last array, a confidence it does not know as low, and anything else as no ruling", () => {
+    const retracted = `[{"word": "meathook", "verdict": "answer", "confidence": "high", "why": "x"}]
+Wait, that is wrong.
+[{"word": "meathook", "verdict": "bonus", "confidence": "certain", "why": "rare"}]`;
+    expect(parseTierReply(retracted, ["meathook"])).toEqual([{ word: "meathook", verdict: "bonus", confidence: "low", why: "rare" }]);
+
+    const noRuling = { word: "meathook", verdict: "no-ruling", confidence: "low", why: "unparseable reply" };
+    // A verdict of another question's.
+    expect(parseTierReply(`[{"word": "meathook", "verdict": "rhyme", "confidence": "high", "why": "x"}]`, ["meathook"])).toEqual([noRuling]);
+    expect(parseTierReply(`[{"word": "meathook", "verdict": "Answer", "confidence": "high", "why": "x"}]`, ["meathook"])).toEqual([noRuling]);
+    expect(parseTierReply("I cannot help with that.", ["meathook"])).toEqual([noRuling]);
+    expect(parseTierReply("", ["meathook"])).toEqual([noRuling]);
   });
 });
 

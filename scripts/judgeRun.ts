@@ -14,15 +14,19 @@ import {
   classifyRuling,
   judgeQuestion,
   parseRhymeReply,
+  parseTierReply,
   parseWordhoodReply,
   rhymeBatches,
   rhymePrompt,
+  TIER_BATCH,
+  tierQuestionPrompt,
   WORDHOOD_BATCH,
   wordhoodPrompt,
   type Classification,
   type JudgedPair,
   type JudgeQuestion,
   type RhymeRuling,
+  type TierRuling,
   type WordFacts,
   type WordhoodRuling,
 } from "../src/judge.ts";
@@ -257,6 +261,32 @@ async function askWordhood(words: readonly string[], opts: CallOptions, tally: T
     for (const r of parseWordhoodReply(text, chunk)) wordhood.set(r.word, r);
   }));
   return wordhood;
+}
+
+/**
+ * The Tier question (#295), of each word once against the Seed Word it was
+ * written in for, `TIER_BATCH` words a call. Asked only of the words a Batch
+ * wrote in with no knownness, and landing nothing: the answer is the
+ * maintainer's default on the ruling list. A word whose reply did not read is
+ * a `no-ruling`.
+ */
+export async function askTier(
+  pairs: readonly JudgedPair[],
+  opts: CallOptions,
+): Promise<{ rulings: Map<string, TierRuling>; calls: { tier: number; fromCache: number }; answeredBy: string[] }> {
+  const calls = { tier: 0, fromCache: 0 };
+  const answeredBy = new Set<string>();
+  const rulings = new Map<string, TierRuling>();
+  const chunks = Array.from({ length: Math.ceil(pairs.length / TIER_BATCH) }, (_, i) => pairs.slice(i * TIER_BATCH, (i + 1) * TIER_BATCH));
+  await inParallel(chunks.map((chunk) => async () => {
+    const reply = await callModel(opts.model, tierQuestionPrompt(chunk), opts.run, opts.label);
+    calls.tier++;
+    if (reply.cached) calls.fromCache++;
+    reply.answeredBy.forEach((m) => answeredBy.add(m));
+    for (const r of parseTierReply(reply.text, chunk.map((p) => p.word))) rulings.set(r.word, r);
+  }));
+  if (chunks.length) process.stderr.write("\n");
+  return { rulings, calls, answeredBy: [...answeredBy].sort() };
 }
 
 /**

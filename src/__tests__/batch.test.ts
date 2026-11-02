@@ -223,15 +223,16 @@ describe("what a Batch costs, before any call is made", () => {
     expect(batchCost(plan, { player: "claude-sonnet-5-5", judge: "claude-haiku-5-5" })).toEqual([
       // Two looks at least, three at most, each played again once when off key.
       { model: "claude-sonnet-5-5", fewest: 6, most: 18, opus: false },
-      // At fewest the looks need no Judge and the hunt's three calls are made;
-      // at most every look takes 30 rhyme calls and a wordhood call per 20 of its 240 Candidates.
-      { model: "claude-haiku-5-5", fewest: 3, most: 3 + 3 * (30 + 12), opus: false },
+      // At fewest the looks need no Judge, write nothing in, and the hunt's three calls are made;
+      // at most every look takes 30 rhyme calls, a wordhood call per 20 of its 240 Candidates,
+      // and a Tier call per 20 of them, should every one be written in with no knownness.
+      { model: "claude-haiku-5-5", fewest: 3, most: 3 + 3 * (30 + 12 + 12), opus: false },
     ]);
   });
 
   it("puts both on one line when the player and the Judge are one model, and says when it is an Opus model", () => {
     expect(batchCost(plan, { player: "claude-opus-5-5", judge: "claude-opus-5-5" })).toEqual([
-      { model: "claude-opus-5-5", fewest: 6 + 3, most: 18 + 3 + 3 * 42, opus: true },
+      { model: "claude-opus-5-5", fewest: 6 + 3, most: 18 + 3 + 3 * 54, opus: true },
     ]);
   });
 
@@ -240,9 +241,9 @@ describe("what a Batch costs, before any call is made", () => {
     expect(judgeCallCap({ seeds: 30 })).toBe(60);
     const { maxJudgeCalls: _, ...uncapped } = plan;
     expect(judgeCallCap(uncapped)).toBe(6);
-    // Three looks of 6 rhyme calls and a wordhood call per 20 of their 48 Candidates.
+    // Three looks of 6 rhyme calls, then a wordhood call and a Tier call per 20 of their 48 Candidates.
     expect(batchCost(uncapped, { player: "claude-sonnet-5-5", judge: "claude-haiku-5-5" })[1]).toEqual(
-      { model: "claude-haiku-5-5", fewest: 3, most: 3 + 3 * (6 + 3), opus: false },
+      { model: "claude-haiku-5-5", fewest: 3, most: 3 + 3 * (6 + 3 + 3), opus: false },
     );
   });
 

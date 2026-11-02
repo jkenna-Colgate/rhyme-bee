@@ -197,6 +197,62 @@ export function parseWordhoodReply(raw: string, words: readonly string[]): Wordh
   });
 }
 
+// ---- the Tier question ---------------------------------------------------------
+
+/**
+ * Asked only of a word a Batch wrote in that has no knownness (#295; ADR-0021,
+ * 2026-11-02 amendment), and never landing by itself: its answer is only the
+ * maintainer's default on the ruling list. It asks about Retrieval, whether a
+ * player would produce the word, because a model asked whether a word is known
+ * answers recognition and over-promotes transparent compounds (ADR-0015).
+ */
+const TIER_QUESTION = `You are helping Tier words for Rhyming Bee, a daily word game. The player is given a Seed Word and types as many words that rhyme with it as they can think of. A word that rhymes scores as an Answer when an ordinary player could be expected to come up with it, and is a Bonus Word, accepted without scoring, when almost nobody would. Each word below rhymes with the Seed Word it is listed with, and is a word, so do not rule on either. Rule on one thing: would an ordinary player think of this word, unprompted, when hunting rhymes for that Seed Word?
+
+That is a question about producing the word, not recognising it. Many words are understood at a glance when shown and are almost never thought of when hunting: a transparent compound or prefixed form such as "unignited" is easy to decode and few players would produce it. Do not rule a word an Answer because it is easy to understand.
+
+Rule each word as exactly one of:
+- "answer": an ordinary player hunting rhymes for the Seed Word would think of it.
+- "bonus": an ordinary player would not think of it, though they might know it when shown.
+
+Reply with only a JSON array, one object per word in the order given:
+[{"word": "...", "verdict": "answer" | "bonus", "confidence": "high" | "medium" | "low", "why": "one short sentence"}]`;
+
+/** How many words one Tier call carries, as the wordhood question does. */
+export const TIER_BATCH = 20;
+
+/** The Tier question, then each word against the Seed Word it was written in for. */
+export function tierQuestionPrompt(pairs: readonly JudgedPair[]): string {
+  return [TIER_QUESTION, "", "Words:", ...pairs.map((p) => `- "${p.word}" for the Seed Word "${p.seedWord}"`)].join("\n");
+}
+
+export type TierAnswer = "answer" | "bonus";
+
+export interface TierRuling {
+  word: string;
+  verdict: TierAnswer | "no-ruling";
+  confidence: Confidence;
+  why: string;
+}
+
+/** One ruling per word asked about. A ruling written against another word is no ruling on this one. */
+export function parseTierReply(raw: string, words: readonly string[]): TierRuling[] {
+  const got = lastArray(raw);
+  return words.map((word, i) => {
+    const o = got[i];
+    const verdict = field(o, "verdict");
+    if (field(o, "word") !== word || (verdict !== "answer" && verdict !== "bonus")) {
+      return { word, verdict: "no-ruling", confidence: "low", why: "unparseable reply" };
+    }
+    const confidence = field(o, "confidence");
+    return {
+      word,
+      verdict,
+      confidence: CONFIDENCES.has(confidence as string) ? (confidence as Confidence) : "low",
+      why: text(field(o, "why")),
+    };
+  });
+}
+
 // ---- the reading check ---------------------------------------------------------
 
 const PHONEME = /^[A-Z]{1,2}[012]?$/;

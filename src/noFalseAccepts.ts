@@ -46,7 +46,7 @@
 
 import type { UndecidedRhyme, UntieredWord } from "./batch.ts";
 import type { DemotionReason } from "./demotions.ts";
-import { phonemesOf, readingsReachKey, type RhymeRuling, type WordhoodRuling } from "./judge.ts";
+import { phonemesOf, readingsReachKey, type Confidence, type RhymeRuling, type TierAnswer, type TierRuling, type WordhoodRuling } from "./judge.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
 
 // ---- the hunt ------------------------------------------------------------------
@@ -178,12 +178,13 @@ export type Decision =
 /**
  * One item of the sitting's ruling list, all put after the Batch's last model
  * call: a hunted Answer the Judge doubts (#268), a rhyme it left undecided
- * (#293), or a word the Batch wrote in that has no knownness, to Tier (#294).
+ * (#293), or a word the Batch wrote in that has no knownness, to Tier (#294),
+ * with the Judge's answer to the Tier question as the default (#295).
  */
 export type RulingItem =
   | { kind: "hunted"; listed: ListedAnswer }
   | { kind: "undecided"; rhyme: UndecidedRhyme }
-  | { kind: "tier"; untiered: UntieredWord };
+  | { kind: "tier"; untiered: UntieredWord; judge?: TierRuling };
 
 /** One command a line: what is typed, padded, then its effect. */
 const commandLine = (typed: string, effect: string): string => `  ${typed.padEnd(20)} ${effect}`;
@@ -339,29 +340,50 @@ export function parseUndecided(input: string, rhyme: UndecidedRhyme): Decision |
 /**
  * What the maintainer is shown to Tier a word the Batch wrote in that has no
  * knownness (#294): why it is asked, the question as Retrieval puts it (would a
- * player produce it, naming the Seed Word; ADR-0015), that an answer is
- * awaited, then one command a line with its effect. Its letters are none of the
- * other items', so a `d` or a `y` meant for one never Tiers here. Every command
- * it names is one `parseTier` reads.
+ * player produce it, naming the Seed Word; ADR-0015), the Judge's answer to the
+ * same question with its confidence when it was asked (#295), that an answer is
+ * awaited, then one command a line with its effect. The Judge's answer is only
+ * a default: Enter accepts it, and nothing is written until the maintainer
+ * rules. Its letters are none of the other items', so a `d` or a `y` meant for
+ * one never Tiers here. Every command it names is one `parseTier` reads.
  */
-export function tierPrompt(untiered: UntieredWord): string[] {
+export function tierPrompt(untiered: UntieredWord, judge?: TierRuling): string[] {
+  const effect: Record<TierAnswer, string> = {
+    answer: "Answer: a Tier verdict is written to data/tier-overrides.csv, so it scores from the next build",
+    bonus: "Bonus Word: a Tier verdict is written to data/tier-overrides.csv, so it stays accepted and unscored",
+  };
+  const proposed = judgeDefault(judge);
   return [
     "Nothing measures how well known it is, so it is a Bonus Word until you Tier it.",
     `Would an ordinary player think of ${untiered.word} when hunting rhymes for ${untiered.seedWord}?`,
+    ...(!judge ? []
+      : proposed ? [`The Judge's answer: ${TIER_NAME[proposed]}, at ${judge.confidence} confidence: ${judge.why}`]
+      : ["The Judge's answer: none it could read, so there is nothing to accept with Enter."]),
     "Waiting for your Tier ruling on this word. Type one of these and press Enter:",
-    commandLine("a", "Answer: a Tier verdict is written to data/tier-overrides.csv, so it scores from the next build"),
-    commandLine("b", "Bonus Word: a Tier verdict is written to data/tier-overrides.csv, so it stays accepted and unscored"),
+    ...(proposed ? [commandLine("Enter", `accept the Judge's answer, ${effect[proposed]}`)] : []),
+    commandLine("a", effect.answer),
+    commandLine("b", effect.bonus),
     commandLine("s", "skip it: nothing is written, and the run report lists it"),
   ];
 }
 
+const TIER_NAME: Record<TierAnswer, string> = { answer: "Answer", bonus: "Bonus Word" };
+
+/** The Tier the Judge's answer fills in, or null when it gave none that reads. */
+const judgeDefault = (judge: TierRuling | undefined): TierAnswer | null =>
+  judge && judge.verdict !== "no-ruling" ? judge.verdict : null;
+
 /**
  * A Tier ruling as the maintainer types it: `a` for Answer, `b` for Bonus
- * Word, `s` to skip. Null when it does not read, so the caller asks again and
- * writes nothing.
+ * Word, `s` to skip, and Enter alone for the Judge's answer when it gave one.
+ * Null when it does not read, so the caller asks again and writes nothing.
  */
-export function parseTier(input: string): Decision | null {
+export function parseTier(input: string, judge?: TierRuling): Decision | null {
   switch (input.trim().toLowerCase()) {
+    case "": {
+      const proposed = judgeDefault(judge);
+      return proposed ? { kind: "tier", tier: proposed } : null;
+    }
     case "a":
       return { kind: "tier", tier: "answer" };
     case "b":
@@ -371,6 +393,40 @@ export function parseTier(input: string): Decision | null {
     default:
       return null;
   }
+}
+
+/** How the maintainer's Tier rulings compared with the Judge's answers, as the run report records it (#295). */
+export interface TierAgreement {
+  /** Every word put to the maintainer to Tier. */
+  words: number;
+  /** Those the Judge answered and the maintainer ruled on, which are the ones compared. */
+  compared: number;
+  agreed: number;
+  /** `agreed / compared`, or null when nothing was compared. */
+  rate: number | null;
+  /** Agreed and compared, at each confidence the Judge gave: what a later decision to let high-confidence answers land alone reads. */
+  byConfidence: Record<Confidence, [agreed: number, compared: number]>;
+}
+
+/**
+ * The agreement between the Judge's Tier answers and the maintainer's rulings,
+ * over the words both answered: a word skipped, or one the Judge gave no
+ * answer on, is counted in `words` and compared with nothing.
+ */
+export function tierAgreement(settled: readonly { judge?: TierRuling; decision: Decision }[]): TierAgreement {
+  const out: TierAgreement = { words: settled.length, compared: 0, agreed: 0, rate: null, byConfidence: { high: [0, 0], medium: [0, 0], low: [0, 0] } };
+  for (const { judge, decision } of settled) {
+    const proposed = judgeDefault(judge);
+    if (!proposed || decision.kind !== "tier") continue;
+    const agrees = decision.tier === proposed ? 1 : 0;
+    out.compared++;
+    out.agreed += agrees;
+    const at = out.byConfidence[judge!.confidence];
+    at[0] += agrees;
+    at[1]++;
+  }
+  out.rate = out.compared ? out.agreed / out.compared : null;
+  return out;
 }
 
 // ---- the gate ------------------------------------------------------------------

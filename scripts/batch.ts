@@ -47,8 +47,12 @@
  * Last come the words the looks wrote in that have no knownness, each once with
  * the Rhyme Key it was found on (#294): the maintainer Tiers it as an Answer or
  * a Bonus Word, which writes a Tier verdict to `data/tier-overrides.csv` as the
- * Editor's Pass does, or skips it, which writes nothing and is reported.
- * The whole list is put after the Batch's last model call.
+ * Editor's Pass does, or skips it, which writes nothing and is reported. The
+ * Judge's answer to its Tier question (would a player think of the word when
+ * hunting rhymes for the Seed Word: Retrieval, ADR-0015) is filled in as the
+ * default, which Enter accepts and nothing writes by itself (#295); the run
+ * report records it beside the ruling, and how often the two agreed.
+ * The whole list is put after the Batch's last model call, the Tier question's.
  *
  * It writes the run report to `data/judge-runs/` and the result per Seed Word
  * to `data/batches.json`, both to be committed with what landed.
@@ -94,13 +98,14 @@ import {
   type TrustResult,
 } from "../src/batch.ts";
 import { parseDeclines } from "../src/declines.ts";
-import { judgeQuestion, readingReachesKey } from "../src/judge.ts";
+import { judgeQuestion, readingReachesKey, TIER_BATCH, type TierRuling } from "../src/judge.ts";
 import { planJudging, rulingKey, type JudgeRulingRecord } from "../src/judgeLanding.ts";
 import type { PuzzleContext } from "../src/session.ts";
 import { exampleRhyme, parsePlayerReply, playerPrompt, playWords, type SyntheticPlay } from "../src/syntheticPlayer.ts";
 import {
   addCalls,
   addWrites,
+  askTier,
   DEFAULT_PLAYER_MODEL,
   JUDGE_MODEL,
   landJudgeLeg,
@@ -115,7 +120,7 @@ import {
   type JudgedItem,
   type JudgeItem,
 } from "./judgeRun.ts";
-import { rulingList, type NoFalseAcceptsResult, type RulingItem } from "../src/noFalseAccepts.ts";
+import { rulingList, tierAgreement, type NoFalseAcceptsResult, type RulingItem } from "../src/noFalseAccepts.ts";
 import {
   huntCalls,
   huntResults,
@@ -207,7 +212,9 @@ console.error(
   `(${maxJudgeCallsGiven === undefined ? `${JUDGE_CALLS_PER_SEED} per Seed Word; --max-judge-calls overrides it` : "--max-judge-calls"})\n` +
   `  Trust gate: k = ${gate.k} within n = ${gate.n} looks; off key above ${offKeyRatio} to 1\n` +
   `  No False Accepts hunt, Judge (${JUDGE_MODEL}): ${huntPlan.sent} scored Answers sent on today's index, ` +
-  `${huntPlan.rhyme} rhyme calls and ${huntPlan.wordhood} wordhood calls (recounted after the looks land)`,
+  `${huntPlan.rhyme} rhyme calls and ${huntPlan.wordhood} wordhood calls (recounted after the looks land)\n` +
+  `  Tier question, Judge (${JUDGE_MODEL}): one call per ${TIER_BATCH} words the looks write in with no knownness, ` +
+  "after the hunt and before the ruling list; none if they write in none",
 );
 const cost = batchCost({ seeds: block.length, gate, maxJudgeCalls, hunt: huntPlan }, { player: playerModel, judge: JUDGE_MODEL });
 console.error("The cost, in calls:");
@@ -276,7 +283,7 @@ interface Day {
 }
 
 const days: Day[] = block.map((seed) => ({ seed, rhymeKey: seed.rhymeKey, looks: [], failuresPerLook: [] }));
-const calls = { player: 0, rhyme: 0, wordhood: 0, fromCache: 0 };
+const calls = { player: 0, rhyme: 0, wordhood: 0, tier: 0, fromCache: 0 };
 const answeredBy = new Set<string>();
 const allRulings: (ReturnType<typeof reportRuling> & { look: number; landed: string | null })[] = [];
 /** Every ruling the looks made or met, from its record: where the Judge's undecided rhymes are picked from (#293). */
@@ -423,19 +430,40 @@ if (!stopped) {
   hunted = { days: huntDays, leg };
 }
 
+// ---- the Tier question ---------------------------------------------------------
+//
+// Asked of each word the looks wrote in that has no knownness, before the ruling
+// list starts, so it is the Batch's last model call (#295). Its answer lands
+// nothing: it is the maintainer's default on the list. A Batch stopped at the
+// call cap asks nothing more, and its words are put to the maintainer without one.
+
+const untiered = untieredWrittenIn(writtenIn, (word) => index.tierOf(word).knownness);
+let tierRulings = new Map<string, TierRuling>();
+if (!stopped && untiered.length) {
+  console.error(`\nThe Tier question: ${untiered.length} words written in with no knownness, ${Math.ceil(untiered.length / TIER_BATCH)} calls`);
+  const asked = await orUsageStop(askTier(untiered, { model: JUDGE_MODEL, run, label: "tier" }));
+  calls.tier += asked.calls.tier;
+  calls.fromCache += asked.calls.fromCache;
+  asked.answeredBy.forEach((m) => answeredBy.add(m));
+  tierRulings = asked.rulings;
+}
+
 // ---- the ruling list -----------------------------------------------------------
 //
 // Put only now, after the Batch's last model call, so a usage stop never lands
 // while the maintainer is typing (#293): the hunted Answers the Judge doubts,
 // then the rhymes it ruled in the looks and left undecided, then the words the
-// looks wrote in that have no knownness, to Tier (#294).
+// looks wrote in that have no knownness, to Tier (#294) with the Judge's answer
+// filled in (#295).
 
 const undecided = undecidedRhymes(lookRulings, readDeclines());
-const untiered = untieredWrittenIn(writtenIn, (word) => index.tierOf(word).knownness);
 const rulingItems: RulingItem[] = [
   ...(hunted ? rulingList(hunted.leg.rulings).map((listed): RulingItem => ({ kind: "hunted", listed })) : []),
   ...undecided.map((rhyme): RulingItem => ({ kind: "undecided", rhyme })),
-  ...untiered.map((word): RulingItem => ({ kind: "tier", untiered: word })),
+  ...untiered.map((word): RulingItem => {
+    const judge = tierRulings.get(word.word);
+    return judge ? { kind: "tier", untiered: word, judge } : { kind: "tier", untiered: word };
+  }),
 ];
 const settled = await settleRulingList(rulingItems, { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
 if (settled.some((s) => s.decision.kind === "demotion" || s.decision.kind === "tier")) {
@@ -449,7 +477,9 @@ const hunt: { days: HuntDay[]; leg: HuntLeg; settled: ReturnType<typeof settledH
   : null;
 const undecidedSettled = settled.flatMap((s) => (s.item.kind === "undecided" ? [{ rhyme: s.item.rhyme, decision: s.decision, wrote: s.wrote }] : []));
 const undecidedSkipped = undecidedSettled.filter((s) => s.decision.kind === "unruled").map((s) => `${s.rhyme.word} /${s.rhyme.rhymeKey}/`);
-const tierSettled = settled.flatMap((s) => (s.item.kind === "tier" ? [{ untiered: s.item.untiered, decision: s.decision, wrote: s.wrote }] : []));
+const tierSettled = settled.flatMap((s) =>
+  s.item.kind === "tier" ? [{ untiered: s.item.untiered, judge: s.item.judge, decision: s.decision, wrote: s.wrote }] : []);
+const tierAgreed = tierAgreement(tierSettled);
 const tierSkipped = tierSettled.filter((s) => s.decision.kind === "unruled").map((s) => `${s.untiered.word} /${s.untiered.rhymeKey}/`);
 
 // ---- the report and the record -------------------------------------------------
@@ -537,11 +567,18 @@ const reportPath = writeRunReport(date, stem, run, {
   tiered: {
     note:
       "Words the looks wrote in that have no knownness, so each was a Bonus Word whatever it is, put to the maintainer to Tier " +
-      "in the sitting (#294). An Answer or a Bonus Word wrote an unlocked Tier verdict to data/tier-overrides.csv, which the next " +
-      "build applies; a skip wrote nothing and is listed under skipped.",
+      "in the sitting (#294), with the Judge's answer to the Tier question as the default (#295). An Answer or a Bonus Word " +
+      "wrote an unlocked Tier verdict to data/tier-overrides.csv, which the next build applies; a skip wrote nothing and is " +
+      "listed under skipped. The Judge's answer landed nothing by itself. agreement compares it with the maintainer's ruling " +
+      "over the words both answered, overall and at each confidence ([agreed, compared]).",
     listed: tierSettled.length,
-    decided: tierSettled.map(({ untiered: u, decision, wrote }) => ({ word: u.word, seedWord: u.seedWord, rhymeKey: u.rhymeKey, decision, wrote })),
+    decided: tierSettled.map(({ untiered: u, judge, decision, wrote }) => ({
+      word: u.word, seedWord: u.seedWord, rhymeKey: u.rhymeKey,
+      judge: judge ? { verdict: judge.verdict, confidence: judge.confidence, why: judge.why } : null,
+      decision, agreed: judge && judge.verdict !== "no-ruling" && decision.kind === "tier" ? decision.tier === judge.verdict : null, wrote,
+    })),
     skipped: tierSkipped,
+    agreement: tierAgreed,
   },
 });
 
@@ -588,7 +625,8 @@ if (undecidedSettled.length) {
 if (tierSettled.length) {
   const tiered = (tier: string) => tierSettled.filter((s) => s.decision.kind === "tier" && s.decision.tier === tier).length;
   console.log(`written-in words with no knownness: ${tierSettled.length}, Tiered Answer ${tiered("answer")}, Bonus Word ${tiered("bonus")}` +
-    `${tierSkipped.length ? `, skipped ${tierSkipped.join(", ")}` : ""}`);
+    `${tierSkipped.length ? `, skipped ${tierSkipped.join(", ")}` : ""}` +
+    `; agreed with the Judge on ${tierAgreed.agreed} of ${tierAgreed.compared} compared`);
 }
 if (stopped) console.log(`stopped: ${stopped}`);
 console.log(

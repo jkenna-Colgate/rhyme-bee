@@ -182,14 +182,14 @@ const itemPair = (item: RulingItem): { word: string; rhymeKey: RhymeKey } =>
  */
 function presentItem(item: RulingItem, index: RhymeIndex, extract: WiktionaryExtract): { lines: string[]; parse: (input: string) => Decision | null } {
   if (item.kind === "tier") {
-    const { untiered } = item;
+    const { untiered, judge } = item;
     return {
       lines: [
         `${untiered.word} for ${untiered.seedWord} /${untiered.rhymeKey}/: written in by this Batch, with no knownness`,
         ...index.readingsOf(untiered.word).map((r) => `  the game reads: ${r.pronunciation.join(" ")}`),
-        ...tierPrompt(untiered).map((line) => `  ${line}`),
+        ...tierPrompt(untiered, judge).map((line) => `  ${line}`),
       ],
-      parse: parseTier,
+      parse: (input) => parseTier(input, judge),
     };
   }
   if (item.kind === "undecided") {
