@@ -60,8 +60,11 @@ import { relative, resolve } from "node:path";
 import {
   batchBlock,
   batchCost,
+  candidateGame,
   DEFAULT_OFF_KEY_RATIO,
   DEFAULT_TRUST_GATE,
+  JUDGE_CALLS_PER_SEED,
+  judgeCallCap,
   keyCount,
   lookAttempt,
   namedBlock,
@@ -151,7 +154,8 @@ if (byRange ? !from || !to || seedsAt >= 0 : named.length === 0) {
 const playerModel = exactModelId(flag("model") ?? DEFAULT_PLAYER_MODEL);
 const gate: TrustGate = { k: number("k", DEFAULT_TRUST_GATE.k), n: number("n", DEFAULT_TRUST_GATE.n) };
 const offKeyRatio = number("off-key-ratio", DEFAULT_OFF_KEY_RATIO);
-const maxJudgeCalls = number("max-judge-calls", 30);
+/** The cap given on the command line, if any; the default scales with the Batch (`judgeCallCap`). */
+const maxJudgeCallsGiven = flag("max-judge-calls") === undefined ? undefined : number("max-judge-calls", 0);
 const confirmed = argv.includes("--yes");
 trustVerdict([0], gate); // refuses an n that leaves no look after a fix, before anything is called
 
@@ -168,6 +172,7 @@ try {
   console.error(`Batch refused, and nothing was called: ${(e as Error).message}`);
   process.exit(1);
 }
+const maxJudgeCalls = judgeCallCap({ seeds: block.length, maxJudgeCalls: maxJudgeCallsGiven });
 const what = from && to ? `${from} to ${to}` : `of ${block.length} named Seed Word(s)`;
 const loaded = loadWiktionary();
 if ("refused" in loaded) {
@@ -185,7 +190,8 @@ console.error(
   `Calls, all on the maintainer's subscription:\n` +
   `  Synthetic Player (${playerModel}): ${block.length * 2} to ${block.length * gate.n} looks (${gate.n} at most each), plus one re-run per off-key look\n` +
   `  Judge (${JUDGE_MODEL}): one rhyme call per 8 new Candidates and one wordhood call per 20 that would act, on every look;\n` +
-  `    about 1 to 3 a look for 3 Seed Words, and at most ${maxJudgeCalls} rhyme calls a look (--max-judge-calls)\n` +
+  `    about 1 to 3 a look for 3 Seed Words, and at most ${maxJudgeCalls} rhyme calls a look ` +
+  `(${maxJudgeCallsGiven === undefined ? `${JUDGE_CALLS_PER_SEED} per Seed Word; --max-judge-calls overrides it` : "--max-judge-calls"})\n` +
   `  Trust gate: k = ${gate.k} within n = ${gate.n} looks; off key above ${offKeyRatio} to 1\n` +
   `  No False Accepts hunt, Judge (${JUDGE_MODEL}): ${huntPlan.sent} scored Answers sent on today's index, ` +
   `${huntPlan.rhyme} rhyme calls and ${huntPlan.wordhood} wordhood calls (recounted after the looks land)`,
@@ -243,6 +249,8 @@ interface Look {
   example: string | null;
   play?: SyntheticPlay;
   trustFailures?: string[];
+  /** Rhymes not counted because the game accepts them as Bonus Words whose knownness measures them as rare. */
+  excusedAsRare?: string[];
 }
 interface Day {
   seed: BatchSeed;
@@ -343,29 +351,41 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
   const freshClassification = new Map<string, JudgedItem>(leg.items.map((j) => [rulingKey(j.word, j.rhymeKey), j]));
   for (const j of leg.items) allRulings.push({ ...reportRuling(j), look: lookNo, landed: recorded.get(rulingKey(j.word, j.rhymeKey))?.landed ?? null });
 
-  // Count each day's Trust failures, and give the gate's verdict.
-  for (const d of looked) {
-    const look = d.looks.at(-1)!;
-    const candidates: LookCandidate[] = look.play!.candidates.map((c) => {
-      const key = rulingKey(c.word, d.rhymeKey);
-      const r = recorded.get(key);
-      if (!r) return { word: c.word };
-      const fresh = freshClassification.get(key)?.classification;
-      return { word: c.word, ruling: { verdict: r.verdict, reachesKey: fresh ? fresh.reachesKey : r.verdict === "rhyme" && readingReachesKey(r.reading, r.rhymeKey), landed: r.landed } };
-    });
-    look.trustFailures = trustFailures(candidates);
-    d.failuresPerLook.push(look.trustFailures.length);
-    const verdict = trustVerdict(d.failuresPerLook, gate);
-    if (verdict !== "look-again") d.result = verdict;
-    console.error(`  ${d.seed.seedWord}: ${look.trustFailures.length} Trust failures${look.trustFailures.length ? ` (${look.trustFailures.join(", ")})` : ""}${d.result ? `, ${d.result}` : ""}`);
-  }
-
-  // Rebuild with what landed, so the next look plays on it.
+  // Rebuild with what landed, so the next look plays on it and this look's
+  // Candidates are counted on what the game now does with them.
   if (landings.readings.length || landings.unconfirmedRhymes.length) {
     console.error("rebuilding the index with what landed");
     const built = rebuild();
     if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
     index = loadIndex();
+  }
+
+  // Count each day's Trust failures, and give the gate's verdict.
+  for (const d of looked) {
+    const look = d.looks.at(-1)!;
+    const seed = contexts.get(d)!.seed;
+    const candidates: LookCandidate[] = look.play!.candidates.map((c) => {
+      const key = rulingKey(c.word, d.rhymeKey);
+      const r = recorded.get(key);
+      if (!r) return { word: c.word };
+      const fresh = freshClassification.get(key)?.classification;
+      return {
+        word: c.word,
+        ruling: { verdict: r.verdict, reachesKey: fresh ? fresh.reachesKey : r.verdict === "rhyme" && readingReachesKey(r.reading, r.rhymeKey), landed: r.landed },
+        game: candidateGame(index.adjudicate(seed, c.word)),
+      };
+    });
+    const trust = trustFailures(candidates, index.knownnessThreshold);
+    look.trustFailures = trust.failures;
+    look.excusedAsRare = trust.excusedAsRare;
+    d.failuresPerLook.push(trust.failures.length);
+    const verdict = trustVerdict(d.failuresPerLook, gate);
+    if (verdict !== "look-again") d.result = verdict;
+    console.error(
+      `  ${d.seed.seedWord}: ${trust.failures.length} Trust failures${trust.failures.length ? ` (${trust.failures.join(", ")})` : ""}` +
+      `${trust.excusedAsRare.length ? `, ${trust.excusedAsRare.length} excused as rare Bonus Words (${trust.excusedAsRare.join(", ")})` : ""}` +
+      `${d.result ? `, ${d.result}` : ""}`,
+    );
   }
 }
 
@@ -405,7 +425,8 @@ const reportPath = writeRunReport(date, stem, run, {
   candidatesJudged: allRulings.filter((r) => "knew" in r).length,
   note:
     "A Batch (#267). Trust failures are Candidates the Judge rules a Rhyme with a reading that reaches the key, " +
-    "leaving out Unconfirmed Rhymes and suggested Demotions. Every write is listed under writes; the index was " +
+    "leaving out Unconfirmed Rhymes and suggested Demotions; a Rhyme the game accepts, after the look's corrections, " +
+    "as a Bonus Word whose knownness is below the Answer line is listed under excusedAsRare and not counted. Every write is listed under writes; the index was " +
     "rebuilt after each look that landed one.",
   ...(stopped ? { stopped } : {}),
   seedsPlayed: days.map((d) => ({
@@ -428,6 +449,7 @@ const reportPath = writeRunReport(date, stem, run, {
             rank: l.play.rank,
             candidates: l.play.candidates.map((c) => c.word),
             trustFailures: l.trustFailures ?? null,
+            excusedAsRare: l.excusedAsRare ?? null,
           }
         : {}),
     })),

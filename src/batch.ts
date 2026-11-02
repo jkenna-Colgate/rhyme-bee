@@ -32,6 +32,7 @@ import type { Landed } from "./judgeLanding.ts";
 import type { RhymeKey } from "./phonology.ts";
 import type { RhymeIndex } from "./rhymeIndex.ts";
 import { addDays, isCalendarDate, scheduledDayFor, type Schedule } from "./schedule.ts";
+import type { Verdict } from "./verdict.ts";
 
 // ---- the block -----------------------------------------------------------------
 
@@ -152,11 +153,33 @@ export function lookAttempt(offKey: readonly boolean[]): LookAttempt {
 
 // ---- the Trust gate ------------------------------------------------------------
 
+/**
+ * What the game does with a Candidate's word once the look's corrections are
+ * in: the outcome a Submission of it gets, and a Bonus Word's knownness, which
+ * is null when the prevalence data has no value for it.
+ */
+export type CandidateGame =
+  | { outcome: "bonus"; knownness: number | null }
+  | { outcome: Exclude<Verdict["outcome"], "bonus"> };
+
+/** A Candidate's game, read off the verdict the index gives a Submission of it. */
+export function candidateGame(verdict: Verdict): CandidateGame {
+  return verdict.outcome === "bonus" ? { outcome: "bonus", knownness: verdict.knownness } : { outcome: verdict.outcome };
+}
+
 /** One Candidate of a look, with the Judge's ruling on it: made in this look, or read back from its record. */
 export interface LookCandidate {
   word: string;
   /** Absent for a Candidate the Judge was not asked about. */
   ruling?: { verdict: RhymeVerdict; reachesKey: boolean; landed?: Landed };
+  /** What the game does with the word after the look's corrections; absent when not read. */
+  game?: CandidateGame;
+}
+
+/** A look's Trust failures, and the Rhymes it did not count because the game is right to accept them as rare Bonus Words. */
+export interface LookTrust {
+  failures: string[];
+  excusedAsRare: string[];
 }
 
 /**
@@ -166,11 +189,22 @@ export interface LookCandidate {
  * ruling on #225 (2026-10-09) is no obvious rhyme, and a word the Judge finds
  * is a name or not a word. A Candidate ruled on before counts the same way, so
  * a known failure left alone is found again by every look that types it.
+ *
+ * A third kind is excused and listed apart (ADR-0021, 2026-11-02 amendment): a
+ * Rhyme the game accepts as a Bonus Word whose knownness is below the Answer
+ * line, because whether a word scores is its Tier's question and not Trust's.
+ * A Bonus Word with no knownness still counts, since that is how a common word
+ * (`fool` for `cool`) ends up one by accident; and so does a word the look
+ * fixed into an Answer (`nightgown`), which the look found failing.
  */
-export function trustFailures(candidates: readonly LookCandidate[]): string[] {
-  return candidates
-    .filter(({ ruling: r }) => r?.verdict === "rhyme" && r.reachesKey && r.landed !== "unconfirmed-rhyme" && r.landed !== "suggested-demotion")
-    .map((c) => c.word);
+export function trustFailures(candidates: readonly LookCandidate[], answerLine: number): LookTrust {
+  const trust: LookTrust = { failures: [], excusedAsRare: [] };
+  for (const { word, ruling: r, game } of candidates) {
+    if (!(r?.verdict === "rhyme" && r.reachesKey && r.landed !== "unconfirmed-rhyme" && r.landed !== "suggested-demotion")) continue;
+    const rare = game?.outcome === "bonus" && game.knownness !== null && game.knownness < answerLine;
+    (rare ? trust.excusedAsRare : trust.failures).push(word);
+  }
+  return trust;
 }
 
 /** The gate's two settings. No value is claimed for either (#225): they are tuned over Batches. */
@@ -208,8 +242,8 @@ export function trustVerdict(failuresPerLook: readonly number[], gate: TrustGate
 export interface BatchCallPlan {
   seeds: number;
   gate: TrustGate;
-  /** The most rhyme calls the Judge may make on one look before the Batch stops. */
-  maxJudgeCalls: number;
+  /** The most rhyme calls the Judge may make on one look before the Batch stops; absent for the default (`judgeCallCap`). */
+  maxJudgeCalls?: number;
   /** The No False Accepts hunt's calls, as counted on the index before the looks. */
   hunt: { rhyme: number; wordhood: number };
 }
@@ -225,17 +259,30 @@ export interface ModelCost {
 
 export const isOpus = (model: string): boolean => /opus/.test(model);
 
+/** The Judge's rhyme calls a look may take, by default, for each Seed Word in the Batch. */
+export const JUDGE_CALLS_PER_SEED = 2;
+
+/**
+ * The most rhyme calls the Judge may make on one look before the Batch stops:
+ * the cap given (`--max-judge-calls`), or two per Seed Word. A fixed cap of 30
+ * stopped a Batch of 30 Seed Words, which needed 36, before it judged anything.
+ */
+export function judgeCallCap(plan: Pick<BatchCallPlan, "seeds" | "maxJudgeCalls">): number {
+  return plan.maxJudgeCalls ?? JUDGE_CALLS_PER_SEED * plan.seeds;
+}
+
 /**
  * The calls a Batch will make, per model: every call is on the maintainer's
  * subscription, so this is its cost. The Synthetic Player plays every Seed
  * Word at least twice (the gate needs a look after the first) and at most `n`
  * looks of two runs each. The Judge may be asked nothing on the looks, and at
- * most `maxJudgeCalls` rhyme calls a look with a wordhood call per 20 of the
+ * most `judgeCallCap` rhyme calls a look with a wordhood call per 20 of the
  * Candidates those hold; the hunt's calls come on top.
  */
 export function batchCost(plan: BatchCallPlan, models: { player: string; judge: string }): ModelCost[] {
   const hunt = plan.hunt.rhyme + plan.hunt.wordhood;
-  const perLook = plan.maxJudgeCalls + Math.ceil((plan.maxJudgeCalls * RHYME_BATCH) / WORDHOOD_BATCH);
+  const cap = judgeCallCap(plan);
+  const perLook = cap + Math.ceil((cap * RHYME_BATCH) / WORDHOOD_BATCH);
   const legs = [
     { model: models.player, fewest: plan.seeds * 2, most: plan.seeds * plan.gate.n * 2 },
     { model: models.judge, fewest: hunt, most: hunt + plan.gate.n * perLook },
