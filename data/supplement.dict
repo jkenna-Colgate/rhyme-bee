@@ -762,6 +762,37 @@ stupidity S T UW0 P IH1 D IH0 T IY0
 theatricality TH IY0 AE2 T R AH0 K AE1 L AH0 T IY0
 triviality T R IH2 V IY0 AE1 L AH0 T IY0
 
+# --- Corrections (`-ental` readings with the t dropped, ruled no Rhyme for `kennel`, #289) ---
+#
+# CMUdict holds each of these words twice, once with the t of "-ental" and once without
+# (`gentle` said "jennle"). The t-dropped reading put the `incidental` family in `kennel`'s
+# (2026-11-11). The maintainer ruled on 2026-11-02 that they do not rhyme with `kennel`
+# (ADR-0011, 2026-11-02 amendment), so each word keeps only its readings with that t, and
+# still rhymes with `incidental`. Normalisation still appends the reduced "-ntl" form. A t
+# dropped elsewhere in the word (`sentimental` "sennimental") is out of scope and kept.
+# `interdental` and `nonjudgmental` are derived from `dental` and `judgmental`.
+accidental AE2 K S AH0 D EH1 N T AH0 L
+continental K AA2 N T AH0 N EH1 N T AH0 L
+dental D EH1 N T AH0 L
+detrimental D EH2 T R AH0 M EH1 N T AH0 L
+developmental D IH0 V EH2 L AH0 P M EH1 N T AH0 L
+elemental EH2 L AH0 M EH1 N T AH0 L
+environmental IH0 N V AY2 R AH0 N M EH1 N T AH0 L
+fundamental F AH2 N D AH0 M EH1 N T AH0 L
+gentle JH EH1 N T AH0 L
+instrumental IH2 N S T R AH0 M EH1 N T AH0 L
+judgmental JH AH0 JH M EH1 N T AH0 L
+monumental M AA2 N Y AH0 M EH1 N T AH0 L
+monumental(1) M AA2 N Y UW0 M EH1 N T AH0 L
+occidental AA2 K S AH0 D EH1 N T AH0 L
+oriental AO2 R IY0 EH1 N T AH0 L
+sentimental S EH2 N T AH0 M EH1 N T AH0 L
+sentimental(1) S EH2 N AH0 M EH1 N T AH0 L
+supplemental S AH2 P L AH0 M EH1 N T AH0 L
+transcendental T R AE2 N S AH0 N D EH1 N T AH0 L
+transcontinental T R AE2 N Z K AA2 N T IH0 N EH1 N T AH0 L
+transcontinental(1) T R AE2 N Z K AA2 N IH0 N EH1 N T AH0 L
+
 # --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
 # reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
 # amended 2026-10-14). Written with nobody reviewing them; see data/judge-runs/. ---
