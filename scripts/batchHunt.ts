@@ -5,8 +5,8 @@
  * calls the model, asks the maintainer and writes what they decide.
  *
  * Every write goes through a path the Editor's Pass already uses: a correction
- * through `applyCorrection` (`data/supplement.dict`, replacing the readings the
- * game holds), a Demotion through `appendDemotion` (`data/demotions.txt`). There
+ * or a keep through `applyCorrection` (`data/supplement.dict`, replacing the
+ * readings the game holds with the one corrected or the several kept), a Demotion through `appendDemotion` (`data/demotions.txt`). There
  * is no third.
  */
 
@@ -20,6 +20,7 @@ import {
   noFalseAcceptsResult,
   parseDecision,
   rulingPrompt,
+  shownReadings,
   type Decision,
   type HuntedAnswer,
   type HuntRuling,
@@ -127,10 +128,9 @@ export interface Settled {
   wrote: string | null;
 }
 
-/** The readings a correction may be picked from: Wiktionary's, as ARPAbet before Normalisation, which the build applies. */
-function offeredReadings(extract: WiktionaryExtract, word: string): Pronunciation[] {
-  const seen = new Set<string>();
-  return (extract.get(word) ?? []).flatMap(ipaReadings).filter((r) => !seen.has(r.join(" ")) && !!seen.add(r.join(" ")));
+/** Wiktionary's readings of a word, as ARPAbet before Normalisation, which the build applies. */
+function wiktionaryOffered(extract: WiktionaryExtract, word: string): Pronunciation[] {
+  return (extract.get(word) ?? []).flatMap(ipaReadings);
 }
 
 /** Rebuild the Rhyme Index, as a Batch does after each look that lands a write. */
@@ -152,34 +152,37 @@ export async function settleRulingList(
   const asking = process.stdin.isTTY ? createInterface({ input: process.stdin, output: process.stderr }) : null;
   if (list.length) console.error(`\nThe ruling list: ${list.length} scored Answers the Judge doubts at high confidence. Each stays scored until you rule.`);
   if (!asking && list.length) console.error("No terminal to ask on, so every one is left unruled.");
+  // Reloaded after each reading written, so a word listed twice shows what it holds now.
+  let index = ctx.index();
   try {
     for (const [i, item] of list.entries()) {
-      const index = ctx.index();
       const word = item.answer.word;
-      const offered = offeredReadings(ctx.extract, word);
+      const shown = shownReadings(index.readingsOf(word), wiktionaryOffered(ctx.extract, word));
       console.error(`\n[${i + 1}/${list.length}] ${word} for ${item.seedWord} /${item.rhymeKey}/: ${item.doubts.join(", ")}`);
       console.error(`  Judge, rhyme: ${item.rhyme.verdict} (${item.rhyme.confidence}) ${item.rhyme.why}`);
       if (item.wordhood) console.error(`  Judge, wordhood: ${item.wordhood.verdict} (${item.wordhood.confidence}) ${item.wordhood.why}`);
       console.error(`  sent for: ${item.answer.reasons.join(", ")}`);
-      for (const r of index.readingsOf(word)) console.error(`  the game reads: ${r.pronunciation.join(" ")}`);
-      for (const ipa of ctx.extract.get(word) ?? []) console.error(`  Wiktionary: ${ipa}`);
-      for (const line of rulingPrompt(offered)) console.error(`  ${line}`);
+      for (const ipa of ctx.extract.get(word) ?? []) console.error(`  Wiktionary (IPA): ${ipa}`);
+      for (const line of rulingPrompt(shown)) console.error(`  ${line}`);
       let decision: Decision = { kind: "unruled" };
       while (asking) {
-        const got = parseDecision(await asking.question("  your ruling > "), offered);
+        const got = parseDecision(await asking.question("  your ruling > "), shown);
         if (got) { decision = got; break; }
-        console.error(`  That does not read. Type ${offered.length ? "c <n>, " : ""}c <ARPAbet>, d, d word, l or s, then Enter.`);
+        console.error("  That does not read, and nothing was written. Type one of the commands above, then Enter.");
       }
       let wrote: string | null = null;
-      if (decision.kind === "correction") {
+      // A correction writes one reading, a keep the several kept: both replace every reading the word had.
+      const readings = decision.kind === "correction" ? [decision.reading] : decision.kind === "keep" ? decision.readings : [];
+      if (readings.length) {
         const result = await applyCorrection(
-          { word, target: item.rhymeKey, phonemes: decision.reading, mode: "replace" },
+          { word, target: item.rhymeKey, phonemes: readings.at(-1)!, kept: readings.slice(0, -1), mode: "replace" },
           {
             context: pinnedEvidenceContext, schedule: () => ctx.schedule, today: () => ctx.today,
             openIndex: ctx.loadIndex, rebuild: async () => rebuild(), source: "batch",
           },
         );
-        wrote = `data/supplement.dict: ${word} ${decision.reading.join(" ")}${result.rebuilt.ok ? "" : " (the rebuild failed)"}`;
+        wrote = `data/supplement.dict: ${result.written.map((r) => `${word} ${r.join(" ")}`).join("; ")}${result.rebuilt.ok ? "" : " (the rebuild failed)"}`;
+        if (result.rebuilt.ok) index = ctx.loadIndex();
         // A reading given to a scheduled Seed Word runs the Seed Word test (#264), as it does in the Editor's Pass.
         for (const line of seedWordCheckLines(result.seedWords)) console.error(`  ${line}`);
       } else if (decision.kind === "demotion") {

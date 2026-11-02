@@ -26,17 +26,22 @@
  * never writes a reading unreviewed (#238); and once the maintainer has left,
  * nothing undoes a wrong Demotion. So a high-confidence ruling that the Answer
  * is no Rhyme, a name and nothing else, or not a word goes on a list, and the
- * maintainer rules on each in the sitting: a pronunciation correction, a
- * Demotion, or leave it. Below high confidence the Answer is left alone, and a
- * doubtful Answer stays scored until it is ruled.
+ * maintainer rules on each in the sitting: keep some of the word's readings
+ * (#292), a pronunciation correction, a Demotion, or leave it. The game's
+ * current readings are shown numbered, with Wiktionary's offered as additions,
+ * so a word half right (`environmental`, two readings with the t and two
+ * without) keeps the half that is. Below high confidence the Answer is left
+ * alone, and a doubtful Answer stays scored until it is ruled.
  *
  * ## The gate
  *
  * It passes when one pass leaves no such Answer scored (#225): every Answer on
  * the list is ruled, and none the maintainer corrected or demoted is still
  * scored once the index is rebuilt. Leaving an Answer is a ruling: it is the
- * maintainer's word that the Judge was wrong. An Answer skipped is not, and
- * fails the day, since it stays scored on nobody's word.
+ * maintainer's word that the Judge was wrong. So is keeping readings, whether or
+ * not one kept still rhymes on the day: the maintainer saw each reading's sound
+ * and chose. An Answer skipped is not, and fails the day, since it stays scored
+ * on nobody's word.
  */
 
 import type { DemotionReason } from "./demotions.ts";
@@ -110,51 +115,134 @@ export function rulingList(rulings: readonly HuntRuling[]): ListedAnswer[] {
 // ---- the maintainer's ruling ---------------------------------------------------
 
 /**
+ * A reading the maintainer is shown when ruling on a word, numbered by its place
+ * in the list: one the game holds (`game`), one Normalisation appended to a
+ * reading the game holds (`normalisation`), or one Wiktionary has and the game
+ * does not, offered as an addition (`wiktionary`). Wiktionary's are ARPAbet
+ * before Normalisation, which the build applies to whatever is written.
+ */
+export interface ShownReading {
+  reading: Pronunciation;
+  from: "game" | "normalisation" | "wiktionary";
+}
+
+/**
+ * The readings to show for a word, numbered in this order: the game's current
+ * readings as the index holds them (`RhymeIndex.readingsOf`), then each of
+ * Wiktionary's the game lacks, once (#292).
+ */
+export function shownReadings(
+  game: readonly { pronunciation: Pronunciation; generated: boolean }[],
+  wiktionary: readonly Pronunciation[],
+): ShownReading[] {
+  const out: ShownReading[] = game.map((g) => ({ reading: [...g.pronunciation], from: g.generated ? "normalisation" : "game" }));
+  const seen = new Set(out.map((s) => s.reading.join(" ")));
+  for (const reading of wiktionary) {
+    const spelling = reading.join(" ");
+    if (seen.has(spelling)) continue;
+    seen.add(spelling);
+    out.push({ reading: [...reading], from: "wiktionary" });
+  }
+  return out;
+}
+
+/**
  * What the maintainer decided about a listed Answer. A correction replaces the
- * game's readings with one (`data/supplement.dict`); a Demotion takes the word's
- * wordhood (`data/demotions.txt`); leave it keeps it scored on the maintainer's
- * word; unruled is an Answer skipped.
+ * word's readings with one, and a keep with the several the maintainer kept
+ * (both in `data/supplement.dict`, several readings written as one word's
+ * alternates); a Demotion takes the word's wordhood (`data/demotions.txt`);
+ * leave it keeps it scored on the maintainer's word; unruled is an Answer
+ * skipped.
+ *
+ * A later kind of item on the ruling list (#293's undecided rhymes, #294's
+ * Tiering) adds kinds of its own here rather than stretching these.
  */
 export type Decision =
   | { kind: "correction"; reading: Pronunciation }
+  | { kind: "keep"; readings: Pronunciation[] }
   | { kind: "demotion"; reason: DemotionReason }
   | { kind: "leave" }
   | { kind: "unruled" };
 
+/** One command a line: what is typed, padded, then its effect. */
+const commandLine = (typed: string, effect: string): string => `  ${typed.padEnd(20)} ${effect}`;
+
+const APPENDED_NOTE = "  (appended by Normalisation: it comes back while a reading it was made from is kept)";
+
 /**
- * What the maintainer is shown when a ruling is wanted: the readings offered,
- * labelled and numbered, then that an answer is awaited and one option a line
- * with its effect. Every option it names is one `parseDecision` reads.
+ * What the maintainer is shown when a ruling is wanted: the readings, numbered
+ * under who holds them, then that an answer is awaited and one command a line
+ * with its effect. Every command it names is one `parseDecision` reads.
  */
-export function rulingPrompt(offered: readonly Pronunciation[]): string[] {
-  const readings = offered.length
-    ? ["Readings you can pick (Wiktionary's, in ARPAbet):", ...offered.map((reading, n) => `  ${n + 1}. ${reading.join(" ")}`)]
-    : ["Readings you can pick: none (Wiktionary has none), so a correction must be typed."];
+export function rulingPrompt(shown: readonly ShownReading[]): string[] {
+  const lines = shown.map((s, n) => ({ from: s.from, text: `  ${n + 1}. ${s.reading.join(" ")}${s.from === "normalisation" ? APPENDED_NOTE : ""}` }));
+  const game = lines.filter((l) => l.from !== "wiktionary").map((l) => l.text);
+  const wiktionary = lines.filter((l) => l.from === "wiktionary").map((l) => l.text);
+  const readings = !shown.length
+    ? ["Readings you can pick: none (the game and Wiktionary have none), so a correction must be typed."]
+    : [
+        ...(game.length ? ["The game's readings of this word (ARPAbet):", ...game] : ["The game holds no reading of this word."]),
+        ...(wiktionary.length ? ["Wiktionary's readings the game lacks, which you can add:", ...wiktionary] : ["Wiktionary's readings the game lacks: none."]),
+      ];
   return [
     ...readings,
     "Waiting for your ruling on this word. Type one of these and press Enter:",
-    ...(offered.length ? ["  c <n>        correct the reading to number <n> above, e.g. c 1 (it replaces the game's reading)"] : []),
-    "  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)",
-    "  d            demote it as a name (the player is told it is a name)",
-    "  d word       demote it as not a word (the player is told it is not a word)",
-    "  l            leave it scored, as the game has it",
-    "  s            skip it: it stays scored unruled, and the day fails its No False Accepts gate",
+    ...(shown.length
+      ? [
+          commandLine("k <n> <n> ...", "keep only the readings numbered, e.g. k 1 3 (every other reading goes)"),
+          commandLine("k <n> ... <ARPAbet>", "keep those and add one you type, e.g. k 1 K AE1 T"),
+          commandLine("c <n>", "correct the reading to number <n> alone, e.g. c 1 (it replaces every reading)"),
+        ]
+      : []),
+    commandLine("c <ARPAbet>", "correct the reading to one you type, e.g. c K AE1 T (it replaces every reading)"),
+    commandLine("d", "demote it as a name (the player is told it is a name)"),
+    commandLine("d word", "demote it as not a word (the player is told it is not a word)"),
+    commandLine("l", "leave it scored, as the game has it"),
+    commandLine("s", "skip it: it stays scored unruled, and the day fails its No False Accepts gate"),
   ];
 }
 
+/** The reading numbered `n` in the list shown, or null when there is none. */
+function numberedReading(shown: readonly ShownReading[], n: string): Pronunciation | null {
+  const reading = /^\d+$/.test(n) ? shown[Number(n) - 1]?.reading : undefined;
+  return reading ? [...reading] : null;
+}
+
 /**
- * A ruling as the maintainer types it: `c <n>` for the nth reading offered, or
- * `c <ARPAbet>` for one typed; `d` for a Demotion as a name, `d word` as not a
- * word; `l` to leave it; `s` to skip it. Null when it does not read.
+ * `k <n> <n> ... [<ARPAbet>]`: the numbered readings, in the order shown and
+ * once each, then the typed one if it is not among them. At least one number,
+ * since a reading typed alone is a correction.
  */
-export function parseDecision(input: string, offered: readonly Pronunciation[]): Decision | null {
+function keepOf(args: readonly string[], shown: readonly ShownReading[]): Decision | null {
+  const firstTyped = args.findIndex((a) => !/^\d+$/.test(a));
+  const numbers = firstTyped === -1 ? args : args.slice(0, firstTyped);
+  if (!numbers.length || numbers.some((n) => !numberedReading(shown, n))) return null;
+  const readings = [...new Set(numbers.map(Number))].sort((a, b) => a - b).map((n) => [...shown[n - 1]!.reading]);
+  if (firstTyped !== -1) {
+    const typed = phonemesOf(args.slice(firstTyped).join(" "));
+    if (!typed) return null;
+    if (!readings.some((r) => r.join(" ") === typed.join(" "))) readings.push(typed);
+  }
+  return { kind: "keep", readings };
+}
+
+/**
+ * A ruling as the maintainer types it: `k <n> <n> ...` to keep the numbered
+ * readings shown, optionally followed by one typed in ARPAbet; `c <n>` for the
+ * nth reading shown alone, or `c <ARPAbet>` for one typed; `d` for a Demotion
+ * as a name, `d word` as not a word; `l` to leave it; `s` to skip it. Null when
+ * it does not read, so the caller asks again and writes nothing.
+ */
+export function parseDecision(input: string, shown: readonly ShownReading[]): Decision | null {
   const [command, ...rest] = input.trim().split(/\s+/);
   const arg = rest.join(" ");
   switch (command?.toLowerCase()) {
+    case "k":
+      return keepOf(rest, shown);
     case "c": {
       if (/^\d+$/.test(arg)) {
-        const reading = offered[Number(arg) - 1];
-        return reading ? { kind: "correction", reading: [...reading] } : null;
+        const reading = numberedReading(shown, arg);
+        return reading ? { kind: "correction", reading } : null;
       }
       const reading = phonemesOf(arg);
       return reading ? { kind: "correction", reading } : null;
@@ -195,7 +283,7 @@ export function noFalseAcceptsResult(
   for (const word of [...new Set(listed)].sort()) {
     const d = decisions.get(word);
     if (!d || d.kind === "unruled") unruled.push(word);
-    else if (d.kind !== "leave" && isScored(word)) stillScored.push(word);
+    else if ((d.kind === "correction" || d.kind === "demotion") && isScored(word)) stillScored.push(word);
   }
   return { result: unruled.length || stillScored.length ? "fail" : "pass", unruled, stillScored };
 }

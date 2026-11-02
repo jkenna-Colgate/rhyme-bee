@@ -139,6 +139,11 @@ export interface CorrectionAsk {
   /** The reading being approved — the agent's proposal, echoed back. */
   phonemes: Pronunciation;
   mode: CorrectionMode;
+  /**
+   * For a replace, readings the editor kept to stand with `phonemes`, written
+   * before it (a Batch's `k`, #292). None unless said.
+   */
+  kept?: readonly Pronunciation[];
 }
 
 /**
@@ -199,7 +204,7 @@ export async function applyCorrection(
   const schedule = deps.schedule();
 
   const current = ctx.pronunciations.get(word) ?? [];
-  const written = readingsToWrite(current, ask.phonemes, ask.mode);
+  const written = readingsToWrite(current, ask.phonemes, ask.mode, ask.kept);
   const keysBefore = keysOf(current);
   const keysAfter = keysOf(written);
   const rechecked = union(keysBefore, keysAfter);
@@ -241,16 +246,20 @@ export async function applyCorrection(
  * A proposal the engine already holds is written once rather than twice. A
  * duplicate line is inert to the parser, but it is a line a later reader has to
  * work out is a duplicate, and the editor did not approve saying a thing twice.
+ *
+ * A replace may also carry readings the editor **kept** (a Batch's `k`, #292):
+ * it then writes those, then the proposal, so the word holds exactly what the
+ * editor chose and nothing else the sources held.
  */
 export function readingsToWrite(
   current: readonly Pronunciation[],
   proposed: Pronunciation,
   mode: CorrectionMode,
+  kept: readonly Pronunciation[] = [],
 ): Pronunciation[] {
-  if (mode === "replace") return [proposed];
   const seen = new Set<string>();
   const out: Pronunciation[] = [];
-  for (const reading of [...current, proposed]) {
+  for (const reading of mode === "replace" ? [...kept, proposed] : [...current, proposed]) {
     const spelling = reading.join(" ");
     if (seen.has(spelling)) continue;
     seen.add(spelling);

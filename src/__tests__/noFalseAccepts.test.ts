@@ -13,6 +13,7 @@ import {
   parseDecision,
   rulingList,
   rulingPrompt,
+  shownReadings,
   type HuntedAnswer,
   type HuntRuling,
 } from "../noFalseAccepts.ts";
@@ -103,57 +104,126 @@ describe("the ruling list", () => {
   });
 });
 
-describe("reading the maintainer's ruling", () => {
-  const offered = [r("CH AA1 K L AH0 T")];
+describe("the readings shown for a ruling", () => {
+  it("numbers the game's readings first, marking those Normalisation appended, then Wiktionary's the game lacks", () => {
+    const game = [
+      { pronunciation: r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L"), generated: false },
+      { pronunciation: r("IH0 N V AY2 R AH0 N M EH1 N AH0 L"), generated: false },
+      { pronunciation: r("IH0 N V AY2 R AH0 N M EH1 N T L"), generated: true },
+    ];
+    const wiktionary = [r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L"), r("EH0 N V AY2 R AH0 N M EH1 N T AH0 L"), r("EH0 N V AY2 R AH0 N M EH1 N T AH0 L")];
+    expect(shownReadings(game, wiktionary)).toEqual([
+      { reading: r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L"), from: "game" },
+      { reading: r("IH0 N V AY2 R AH0 N M EH1 N AH0 L"), from: "game" },
+      { reading: r("IH0 N V AY2 R AH0 N M EH1 N T L"), from: "normalisation" },
+      { reading: r("EH0 N V AY2 R AH0 N M EH1 N T AH0 L"), from: "wiktionary" },
+    ]);
+  });
+});
 
-  it("reads a correction as one of the readings offered, or as a reading typed in ARPAbet", () => {
-    expect(parseDecision("c 1", offered)).toEqual({ kind: "correction", reading: r("CH AA1 K L AH0 T") });
-    expect(parseDecision("c ch aa1 k ah0 l ah0 t", offered)).toEqual({ kind: "correction", reading: r("CH AA1 K AH0 L AH0 T") });
+describe("reading the maintainer's ruling", () => {
+  const shown = shownReadings(
+    [{ pronunciation: r("CH AA1 K L AH0 T"), generated: false }, { pronunciation: r("CH AA1 K L EY2 T"), generated: false }],
+    [r("CH AA1 K AH0 L AH0 T")],
+  );
+
+  it("reads a correction as one of the readings shown, or as a reading typed in ARPAbet", () => {
+    expect(parseDecision("c 1", shown)).toEqual({ kind: "correction", reading: r("CH AA1 K L AH0 T") });
+    expect(parseDecision("c 3", shown)).toEqual({ kind: "correction", reading: r("CH AA1 K AH0 L AH0 T") });
+    expect(parseDecision("c ch aa1 k ah0 l ah0 t", shown)).toEqual({ kind: "correction", reading: r("CH AA1 K AH0 L AH0 T") });
+  });
+
+  it("reads keeping exactly the readings numbered, in the order shown, once each", () => {
+    expect(parseDecision("k 1 3", shown)).toEqual({ kind: "keep", readings: [r("CH AA1 K L AH0 T"), r("CH AA1 K AH0 L AH0 T")] });
+    expect(parseDecision("k 3 1 3", shown)).toEqual({ kind: "keep", readings: [r("CH AA1 K L AH0 T"), r("CH AA1 K AH0 L AH0 T")] });
+    expect(parseDecision("K 2", shown)).toEqual({ kind: "keep", readings: [r("CH AA1 K L EY2 T")] });
+  });
+
+  it("reads keeping some readings and adding one typed", () => {
+    expect(parseDecision("k 1 ch ao1 k l ah0 t", shown)).toEqual({ kind: "keep", readings: [r("CH AA1 K L AH0 T"), r("CH AO1 K L AH0 T")] });
+    // A typed reading already kept is kept once.
+    expect(parseDecision("k 1 CH AA1 K L AH0 T", shown)).toEqual({ kind: "keep", readings: [r("CH AA1 K L AH0 T")] });
   });
 
   it("reads a Demotion with the rejection the player will get, a name by default", () => {
-    expect(parseDecision("d", offered)).toEqual({ kind: "demotion", reason: "proper-noun" });
-    expect(parseDecision("d word", offered)).toEqual({ kind: "demotion", reason: "not-a-known-word" });
+    expect(parseDecision("d", shown)).toEqual({ kind: "demotion", reason: "proper-noun" });
+    expect(parseDecision("d word", shown)).toEqual({ kind: "demotion", reason: "not-a-known-word" });
   });
 
   it("reads leaving it alone, and skipping it unruled", () => {
-    expect(parseDecision("l", offered)).toEqual({ kind: "leave" });
-    expect(parseDecision("s", offered)).toEqual({ kind: "unruled" });
+    expect(parseDecision("l", shown)).toEqual({ kind: "leave" });
+    expect(parseDecision("s", shown)).toEqual({ kind: "unruled" });
   });
 
   it("reads nothing from a reading that is not ARPAbet or a number outside the list", () => {
-    expect(parseDecision("c 2", offered)).toBeNull();
-    expect(parseDecision("c tʃɑk", offered)).toBeNull();
-    expect(parseDecision("x", offered)).toBeNull();
+    expect(parseDecision("c 4", shown)).toBeNull();
+    expect(parseDecision("c tʃɑk", shown)).toBeNull();
+    expect(parseDecision("x", shown)).toBeNull();
+    expect(parseDecision("", shown)).toBeNull();
+  });
+
+  it("reads nothing from a keep that names no reading shown, or adds one that is not ARPAbet", () => {
+    expect(parseDecision("k", shown)).toBeNull();
+    expect(parseDecision("k 0", shown)).toBeNull();
+    expect(parseDecision("k 1 4", shown)).toBeNull();
+    expect(parseDecision("k 1 tʃɑk", shown)).toBeNull();
+    expect(parseDecision("k 1 CH AA1 K 2", shown)).toBeNull();
+    // Typing a reading alone is a correction, `c`.
+    expect(parseDecision("k CH AA1 K L AH0 T", shown)).toBeNull();
   });
 });
 
 describe("asking the maintainer for a ruling", () => {
-  it("labels the readings it numbers, says it is waiting, and gives one option a line with its effect", () => {
-    expect(rulingPrompt([r("CH AA1 K L AH0 T"), r("CH AO1 K L AH0 T")])).toEqual([
-      "Readings you can pick (Wiktionary's, in ARPAbet):",
+  const shown = shownReadings(
+    [{ pronunciation: r("CH AA1 K L AH0 T"), generated: false }, { pronunciation: r("CH AA1 K L T"), generated: true }],
+    [r("CH AO1 K L AH0 T")],
+  );
+
+  it("numbers the readings under who holds them, says it is waiting, and gives one command a line with its effect", () => {
+    expect(rulingPrompt(shown)).toEqual([
+      "The game's readings of this word (ARPAbet):",
       "  1. CH AA1 K L AH0 T",
-      "  2. CH AO1 K L AH0 T",
+      "  2. CH AA1 K L T  (appended by Normalisation: it comes back while a reading it was made from is kept)",
+      "Wiktionary's readings the game lacks, which you can add:",
+      "  3. CH AO1 K L AH0 T",
       "Waiting for your ruling on this word. Type one of these and press Enter:",
-      "  c <n>        correct the reading to number <n> above, e.g. c 1 (it replaces the game's reading)",
-      "  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)",
-      "  d            demote it as a name (the player is told it is a name)",
-      "  d word       demote it as not a word (the player is told it is not a word)",
-      "  l            leave it scored, as the game has it",
-      "  s            skip it: it stays scored unruled, and the day fails its No False Accepts gate",
+      "  k <n> <n> ...        keep only the readings numbered, e.g. k 1 3 (every other reading goes)",
+      "  k <n> ... <ARPAbet>  keep those and add one you type, e.g. k 1 K AE1 T",
+      "  c <n>                correct the reading to number <n> alone, e.g. c 1 (it replaces every reading)",
+      "  c <ARPAbet>          correct the reading to one you type, e.g. c K AE1 T (it replaces every reading)",
+      "  d                    demote it as a name (the player is told it is a name)",
+      "  d word               demote it as not a word (the player is told it is not a word)",
+      "  l                    leave it scored, as the game has it",
+      "  s                    skip it: it stays scored unruled, and the day fails its No False Accepts gate",
+    ]);
+  });
+
+  it("says when Wiktionary has no reading the game lacks", () => {
+    const prompt = rulingPrompt(shownReadings([{ pronunciation: r("CH AA1 K L AH0 T"), generated: false }], [r("CH AA1 K L AH0 T")]));
+    expect(prompt.slice(0, 3)).toEqual([
+      "The game's readings of this word (ARPAbet):",
+      "  1. CH AA1 K L AH0 T",
+      "Wiktionary's readings the game lacks: none.",
     ]);
   });
 
   it("offers no number to pick when there are no readings to pick from", () => {
     const prompt = rulingPrompt([]);
-    expect(prompt[0]).toBe("Readings you can pick: none (Wiktionary has none), so a correction must be typed.");
-    expect(prompt.some((line) => line.includes("c <n>"))).toBe(false);
-    expect(prompt).toContain("  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)");
+    expect(prompt[0]).toBe("Readings you can pick: none (the game and Wiktionary have none), so a correction must be typed.");
+    expect(prompt.some((line) => line.includes("<n>"))).toBe(false);
+    expect(prompt).toContain("  c <ARPAbet>          correct the reading to one you type, e.g. c K AE1 T (it replaces every reading)");
   });
 
-  it("accepts every option it offers", () => {
-    const offered = [r("CH AA1 K L AH0 T")];
-    expect(["c 1", "c K AE1 T", "d", "d word", "l", "s"].map((input) => parseDecision(input, offered))).not.toContain(null);
+  it("accepts every command it names", () => {
+    for (const readings of [shown, []]) {
+      const commands = rulingPrompt(readings).filter((line) => /^ {2}[a-z]/.test(line));
+      expect(commands.length).toBeGreaterThan(0);
+      for (const line of commands) {
+        // The example the line gives, or else the command as written.
+        const typed = /e\.g\. (.+?)(?: \(|$)/.exec(line)?.[1] ?? line.trim().split(/\s{2,}/)[0]!;
+        expect(parseDecision(typed, readings), line).not.toBeNull();
+      }
+    }
   });
 });
 
@@ -177,6 +247,12 @@ describe("the No False Accepts gate", () => {
   it("fails on a correction or Demotion that left the Answer scored", () => {
     const result = noFalseAcceptsResult(["chocolate"], new Map([["chocolate", { kind: "correction", reading: r("CH AA1 K L EY2 T") }]]), () => true);
     expect(result).toEqual({ result: "fail", unruled: [], stillScored: ["chocolate"] });
+  });
+
+  it("counts keeping readings as a ruling, whether or not what was kept still rhymes on the day", () => {
+    // `environmental` keeps its readings with the t: it leaves `kennel` and stays on `incidental`.
+    const result = noFalseAcceptsResult(["environmental"], new Map([["environmental", { kind: "keep", readings: [r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L")] }]]), () => true);
+    expect(result).toEqual({ result: "pass", unruled: [], stillScored: [] });
   });
 
   it("passes a day with nothing on the list", () => {
