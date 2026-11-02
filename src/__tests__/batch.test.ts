@@ -9,6 +9,7 @@ import {
   batchBlock,
   batchCost,
   batchesOf,
+  judgeCallCap,
   keyCount,
   lookAttempt,
   namedBlock,
@@ -230,6 +231,22 @@ describe("what a Batch costs, before any call is made", () => {
       { model: "claude-opus-5-5", fewest: 6 + 3, most: 18 + 3 + 3 * 42, opus: true },
     ]);
   });
+
+  it("caps the Judge at two rhyme calls a look per Seed Word when no cap is given", () => {
+    // A Batch of 30 needed 36 calls on its first look and was stopped by a cap of 30.
+    expect(judgeCallCap({ seeds: 30 })).toBe(60);
+    const { maxJudgeCalls: _, ...uncapped } = plan;
+    expect(judgeCallCap(uncapped)).toBe(6);
+    // Three looks of 6 rhyme calls and a wordhood call per 20 of their 48 Candidates.
+    expect(batchCost(uncapped, { player: "claude-sonnet-5-5", judge: "claude-haiku-5-5" })[1]).toEqual(
+      { model: "claude-haiku-5-5", fewest: 3, most: 3 + 3 * (6 + 3), opus: false },
+    );
+  });
+
+  it("lets a cap that is given override the default", () => {
+    expect(judgeCallCap({ seeds: 30, maxJudgeCalls: 45 })).toBe(45);
+    expect(judgeCallCap(plan)).toBe(30);
+  });
 });
 
 describe("the committed record of which Seed Words have been through a Batch", () => {
@@ -281,37 +298,77 @@ describe("the committed record of which Seed Words have been through a Batch", (
 });
 
 describe("what a look counts as a Trust failure", () => {
+  /** The Answer line: a knownness at or above it makes an Answer. */
+  const LINE = 0.5;
+  const failures = (candidates: Parameters<typeof trustFailures>[0]) => trustFailures(candidates, LINE).failures;
+
   it("counts a Candidate the Judge rules a Rhyme with a reading that reaches the key", () => {
-    expect(trustFailures([
+    expect(failures([
       { word: "snored", ruling: { verdict: "rhyme", reachesKey: true, landed: "reading" } },
       { word: "glum", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" } },
     ])).toEqual(["snored", "glum"]);
   });
 
   it("does not count a Rhyme whose reading misses the key, or a ruling of no Rhyme", () => {
-    expect(trustFailures([
+    expect(failures([
       { word: "time", ruling: { verdict: "no-rhyme", reachesKey: false, landed: "nothing" } },
       { word: "fine", ruling: { verdict: "rhyme", reachesKey: false, landed: "nothing" } },
     ])).toEqual([]);
   });
 
   it("does not count a Candidate the Judge was not asked about, or whose reply could not be read", () => {
-    expect(trustFailures([
+    expect(failures([
       { word: "objurgate" },
       { word: "mow", ruling: { verdict: "no-ruling", reachesKey: false } },
     ])).toEqual([]);
   });
 
   it("does not count an Unconfirmed Rhyme, which is no obvious rhyme by the maintainer's ruling on #225", () => {
-    expect(trustFailures([{ word: "clique", ruling: { verdict: "rhyme", reachesKey: true, landed: "unconfirmed-rhyme" } }])).toEqual([]);
+    expect(failures([{ word: "clique", ruling: { verdict: "rhyme", reachesKey: true, landed: "unconfirmed-rhyme" } }])).toEqual([]);
   });
 
   it("does not count a word the Judge finds is a name or not a word", () => {
-    expect(trustFailures([{ word: "marx", ruling: { verdict: "rhyme", reachesKey: true, landed: "suggested-demotion" } }])).toEqual([]);
+    expect(failures([{ word: "marx", ruling: { verdict: "rhyme", reachesKey: true, landed: "suggested-demotion" } }])).toEqual([]);
   });
 
   it("counts a Candidate ruled in an earlier look or Batch the same way, from its record", () => {
     // Ruled a Rhyme at low confidence before, so it landed nothing and is still a Candidate.
-    expect(trustFailures([{ word: "fjord", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" } }])).toEqual(["fjord"]);
+    expect(failures([{ word: "fjord", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" } }])).toEqual(["fjord"]);
+  });
+
+  it("excuses a Rhyme the game accepts as a Bonus Word whose knownness measures it as rare, and says so", () => {
+    // `hod` for `nod`: the game is right not to score it, which is its Tier's question and not Trust's.
+    expect(trustFailures([
+      { word: "hod", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.2 } },
+      { word: "snored", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "rejected" } },
+    ], LINE)).toEqual({ failures: ["snored"], excusedAsRare: ["hod"] });
+  });
+
+  it("counts a Rhyme the game accepts as a Bonus Word with no knownness, which is how a common word ends up one by accident", () => {
+    // `fool` for `cool`, missing from the prevalence data.
+    expect(trustFailures([
+      { word: "fool", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: null } },
+    ], LINE)).toEqual({ failures: ["fool"], excusedAsRare: [] });
+  });
+
+  it("counts a Rhyme the look fixed into an Answer, in that look", () => {
+    // `nightgown` for `down`: it had no reading, one was written in, and the rebuild made it an Answer.
+    expect(trustFailures([
+      { word: "nightgown", ruling: { verdict: "rhyme", reachesKey: true, landed: "reading" }, game: { outcome: "answer" } },
+    ], LINE)).toEqual({ failures: ["nightgown"], excusedAsRare: [] });
+  });
+
+  it("counts a Bonus Word whose knownness is at the Answer line, which the game could only have Tiered by mistake", () => {
+    expect(trustFailures([
+      { word: "lard", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: LINE } },
+    ], LINE)).toEqual({ failures: ["lard"], excusedAsRare: [] });
+  });
+
+  it("excuses nothing that was never a failure: a rare Bonus Word ruled no Rhyme, an Unconfirmed Rhyme, a Demotion", () => {
+    expect(trustFailures([
+      { word: "pard", ruling: { verdict: "no-rhyme", reachesKey: false, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.1 } },
+      { word: "clique", ruling: { verdict: "rhyme", reachesKey: true, landed: "unconfirmed-rhyme" }, game: { outcome: "unconfirmed" } },
+      { word: "marx", ruling: { verdict: "rhyme", reachesKey: true, landed: "suggested-demotion" }, game: { outcome: "bonus", knownness: 0.1 } },
+    ], LINE)).toEqual({ failures: [], excusedAsRare: [] });
   });
 });
