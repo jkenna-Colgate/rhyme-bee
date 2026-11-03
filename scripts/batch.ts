@@ -98,7 +98,7 @@ import {
   type TrustResult,
 } from "../src/batch.ts";
 import { parseDeclines } from "../src/declines.ts";
-import { judgeQuestion, readingReachesKey, TIER_BATCH, type TierRuling } from "../src/judge.ts";
+import { judgeQuestion, readingReachesKey, TIER_BATCH, type TierAnswer, type TierRuling } from "../src/judge.ts";
 import { planJudging, rulingKey, type JudgeRulingRecord } from "../src/judgeLanding.ts";
 import type { PuzzleContext } from "../src/session.ts";
 import { exampleRhyme, parsePlayerReply, playerPrompt, playWords, type SyntheticPlay } from "../src/syntheticPlayer.ts";
@@ -121,7 +121,7 @@ import {
   type JudgeItem,
 } from "./judgeRun.ts";
 import { rulingList, type NoFalseAcceptsResult } from "../src/noFalseAccepts.ts";
-import { tierAgreement, type RulingItem } from "../src/rulingList.ts";
+import { tierAgreement, type Decision, type RulingItem } from "../src/rulingList.ts";
 import {
   huntCalls,
   huntResults,
@@ -421,14 +421,14 @@ for (const d of days) if (!d.result && !d.notChecked) d.notChecked = stopped ? "
 
 // ---- No False Accepts ----------------------------------------------------------
 
-let hunted: { days: HuntDay[]; leg: HuntLeg } | null = null;
+let huntAsked: { days: HuntDay[]; leg: HuntLeg } | null = null;
 if (!stopped) {
   const huntDays = planHunt(index, days.filter((d) => !d.notChecked).map((d) => ({ ...d.seed, rhymeKey: d.rhymeKey })), scheduleRaw.scoring, wiktionary);
   const planned = huntCalls(huntDays);
   console.error(`\nNo False Accepts: ${planned.sent} scored Answers to the Judge, ${planned.rhyme} rhyme and ${planned.wordhood} wordhood calls`);
   const leg = await orUsageStop(judgeHunt(huntDays, { model: JUDGE_MODEL, run }));
   noteLeg(leg);
-  hunted = { days: huntDays, leg };
+  huntAsked = { days: huntDays, leg };
 }
 
 // ---- the Tier question ---------------------------------------------------------
@@ -457,7 +457,7 @@ if (!stopped && untiered.length) {
 
 const undecided = undecidedRhymes(lookRulings, readDeclines());
 const rulingItems: RulingItem[] = [
-  ...(hunted ? rulingList(hunted.leg.rulings).map((listed): RulingItem => ({ kind: "hunted", listed })) : []),
+  ...(huntAsked ? rulingList(huntAsked.leg.rulings).map((listed): RulingItem => ({ kind: "hunted", listed })) : []),
   ...undecided.map((rhyme): RulingItem => ({ kind: "undecided", rhyme })),
   ...untiered.map((word): RulingItem => {
     const judge = tierRulings.get(word.word);
@@ -471,8 +471,8 @@ if (settled.some((s) => s.decision.kind === "demotion" || s.decision.kind === "t
   if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
 }
 if (settled.some((s) => s.wrote)) index = loadIndex();
-const hunt: { days: HuntDay[]; leg: HuntLeg; settled: ReturnType<typeof settledHunted>; results: Map<string, NoFalseAcceptsResult> } | null = hunted
-  ? { ...hunted, settled: settledHunted(settled), results: huntResults(hunted.days, settled, index, scheduleRaw.scoring) }
+const hunt: { days: HuntDay[]; leg: HuntLeg; settled: ReturnType<typeof settledHunted>; results: Map<string, NoFalseAcceptsResult> } | null = huntAsked
+  ? { ...huntAsked, settled: settledHunted(settled), results: huntResults(huntAsked.days, settled, index, scheduleRaw.scoring) }
   : null;
 const undecidedSettled = settled.flatMap((s) => (s.item.kind === "undecided" ? [{ rhyme: s.item.rhyme, decision: s.decision, wrote: s.wrote }] : []));
 const undecidedSkipped = undecidedSettled.filter((s) => s.decision.kind === "unruled").map((s) => `${s.rhyme.word} /${s.rhyme.rhymeKey}/`);
@@ -617,12 +617,12 @@ console.log(`calls: ${JSON.stringify(calls)}`);
 console.log(`writes: ${writes.readings.length} readings, ${writes.unconfirmedRhymes.length} Unconfirmed Rhymes, ${writes.suggestedDemotions.length} suggested Demotions`);
 if (settled.length) console.log(`ruled in the sitting: ${settled.filter((s) => s.wrote).map((s) => s.wrote).join("; ") || "nothing written"}`);
 if (undecidedSettled.length) {
-  const count = (kind: string) => undecidedSettled.filter((s) => s.decision.kind === kind).length;
+  const count = (kind: Decision["kind"]) => undecidedSettled.filter((s) => s.decision.kind === kind).length;
   console.log(`rhymes the Judge left undecided: ${undecidedSettled.length}, confirmed ${count("confirm")}, declined ${count("decline")}` +
     `${undecidedSkipped.length ? `, skipped ${undecidedSkipped.join(", ")}` : ""}`);
 }
 if (tierSettled.length) {
-  const tiered = (tier: string) => tierSettled.filter((s) => s.decision.kind === "tier" && s.decision.tier === tier).length;
+  const tiered = (tier: TierAnswer) => tierSettled.filter((s) => s.decision.kind === "tier" && s.decision.tier === tier).length;
   console.log(`written-in words with no knownness: ${tierSettled.length}, Tiered Answer ${tiered("answer")}, Bonus Word ${tiered("bonus")}` +
     `${tierSkipped.length ? `, skipped ${tierSkipped.join(", ")}` : ""}` +
     `; agreed with the Judge on ${tierAgreed.agreed} of ${tierAgreed.compared} compared`);

@@ -21,7 +21,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
-import { rhymeBatches, WORDHOOD_BATCH, type RhymeRuling } from "../src/judge.ts";
+import { rhymeBatches, WORDHOOD_BATCH, type RhymeRuling, type TierAnswer } from "../src/judge.ts";
 import {
   huntAnswers,
   noFalseAcceptsResult,
@@ -168,9 +168,9 @@ const TIER_OVERRIDES_PATH = resolve(dataDir, "tier-overrides.csv");
  * is Tiered because a player would think of it (Retrieval), and with no
  * knownness there is no measure that would make it rare.
  */
-const BATCH_TIER_VERDICT = { answer: "answer-common", bonus: "bonus" } as const satisfies Record<"answer" | "bonus", TierVerdict>;
+const BATCH_TIER_VERDICT = { answer: "answer-common", bonus: "bonus" } as const satisfies Record<TierAnswer, TierVerdict>;
 
-type SittingContext ={ index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex };
+type SittingContext = { index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex };
 
 /** The item's word and the Rhyme Key it is ruled on. */
 const itemPair = (item: RulingItem): { word: string; rhymeKey: RhymeKey } =>

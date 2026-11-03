@@ -77,7 +77,7 @@ export type Decision =
   | { kind: "leave" }
   | { kind: "confirm"; reading: Pronunciation }
   | { kind: "decline" }
-  | { kind: "tier"; tier: "answer" | "bonus" }
+  | { kind: "tier"; tier: TierAnswer }
   | { kind: "unruled" };
 
 /**
