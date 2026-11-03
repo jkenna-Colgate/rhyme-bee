@@ -533,6 +533,15 @@ and 12 others. Four of those were real rhymes and are corrected in
 `-ation` family. No other scheduled day changes. The `-ual` words are now Weak
 Rhymes for `cool`: accepted, with no Points.
 
+Then, for consistency, the maintainer ruled that every `-ual` word gets the same
+verdict. An "oo" before "-al" rhymes on `UW L` only when it carries the word's
+main stress (`dual`, `cruel`, `accrual`, `renewal`, `fuel`), and otherwise it
+does not. CMUdict marks a few with secondary stress, so they still scored for
+`cool` after the rule change (`spiritual`, `contextual`, `textual`,
+`unusual`). `data/supplement.dict` now writes their "oo" unstressed, and the
+same for `actually`, `unusually`, `homosexuals` and `spirituals`. `cool` keeps
+52 Answers.
+
 ### What was not made a rule
 
 **Promotion's own errors on a weak ending.** The same review found

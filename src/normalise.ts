@@ -257,12 +257,16 @@ const LIQUIDS = new Set(["L", "R"]);
  * which is the argument worth having. `lion` is *not* reached: it is a nasal
  * after a vowel, so the schwa stays.
  *
- * One residue is known and accepted. `UW` still absorbs at secondary stress, so
- * `spiritual`, `contextual`, `textual` and `unusual` keep a reading on `UW L`
- * and rhyme with `cool`. Cutting them means cutting `cruel` and `duel` with
- * them — the complaint this rule was built for — because a Rhyme Key strips
- * stress digits, so `schwaTwins.ts` cannot tell the two apart and no
- * stress-based limit is expressible on both sides of the rule (#209).
+ * One residue was known, and is now corrected in the data rather than here.
+ * `UW` still absorbs at secondary stress, so `spiritual`, `contextual`,
+ * `textual` and `unusual`, which the source marks `UW2`, kept a reading on
+ * `UW L` and rhymed with `cool`. Cutting them here means cutting `cruel` and
+ * `duel` with them — the complaint this rule was built for — because a Rhyme
+ * Key strips stress digits, so `schwaTwins.ts` cannot tell the two apart and
+ * no stress-based limit is expressible on both sides of the rule (#209). The
+ * maintainer ruled on 2026-11-03 that an "oo" before "-al" rhymes on `UW L`
+ * only under the word's main stress (#290), and `data/supplement.dict` writes
+ * those words' "oo" unstressed.
  *
  * A word with a droppable schwa ends up with two Rhyme Keys and so reads as
  * ambiguous, which bars it from being a Seed Word without an explicit key.
