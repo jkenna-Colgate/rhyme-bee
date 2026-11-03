@@ -199,6 +199,8 @@ export interface JudgedItem extends JudgeItem {
 export interface JudgeCalls {
   rhyme: number;
   wordhood: number;
+  /** Counted only by a leg that asks the Tier question (#295), so no other run report changes shape. */
+  tier?: number;
   fromCache: number;
 }
 
@@ -208,6 +210,7 @@ export const noCalls = (): JudgeCalls => ({ rhyme: 0, wordhood: 0, fromCache: 0 
 export function addCalls(into: JudgeCalls, more: JudgeCalls): void {
   into.rhyme += more.rhyme;
   into.wordhood += more.wordhood;
+  if (more.tier !== undefined) into.tier = (into.tier ?? 0) + more.tier;
   into.fromCache += more.fromCache;
 }
 
@@ -229,9 +232,9 @@ interface CallOptions {
   label?: string;
 }
 
-async function ask(prompt: string, kind: "rhyme" | "wordhood", opts: CallOptions, tally: Tally): Promise<string> {
+async function ask(prompt: string, kind: "rhyme" | "wordhood" | "tier", opts: CallOptions, tally: Tally): Promise<string> {
   const reply = await callModel(opts.model, prompt, opts.run, opts.label);
-  tally.calls[kind]++;
+  tally.calls[kind] = (tally.calls[kind] ?? 0) + 1;
   if (reply.cached) tally.calls.fromCache++;
   reply.answeredBy.forEach((m) => tally.answeredBy.add(m));
   return reply.text;
@@ -251,16 +254,30 @@ async function askRhyme<T extends JudgedPair & { rhymeKey: RhymeKey }>(
   return rulings;
 }
 
-/** The wordhood question, apart from the rhyme one, of each word once, `WORDHOOD_BATCH` words a call. */
-async function askWordhood(words: readonly string[], opts: CallOptions, tally: Tally): Promise<Map<string, WordhoodRuling>> {
-  const sorted = [...new Set(words)].sort();
-  const wordhood = new Map<string, WordhoodRuling>();
-  const chunks = Array.from({ length: Math.ceil(sorted.length / WORDHOOD_BATCH) }, (_, i) => sorted.slice(i * WORDHOOD_BATCH, (i + 1) * WORDHOOD_BATCH));
+/**
+ * A question asked of each word on a list, `size` items a call, each reply read
+ * into one ruling per word: the wordhood question and the Tier question. A word
+ * whose reply did not read has a `no-ruling`.
+ */
+async function askOfEachWord<I, R extends { word: string }>(
+  items: readonly I[],
+  question: { kind: "wordhood" | "tier"; size: number; prompt: (chunk: readonly I[]) => string; parse: (text: string, chunk: readonly I[]) => R[] },
+  opts: CallOptions,
+  tally: Tally,
+): Promise<Map<string, R>> {
+  const rulings = new Map<string, R>();
+  const chunks = Array.from({ length: Math.ceil(items.length / question.size) }, (_, i) => items.slice(i * question.size, (i + 1) * question.size));
   await inParallel(chunks.map((chunk) => async () => {
-    const text = await ask(wordhoodPrompt(chunk), "wordhood", opts, tally);
-    for (const r of parseWordhoodReply(text, chunk)) wordhood.set(r.word, r);
+    const text = await ask(question.prompt(chunk), question.kind, opts, tally);
+    for (const r of question.parse(text, chunk)) rulings.set(r.word, r);
   }));
-  return wordhood;
+  return rulings;
+}
+
+/** The wordhood question, apart from the rhyme one, of each word once, `WORDHOOD_BATCH` words a call. */
+function askWordhood(words: readonly string[], opts: CallOptions, tally: Tally): Promise<Map<string, WordhoodRuling>> {
+  const question = { kind: "wordhood", size: WORDHOOD_BATCH, prompt: wordhoodPrompt, parse: parseWordhoodReply } as const;
+  return askOfEachWord([...new Set(words)].sort(), question, opts, tally);
 }
 
 /**
@@ -273,20 +290,12 @@ async function askWordhood(words: readonly string[], opts: CallOptions, tally: T
 export async function askTier(
   pairs: readonly JudgedPair[],
   opts: CallOptions,
-): Promise<{ rulings: Map<string, TierRuling>; calls: { tier: number; fromCache: number }; answeredBy: string[] }> {
-  const calls = { tier: 0, fromCache: 0 };
-  const answeredBy = new Set<string>();
-  const rulings = new Map<string, TierRuling>();
-  const chunks = Array.from({ length: Math.ceil(pairs.length / TIER_BATCH) }, (_, i) => pairs.slice(i * TIER_BATCH, (i + 1) * TIER_BATCH));
-  await inParallel(chunks.map((chunk) => async () => {
-    const reply = await callModel(opts.model, tierQuestionPrompt(chunk), opts.run, opts.label);
-    calls.tier++;
-    if (reply.cached) calls.fromCache++;
-    reply.answeredBy.forEach((m) => answeredBy.add(m));
-    for (const r of parseTierReply(reply.text, chunk.map((p) => p.word))) rulings.set(r.word, r);
-  }));
-  if (chunks.length) process.stderr.write("\n");
-  return { rulings, calls, answeredBy: [...answeredBy].sort() };
+): Promise<{ rulings: Map<string, TierRuling>; calls: JudgeCalls; answeredBy: string[] }> {
+  const tally: Tally = { calls: { ...noCalls(), tier: 0 }, answeredBy: new Set() };
+  const parse = (text: string, chunk: readonly JudgedPair[]) => parseTierReply(text, chunk.map((p) => p.word));
+  const rulings = await askOfEachWord(pairs, { kind: "tier", size: TIER_BATCH, prompt: tierQuestionPrompt, parse }, opts, tally);
+  if (pairs.length) process.stderr.write("\n");
+  return { rulings, calls: tally.calls, answeredBy: [...tally.answeredBy].sort() };
 }
 
 /**

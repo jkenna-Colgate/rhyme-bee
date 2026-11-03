@@ -7,7 +7,7 @@
  * `scripts/appendedReadingsTrial.ts` calls the model and writes the report.
  */
 
-import type { Confidence, RhymeRuling } from "../src/judge.ts";
+import { agreementOver, type Agreed, type Agreement, type RhymeRuling } from "../src/judge.ts";
 import { rulingList, type HuntRuling } from "../src/noFalseAccepts.ts";
 import type { RhymeKey } from "../src/phonology.ts";
 
@@ -102,23 +102,17 @@ export interface TrialItem {
   judge: RhymeRuling;
 }
 
-/** Agreed, and compared. */
-export type Agreement = [agreed: number, compared: number];
-
-export interface TrialScore {
-  /** The pairs the maintainer ruled on (a skip is not one). */
-  compared: number;
-  /** Those where the Judge's verdict was the maintainer's. A pair the Judge gave no ruling on disagrees. */
-  agreed: number;
-  /** `agreed / compared`, or null when nothing was compared. */
-  rate: number | null;
-  byFrom: Record<TrialItem["from"], Agreement>;
-  /** At each confidence the Judge gave. */
-  byConfidence: Record<Confidence, Agreement>;
+/**
+ * The trial's score: compared are the pairs the maintainer ruled on (a skip is
+ * not one), and agreed those where the Judge's verdict was the maintainer's. A
+ * pair the Judge gave no ruling on disagrees.
+ */
+export interface TrialScore extends Agreement {
+  byFrom: Record<TrialItem["from"], Agreed>;
   /** What the hunt would do: of the pairs the maintainer ruled no Rhyme, how many its ruling list holds. */
-  falseAcceptsListed: Agreement;
+  falseAcceptsListed: Agreed;
   /** And of the pairs the maintainer ruled Rhymes, how many it would put on the list anyway, each one for the maintainer to leave. */
-  rhymesListed: Agreement;
+  rhymesListed: Agreed;
   misses: TrialItem[];
 }
 
@@ -135,23 +129,19 @@ function listedAsNoRhyme(item: TrialItem): boolean {
  * Rhyme's reading reaches the key changes nothing it does.
  */
 export function scoreTrial(items: readonly TrialItem[]): TrialScore {
-  const out: TrialScore = {
-    compared: 0, agreed: 0, rate: null,
-    byFrom: { given: [0, 0], sampled: [0, 0] },
-    byConfidence: { high: [0, 0], medium: [0, 0], low: [0, 0] },
-    falseAcceptsListed: [0, 0], rhymesListed: [0, 0], misses: [],
-  };
-  const tally = (into: Agreement, yes: boolean) => { into[0] += yes ? 1 : 0; into[1]++; };
-  for (const item of items) {
-    if (item.maintainer === "skip") continue;
-    const agrees = item.judge.verdict === item.maintainer;
-    out.compared++;
-    if (agrees) out.agreed++;
-    else out.misses.push(item);
-    tally(out.byFrom[item.from], agrees);
-    tally(out.byConfidence[item.judge.confidence], agrees);
-    tally(item.maintainer === "no-rhyme" ? out.falseAcceptsListed : out.rhymesListed, listedAsNoRhyme(item));
+  const ruled = items.filter((item) => item.maintainer !== "skip");
+  const agrees = (item: TrialItem) => item.judge.verdict === item.maintainer;
+  const overall = agreementOver(ruled.map((item) => ({ confidence: item.judge.confidence, agrees: agrees(item) })));
+  const byFrom: Record<TrialItem["from"], Agreed> = { given: [0, 0], sampled: [0, 0] };
+  const falseAcceptsListed: Agreed = [0, 0];
+  const rhymesListed: Agreed = [0, 0];
+  const tally = (into: Agreed, yes: boolean) => { into[0] += yes ? 1 : 0; into[1]++; };
+  for (const item of ruled) {
+    tally(byFrom[item.from], agrees(item));
+    tally(item.maintainer === "no-rhyme" ? falseAcceptsListed : rhymesListed, listedAsNoRhyme(item));
   }
-  out.rate = out.compared ? out.agreed / out.compared : null;
-  return out;
+  return {
+    compared: overall.compared, agreed: overall.agreed, rate: overall.rate, byFrom, byConfidence: overall.byConfidence,
+    falseAcceptsListed, rhymesListed, misses: ruled.filter((item) => !agrees(item)),
+  };
 }

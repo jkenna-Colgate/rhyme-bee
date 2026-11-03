@@ -11,7 +11,7 @@
 
 import type { UndecidedRhyme, UntieredWord } from "./batch.ts";
 import type { DemotionReason } from "./demotions.ts";
-import { phonemesOf, readingReachesKey, type Confidence, type TierAnswer, type TierRuling } from "./judge.ts";
+import { agreementOver, phonemesOf, readingReachesKey, type Agreement, type TierAnswer, type TierRuling } from "./judge.ts";
 import type { ListedAnswer } from "./noFalseAccepts.ts";
 import { isVowelSound, type Pronunciation, type RhymeKey } from "./phonology.ts";
 
@@ -331,17 +331,14 @@ export function parseTier(input: string, judge?: TierRuling): Decision | null {
   }
 }
 
-/** How the maintainer's Tier rulings compared with the Judge's answers, as the run report records it (#295). */
-export interface TierAgreement {
+/**
+ * How the maintainer's Tier rulings compared with the Judge's answers, as the
+ * run report records it (#295): compared are the words the Judge answered and
+ * the maintainer ruled on.
+ */
+export interface TierAgreement extends Agreement {
   /** Every word put to the maintainer to Tier. */
   words: number;
-  /** Those the Judge answered and the maintainer ruled on, which are the ones compared. */
-  compared: number;
-  agreed: number;
-  /** `agreed / compared`, or null when nothing was compared. */
-  rate: number | null;
-  /** Agreed and compared, at each confidence the Judge gave: what a later decision to let high-confidence answers land alone reads. */
-  byConfidence: Record<Confidence, [agreed: number, compared: number]>;
 }
 
 /**
@@ -350,17 +347,9 @@ export interface TierAgreement {
  * answer on, is counted in `words` and compared with nothing.
  */
 export function tierAgreement(settled: readonly { judge?: TierRuling; decision: Decision }[]): TierAgreement {
-  const out: TierAgreement = { words: settled.length, compared: 0, agreed: 0, rate: null, byConfidence: { high: [0, 0], medium: [0, 0], low: [0, 0] } };
-  for (const { judge, decision } of settled) {
+  const comparisons = settled.flatMap(({ judge, decision }) => {
     const proposed = judgeDefault(judge);
-    if (!proposed || decision.kind !== "tier") continue;
-    const agrees = decision.tier === proposed ? 1 : 0;
-    out.compared++;
-    out.agreed += agrees;
-    const at = out.byConfidence[judge!.confidence];
-    at[0] += agrees;
-    at[1]++;
-  }
-  out.rate = out.compared ? out.agreed / out.compared : null;
-  return out;
+    return proposed && decision.kind === "tier" ? [{ confidence: judge!.confidence, agrees: decision.tier === proposed }] : [];
+  });
+  return { words: settled.length, ...agreementOver(comparisons) };
 }

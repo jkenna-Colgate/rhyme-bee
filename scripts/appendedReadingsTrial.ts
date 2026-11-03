@@ -27,13 +27,13 @@
 
 import { createInterface } from "node:readline/promises";
 import { appendedOnlyAnswers } from "../src/appendedReadings.ts";
+import type { Agreed } from "../src/judge.ts";
 import {
   GIVEN_RULINGS,
   parseSampleRuling,
   sampleAcrossDays,
   samplePrompt,
   scoreTrial,
-  type Agreement,
   type SampleRuling,
   type TrialDay,
   type TrialItem,
@@ -174,7 +174,7 @@ const items: TrialItem[] = [
 ];
 const score = scoreTrial(items);
 
-const pct = ([a, b]: Agreement) => `${a}/${b}${b ? ` (${((100 * a) / b).toFixed(1)}%)` : ""}`;
+const pct = ([a, b]: Agreed) => `${a}/${b}${b ? ` (${((100 * a) / b).toFixed(1)}%)` : ""}`;
 const listed = rulingList(leg.rulings);
 const tally: Record<string, number> = {};
 for (const r of leg.rulings) tally[`${r.rhyme.verdict} ${r.rhyme.confidence}`] = (tally[`${r.rhyme.verdict} ${r.rhyme.confidence}`] ?? 0) + 1;

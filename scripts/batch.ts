@@ -443,9 +443,7 @@ let tierRulings = new Map<string, TierRuling>();
 if (!stopped && untiered.length) {
   console.error(`\nThe Tier question: ${untiered.length} words written in with no knownness, ${Math.ceil(untiered.length / TIER_BATCH)} calls`);
   const asked = await orUsageStop(askTier(untiered, { model: JUDGE_MODEL, run, label: "tier" }));
-  calls.tier += asked.calls.tier;
-  calls.fromCache += asked.calls.fromCache;
-  asked.answeredBy.forEach((m) => answeredBy.add(m));
+  noteLeg(asked);
   tierRulings = asked.rulings;
 }
 

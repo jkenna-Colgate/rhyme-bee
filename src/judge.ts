@@ -171,30 +171,42 @@ export function wordhoodPrompt(words: readonly string[]): string {
 
 export type WordhoodVerdict = "word" | "name" | "not-a-word" | "no-ruling";
 
-export interface WordhoodRuling {
+export type WordhoodRuling = WordRuling<Exclude<WordhoodVerdict, "no-ruling">>;
+
+/** A ruling on one word of a list, with one of `V` as its verdict or no ruling. */
+interface WordRuling<V extends string> {
   word: string;
-  verdict: WordhoodVerdict;
+  verdict: V | "no-ruling";
   confidence: Confidence;
   why: string;
 }
 
-/** One ruling per word asked about. A ruling written against another word is no ruling on this one. */
-export function parseWordhoodReply(raw: string, words: readonly string[]): WordhoodRuling[] {
+/**
+ * One ruling per word asked about, from a reply of one object per word in the
+ * order asked, each with one of `verdicts`. A ruling written against another
+ * word is no ruling on this one, and neither is a verdict not asked for.
+ */
+function parseWordReply<V extends string>(raw: string, words: readonly string[], verdicts: readonly V[]): WordRuling<V>[] {
   const got = lastArray(raw);
   return words.map((word, i) => {
     const o = got[i];
     const verdict = field(o, "verdict");
-    if (field(o, "word") !== word || (verdict !== "word" && verdict !== "name" && verdict !== "not-a-word")) {
+    if (field(o, "word") !== word || !verdicts.includes(verdict as V)) {
       return { word, verdict: "no-ruling", confidence: "low", why: "unparseable reply" };
     }
     const confidence = field(o, "confidence");
     return {
       word,
-      verdict,
+      verdict: verdict as V,
       confidence: CONFIDENCES.has(confidence as string) ? (confidence as Confidence) : "low",
       why: text(field(o, "why")),
     };
   });
+}
+
+/** One ruling per word asked about. A ruling written against another word is no ruling on this one. */
+export function parseWordhoodReply(raw: string, words: readonly string[]): WordhoodRuling[] {
+  return parseWordReply(raw, words, ["word", "name", "not-a-word"]);
 }
 
 // ---- the Tier question ---------------------------------------------------------
@@ -227,30 +239,43 @@ export function tierQuestionPrompt(pairs: readonly JudgedPair[]): string {
 
 export type TierAnswer = "answer" | "bonus";
 
-export interface TierRuling {
-  word: string;
-  verdict: TierAnswer | "no-ruling";
-  confidence: Confidence;
-  why: string;
-}
+export type TierRuling = WordRuling<TierAnswer>;
 
 /** One ruling per word asked about. A ruling written against another word is no ruling on this one. */
 export function parseTierReply(raw: string, words: readonly string[]): TierRuling[] {
-  const got = lastArray(raw);
-  return words.map((word, i) => {
-    const o = got[i];
-    const verdict = field(o, "verdict");
-    if (field(o, "word") !== word || (verdict !== "answer" && verdict !== "bonus")) {
-      return { word, verdict: "no-ruling", confidence: "low", why: "unparseable reply" };
-    }
-    const confidence = field(o, "confidence");
-    return {
-      word,
-      verdict,
-      confidence: CONFIDENCES.has(confidence as string) ? (confidence as Confidence) : "low",
-      why: text(field(o, "why")),
-    };
-  });
+  return parseWordReply(raw, words, ["answer", "bonus"]);
+}
+
+// ---- the Judge against the maintainer --------------------------------------------
+
+/** Agreed, and compared. */
+export type Agreed = [agreed: number, compared: number];
+
+/**
+ * How the Judge's answers compared with the maintainer's rulings, over the
+ * items both answered: what a run report records, so that a later decision to
+ * let the Judge's answers land alone reads it (#295, #296).
+ */
+export interface Agreement {
+  compared: number;
+  agreed: number;
+  /** `agreed / compared`, or null when nothing was compared. */
+  rate: number | null;
+  /** At each confidence the Judge gave. */
+  byConfidence: Record<Confidence, Agreed>;
+}
+
+/** The agreement over these comparisons: for each, the Judge's confidence and whether it gave the maintainer's ruling. */
+export function agreementOver(comparisons: readonly { confidence: Confidence; agrees: boolean }[]): Agreement {
+  const byConfidence: Record<Confidence, Agreed> = { high: [0, 0], medium: [0, 0], low: [0, 0] };
+  let agreed = 0;
+  for (const { confidence, agrees } of comparisons) {
+    if (agrees) agreed++;
+    byConfidence[confidence][0] += agrees ? 1 : 0;
+    byConfidence[confidence][1]++;
+  }
+  const compared = comparisons.length;
+  return { compared, agreed, rate: compared ? agreed / compared : null, byConfidence };
 }
 
 // ---- the reading check ---------------------------------------------------------
