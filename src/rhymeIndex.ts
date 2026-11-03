@@ -20,7 +20,14 @@ import {
   type RhymeKey,
 } from "./phonology.ts";
 import { normaliseWord } from "./cmudict.ts";
-import { BEFORE_R_MERGES, GLIDING_VOWELS, mergeWeakVowels, RHOTIC, TAP, WEAK_ER } from "./normalise.ts";
+import {
+  BEFORE_R_MERGES,
+  GLIDING_VOWELS,
+  isSyllabicConsonantVariantOf,
+  mergeWeakVowels,
+  RHOTIC,
+  WEAK_ER,
+} from "./normalise.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
 import { respell } from "./respelling.ts";
 import { schwaTwinOf } from "./schwaTwins.ts";
@@ -148,46 +155,13 @@ const VALID_SUBMISSION = /^[a-z]+$/;
 const byMemberWord = (a: FamilyMember, b: FamilyMember) => a.word.localeCompare(b.word);
 
 /**
- * True if `candidate` is exactly `earlier` with its final unstressed schwa
- * dropped and the sonorant that followed it left to carry the syllable alone —
- * the shape `src/normalise.ts`'s `syllabic-consonant` rule appends (`gruel`'s
- * `G R UW1 AH0 L` gains `G R UW1 L`). Recognised by shape, not tracked with a
- * second piece of data: the rule only ever *appends*, so a generated reading is
- * always a later entry in the word's own list, and it is always exactly this
- * transform (or `isStressPromotionVariantOf`, below) of an earlier one (#75).
- *
- * Deliberately looser than the rule it recognises: it does not re-check that
- * the sonorant is one the rule would have acted on, or the vowel-before-the-
- * schwa restrictions that decide whether the rule *fires*. Those restrictions
- * only ever narrow which readings get a variant generated in the first place;
- * skipping them here can only make this function say "generated" about a
- * reading that is, in fact, base — refusing a pin the data would have allowed,
- * never permitting one it would have refused. Pinning fails safe.
- */
-function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
-  if (candidate.length !== earlier.length - 1) return false;
-  const schwa = earlier.at(-2);
-  const sonorant = earlier.at(-1);
-  if (schwa === undefined || sonorant === undefined) return false;
-  if (bareSound(schwa) !== "AH" || stressOf(schwa) !== 0) return false;
-  if (candidate.at(-1) !== sonorant) return false;
-  // The `tap` rule, which runs after this one, reads a t before the schwa as d
-  // in the full reading and leaves the variant's t, with no vowel after it, as
-  // written (`metal`'s `M EH1 D AH0 L` beside `M EH1 T L`; #262).
-  const consonant = candidate.length - 2;
-  return candidate
-    .slice(0, -1)
-    .every((phoneme, i) => phoneme === earlier[i] || (i === consonant && phoneme === "T" && earlier[i] === TAP));
-}
-
-/**
  * True if `candidate` is exactly `earlier` with one unstressed vowel promoted
  * to secondary stress and nothing else changed — the shape `src/normalise.ts`'s
  * `stress-promotion` rule appends (`module`'s `M AA1 JH UW0 L` gains
  * `M AA1 JH UW2 L`). A promoted vowel before `r` may also be respelled by the
  * `vowel-before-r` rule (`graybeard`'s `IY0 R D` gains `IH2 R D`). See
- * `isSyllabicConsonantVariantOf` for why shape, not a schema field, is what
- * pinning reads.
+ * `isSyllabicConsonantVariantOf` in src/normalise.ts for why shape, not a
+ * schema field, is what pinning reads.
  */
 function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   if (candidate.length !== earlier.length) return false;
@@ -218,7 +192,7 @@ function isStressPromotionVariantOf(candidate: Pronunciation, earlier: Pronuncia
  * an `AY`, `AW` or `OY` read as plain `R`, or that `R` read as `ER0`, and
  * nothing else changed: the shape `src/normalise.ts`'s `glide-r` rule appends
  * (`power`'s `P AW1 ER0` gains `P AW1 R`). Looser than the rule, like the
- * syllabic check above: a word the dictionary writes both ways (`fire`) has
+ * syllabic check: a word the dictionary writes both ways (`fire`) has
  * its second reading taken for generated, which refuses a pin the data would
  * have allowed and never permits one it would have refused.
  */
@@ -236,7 +210,7 @@ function isGlideRVariantOf(candidate: Pronunciation, earlier: Pronunciation): bo
 /**
  * True if `candidate` is a generated variant of `earlier` — a reading
  * normalisation appended alongside it, rather than one the pinned data ever
- * transcribed. The three shapes above are the whole of the frozen rule set that
+ * transcribed. These three shapes are the whole of the frozen rule set that
  * appends (ADR-0011); the rules that replace (the cot-caught merger, the weak-
  * vowel merge, the tap, the vowel before `r`) never grow a word's reading count,
  * so they need no shape here, only an allowance in a shape above where one runs

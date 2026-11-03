@@ -239,9 +239,10 @@ const LIQUIDS = new Set(["L", "R"]);
  * gain one of just eight partners, and seven of the eight carry a stress mark
  * that a sibling word in the same index contradicts: `coarticulation` is
  * marked `EY0` where `articulation` has `EY1`, and 872 of the 1,038 reach it.
- * The drop does not produce those rhymes. It manufactures a coda, stress
- * promotion fires on that coda (#86), and the promoted reading carries the
- * key. ADR-0018 deduces that correcting the stress in `data/supplement.dict`
+ * The drop does not produce those rhymes. It manufactured a coda, stress
+ * promotion fired on that coda (#86), and the promoted reading carried the
+ * key. Promotion no longer reads this rule's readings (#290), so these figures
+ * describe the rule as it was measured, not as it now composes. ADR-0018 deduces that correcting the stress in `data/supplement.dict`
  * would give the same verdicts without either rule, which is why reach here is
  * measured **net** of what a per-word correction produces anyway. Net, this
  * rule's population is 33 words, and the two limits above were tuned against
@@ -299,6 +300,41 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
 }
 
 /**
+ * True if `candidate` is exactly `earlier` with its final unstressed schwa
+ * dropped and the sonorant that followed it left to carry the syllable alone —
+ * the shape the `syllabic-consonant` rule above appends (`gruel`'s
+ * `G R UW1 AH0 L` gains `G R UW1 L`). Recognised by shape, not tracked with a
+ * second piece of data: the rule only ever *appends*, so a generated reading is
+ * always a later entry in the word's own list, and it is always exactly this
+ * transform (or `isStressPromotionVariantOf` in src/rhymeIndex.ts) of an
+ * earlier one (#75). Pinning reads it, and so does stress promotion, which
+ * judges a variant by the reading it was made from (#290).
+ *
+ * Deliberately looser than the rule it recognises: it does not re-check that
+ * the sonorant is one the rule would have acted on, or the vowel-before-the-
+ * schwa restrictions that decide whether the rule *fires*. Those restrictions
+ * only ever narrow which readings get a variant generated in the first place;
+ * skipping them here can only make this function say "generated" about a
+ * reading that is, in fact, base — refusing a pin the data would have allowed,
+ * never permitting one it would have refused. Pinning fails safe.
+ */
+export function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+  if (candidate.length !== earlier.length - 1) return false;
+  const schwa = earlier.at(-2);
+  const sonorant = earlier.at(-1);
+  if (schwa === undefined || sonorant === undefined) return false;
+  if (bareSound(schwa) !== SCHWA || stressOf(schwa) !== 0) return false;
+  if (candidate.at(-1) !== sonorant) return false;
+  // The `tap` rule, which runs after this one, reads a t before the schwa as d
+  // in the full reading and leaves the variant's t, with no vowel after it, as
+  // written (`metal`'s `M EH1 D AH0 L` beside `M EH1 T L`; #262).
+  const consonant = candidate.length - 2;
+  return candidate
+    .slice(0, -1)
+    .every((phoneme, i) => phoneme === earlier[i] || (i === consonant && phoneme === "T" && earlier[i] === TAP));
+}
+
+/**
  * The three vowels CMUdict uses for a *reduction*. Consulted only on a vowel the
  * data already marks unstressed, where each one is by definition the reduced
  * article: `AH0` is the schwa, `IH0` the reduced high front vowel, `ER0` the
@@ -324,8 +360,8 @@ function isLoneInflectionalCoda(coda: Pronunciation): boolean {
  * that vowel marked *secondary* stress. `module` is `M AA1 JH UW0 L` in the data
  * and "MODJ-ool" out of every mouth; the contrast the game was rejecting it over
  * is a stress digit on a vowel it agrees is the same vowel — `UW0` against `UW2`
- * — and no listener can hear that. So `module`, `nodule`, `schedule` and
- * `ritual` were all refused for a Seed Word on `UW L`.
+ * — and no listener can hear that. So `module`, `nodule` and `schedule` were
+ * all refused for a Seed Word on `UW L`.
  *
  * This is the same claim ADR-0001 already rests on. `impregnate` rhymes with
  * `ate` on `EY2`, its secondary stress; `candidate` is `K AE1 N D AH0 D EY0 T`,
@@ -335,6 +371,21 @@ function isLoneInflectionalCoda(coda: Pronunciation): boolean {
  * Like the syllabic consonant this **appends**, and that is the whole of its
  * safety argument: the base reading survives, first and untouched, so no
  * Submission the game used to accept is refused now.
+ *
+ * The rule judges the reading the source wrote, not one the syllabic consonant
+ * rule made. That rule runs first and drops a schwa, and the vowel before the
+ * schwa is then last: `manual` is `M AE1 N Y UW0 AH0 L`, the syllabic reading
+ * `M AE1 N Y UW0 L`, and promoting that made `manual` a Rhyme for `cool`. In
+ * the reading the source wrote, that vowel was never in a closed final
+ * syllable, so promotion skips every reading that
+ * `isSyllabicConsonantVariantOf` finds was made from one before it (#290,
+ * ADR-0011's amendment of 2026-11-02). `module` keeps
+ * `UW L` because its source reading ends `UW0 L`, and `cruel` because its
+ * vowel was stressed as written. The skip is wider than the words it was
+ * written for: it also took `clergyman ~ committeeman`, `dutiful` and
+ * `wearisome` off keys only their own shape held (#86). Four real rhymes it
+ * cost (`subsection`, `rectangle`, `bifocal`, `orgasm`) are corrected in
+ * `data/supplement.dict` instead, by the light stress they carry.
  *
  * Three limits keep the claim honest. The first two are the substance of the
  * rule; the third was measured. Every figure below is over the playable lexicon
@@ -395,26 +446,22 @@ function isLoneInflectionalCoda(coda: Pronunciation): boolean {
  * enforced: no word in that lexicon gains its *first* Rhyme Key, because a
  * reading with no stressed vowel at all is a function word whose final vowel is a
  * schwa. The rule carries no guard for it, so a future reading could.
+ * These figures predate the skip above, which took 71 words off a family on 19
+ * keys (36 of them `-ual` words leaving `cool`; #290), and are not re-measured.
  * The bulk of the gain is `-ate` verbs and nouns joining `ate` (+61, `candidate`,
- * `phosphate`, `template`, `vibrate`), `-ule`/`-ual` joining `cool` (+42,
- * `module`, `schedule`, `ritual`), `-on` joining `on` (+35, `python`,
+ * `phosphate`, `template`, `vibrate`), `-ule` joining `cool` (`module`,
+ * `schedule`; +42 before the skip took the `-ual` words), `-on` joining `on` (+35, `python`,
  * `decathlon`), `-man`/`-men` compounds joining `man` and `men` (+27,
  * `frenchman`, `craftsmen`), and a long tail of compounds the data under-marked:
  * `mushroom ~ room`, `earpiece ~ peace`, `zigzag ~ bag`, `metaphor ~ four`,
  * `provolone ~ bone`, `morphine ~ green`, `termite ~ bite`, `vortex ~ flex`.
  *
- * Two groups are stated rather than hidden, because a reviewer should be able to
- * challenge them:
- *
- *   - CMUdict transcribes the `-os` plurals with an `S` rather than a `Z`
- *     (`bimbos B IH1 M B OW0 S`), so those escape the coda limit and about 19 of
- *     them join the `dose` family. Blocking a lone `S` too would cost more than
- *     it saves — `earpiece`, `mongoose`, `birdhouse`, `invoice`, `biomass`,
- *     `sucrose`, `duress` — so the data error is left visible.
- *   - Composed with the syllabic consonant, the rule reaches a few `-yman`
- *     compounds (`clergyman`, `ferryman`, `assemblyman`) and small closed sets
- *     like `dutiful ~ undutiful`. Each lands in a key holding only words of its
- *     own shape, so the effect is confined to words that already shared a family.
+ * One group is stated rather than hidden, because a reviewer should be able to
+ * challenge it: CMUdict transcribes the `-os` plurals with an `S` rather than a
+ * `Z` (`bimbos B IH1 M B OW0 S`), so those escape the coda limit and about 19 of
+ * them join the `dose` family. Blocking a lone `S` too would cost more than it
+ * saves — `earpiece`, `mongoose`, `birdhouse`, `invoice`, `biomass`,
+ * `sucrose`, `duress` — so the data error is left visible.
  *
  * Appending is monotone for *adjudication* and only for adjudication. Each of
  * those 729 words now carries two Rhyme Keys, so it reads as ambiguous:
@@ -427,8 +474,24 @@ function isLoneInflectionalCoda(coda: Pronunciation): boolean {
  */
 const stressPromotion: NormalisationRule = {
   name: "stress-promotion",
-  apply: (readings) => [...readings, ...readings.flatMap(promotedVariantsOf)],
+  apply: (readings) => [
+    ...readings,
+    ...readings.flatMap((reading, i) =>
+      exposedBySyllabicConsonant(reading, readings.slice(0, i)) ? [] : promotedVariantsOf(reading),
+    ),
+  ],
 };
+
+/**
+ * True if `reading` is the syllabic consonant rule's variant of one of the
+ * readings before it, and so has a last vowel that rule exposed. In the reading
+ * the variant was made from, that vowel was not last: the schwa came after it.
+ * So its syllable was never a closed final one, and the reading it came from is
+ * the one stress promotion judges (#290).
+ */
+function exposedBySyllabicConsonant(reading: Pronunciation, earlier: readonly Pronunciation[]): boolean {
+  return earlier.some((source) => isSyllabicConsonantVariantOf(reading, source));
+}
 
 /** The promoted reading of one reading, or none if its final vowel is not eligible. */
 function promotedVariantsOf(reading: Pronunciation): Pronunciation[] {
