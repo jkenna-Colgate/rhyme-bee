@@ -46,8 +46,10 @@
 
 import type { UndecidedRhyme, UntieredWord } from "./batch.ts";
 import type { DemotionReason } from "./demotions.ts";
-import { phonemesOf, readingsReachKey, type Confidence, type RhymeRuling, type TierAnswer, type TierRuling, type WordhoodRuling } from "./judge.ts";
-import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
+import {
+  phonemesOf, readingReachesKey, readingsReachKey, type Confidence, type RhymeRuling, type TierAnswer, type TierRuling, type WordhoodRuling,
+} from "./judge.ts";
+import { isVowelSound, rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
 
 // ---- the hunt ------------------------------------------------------------------
 
@@ -288,6 +290,26 @@ const KNEW: Record<UndecidedRhyme["knew"], (key: RhymeKey) => string> = {
 };
 
 /**
+ * A reading confirming may write for this rhyme: one that reaches its Rhyme Key
+ * once Normalisation has read it (directly, by the merger, or by its Schwa
+ * Twin), as the Judge's own reading must to land. Null for one that misses it,
+ * since writing it would leave the word no Rhyme on the key it was confirmed for.
+ */
+const confirmable = (reading: Pronunciation | null, key: RhymeKey): Pronunciation | null =>
+  reading && readingReachesKey(reading.join(" "), key) ? [...reading] : null;
+
+/** A reading whose Rhyme Key is `key`: the key said as a word, its first vowel stressed. */
+const keyAsReading = (key: RhymeKey): string => {
+  let stressed = false;
+  return key.split(" ").map((sound) => {
+    if (!isVowelSound(sound)) return sound;
+    const mark = stressed ? "0" : "1";
+    stressed = true;
+    return sound + mark;
+  }).join(" ");
+};
+
+/**
  * What the maintainer is shown for a rhyme the Judge left undecided (#293): what
  * the Judge ruled and what the game knew, the Judge's reading and reasoning, then
  * that an answer is awaited and one command a line with its effect. Confirming
@@ -296,7 +318,8 @@ const KNEW: Record<UndecidedRhyme["knew"], (key: RhymeKey) => string> = {
  * never declines here. Every command it names is one `parseUndecided` reads.
  */
 export function undecidedPrompt(rhyme: UndecidedRhyme): string[] {
-  const { word, rhymeKey: key, reading } = rhyme;
+  const { word, rhymeKey: key } = rhyme;
+  const reading = confirmable(rhyme.reading, key);
   const heard = rhyme.heard ?? "none given";
   return [
     `The Judge ruled it a Rhyme at ${rhyme.confidence} confidence, and nothing landed: ${KNEW[rhyme.knew](key)}.`,
@@ -308,7 +331,7 @@ export function undecidedPrompt(rhyme: UndecidedRhyme): string[] {
           commandLine("y", `confirm it: ${reading.join(" ")} is written beside the word's readings, so it rhymes on /${key}/ from then on`),
           commandLine("y <ARPAbet>", `confirm it with a reading you type instead, e.g. y ${reading.join(" ")} (written beside the word's readings)`),
         ]
-      : [commandLine("y <ARPAbet>", "confirm it with a reading you type, e.g. y K AE1 T (written beside the word's readings)")]),
+      : [commandLine("y <ARPAbet>", `confirm it with a reading you type, e.g. y ${keyAsReading(key)} (written beside the word's readings)`)]),
     commandLine("n", `decline it: a Decline is recorded for ${word} on /${key}/, so it is not raised again`),
     commandLine("s", "skip it: nothing is written, and the run report lists it"),
   ];
@@ -317,14 +340,15 @@ export function undecidedPrompt(rhyme: UndecidedRhyme): string[] {
 /**
  * A ruling on an undecided rhyme as the maintainer types it: `y` to confirm the
  * Judge's reading, `y <ARPAbet>` to confirm one typed; `n` to decline; `s` to
- * skip. Null when it does not read, so the caller asks again and writes nothing.
+ * skip. Either reading must reach the Rhyme Key. Null when it does not read, or
+ * the reading misses the key, so the caller asks again and writes nothing.
  */
 export function parseUndecided(input: string, rhyme: UndecidedRhyme): Decision | null {
   const [command, ...rest] = input.trim().split(/\s+/);
   switch (command?.toLowerCase()) {
     case "y": {
-      const reading = rest.length ? phonemesOf(rest.join(" ")) : rhyme.reading;
-      return reading ? { kind: "confirm", reading: [...reading] } : null;
+      const reading = confirmable(rest.length ? phonemesOf(rest.join(" ")) : rhyme.reading, rhyme.rhymeKey);
+      return reading ? { kind: "confirm", reading } : null;
     }
     case "n":
       return rest.length ? null : { kind: "decline" };

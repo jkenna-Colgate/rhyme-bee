@@ -264,13 +264,30 @@ describe("asking the maintainer about a rhyme the Judge left undecided", () => {
       "  The Judge's reading: B AA1 R B AH0 R, which misses /AA R/, so confirming needs a reading typed",
     ]);
     expect(prompt.some((line) => /^ {2}y {2,}/.test(line))).toBe(false);
-    expect(prompt).toContain("  y <ARPAbet>          confirm it with a reading you type, e.g. y K AE1 T (written beside the word's readings)");
+    // The example is the Rhyme Key itself said as a word, so it reads as one the key would take.
+    expect(prompt).toContain("  y <ARPAbet>          confirm it with a reading you type, e.g. y AA1 R (written beside the word's readings)");
   });
 
   it("reads confirming as the Judge's reading, or as one typed in ARPAbet", () => {
     expect(parseUndecided("y", house)).toEqual({ kind: "confirm", reading: r("HH AW1 Z") });
     expect(parseUndecided("Y hh aw1 z", house)).toEqual({ kind: "confirm", reading: r("HH AW1 Z") });
     expect(parseUndecided("y B AA1 R B AA2 R", barbar)).toEqual({ kind: "confirm", reading: r("B AA1 R B AA2 R") });
+  });
+
+  it("refuses a typed reading that misses the Rhyme Key, so it asks again and writes nothing", () => {
+    expect(parseUndecided("y K AE1 T", house)).toBeNull();
+    expect(parseUndecided("y B AA1 R B AH0 R", barbar)).toBeNull();
+  });
+
+  it("reads a typed reading as Normalisation will, so the caught vowel confirms on the merged key", () => {
+    const doll: UndecidedRhyme = { ...barbar, word: "gall", seedWord: "doll", rhymeKey: "AA L", heard: null };
+    expect(parseUndecided("y G AO1 L", doll)).toEqual({ kind: "confirm", reading: r("G AO1 L") });
+  });
+
+  it("neither offers nor confirms a Judge's reading that misses the Rhyme Key, however it came to be held", () => {
+    const astray: UndecidedRhyme = { ...house, reading: r("HH AW1 S") };
+    expect(parseUndecided("y", astray)).toBeNull();
+    expect(undecidedPrompt(astray).some((line) => /^ {2}y {2,}/.test(line))).toBe(false);
   });
 
   it("reads declining, and skipping it unruled", () => {
