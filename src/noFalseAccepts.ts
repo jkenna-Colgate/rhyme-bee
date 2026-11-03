@@ -118,11 +118,14 @@ export function rulingList(rulings: readonly HuntRuling[]): ListedAnswer[] {
 // ---- the maintainer's ruling ---------------------------------------------------
 
 /**
- * A reading the maintainer is shown when ruling on a word, numbered by its place
- * in the list: one the game holds (`game`), one Normalisation appended to a
- * reading the game holds (`normalisation`), or one Wiktionary has and the game
- * does not, offered as an addition (`wiktionary`). Wiktionary's are ARPAbet
- * before Normalisation, which the build applies to whatever is written.
+ * A reading the maintainer is shown when ruling on a word: one the game holds
+ * (`game`), one Normalisation appended to a reading the game holds
+ * (`normalisation`), or one Wiktionary has and the game does not, offered as an
+ * addition (`wiktionary`). Wiktionary's are ARPAbet before Normalisation, which
+ * the build applies to whatever is written. Every one but an appended reading is
+ * numbered, by its place among those: an appended reading comes back by itself
+ * while a reading it was made from is kept, so writing it as a source line would
+ * only put a reading the build makes into the supplement.
  */
 export interface ShownReading {
   reading: Pronunciation;
@@ -130,9 +133,9 @@ export interface ShownReading {
 }
 
 /**
- * The readings to show for a word, numbered in this order: the game's current
- * readings as the index holds them (`RhymeIndex.readingsOf`), then each of
- * Wiktionary's the game lacks, once (#292).
+ * The readings to show for a word, in this order: the game's current readings
+ * as the index holds them (`RhymeIndex.readingsOf`), then each of Wiktionary's
+ * the game lacks, once (#292).
  */
 export function shownReadings(
   game: readonly { pronunciation: Pronunciation; generated: boolean }[],
@@ -191,15 +194,23 @@ export type RulingItem =
 /** One command a line: what is typed, padded, then its effect. */
 const commandLine = (typed: string, effect: string): string => `  ${typed.padEnd(20)} ${effect}`;
 
-const APPENDED_NOTE = "  (appended by Normalisation: it comes back while a reading it was made from is kept)";
+const APPENDED_NOTE = "  (appended by Normalisation, so not numbered: it comes back by itself while a reading it was made from is kept)";
+
+/** The readings that can be kept or corrected to, in the order shown: `numbered[n - 1]` is number n. */
+const numberedOf = (shown: readonly ShownReading[]): ShownReading[] => shown.filter((s) => s.from !== "normalisation");
 
 /**
- * What the maintainer is shown when a ruling is wanted: the readings, numbered
- * under who holds them, then that an answer is awaited and one command a line
- * with its effect. Every command it names is one `parseDecision` reads.
+ * What the maintainer is shown when a ruling is wanted: the readings under who
+ * holds them, numbered but for those Normalisation appended, then that an answer
+ * is awaited and one command a line with its effect. Every command it names is
+ * one `parseDecision` reads.
  */
 export function rulingPrompt(shown: readonly ShownReading[]): string[] {
-  const lines = shown.map((s, n) => ({ from: s.from, text: `  ${n + 1}. ${s.reading.join(" ")}${s.from === "normalisation" ? APPENDED_NOTE : ""}` }));
+  const numbered = numberedOf(shown);
+  const lines = shown.map((s) => ({
+    from: s.from,
+    text: s.from === "normalisation" ? `     ${s.reading.join(" ")}${APPENDED_NOTE}` : `  ${numbered.indexOf(s) + 1}. ${s.reading.join(" ")}`,
+  }));
   const game = lines.filter((l) => l.from !== "wiktionary").map((l) => l.text);
   const wiktionary = lines.filter((l) => l.from === "wiktionary").map((l) => l.text);
   const readings = !shown.length
@@ -211,9 +222,9 @@ export function rulingPrompt(shown: readonly ShownReading[]): string[] {
   return [
     ...readings,
     "Waiting for your ruling on this word. Type one of these and press Enter:",
-    ...(shown.length
+    ...(numbered.length
       ? [
-          commandLine("k <n> <n> ...", "keep only the readings numbered, e.g. k 1 3 (every other reading goes)"),
+          commandLine("k <n> <n> ...", `keep only the readings numbered, e.g. k ${numbered.length > 1 ? "1 2" : "1"} (every other reading goes)`),
           commandLine("k <n> ... <ARPAbet>", "keep those and add one you type, e.g. k 1 K AE1 T"),
           commandLine("c <n>", "correct the reading to number <n> alone, e.g. c 1 (it replaces every reading)"),
         ]
@@ -228,7 +239,7 @@ export function rulingPrompt(shown: readonly ShownReading[]): string[] {
 
 /** The reading numbered `n` in the list shown, or null when there is none. */
 function numberedReading(shown: readonly ShownReading[], n: string): Pronunciation | null {
-  const reading = /^\d+$/.test(n) ? shown[Number(n) - 1]?.reading : undefined;
+  const reading = /^\d+$/.test(n) ? numberedOf(shown)[Number(n) - 1]?.reading : undefined;
   return reading ? [...reading] : null;
 }
 
@@ -241,7 +252,8 @@ function keepOf(args: readonly string[], shown: readonly ShownReading[]): Decisi
   const firstTyped = args.findIndex((a) => !/^\d+$/.test(a));
   const numbers = firstTyped === -1 ? args : args.slice(0, firstTyped);
   if (!numbers.length || numbers.some((n) => !numberedReading(shown, n))) return null;
-  const readings = [...new Set(numbers.map(Number))].sort((a, b) => a - b).map((n) => [...shown[n - 1]!.reading]);
+  const numbered = numberedOf(shown);
+  const readings = [...new Set(numbers.map(Number))].sort((a, b) => a - b).map((n) => [...numbered[n - 1]!.reading]);
   if (firstTyped !== -1) {
     const typed = phonemesOf(args.slice(firstTyped).join(" "));
     if (!typed) return null;

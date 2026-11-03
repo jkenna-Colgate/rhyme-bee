@@ -111,7 +111,7 @@ describe("the ruling list", () => {
 });
 
 describe("the readings shown for a ruling", () => {
-  it("numbers the game's readings first, marking those Normalisation appended, then Wiktionary's the game lacks", () => {
+  it("lists the game's readings first, marking those Normalisation appended, then Wiktionary's the game lacks", () => {
     const game = [
       { pronunciation: r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L"), generated: false },
       { pronunciation: r("IH0 N V AY2 R AH0 N M EH1 N AH0 L"), generated: false },
@@ -168,6 +168,18 @@ describe("reading the maintainer's ruling", () => {
     expect(parseDecision("", shown)).toBeNull();
   });
 
+  it("numbers no reading Normalisation appended, so none can be kept or corrected to", () => {
+    const appended = shownReadings(
+      [{ pronunciation: r("CH AA1 K L AH0 T"), generated: false }, { pronunciation: r("CH AA1 K L T"), generated: true }],
+      [r("CH AO1 K L AH0 T")],
+    );
+    // 2 is Wiktionary's, the appended reading having no number.
+    expect(parseDecision("k 1 2", appended)).toEqual({ kind: "keep", readings: [r("CH AA1 K L AH0 T"), r("CH AO1 K L AH0 T")] });
+    expect(parseDecision("c 2", appended)).toEqual({ kind: "correction", reading: r("CH AO1 K L AH0 T") });
+    expect(parseDecision("k 3", appended)).toBeNull();
+    expect(parseDecision("c 3", appended)).toBeNull();
+  });
+
   it("reads nothing from a keep that names no reading shown, or adds one that is not ARPAbet", () => {
     expect(parseDecision("k", shown)).toBeNull();
     expect(parseDecision("k 0", shown)).toBeNull();
@@ -189,11 +201,11 @@ describe("asking the maintainer for a ruling", () => {
     expect(rulingPrompt(shown)).toEqual([
       "The game's readings of this word (ARPAbet):",
       "  1. CH AA1 K L AH0 T",
-      "  2. CH AA1 K L T  (appended by Normalisation: it comes back while a reading it was made from is kept)",
+      "     CH AA1 K L T  (appended by Normalisation, so not numbered: it comes back by itself while a reading it was made from is kept)",
       "Wiktionary's readings the game lacks, which you can add:",
-      "  3. CH AO1 K L AH0 T",
+      "  2. CH AO1 K L AH0 T",
       "Waiting for your ruling on this word. Type one of these and press Enter:",
-      "  k <n> <n> ...        keep only the readings numbered, e.g. k 1 3 (every other reading goes)",
+      "  k <n> <n> ...        keep only the readings numbered, e.g. k 1 2 (every other reading goes)",
       "  k <n> ... <ARPAbet>  keep those and add one you type, e.g. k 1 K AE1 T",
       "  c <n>                correct the reading to number <n> alone, e.g. c 1 (it replaces every reading)",
       "  c <ARPAbet>          correct the reading to one you type, e.g. c K AE1 T (it replaces every reading)",
