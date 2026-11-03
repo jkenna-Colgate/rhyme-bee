@@ -242,9 +242,10 @@ const LIQUIDS = new Set(["L", "R"]);
  * The drop does not produce those rhymes. It manufactured a coda, stress
  * promotion fired on that coda (#86), and the promoted reading carried the
  * key. Promotion no longer reads this rule's readings (#290), so these figures
- * describe the rule as it was measured, not as it now composes. ADR-0018 deduces that correcting the stress in `data/supplement.dict`
- * would give the same verdicts without either rule, which is why reach here is
- * measured **net** of what a per-word correction produces anyway. Net, this
+ * describe the rule as it was measured, not as it now composes. ADR-0018
+ * deduces that correcting the stress in `data/supplement.dict` would give the
+ * same verdicts without either rule, which is why reach here is measured
+ * **net** of what a per-word correction produces anyway. Net, this
  * rule's population is 33 words, and the two limits above were tuned against
  * the gross figure, so they stand provisional (ADR-0018).
  *
@@ -261,7 +262,7 @@ const LIQUIDS = new Set(["L", "R"]);
  * `UW` still absorbs at secondary stress, so `spiritual`, `contextual`,
  * `textual` and `unusual`, which the source marks `UW2`, kept a reading on
  * `UW L` and rhymed with `cool`. Cutting them here means cutting `cruel` and
- * `duel` with them — the complaint this rule was built for — because a Rhyme
+ * `duel` with them (the complaint this rule was built for), because a Rhyme
  * Key strips stress digits, so `schwaTwins.ts` cannot tell the two apart and
  * no stress-based limit is expressible on both sides of the rule (#209). The
  * maintainer ruled on 2026-11-03 that an "oo" before "-al" rhymes on `UW L`
@@ -305,7 +306,7 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
 
 /**
  * True if `candidate` is exactly `earlier` with its final unstressed schwa
- * dropped and the sonorant that followed it left to carry the syllable alone —
+ * dropped and the sonorant that followed it left to carry the syllable alone:
  * the shape the `syllabic-consonant` rule above appends (`gruel`'s
  * `G R UW1 AH0 L` gains `G R UW1 L`). Recognised by shape, not tracked with a
  * second piece of data: the rule only ever *appends*, so a generated reading is
@@ -319,7 +320,7 @@ function syllabicVariantsOf(reading: Pronunciation): Pronunciation[] {
  * schwa restrictions that decide whether the rule *fires*. Those restrictions
  * only ever narrow which readings get a variant generated in the first place;
  * skipping them here can only make this function say "generated" about a
- * reading that is, in fact, base — refusing a pin the data would have allowed,
+ * reading that is, in fact, base, refusing a pin the data would have allowed,
  * never permitting one it would have refused. Pinning fails safe.
  */
 export function isSyllabicConsonantVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
@@ -363,8 +364,8 @@ function isLoneInflectionalCoda(coda: Pronunciation): boolean {
  * vowel, and is followed by at least one consonant gains a second reading with
  * that vowel marked *secondary* stress. `module` is `M AA1 JH UW0 L` in the data
  * and "MODJ-ool" out of every mouth; the contrast the game was rejecting it over
- * is a stress digit on a vowel it agrees is the same vowel — `UW0` against `UW2`
- * — and no listener can hear that. So `module`, `nodule` and `schedule` were
+ * is a stress digit on a vowel it agrees is the same vowel (`UW0` against
+ * `UW2`), and no listener can hear that. So `module`, `nodule` and `schedule` were
  * all refused for a Seed Word on `UW L`.
  *
  * This is the same claim ADR-0001 already rests on. `impregnate` rhymes with
@@ -454,18 +455,19 @@ function isLoneInflectionalCoda(coda: Pronunciation): boolean {
  * keys (36 of them `-ual` words leaving `cool`; #290), and are not re-measured.
  * The bulk of the gain is `-ate` verbs and nouns joining `ate` (+61, `candidate`,
  * `phosphate`, `template`, `vibrate`), `-ule` joining `cool` (`module`,
- * `schedule`; +42 before the skip took the `-ual` words), `-on` joining `on` (+35, `python`,
- * `decathlon`), `-man`/`-men` compounds joining `man` and `men` (+27,
- * `frenchman`, `craftsmen`), and a long tail of compounds the data under-marked:
- * `mushroom ~ room`, `earpiece ~ peace`, `zigzag ~ bag`, `metaphor ~ four`,
- * `provolone ~ bone`, `morphine ~ green`, `termite ~ bite`, `vortex ~ flex`.
+ * `schedule`; +42 before the skip took the `-ual` words), `-on` joining `on`
+ * (+35, `python`, `decathlon`), `-man`/`-men` compounds joining `man` and
+ * `men` (+27, `frenchman`, `craftsmen`), and a long tail of compounds the data
+ * under-marked: `mushroom ~ room`, `earpiece ~ peace`, `zigzag ~ bag`,
+ * `metaphor ~ four`, `provolone ~ bone`, `morphine ~ green`, `termite ~ bite`,
+ * `vortex ~ flex`.
  *
  * One group is stated rather than hidden, because a reviewer should be able to
  * challenge it: CMUdict transcribes the `-os` plurals with an `S` rather than a
  * `Z` (`bimbos B IH1 M B OW0 S`), so those escape the coda limit and about 19 of
  * them join the `dose` family. Blocking a lone `S` too would cost more than it
- * saves — `earpiece`, `mongoose`, `birdhouse`, `invoice`, `biomass`,
- * `sucrose`, `duress` — so the data error is left visible.
+ * saves (`earpiece`, `mongoose`, `birdhouse`, `invoice`, `biomass`,
+ * `sucrose`, `duress`), so the data error is left visible.
  *
  * Appending is monotone for *adjudication* and only for adjudication. Each of
  * those 729 words now carries two Rhyme Keys, so it reads as ambiguous:

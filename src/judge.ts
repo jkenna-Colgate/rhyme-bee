@@ -171,30 +171,111 @@ export function wordhoodPrompt(words: readonly string[]): string {
 
 export type WordhoodVerdict = "word" | "name" | "not-a-word" | "no-ruling";
 
-export interface WordhoodRuling {
+export type WordhoodRuling = WordRuling<Exclude<WordhoodVerdict, "no-ruling">>;
+
+/** A ruling on one word of a list, with one of `V` as its verdict or no ruling. */
+interface WordRuling<V extends string> {
   word: string;
-  verdict: WordhoodVerdict;
+  verdict: V | "no-ruling";
   confidence: Confidence;
   why: string;
 }
 
-/** One ruling per word asked about. A ruling written against another word is no ruling on this one. */
-export function parseWordhoodReply(raw: string, words: readonly string[]): WordhoodRuling[] {
+/**
+ * One ruling per word asked about, from a reply of one object per word in the
+ * order asked, each with one of `verdicts`. A ruling written against another
+ * word is no ruling on this one, and neither is a verdict not asked for.
+ */
+function parseWordReply<V extends string>(raw: string, words: readonly string[], verdicts: readonly V[]): WordRuling<V>[] {
   const got = lastArray(raw);
   return words.map((word, i) => {
     const o = got[i];
     const verdict = field(o, "verdict");
-    if (field(o, "word") !== word || (verdict !== "word" && verdict !== "name" && verdict !== "not-a-word")) {
+    if (field(o, "word") !== word || !verdicts.includes(verdict as V)) {
       return { word, verdict: "no-ruling", confidence: "low", why: "unparseable reply" };
     }
     const confidence = field(o, "confidence");
     return {
       word,
-      verdict,
+      verdict: verdict as V,
       confidence: CONFIDENCES.has(confidence as string) ? (confidence as Confidence) : "low",
       why: text(field(o, "why")),
     };
   });
+}
+
+/** One ruling per word asked about. A ruling written against another word is no ruling on this one. */
+export function parseWordhoodReply(raw: string, words: readonly string[]): WordhoodRuling[] {
+  return parseWordReply(raw, words, ["word", "name", "not-a-word"]);
+}
+
+// ---- the Tier question ---------------------------------------------------------
+
+/**
+ * Asked only of a word a Batch wrote in that has no knownness (#295; ADR-0021,
+ * 2026-11-02 amendment), and never landing by itself: its answer is only the
+ * maintainer's default on the ruling list. It asks about Retrieval, whether a
+ * player would produce the word, because a model asked whether a word is known
+ * answers recognition and over-promotes transparent compounds (ADR-0015).
+ */
+const TIER_QUESTION = `You are helping Tier words for Rhyming Bee, a daily word game. The player is given a Seed Word and types as many words that rhyme with it as they can think of. A word that rhymes scores as an Answer when an ordinary player could be expected to come up with it, and is a Bonus Word, accepted without scoring, when almost nobody would. Each word below rhymes with the Seed Word it is listed with, and is a word, so do not rule on either. Rule on one thing: would an ordinary player think of this word, unprompted, when hunting rhymes for that Seed Word?
+
+That is a question about producing the word, not recognising it. Many words are understood at a glance when shown and are almost never thought of when hunting: a transparent compound or prefixed form such as "unignited" is easy to decode and few players would produce it. Do not rule a word an Answer because it is easy to understand.
+
+Rule each word as exactly one of:
+- "answer": an ordinary player hunting rhymes for the Seed Word would think of it.
+- "bonus": an ordinary player would not think of it, though they might know it when shown.
+
+Reply with only a JSON array, one object per word in the order given:
+[{"word": "...", "verdict": "answer" | "bonus", "confidence": "high" | "medium" | "low", "why": "one short sentence"}]`;
+
+/** How many words one Tier call carries, as the wordhood question does. */
+export const TIER_BATCH = 20;
+
+/** The Tier question, then each word against the Seed Word it was written in for. */
+export function tierQuestionPrompt(pairs: readonly JudgedPair[]): string {
+  return [TIER_QUESTION, "", "Words:", ...pairs.map((p) => `- "${p.word}" for the Seed Word "${p.seedWord}"`)].join("\n");
+}
+
+export type TierAnswer = "answer" | "bonus";
+
+export type TierRuling = WordRuling<TierAnswer>;
+
+/** One ruling per word asked about. A ruling written against another word is no ruling on this one. */
+export function parseTierReply(raw: string, words: readonly string[]): TierRuling[] {
+  return parseWordReply(raw, words, ["answer", "bonus"]);
+}
+
+// ---- the Judge against the maintainer --------------------------------------------
+
+/** Agreed, and compared. */
+export type Agreed = [agreed: number, compared: number];
+
+/**
+ * How the Judge's answers compared with the maintainer's rulings, over the
+ * items both answered: what a run report records, so that a later decision to
+ * let the Judge's answers land alone reads it (#295, #296).
+ */
+export interface Agreement {
+  compared: number;
+  agreed: number;
+  /** `agreed / compared`, or null when nothing was compared. */
+  rate: number | null;
+  /** At each confidence the Judge gave. */
+  byConfidence: Record<Confidence, Agreed>;
+}
+
+/** The agreement over these comparisons: for each, the Judge's confidence and whether it gave the maintainer's ruling. */
+export function agreementOver(comparisons: readonly { confidence: Confidence; agrees: boolean }[]): Agreement {
+  const byConfidence: Record<Confidence, Agreed> = { high: [0, 0], medium: [0, 0], low: [0, 0] };
+  let agreed = 0;
+  for (const { confidence, agrees } of comparisons) {
+    if (agrees) agreed++;
+    byConfidence[confidence][0] += agrees ? 1 : 0;
+    byConfidence[confidence][1]++;
+  }
+  const compared = comparisons.length;
+  return { compared, agreed, rate: compared ? agreed / compared : null, byConfidence };
 }
 
 // ---- the reading check ---------------------------------------------------------

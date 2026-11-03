@@ -647,6 +647,11 @@ export class RhymeIndex {
     return this.#tier(normaliseWord(word));
   }
 
+  /** The Answer line: a knownness at or above it makes an Answer, and below it a Bonus Word. */
+  get knownnessThreshold(): number {
+    return this.#config.knownnessThreshold;
+  }
+
   /**
    * The one definition of family membership: does this word rhyme on the key,
    * and if so, what does it bring? Both traversals go through here, so

@@ -152,6 +152,15 @@ describe("what replace and join write", () => {
     ]);
   });
 
+  it("writes a replace that keeps readings as those it keeps, then the proposal, each once (#292)", () => {
+    expect(readingsToWrite(current, proposed, "replace", [["G", "EY1", "T"], ["G", "IH1", "T"]])).toEqual([
+      ["G", "EY1", "T"],
+      ["G", "IH1", "T"],
+      ["G", "AE1", "T"],
+    ]);
+    expect(readingsToWrite(current, ["G", "EY1", "T"], "replace", [["G", "EY1", "T"]])).toEqual([["G", "EY1", "T"]]);
+  });
+
   it("writes a join's reading once when the engine already holds it", () => {
     expect(readingsToWrite(current, ["G", "EY1", "T"], "join")).toEqual([["G", "EY1", "T"]]);
   });
@@ -232,6 +241,30 @@ describe("a word corrected by join, through a real build", () => {
     expect(replaced.rhymeKeysOf("gate")).toEqual(["AE T"]);
     expect(membersOf(replaced, "hat")).toContain("gate");
     expect(membersOf(replaced, "ate")).not.toContain("gate");
+  });
+});
+
+describe("a replace that keeps several readings, through a real build (#292)", () => {
+  // `environmental` keeps its two readings with the t; the two without go.
+  const kept = makeTestIndex({
+    supplement: correctionLines({
+      word: "environmental",
+      mode: "replace",
+      target: "EH N AH L",
+      readings: [
+        ["IH0", "N", "V", "AY2", "R", "AH0", "N", "M", "EH1", "N", "T", "AH0", "L"],
+        ["EH0", "N", "V", "AY2", "R", "AH0", "N", "M", "EH1", "N", "T", "AH0", "L"],
+      ],
+    }),
+  });
+
+  it("holds exactly the readings kept, and what Normalisation appends to them", () => {
+    expect(kept.readingsOf("environmental").map((r) => `${r.pronunciation.join(" ")}${r.generated ? " (appended)" : ""}`)).toEqual([
+      "IH0 N V AY2 R AH0 N M EH1 N T AH0 L",
+      "EH0 N V AY2 R AH0 N M EH1 N T AH0 L",
+      "IH0 N V AY2 R AH0 N M EH1 N T L (appended)",
+      "EH0 N V AY2 R AH0 N M EH1 N T L (appended)",
+    ]);
   });
 });
 
@@ -508,6 +541,13 @@ describe("applyCorrection", () => {
     const written = readFileSync(supplementPath, "utf8");
     expect(written).toContain("correction approved on a Batch's No False Accepts ruling list");
     expect(written).not.toContain("approved in the Editor's Pass");
+  });
+
+  it("names a rhyme the Judge left undecided, confirmed in a Batch's sitting, as its own approval", async () => {
+    await applyCorrection(joinAsk, { ...deps(""), source: "batch-undecided" });
+    const written = readFileSync(supplementPath, "utf8");
+    expect(written).toContain("correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293)");
+    expect(written).not.toContain("No False Accepts");
   });
 
   it("repairs a supplement whose last newline was trimmed rather than fusing onto it", async () => {

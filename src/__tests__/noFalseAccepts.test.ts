@@ -1,21 +1,24 @@
 /**
  * The No False Accepts half of a Batch (#268), as pure functions: which scored
  * Answers the hunt puts to the Judge, which of the Judge's rulings go on the
- * maintainer's ruling list, how a typed ruling is read, and the gate's verdict
- * once the maintainer has ruled (GLOSSARY.md, Playability Bar; #225, #242).
+ * maintainer's ruling list, and the gate's verdict once the maintainer has
+ * ruled (GLOSSARY.md, Playability Bar; #225, #242). How a typed ruling is read
+ * is tested in `rulingList.test.ts`.
  */
 
 import { describe, expect, it } from "vitest";
 import type { RhymeRuling, WordhoodRuling } from "../judge.ts";
 import {
   huntAnswers,
+  huntListing,
   noFalseAcceptsResult,
-  parseDecision,
   rulingList,
-  rulingPrompt,
+  type AppendedGroup,
   type HuntedAnswer,
+  type HuntReason,
   type HuntRuling,
 } from "../noFalseAccepts.ts";
+import type { MarkedReading } from "../appendedReadings.ts";
 import type { Pronunciation } from "../phonology.ts";
 
 const r = (s: string): Pronunciation => s.split(" ");
@@ -30,9 +33,13 @@ const WIKTIONARY: Record<string, Pronunciation[]> = {
   trial: [r("T R AY1 AH0 L")],
 };
 const NAMES = new Set(["kate", "grace", "chocolate"]);
+/** The game's readings, each marked if Normalisation appended it. */
+const source = (s: string): MarkedReading => ({ pronunciation: r(s), generated: false });
+const appended = (s: string): MarkedReading => ({ pronunciation: r(s), generated: true });
 const facts = {
   wiktionaryReadings: (w: string) => WIKTIONARY[w] ?? [],
   isName: (w: string) => NAMES.has(w),
+  readingsOf: (): MarkedReading[] => [],
 };
 
 describe("which scored Answers the hunt puts to the Judge", () => {
@@ -59,6 +66,40 @@ describe("which scored Answers the hunt puts to the Judge", () => {
 
   it("counts a reading on the key's Schwa Twin as on the key", () => {
     expect(huntAnswers(["trial"], "AY L", facts)).toEqual([]);
+  });
+
+  describe("an Answer only Normalisation puts on the key (#297)", () => {
+    // `event` /EH N T/: stress promotion appends a stressed final syllable to `comment` and `vestment`.
+    const WIKT: Record<string, Pronunciation[]> = { comment: [r("K AA1 M EH2 N T")], vestment: [r("V EH1 S T M AH0 N T")] };
+    const GAME: Record<string, MarkedReading[]> = {
+      vestment: [source("V EH1 S T M AH0 N T"), appended("V EH1 S T M EH2 N T")],
+      comment: [source("K AA1 M EH0 N T"), appended("K AA1 M EH2 N T")],
+      lament: [source("L AH0 M EH1 N T")],
+      // A reading a source transcribed reaches the key beside the appended one.
+      segment: [source("S EH1 G M EH2 N T"), appended("S EH1 G M EH0 N T")],
+    };
+    const onEvent = { ...facts, wiktionaryReadings: (w: string) => WIKT[w] ?? [], readingsOf: (w: string) => GAME[w] ?? [] };
+
+    it("sends it with a reason of its own, beside another key when Wiktionary misses too", () => {
+      expect(huntAnswers(["lament", "vestment"], "EH N T", onEvent)).toEqual([
+        { word: "vestment", reasons: ["another-key", "appended-only"], wiktionaryKeys: ["EH S T M AH N T"] },
+      ]);
+    });
+
+    it("sends it though its Wiktionary readings agree, since they went through the same Normalisation", () => {
+      expect(huntAnswers(["comment"], "EH N T", onEvent)).toEqual([
+        { word: "comment", reasons: ["appended-only"], wiktionaryKeys: ["EH N T"] },
+      ]);
+    });
+
+    it("does not send for this reason an Answer a source reading also puts on the key", () => {
+      expect(huntAnswers(["segment"], "EH N T", onEvent)).toEqual([]);
+    });
+
+    it("counts the key's Schwa Twin as the key, as the other reason does", () => {
+      const onFile = { ...facts, readingsOf: (w: string) => (w === "trial" ? [appended("T R AY1 AH0 L")] : []) };
+      expect(huntAnswers(["trial"], "AY L", onFile).map((h) => h.reasons)).toEqual([["appended-only"]]);
+    });
   });
 
   it("names each Answer once and in alphabetical order", () => {
@@ -103,57 +144,66 @@ describe("the ruling list", () => {
   });
 });
 
-describe("reading the maintainer's ruling", () => {
-  const offered = [r("CH AA1 K L AH0 T")];
-
-  it("reads a correction as one of the readings offered, or as a reading typed in ARPAbet", () => {
-    expect(parseDecision("c 1", offered)).toEqual({ kind: "correction", reading: r("CH AA1 K L AH0 T") });
-    expect(parseDecision("c ch aa1 k ah0 l ah0 t", offered)).toEqual({ kind: "correction", reading: r("CH AA1 K AH0 L AH0 T") });
+describe("a day's group of Answers only Normalisation puts on the key (#297)", () => {
+  /** A ruling on `event` /EH N T/ unless another day is given. */
+  const on = (word: string, reasons: HuntReason[], rhymeRuling: RhymeRuling, day = { seedWord: "event", rhymeKey: "EH N T" }): HuntRuling => ({
+    ...day, answer: { word, reasons, wiktionaryKeys: [] }, rhyme: rhymeRuling,
   });
+  const words = (group: AppendedGroup) => group.members.map((m) => [m.answer.word, m.doubts]);
 
-  it("reads a Demotion with the rejection the player will get, a name by default", () => {
-    expect(parseDecision("d", offered)).toEqual({ kind: "demotion", reason: "proper-noun" });
-    expect(parseDecision("d word", offered)).toEqual({ kind: "demotion", reason: "not-a-known-word" });
-  });
-
-  it("reads leaving it alone, and skipping it unruled", () => {
-    expect(parseDecision("l", offered)).toEqual({ kind: "leave" });
-    expect(parseDecision("s", offered)).toEqual({ kind: "unruled" });
-  });
-
-  it("reads nothing from a reading that is not ARPAbet or a number outside the list", () => {
-    expect(parseDecision("c 2", offered)).toBeNull();
-    expect(parseDecision("c tʃɑk", offered)).toBeNull();
-    expect(parseDecision("x", offered)).toBeNull();
-  });
-});
-
-describe("asking the maintainer for a ruling", () => {
-  it("labels the readings it numbers, says it is waiting, and gives one option a line with its effect", () => {
-    expect(rulingPrompt([r("CH AA1 K L AH0 T"), r("CH AO1 K L AH0 T")])).toEqual([
-      "Readings you can pick (Wiktionary's, in ARPAbet):",
-      "  1. CH AA1 K L AH0 T",
-      "  2. CH AO1 K L AH0 T",
-      "Waiting for your ruling on this word. Type one of these and press Enter:",
-      "  c <n>        correct the reading to number <n> above, e.g. c 1 (it replaces the game's reading)",
-      "  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)",
-      "  d            demote it as a name (the player is told it is a name)",
-      "  d word       demote it as not a word (the player is told it is not a word)",
-      "  l            leave it scored, as the game has it",
-      "  s            skip it: it stays scored unruled, and the day fails its No False Accepts gate",
+  it("lists every appended-only Answer on a day the Judge holds one, in one group, the held ones marked", () => {
+    // 2027-01-12: the Judge held `vestment` and passed `comment` and `document`, which have the same shape.
+    const { answers, groups } = huntListing([
+      on("comment", ["appended-only"], rhyme("rhyme", "high")),
+      on("document", ["appended-only"], rhyme("rhyme", "medium")),
+      on("vestment", ["appended-only"], rhyme("no-rhyme", "high")),
     ]);
+    expect(answers).toEqual([]);
+    expect(groups.map((g) => [g.seedWord, g.rhymeKey])).toEqual([["event", "EH N T"]]);
+    expect(words(groups[0]!)).toEqual([["comment", []], ["document", []], ["vestment", ["no-rhyme"]]]);
   });
 
-  it("offers no number to pick when there are no readings to pick from", () => {
-    const prompt = rulingPrompt([]);
-    expect(prompt[0]).toBe("Readings you can pick: none (Wiktionary has none), so a correction must be typed.");
-    expect(prompt.some((line) => line.includes("c <n>"))).toBe(false);
-    expect(prompt).toContain("  c <ARPAbet>  correct the reading to one you type, e.g. c K AE1 T (it replaces the game's reading)");
+  it("lists nothing for this reason on a day the Judge holds none of them", () => {
+    const { answers, groups } = huntListing([
+      on("comment", ["appended-only"], rhyme("rhyme", "high")),
+      on("vestment", ["appended-only"], rhyme("no-rhyme", "medium")),
+    ]);
+    expect(answers).toEqual([]);
+    expect(groups).toEqual([]);
   });
 
-  it("accepts every option it offers", () => {
-    const offered = [r("CH AA1 K L AH0 T")];
-    expect(["c 1", "c K AE1 T", "d", "d word", "l", "s"].map((input) => parseDecision(input, offered))).not.toContain(null);
+  it("groups each day apart, and only the days with a hold", () => {
+    const flex = { seedWord: "flex", rhymeKey: "EH K S" };
+    const { groups } = huntListing([
+      on("comment", ["appended-only"], rhyme("no-rhyme", "high")),
+      on("prospects", ["appended-only"], rhyme("rhyme", "high"), flex),
+      on("vestment", ["appended-only"], rhyme("rhyme", "high")),
+    ]);
+    expect(groups.map((g) => [g.seedWord, g.members.map((m) => m.answer.word)])).toEqual([["event", ["comment", "vestment"]]]);
+  });
+
+  it("holds a day on a name or a non-word as on no Rhyme", () => {
+    const { groups } = huntListing([
+      { ...on("lament", ["names-hit", "appended-only"], rhyme("rhyme", "high")), wordhood: wordhood("lament", "name", "high") },
+      on("comment", ["appended-only"], rhyme("rhyme", "high")),
+    ]);
+    expect(words(groups[0]!)).toEqual([["lament", ["name"]], ["comment", []]]);
+  });
+
+  it("lists a word already listed for another reason once, in the group", () => {
+    const { answers, groups } = huntListing([
+      on("vestment", ["another-key", "appended-only"], rhyme("no-rhyme", "high")),
+      on("comment", ["appended-only"], rhyme("rhyme", "high")),
+      // Doubted on the same day for another reason alone, so it is no member of the group.
+      on("cement", ["another-key"], rhyme("no-rhyme", "high")),
+    ]);
+    expect(answers.map((a) => a.answer.word)).toEqual(["cement"]);
+    expect(words(groups[0]!)).toEqual([["vestment", ["no-rhyme"]], ["comment", []]]);
+  });
+
+  it("lists what the ruling list always has when no day has a group", () => {
+    const rulings = [on("cement", ["another-key"], rhyme("no-rhyme", "high")), on("lament", ["names-hit"], rhyme("rhyme", "high"))];
+    expect(huntListing(rulings)).toEqual({ answers: rulingList(rulings), groups: [] });
   });
 });
 
@@ -177,6 +227,12 @@ describe("the No False Accepts gate", () => {
   it("fails on a correction or Demotion that left the Answer scored", () => {
     const result = noFalseAcceptsResult(["chocolate"], new Map([["chocolate", { kind: "correction", reading: r("CH AA1 K L EY2 T") }]]), () => true);
     expect(result).toEqual({ result: "fail", unruled: [], stillScored: ["chocolate"] });
+  });
+
+  it("counts keeping readings as a ruling, whether or not what was kept still rhymes on the day", () => {
+    // `environmental` keeps its readings with the t: it leaves `kennel` and stays on `incidental`.
+    const result = noFalseAcceptsResult(["environmental"], new Map([["environmental", { kind: "keep", readings: [r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L")] }]]), () => true);
+    expect(result).toEqual({ result: "pass", unruled: [], stillScored: [] });
   });
 
   it("passes a day with nothing on the list", () => {
