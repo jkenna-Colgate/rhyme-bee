@@ -26,8 +26,8 @@
  */
 
 import { createInterface } from "node:readline/promises";
+import { appendedOnlyAnswers } from "../src/appendedReadings.ts";
 import {
-  appendedOnlyAnswers,
   GIVEN_RULINGS,
   parseSampleRuling,
   sampleAcrossDays,
@@ -38,7 +38,7 @@ import {
   type TrialDay,
   type TrialItem,
   type TrialPair,
-} from "../src/appendedReadings.ts";
+} from "./judgeTrial.ts";
 import { rulingList, type HuntRuling } from "../src/noFalseAccepts.ts";
 import { rhymeKeyOf } from "../src/phonology.ts";
 import { schwaTwinOf } from "../src/schwaTwins.ts";
