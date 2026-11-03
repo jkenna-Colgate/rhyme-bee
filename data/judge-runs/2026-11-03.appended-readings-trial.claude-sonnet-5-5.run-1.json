@@ -1,0 +1,6157 @@
+{
+  "date": "2026-11-03",
+  "command": "appendedReadingsTrial --yes",
+  "run": 1,
+  "model": "claude-sonnet-5-5",
+  "answeredBy": [
+    "claude-sonnet-5-5"
+  ],
+  "calls": {
+    "rhyme": 35,
+    "wordhood": 14,
+    "fromCache": 0
+  },
+  "note": "A one-off trial (#296; ADR-0021, 2026-11-02 amendment): every scored Answer on a scheduled day's Rhyme Key (or its merged keys) only through readings Normalisation appended, put to the Judge once, rhyme and wordhood apart, as the No False Accepts hunt asks. Scored against the maintainer's given rulings and a sample asked blind. Nothing is written to the game's data.",
+  "selection": {
+    "words": 278,
+    "days": 84,
+    "scheduledDays": 260,
+    "daysWithNone": 176,
+    "unpinned": [],
+    "givenOutside": [],
+    "perDay": [
+      {
+        "date": "2026-08-06",
+        "seedWord": "cage",
+        "rhymeKey": "EY JH",
+        "words": [
+          "birdcage"
+        ]
+      },
+      {
+        "date": "2026-08-10",
+        "seedWord": "beard",
+        "rhymeKey": "IH R D",
+        "words": [
+          "graybeard"
+        ]
+      },
+      {
+        "date": "2026-08-12",
+        "seedWord": "blame",
+        "rhymeKey": "EY M",
+        "words": [
+          "endgame"
+        ]
+      },
+      {
+        "date": "2026-08-13",
+        "seedWord": "slept",
+        "rhymeKey": "EH P T",
+        "words": [
+          "concept",
+          "percept"
+        ]
+      },
+      {
+        "date": "2026-08-14",
+        "seedWord": "wall",
+        "rhymeKey": "AA L",
+        "words": [
+          "firewall",
+          "menthol"
+        ]
+      },
+      {
+        "date": "2026-08-16",
+        "seedWord": "horse",
+        "rhymeKey": "AO R S",
+        "words": [
+          "discourse",
+          "recourse",
+          "resource"
+        ]
+      },
+      {
+        "date": "2026-08-19",
+        "seedWord": "sword",
+        "rhymeKey": "AO R D",
+        "words": [
+          "discord"
+        ]
+      },
+      {
+        "date": "2026-08-20",
+        "seedWord": "import",
+        "rhymeKey": "AO R T",
+        "words": [
+          "cohort",
+          "export"
+        ]
+      },
+      {
+        "date": "2026-08-28",
+        "seedWord": "fox",
+        "rhymeKey": "AA K S",
+        "words": [
+          "bollocks",
+          "xerox"
+        ]
+      },
+      {
+        "date": "2026-09-01",
+        "seedWord": "ground",
+        "rhymeKey": "AW N D",
+        "words": [
+          "bloodhound",
+          "dumbfound",
+          "northbound"
+        ]
+      },
+      {
+        "date": "2026-09-02",
+        "seedWord": "noon",
+        "rhymeKey": "UW N",
+        "words": [
+          "autoimmune",
+          "fortune",
+          "tribune"
+        ]
+      },
+      {
+        "date": "2026-09-04",
+        "seedWord": "male",
+        "rhymeKey": "EY L",
+        "words": [
+          "nightingale"
+        ]
+      },
+      {
+        "date": "2026-09-09",
+        "seedWord": "tomb",
+        "rhymeKey": "UW M",
+        "words": [
+          "mushroom",
+          "vacuum",
+          "volume"
+        ]
+      },
+      {
+        "date": "2026-09-10",
+        "seedWord": "shoot",
+        "rhymeKey": "UW T",
+        "words": [
+          "contribute",
+          "dissolute",
+          "distribute",
+          "redistribute",
+          "reinstitute",
+          "solute",
+          "statute",
+          "tribute"
+        ]
+      },
+      {
+        "date": "2026-09-11",
+        "seedWord": "gain",
+        "rhymeKey": "EY N",
+        "words": [
+          "boatswain",
+          "hexane",
+          "octane"
+        ]
+      },
+      {
+        "date": "2026-09-16",
+        "seedWord": "suggest",
+        "rhymeKey": "EH S T",
+        "words": [
+          "conquest",
+          "darnedest",
+          "hillcrest",
+          "houseguest",
+          "processed",
+          "reprocessed"
+        ]
+      },
+      {
+        "date": "2026-09-18",
+        "seedWord": "juice",
+        "rhymeKey": "UW S",
+        "words": [
+          "mongoose"
+        ]
+      },
+      {
+        "date": "2026-09-23",
+        "seedWord": "ghost",
+        "rhymeKey": "OW S T",
+        "words": [
+          "compost",
+          "provost",
+          "undiagnosed"
+        ]
+      },
+      {
+        "date": "2026-09-26",
+        "seedWord": "role",
+        "rhymeKey": "OW L",
+        "words": [
+          "asshole",
+          "aureole",
+          "camisole",
+          "creole",
+          "petrol"
+        ]
+      },
+      {
+        "date": "2026-09-29",
+        "seedWord": "klutz",
+        "rhymeKey": "AH T S",
+        "words": [
+          "peanuts"
+        ]
+      },
+      {
+        "date": "2026-10-03",
+        "seedWord": "hut",
+        "rhymeKey": "AH T",
+        "words": [
+          "peanut"
+        ]
+      },
+      {
+        "date": "2026-10-26",
+        "seedWord": "mouse",
+        "rhymeKey": "AW S",
+        "words": [
+          "birdhouse"
+        ]
+      },
+      {
+        "date": "2026-10-28",
+        "seedWord": "about",
+        "rhymeKey": "AW T",
+        "words": [
+          "shootout"
+        ]
+      },
+      {
+        "date": "2026-10-31",
+        "seedWord": "steam",
+        "rhymeKey": "IY M",
+        "words": [
+          "phoneme"
+        ]
+      },
+      {
+        "date": "2026-11-01",
+        "seedWord": "hop",
+        "rhymeKey": "AA P",
+        "words": [
+          "airdrop"
+        ]
+      },
+      {
+        "date": "2026-11-02",
+        "seedWord": "grassroots",
+        "rhymeKey": "UW T S",
+        "words": [
+          "contributes",
+          "distributes",
+          "solutes",
+          "statutes",
+          "tributes"
+        ]
+      },
+      {
+        "date": "2026-11-04",
+        "seedWord": "hook",
+        "rhymeKey": "UH K",
+        "words": [
+          "playbook"
+        ]
+      },
+      {
+        "date": "2026-11-07",
+        "seedWord": "plot",
+        "rhymeKey": "AA T",
+        "words": [
+          "foxtrot",
+          "kumquat",
+          "polyglot",
+          "subplot"
+        ]
+      },
+      {
+        "date": "2026-11-10",
+        "seedWord": "bark",
+        "rhymeKey": "AA R K",
+        "words": [
+          "bookmark"
+        ]
+      },
+      {
+        "date": "2026-11-12",
+        "seedWord": "feet",
+        "rhymeKey": "IY T",
+        "words": [
+          "aesthete"
+        ]
+      },
+      {
+        "date": "2026-11-13",
+        "seedWord": "cool",
+        "rhymeKey": "UW L",
+        "words": [
+          "glandule",
+          "globule",
+          "microtubule",
+          "miniscule",
+          "module",
+          "nodule",
+          "ovule",
+          "pustule",
+          "reschedule",
+          "reticule",
+          "schedule",
+          "tubule"
+        ]
+      },
+      {
+        "date": "2026-11-15",
+        "seedWord": "guitar",
+        "rhymeKey": "AA R",
+        "words": [
+          "armoire",
+          "costar",
+          "exemplar",
+          "insofar",
+          "quasar",
+          "sonar"
+        ]
+      },
+      {
+        "date": "2026-11-21",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "words": [
+          "fiat"
+        ]
+      },
+      {
+        "date": "2026-11-24",
+        "seedWord": "deflect",
+        "rhymeKey": "EH K T",
+        "words": [
+          "abject",
+          "prospect"
+        ]
+      },
+      {
+        "date": "2026-11-26",
+        "seedWord": "triceratops",
+        "rhymeKey": "AA P S",
+        "words": [
+          "airdrops"
+        ]
+      },
+      {
+        "date": "2026-12-01",
+        "seedWord": "town",
+        "rhymeKey": "AW N",
+        "words": [
+          "pronoun"
+        ]
+      },
+      {
+        "date": "2026-12-03",
+        "seedWord": "police",
+        "rhymeKey": "IY S",
+        "words": [
+          "coyotes",
+          "earpiece"
+        ]
+      },
+      {
+        "date": "2026-12-07",
+        "seedWord": "act",
+        "rhymeKey": "AE K T",
+        "words": [
+          "cataract",
+          "subcompact"
+        ]
+      },
+      {
+        "date": "2026-12-09",
+        "seedWord": "hog",
+        "rhymeKey": "AA G",
+        "words": [
+          "catalog",
+          "dialog",
+          "prologue"
+        ]
+      },
+      {
+        "date": "2026-12-11",
+        "seedWord": "flex",
+        "rhymeKey": "EH K S",
+        "words": [
+          "cortex",
+          "ibex",
+          "index",
+          "prospects",
+          "reflex",
+          "vortex"
+        ]
+      },
+      {
+        "date": "2026-12-13",
+        "seedWord": "bomb",
+        "rhymeKey": "AA M",
+        "words": [
+          "napalm",
+          "pompom",
+          "wigwam"
+        ]
+      },
+      {
+        "date": "2026-12-17",
+        "seedWord": "vast",
+        "rhymeKey": "AE S T",
+        "words": [
+          "bombast"
+        ]
+      },
+      {
+        "date": "2026-12-18",
+        "seedWord": "cross",
+        "rhymeKey": "AA S",
+        "words": [
+          "chaos",
+          "ethos",
+          "pathos"
+        ]
+      },
+      {
+        "date": "2026-12-20",
+        "seedWord": "lawn",
+        "rhymeKey": "AA N",
+        "words": [
+          "chevron",
+          "cyclotron",
+          "decathlon",
+          "doggone",
+          "electron",
+          "eon",
+          "ganglion",
+          "icon",
+          "interferon",
+          "krypton",
+          "marzipan",
+          "neon",
+          "neuron",
+          "orangutan",
+          "oxymoron",
+          "python",
+          "recon",
+          "tampon",
+          "telethon",
+          "xenon"
+        ]
+      },
+      {
+        "date": "2026-12-22",
+        "seedWord": "snob",
+        "rhymeKey": "AA B",
+        "words": [
+          "doorknob"
+        ]
+      },
+      {
+        "date": "2026-12-24",
+        "seedWord": "wax",
+        "rhymeKey": "AE K S",
+        "words": [
+          "anthrax",
+          "cossacks",
+          "kayaks",
+          "thorax"
+        ]
+      },
+      {
+        "date": "2026-12-27",
+        "seedWord": "graph",
+        "rhymeKey": "AE F",
+        "words": [
+          "autoradiograph"
+        ]
+      },
+      {
+        "date": "2026-12-31",
+        "seedWord": "back",
+        "rhymeKey": "AE K",
+        "words": [
+          "aphrodisiac",
+          "bivouac",
+          "egomaniac",
+          "hemophiliac",
+          "hypochondriac",
+          "kayak",
+          "kleptomaniac",
+          "sumac"
+        ]
+      },
+      {
+        "date": "2027-01-01",
+        "seedWord": "glass",
+        "rhymeKey": "AE S",
+        "words": [
+          "biomass"
+        ]
+      },
+      {
+        "date": "2027-01-02",
+        "seedWord": "rag",
+        "rhymeKey": "AE G",
+        "words": [
+          "zigzag"
+        ]
+      },
+      {
+        "date": "2027-01-03",
+        "seedWord": "damn",
+        "rhymeKey": "AE M",
+        "words": [
+          "chromatogram",
+          "deprogram",
+          "imam"
+        ]
+      },
+      {
+        "date": "2027-01-09",
+        "seedWord": "man",
+        "rhymeKey": "AE N",
+        "words": [
+          "birdman",
+          "iceman",
+          "marzipan",
+          "orangutan",
+          "spiderman",
+          "tribesman",
+          "woodsman"
+        ]
+      },
+      {
+        "date": "2027-01-12",
+        "seedWord": "event",
+        "rhymeKey": "EH N T",
+        "words": [
+          "admonishment",
+          "announcement",
+          "battlement",
+          "comment",
+          "compliment",
+          "disfigurement",
+          "document",
+          "portent",
+          "preannouncement",
+          "reorient",
+          "vestment"
+        ]
+      },
+      {
+        "date": "2027-01-18",
+        "seedWord": "mind",
+        "rhymeKey": "AY N D",
+        "words": [
+          "rewind"
+        ]
+      },
+      {
+        "date": "2027-01-20",
+        "seedWord": "expense",
+        "rhymeKey": "EH N S",
+        "words": [
+          "nonsense"
+        ]
+      },
+      {
+        "date": "2027-01-25",
+        "seedWord": "hardwired",
+        "rhymeKey": "AY ER D",
+        "words": [
+          "aspired",
+          "attired",
+          "expired",
+          "mired",
+          "reacquired"
+        ]
+      },
+      {
+        "date": "2027-01-27",
+        "seedWord": "band",
+        "rhymeKey": "AE N D",
+        "words": [
+          "bookstand"
+        ]
+      },
+      {
+        "date": "2027-01-28",
+        "seedWord": "bald",
+        "rhymeKey": "AA L D",
+        "words": [
+          "ribald"
+        ]
+      },
+      {
+        "date": "2027-01-30",
+        "seedWord": "belong",
+        "rhymeKey": "AA NG",
+        "words": [
+          "oblong",
+          "oolong"
+        ]
+      },
+      {
+        "date": "2027-02-01",
+        "seedWord": "quartz",
+        "rhymeKey": "AO R T S",
+        "words": [
+          "cohorts",
+          "escorts",
+          "exports"
+        ]
+      },
+      {
+        "date": "2027-02-06",
+        "seedWord": "bronze",
+        "rhymeKey": "AA N Z",
+        "words": [
+          "electrons",
+          "neurons",
+          "orangutans",
+          "tampons",
+          "zircons"
+        ]
+      },
+      {
+        "date": "2027-02-10",
+        "seedWord": "upheld",
+        "rhymeKey": "EH L D",
+        "words": [
+          "marveled"
+        ]
+      },
+      {
+        "date": "2027-02-21",
+        "seedWord": "diagnose",
+        "rhymeKey": "OW S",
+        "words": [
+          "cosmos",
+          "dextrose",
+          "ethnos",
+          "kudos",
+          "lactose",
+          "maltose",
+          "sucrose"
+        ]
+      },
+      {
+        "date": "2027-02-27",
+        "seedWord": "float",
+        "rhymeKey": "OW T",
+        "words": [
+          "airboat",
+          "compote",
+          "coyote",
+          "homozygote",
+          "zygote"
+        ]
+      },
+      {
+        "date": "2027-03-02",
+        "seedWord": "hire",
+        "rhymeKey": "AY ER",
+        "words": [
+          "admire",
+          "afire",
+          "aspire",
+          "backfire",
+          "brushfire",
+          "crossfire",
+          "dire",
+          "esquire",
+          "expire",
+          "haywire",
+          "hellfire",
+          "inquire",
+          "inspire",
+          "ire",
+          "lyre",
+          "mire",
+          "perspire",
+          "reacquire",
+          "rehire",
+          "respire",
+          "shire",
+          "spire",
+          "squire",
+          "vampire"
+        ]
+      },
+      {
+        "date": "2027-03-03",
+        "seedWord": "skirt",
+        "rhymeKey": "ER T",
+        "words": [
+          "turret"
+        ]
+      },
+      {
+        "date": "2027-03-04",
+        "seedWord": "motel",
+        "rhymeKey": "EH L",
+        "words": [
+          "prequel",
+          "quantifiable",
+          "trowel",
+          "yokel"
+        ]
+      },
+      {
+        "date": "2027-03-07",
+        "seedWord": "worn",
+        "rhymeKey": "AO R N",
+        "words": [
+          "acorn",
+          "capricorn",
+          "leghorn",
+          "newborn"
+        ]
+      },
+      {
+        "date": "2027-03-08",
+        "seedWord": "collapse",
+        "rhymeKey": "AE P S",
+        "words": [
+          "synapse"
+        ]
+      },
+      {
+        "date": "2027-03-13",
+        "seedWord": "neck",
+        "rhymeKey": "EH K",
+        "words": [
+          "shipwreck"
+        ]
+      },
+      {
+        "date": "2027-03-14",
+        "seedWord": "swipe",
+        "rhymeKey": "AY P",
+        "words": [
+          "hornpipe"
+        ]
+      },
+      {
+        "date": "2027-03-16",
+        "seedWord": "hive",
+        "rhymeKey": "AY V",
+        "words": [
+          "skydive"
+        ]
+      },
+      {
+        "date": "2027-03-19",
+        "seedWord": "pen",
+        "rhymeKey": "EH N",
+        "words": [
+          "mutagen"
+        ]
+      },
+      {
+        "date": "2027-03-20",
+        "seedWord": "power",
+        "rhymeKey": "AW ER",
+        "words": [
+          "dower",
+          "hydropower"
+        ]
+      },
+      {
+        "date": "2027-03-25",
+        "seedWord": "core",
+        "rhymeKey": "AO R",
+        "words": [
+          "downpour",
+          "furor",
+          "metaphor",
+          "pedicure",
+          "pompadour",
+          "signor"
+        ]
+      },
+      {
+        "date": "2027-03-31",
+        "seedWord": "ersatz",
+        "rhymeKey": "AA T S",
+        "words": [
+          "subplots"
+        ]
+      },
+      {
+        "date": "2027-04-01",
+        "seedWord": "loan",
+        "rhymeKey": "OW N",
+        "words": [
+          "brimstone",
+          "ketone",
+          "provolone"
+        ]
+      },
+      {
+        "date": "2027-04-03",
+        "seedWord": "let",
+        "rhymeKey": "EH T",
+        "words": [
+          "sextuplet",
+          "sorbet"
+        ]
+      },
+      {
+        "date": "2027-04-05",
+        "seedWord": "time",
+        "rhymeKey": "AY M",
+        "words": [
+          "coenzyme"
+        ]
+      },
+      {
+        "date": "2027-04-07",
+        "seedWord": "air",
+        "rhymeKey": "EH R",
+        "words": [
+          "camembert",
+          "corsair",
+          "ploughshare"
+        ]
+      },
+      {
+        "date": "2027-04-08",
+        "seedWord": "chess",
+        "rhymeKey": "EH S",
+        "words": [
+          "casualness",
+          "duress",
+          "empress",
+          "flavorless",
+          "fontes",
+          "gutless",
+          "inclusiveness",
+          "intrusiveness",
+          "morales",
+          "morones",
+          "princess",
+          "reprocess",
+          "thankfulness"
+        ]
+      },
+      {
+        "date": "2027-04-15",
+        "seedWord": "curl",
+        "rhymeKey": "ER L",
+        "words": [
+          "squirrel"
+        ]
+      },
+      {
+        "date": "2027-04-17",
+        "seedWord": "computer",
+        "rhymeKey": "UW D ER",
+        "words": [
+          "sharpshooter"
+        ]
+      },
+      {
+        "date": "2027-04-19",
+        "seedWord": "smile",
+        "rhymeKey": "AY L",
+        "words": [
+          "imbecile",
+          "pedophile",
+          "penile",
+          "projectile",
+          "reptile",
+          "woodpile"
+        ]
+      }
+    ]
+  },
+  "rhymeRulings": {
+    "rhyme high": 186,
+    "rhyme medium": 45,
+    "no-rhyme high": 31,
+    "rhyme low": 1,
+    "no-rhyme medium": 13,
+    "no-rhyme low": 2
+  },
+  "rulingList": {
+    "held": 33,
+    "doubts": {
+      "no-rhyme": 31,
+      "name": 2
+    },
+    "words": [
+      {
+        "word": "bollocks",
+        "seedWord": "fox",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "fortune",
+        "seedWord": "noon",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "darnedest",
+        "seedWord": "suggest",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "processed",
+        "seedWord": "suggest",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "reprocessed",
+        "seedWord": "suggest",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "petrol",
+        "seedWord": "role",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "coyotes",
+        "seedWord": "police",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "prospects",
+        "seedWord": "flex",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "chevron",
+        "seedWord": "lawn",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "ganglion",
+        "seedWord": "lawn",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "marzipan",
+        "seedWord": "lawn",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "orangutan",
+        "seedWord": "lawn",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "spiderman",
+        "seedWord": "man",
+        "doubts": [
+          "name"
+        ]
+      },
+      {
+        "word": "announcement",
+        "seedWord": "event",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "disfigurement",
+        "seedWord": "event",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "preannouncement",
+        "seedWord": "event",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "vestment",
+        "seedWord": "event",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "marveled",
+        "seedWord": "upheld",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "turret",
+        "seedWord": "skirt",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "quantifiable",
+        "seedWord": "motel",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "trowel",
+        "seedWord": "motel",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "yokel",
+        "seedWord": "motel",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "pedicure",
+        "seedWord": "core",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "sorbet",
+        "seedWord": "let",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "casualness",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "empress",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "flavorless",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "gutless",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "inclusiveness",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "intrusiveness",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "morales",
+        "seedWord": "chess",
+        "doubts": [
+          "name"
+        ]
+      },
+      {
+        "word": "morones",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      },
+      {
+        "word": "thankfulness",
+        "seedWord": "chess",
+        "doubts": [
+          "no-rhyme"
+        ]
+      }
+    ]
+  },
+  "agreement": {
+    "compared": 37,
+    "agreed": 34,
+    "rate": 0.918918918918919,
+    "byFrom": {
+      "given": [
+        6,
+        8
+      ],
+      "sampled": [
+        28,
+        29
+      ]
+    },
+    "byConfidence": {
+      "high": [
+        32,
+        34
+      ],
+      "medium": [
+        2,
+        3
+      ],
+      "low": [
+        0,
+        0
+      ]
+    },
+    "falseAcceptsListed": [
+      4,
+      6
+    ],
+    "rhymesListed": [
+      1,
+      31
+    ],
+    "misses": [
+      {
+        "word": "comment",
+        "seedWord": "event",
+        "maintainer": "no-rhyme",
+        "rhymeKey": "EH N T",
+        "from": "given",
+        "judge": {
+          "verdict": "rhyme",
+          "reading": "K AA1 M EH2 N T",
+          "confidence": "high",
+          "why": "The closed final syllable has a full EH vowel with secondary stress, giving EH N T like 'event'."
+        }
+      },
+      {
+        "word": "document",
+        "seedWord": "event",
+        "maintainer": "no-rhyme",
+        "rhymeKey": "EH N T",
+        "from": "given",
+        "judge": {
+          "verdict": "rhyme",
+          "reading": "D AA1 K Y AH0 M EH2 N T",
+          "confidence": "medium",
+          "why": "The verb 'document' is said with secondary stress on a full EH in the closed last syllable, giving EH N T."
+        }
+      },
+      {
+        "word": "prospects",
+        "seedWord": "flex",
+        "rhymeKey": "EH K S",
+        "from": "sampled",
+        "maintainer": "rhyme",
+        "judge": {
+          "verdict": "no-rhyme",
+          "reading": null,
+          "confidence": "high",
+          "why": "It ends in EH-K-T-S, which has an extra T compared with flex's EH-K-S."
+        }
+      }
+    ]
+  },
+  "sample": [
+    {
+      "word": "graybeard",
+      "seedWord": "beard",
+      "rhymeKey": "IH R D",
+      "date": "2026-08-10",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "percept",
+      "seedWord": "slept",
+      "rhymeKey": "EH P T",
+      "date": "2026-08-13",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "discord",
+      "seedWord": "sword",
+      "rhymeKey": "AO R D",
+      "date": "2026-08-19",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "dumbfound",
+      "seedWord": "ground",
+      "rhymeKey": "AW N D",
+      "date": "2026-09-01",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "nightingale",
+      "seedWord": "male",
+      "rhymeKey": "EY L",
+      "date": "2026-09-04",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "houseguest",
+      "seedWord": "suggest",
+      "rhymeKey": "EH S T",
+      "date": "2026-09-16",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "camisole",
+      "seedWord": "role",
+      "rhymeKey": "OW L",
+      "date": "2026-09-26",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "peanut",
+      "seedWord": "hut",
+      "rhymeKey": "AH T",
+      "date": "2026-10-03",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "phoneme",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "date": "2026-10-31",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "playbook",
+      "seedWord": "hook",
+      "rhymeKey": "UH K",
+      "date": "2026-11-04",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "bookmark",
+      "seedWord": "bark",
+      "rhymeKey": "AA R K",
+      "date": "2026-11-10",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "insofar",
+      "seedWord": "guitar",
+      "rhymeKey": "AA R",
+      "date": "2026-11-15",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "prospect",
+      "seedWord": "deflect",
+      "rhymeKey": "EH K T",
+      "date": "2026-11-24",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "earpiece",
+      "seedWord": "police",
+      "rhymeKey": "IY S",
+      "date": "2026-12-03",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "prospects",
+      "seedWord": "flex",
+      "rhymeKey": "EH K S",
+      "date": "2026-12-11",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "bombast",
+      "seedWord": "vast",
+      "rhymeKey": "AE S T",
+      "date": "2026-12-17",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "kayaks",
+      "seedWord": "wax",
+      "rhymeKey": "AE K S",
+      "date": "2026-12-24",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "biomass",
+      "seedWord": "glass",
+      "rhymeKey": "AE S",
+      "date": "2027-01-01",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "deprogram",
+      "seedWord": "damn",
+      "rhymeKey": "AE M",
+      "date": "2027-01-03",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "nonsense",
+      "seedWord": "expense",
+      "rhymeKey": "EH N S",
+      "date": "2027-01-20",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "bookstand",
+      "seedWord": "band",
+      "rhymeKey": "AE N D",
+      "date": "2027-01-27",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "escorts",
+      "seedWord": "quartz",
+      "rhymeKey": "AO R T S",
+      "date": "2027-02-01",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "kudos",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "date": "2027-02-21",
+      "maintainer": "skip"
+    },
+    {
+      "word": "turret",
+      "seedWord": "skirt",
+      "rhymeKey": "ER T",
+      "date": "2027-03-03",
+      "maintainer": "no-rhyme"
+    },
+    {
+      "word": "synapse",
+      "seedWord": "collapse",
+      "rhymeKey": "AE P S",
+      "date": "2027-03-08",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "skydive",
+      "seedWord": "hive",
+      "rhymeKey": "AY V",
+      "date": "2027-03-16",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "hydropower",
+      "seedWord": "power",
+      "rhymeKey": "AW ER",
+      "date": "2027-03-20",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "ketone",
+      "seedWord": "loan",
+      "rhymeKey": "OW N",
+      "date": "2027-04-01",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "corsair",
+      "seedWord": "air",
+      "rhymeKey": "EH R",
+      "date": "2027-04-07",
+      "maintainer": "rhyme"
+    },
+    {
+      "word": "sharpshooter",
+      "seedWord": "computer",
+      "rhymeKey": "UW D ER",
+      "date": "2027-04-17",
+      "maintainer": "rhyme"
+    }
+  ],
+  "rulings": [
+    {
+      "word": "birdcage",
+      "seedWord": "cage",
+      "rhymeKey": "EY JH",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B ER1 D K EY2 JH",
+        "confidence": "high",
+        "why": "It is a compound whose last part 'cage' keeps secondary stress."
+      },
+      "wordhood": {
+        "word": "birdcage",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common compound noun."
+      }
+    },
+    {
+      "word": "graybeard",
+      "seedWord": "beard",
+      "rhymeKey": "IH R D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "G R EY1 B IH2 R D",
+        "confidence": "high",
+        "why": "Compound whose last part \"beard\" keeps secondary stress, so the key is IH R D."
+      },
+      "wordhood": {
+        "word": "graybeard",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for an old man, a standard compound."
+      }
+    },
+    {
+      "word": "endgame",
+      "seedWord": "blame",
+      "rhymeKey": "EY M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 N D G EY2 M",
+        "confidence": "high",
+        "why": "It is a compound ending in 'game', which has the rime EY M, the same as 'blame'."
+      },
+      "wordhood": {
+        "word": "endgame",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard noun, as in chess."
+      }
+    },
+    {
+      "word": "concept",
+      "seedWord": "slept",
+      "rhymeKey": "EH P T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 N S EH2 P T",
+        "confidence": "medium",
+        "why": "The full EH vowel in the closed last syllable carries secondary stress, giving EH P T."
+      },
+      "wordhood": {
+        "word": "concept",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word."
+      }
+    },
+    {
+      "word": "percept",
+      "seedWord": "slept",
+      "rhymeKey": "EH P T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P ER1 S EH2 P T",
+        "confidence": "medium",
+        "why": "The full EH vowel in the closed last syllable carries secondary stress, giving EH P T."
+      },
+      "wordhood": {
+        "word": "percept",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Psychology/philosophy term for an object of perception."
+      }
+    },
+    {
+      "word": "firewall",
+      "seedWord": "wall",
+      "rhymeKey": "AA L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "F AY1 ER0 W AO2 L",
+        "confidence": "high",
+        "why": "Compound whose last part \"wall\" keeps secondary stress."
+      },
+      "wordhood": {
+        "word": "firewall",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common compound noun."
+      }
+    },
+    {
+      "word": "menthol",
+      "seedWord": "wall",
+      "rhymeKey": "AA L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M EH1 N TH AO2 L",
+        "confidence": "medium",
+        "why": "The final syllable \"thol\" is said with a full AO or AA vowel and secondary stress, so its rime is AO L, which matches \"wall\"."
+      },
+      "wordhood": {
+        "word": "menthol",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A minty organic compound."
+      }
+    },
+    {
+      "word": "discourse",
+      "seedWord": "horse",
+      "rhymeKey": "AO R S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D IH1 S K AO2 R S",
+        "confidence": "high",
+        "why": "The final syllable has a full vowel with stress and the rime AO R S."
+      },
+      "wordhood": {
+        "word": "discourse",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Formal discussion or communication."
+      }
+    },
+    {
+      "word": "recourse",
+      "seedWord": "horse",
+      "rhymeKey": "AO R S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY1 K AO2 R S",
+        "confidence": "high",
+        "why": "The final syllable has a full vowel with stress and the rime AO R S."
+      },
+      "wordhood": {
+        "word": "recourse",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English noun meaning a source of help or a resort to it."
+      }
+    },
+    {
+      "word": "resource",
+      "seedWord": "horse",
+      "rhymeKey": "AO R S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY1 S AO2 R S",
+        "confidence": "high",
+        "why": "The final syllable has a full vowel with stress and the rime AO R S."
+      },
+      "wordhood": {
+        "word": "resource",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun and verb."
+      }
+    },
+    {
+      "word": "discord",
+      "seedWord": "sword",
+      "rhymeKey": "AO R D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D IH1 S K AO2 R D",
+        "confidence": "high",
+        "why": "The final syllable is a full AO2 R D with secondary stress, matching 'sword'."
+      },
+      "wordhood": {
+        "word": "discord",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Disagreement or lack of harmony."
+      }
+    },
+    {
+      "word": "cohort",
+      "seedWord": "import",
+      "rhymeKey": "AO R T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K OW1 HH AO2 R T",
+        "confidence": "high",
+        "why": "The final syllable has secondary stress and the rime AO R T, matching 'import'."
+      },
+      "wordhood": {
+        "word": "cohort",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word for a group of people."
+      }
+    },
+    {
+      "word": "export",
+      "seedWord": "import",
+      "rhymeKey": "AO R T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 K S P AO2 R T",
+        "confidence": "high",
+        "why": "The noun has secondary stress on AO R T, which is the Rhyme Key of import (IH1 M P AO2 R T)."
+      },
+      "wordhood": {
+        "word": "export",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard noun and verb."
+      }
+    },
+    {
+      "word": "bollocks",
+      "seedWord": "fox",
+      "rhymeKey": "AA K S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "Its last stressed syllable is \"bol\", so the Rhyme Key is AA L AH K S, which is longer than \"fox\"'s AA K S."
+      },
+      "wordhood": {
+        "word": "bollocks",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "British slang noun and interjection, in standard dictionaries."
+      }
+    },
+    {
+      "word": "xerox",
+      "seedWord": "fox",
+      "rhymeKey": "AA K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "Z IH1 R AA2 K S",
+        "confidence": "high",
+        "why": "The final syllable \"rox\" has secondary stress and the rime AA K S, which matches \"fox\"."
+      },
+      "wordhood": {
+        "word": "xerox",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Listed in dictionaries as a verb and noun meaning to photocopy, though it began as a brand name."
+      }
+    },
+    {
+      "word": "bloodhound",
+      "seedWord": "ground",
+      "rhymeKey": "AW N D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B L AH1 D HH AW2 N D",
+        "confidence": "high",
+        "why": "It is a compound ending in hound, with secondary-stressed AW N D, the same as ground."
+      },
+      "wordhood": {
+        "word": "bloodhound",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common noun for a dog breed."
+      }
+    },
+    {
+      "word": "dumbfound",
+      "seedWord": "ground",
+      "rhymeKey": "AW N D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AH1 M F AW2 N D",
+        "confidence": "high",
+        "why": "The last syllable carries secondary stress and has the rime AW-N-D, the same as ground."
+      },
+      "wordhood": {
+        "word": "dumbfound",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard verb meaning to astonish."
+      }
+    },
+    {
+      "word": "northbound",
+      "seedWord": "ground",
+      "rhymeKey": "AW N D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N AO1 R TH B AW2 N D",
+        "confidence": "high",
+        "why": "The compound's last part, bound, keeps secondary stress with the rime AW-N-D."
+      },
+      "wordhood": {
+        "word": "northbound",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Adjective meaning traveling toward the north."
+      }
+    },
+    {
+      "word": "autoimmune",
+      "seedWord": "noon",
+      "rhymeKey": "UW N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AO2 T OW0 IH0 M Y UW1 N",
+        "confidence": "high",
+        "why": "'Immune' is a longer word ending in the stressed UW N, so it ends in the seed's key."
+      },
+      "wordhood": {
+        "word": "autoimmune",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English medical adjective."
+      }
+    },
+    {
+      "word": "fortune",
+      "seedWord": "noon",
+      "rhymeKey": "UW N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last syllable is a weak 'chun' (AH0 N), not a full UW vowel, so the key does not match UW N."
+      },
+      "wordhood": {
+        "word": "fortune",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun."
+      }
+    },
+    {
+      "word": "tribune",
+      "seedWord": "noon",
+      "rhymeKey": "UW N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "T R IH1 B Y UW2 N",
+        "confidence": "high",
+        "why": "The final 'une' is a full UW vowel in a closed syllable with secondary stress, so the key is UW N."
+      },
+      "wordhood": {
+        "word": "tribune",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a Roman official or a protector of the people."
+      }
+    },
+    {
+      "word": "nightingale",
+      "seedWord": "male",
+      "rhymeKey": "EY L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N AY1 T IH0 NG G EY2 L",
+        "confidence": "high",
+        "why": "The final syllable 'gale' keeps secondary stress and has the rime EY L, the same as 'male'."
+      },
+      "wordhood": {
+        "word": "nightingale",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A songbird."
+      }
+    },
+    {
+      "word": "mushroom",
+      "seedWord": "tomb",
+      "rhymeKey": "UW M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AH1 SH R UW2 M",
+        "confidence": "high",
+        "why": "The final 'room' has a full UW vowel with secondary stress, as in a compound, so the key is UW M."
+      },
+      "wordhood": {
+        "word": "mushroom",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An edible fungus."
+      }
+    },
+    {
+      "word": "vacuum",
+      "seedWord": "tomb",
+      "rhymeKey": "UW M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "V AE1 K Y UW2 M",
+        "confidence": "medium",
+        "why": "The common full-vowel pronunciation 'vack-yoom' has a closed last syllable with secondary stress, so the key is UW M."
+      },
+      "wordhood": {
+        "word": "vacuum",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A common English noun and verb."
+      }
+    },
+    {
+      "word": "volume",
+      "seedWord": "tomb",
+      "rhymeKey": "UW M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "V AA1 L Y UW2 M",
+        "confidence": "low",
+        "why": "The less common full-vowel 'vol-yoom' pronunciation puts secondary stress on UW M, but 'vol-yum' is the usual one."
+      },
+      "wordhood": {
+        "word": "volume",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A common English noun for a book, amount of space, or loudness."
+      }
+    },
+    {
+      "word": "contribute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AH0 N T R IH1 B Y UW2 T",
+        "confidence": "high",
+        "why": "The closed final syllable 'ute' keeps a full UW with secondary stress, giving the key UW-T."
+      },
+      "wordhood": {
+        "word": "contribute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English verb."
+      }
+    },
+    {
+      "word": "dissolute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D IH1 S AH0 L UW2 T",
+        "confidence": "high",
+        "why": "The closed final syllable has a full UW with secondary stress, giving the key UW-T."
+      },
+      "wordhood": {
+        "word": "dissolute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Adjective meaning lacking moral restraint."
+      }
+    },
+    {
+      "word": "distribute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D IH0 S T R IH1 B Y UW2 T",
+        "confidence": "high",
+        "why": "The closed final syllable has a full UW with secondary stress, giving the key UW-T."
+      },
+      "wordhood": {
+        "word": "distribute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Verb meaning to give out or spread."
+      }
+    },
+    {
+      "word": "redistribute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY2 D IH0 S T R IH1 B Y UW2 T",
+        "confidence": "high",
+        "why": "The closed final syllable has a full UW with secondary stress, giving the key UW-T."
+      },
+      "wordhood": {
+        "word": "redistribute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English verb meaning to distribute again."
+      }
+    },
+    {
+      "word": "reinstitute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY0 IH1 N S T AH0 T UW2 T",
+        "confidence": "high",
+        "why": "The closed final syllable has a full UW with secondary stress, giving the key UW-T."
+      },
+      "wordhood": {
+        "word": "reinstitute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English verb meaning to institute again."
+      }
+    },
+    {
+      "word": "solute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S AA1 L Y UW2 T",
+        "confidence": "medium",
+        "why": "The final syllable 'ute' is a full UW in a closed syllable, so it carries secondary stress, giving the key UW-T."
+      },
+      "wordhood": {
+        "word": "solute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A substance dissolved in a solvent."
+      }
+    },
+    {
+      "word": "statute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S T AE1 CH UW2 T",
+        "confidence": "medium",
+        "why": "The full-vowel UW in the closed final syllable carries secondary stress, giving the key UW-T."
+      },
+      "wordhood": {
+        "word": "statute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English noun for a written law."
+      }
+    },
+    {
+      "word": "tribute",
+      "seedWord": "shoot",
+      "rhymeKey": "UW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "T R IH1 B Y UW2 T",
+        "confidence": "medium",
+        "why": "The full vowel in the closed last syllable 'ute' takes secondary stress, giving the key UW T, as with 'module' for 'rule'."
+      },
+      "wordhood": {
+        "word": "tribute",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun for payment or an expression of respect."
+      }
+    },
+    {
+      "word": "boatswain",
+      "seedWord": "gain",
+      "rhymeKey": "EY N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "It is normally said 'bosun' (B OW1 S AH0 N) with a weak final syllable, so it does not have the rime EY N."
+      },
+      "wordhood": {
+        "word": "boatswain",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard nautical term for a ship's officer."
+      }
+    },
+    {
+      "word": "hexane",
+      "seedWord": "gain",
+      "rhymeKey": "EY N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH EH1 K S EY2 N",
+        "confidence": "high",
+        "why": "The closed final syllable '-ane' keeps a full vowel with secondary stress, giving the rime EY N."
+      },
+      "wordhood": {
+        "word": "hexane",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A chemical compound, an English technical term."
+      }
+    },
+    {
+      "word": "octane",
+      "seedWord": "gain",
+      "rhymeKey": "EY N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AA1 K T EY2 N",
+        "confidence": "high",
+        "why": "The closed final syllable '-ane' keeps a full vowel with secondary stress, giving the rime EY N."
+      },
+      "wordhood": {
+        "word": "octane",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A hydrocarbon found in petroleum."
+      }
+    },
+    {
+      "word": "conquest",
+      "seedWord": "suggest",
+      "rhymeKey": "EH S T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 N K W EH2 S T",
+        "confidence": "high",
+        "why": "Secondary stress on the full vowel EH in the closed final syllable gives the key EH-S-T."
+      },
+      "wordhood": {
+        "word": "conquest",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word."
+      }
+    },
+    {
+      "word": "darnedest",
+      "seedWord": "suggest",
+      "rhymeKey": "EH S T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The final syllable is a weak AH0 S T, so only an unstressed ending matches."
+      },
+      "wordhood": {
+        "word": "darnedest",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Superlative of darned, as in 'did his darnedest'."
+      }
+    },
+    {
+      "word": "hillcrest",
+      "seedWord": "suggest",
+      "rhymeKey": "EH S T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH IH1 L K R EH2 S T",
+        "confidence": "high",
+        "why": "The compound's second part keeps secondary stress on EH, giving EH-S-T."
+      },
+      "wordhood": {
+        "word": "hillcrest",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "A compound of 'hill' and 'crest', though mostly used in place names."
+      }
+    },
+    {
+      "word": "houseguest",
+      "seedWord": "suggest",
+      "rhymeKey": "EH S T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH AW1 S G EH2 S T",
+        "confidence": "high",
+        "why": "The compound's second part keeps secondary stress on EH, giving EH-S-T."
+      },
+      "wordhood": {
+        "word": "houseguest",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard compound noun for a guest staying in a home."
+      }
+    },
+    {
+      "word": "processed",
+      "seedWord": "suggest",
+      "rhymeKey": "EH S T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "It is one syllable, P R AA1 S T, so the key is AA-S-T."
+      },
+      "wordhood": {
+        "word": "processed",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Past tense/participle of process."
+      }
+    },
+    {
+      "word": "reprocessed",
+      "seedWord": "suggest",
+      "rhymeKey": "EH S T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last stressed vowel is AA, so the key is AA-S-T."
+      },
+      "wordhood": {
+        "word": "reprocessed",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Past tense of 'reprocess'."
+      }
+    },
+    {
+      "word": "mongoose",
+      "seedWord": "juice",
+      "rhymeKey": "UW S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AA1 NG G UW2 S",
+        "confidence": "high",
+        "why": "The final closed syllable 'goose' has a full UW vowel with secondary stress, giving the key UW-S."
+      },
+      "wordhood": {
+        "word": "mongoose",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A small carnivorous mammal."
+      }
+    },
+    {
+      "word": "compost",
+      "seedWord": "ghost",
+      "rhymeKey": "OW S T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 M P OW2 S T",
+        "confidence": "high",
+        "why": "The closed final syllable -post keeps a full OW with secondary stress, giving the key OW S T."
+      },
+      "wordhood": {
+        "word": "compost",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word."
+      }
+    },
+    {
+      "word": "provost",
+      "seedWord": "ghost",
+      "rhymeKey": "OW S T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P R AA1 V OW2 S T",
+        "confidence": "medium",
+        "why": "Provost is commonly said with a full OW in the final syllable, giving OW S T. The weak AH0 reading would not rhyme."
+      },
+      "wordhood": {
+        "word": "provost",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English word for a senior academic or administrative official."
+      }
+    },
+    {
+      "word": "undiagnosed",
+      "seedWord": "ghost",
+      "rhymeKey": "OW S T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AH2 N D AY2 AH0 G N OW1 S T",
+        "confidence": "high",
+        "why": "It ends in the stressed OW1 S T of diagnosed, which has the same key as ghost."
+      },
+      "wordhood": {
+        "word": "undiagnosed",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard adjective meaning not yet diagnosed."
+      }
+    },
+    {
+      "word": "asshole",
+      "seedWord": "role",
+      "rhymeKey": "OW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AE1 S HH OW2 L",
+        "confidence": "high",
+        "why": "Compound whose last part \"hole\" keeps secondary stress, giving OW L."
+      },
+      "wordhood": {
+        "word": "asshole",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Vulgar but standard English noun."
+      }
+    },
+    {
+      "word": "aureole",
+      "seedWord": "role",
+      "rhymeKey": "OW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AO1 R IY0 OW2 L",
+        "confidence": "medium",
+        "why": "The final closed syllable has a full OW vowel with secondary stress, giving OW L."
+      },
+      "wordhood": {
+        "word": "aureole",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a halo or ring of light."
+      }
+    },
+    {
+      "word": "camisole",
+      "seedWord": "role",
+      "rhymeKey": "OW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AE1 M AH0 S OW2 L",
+        "confidence": "high",
+        "why": "The final closed syllable has a full OW vowel with secondary stress, giving OW L."
+      },
+      "wordhood": {
+        "word": "camisole",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English noun for a sleeveless undergarment."
+      }
+    },
+    {
+      "word": "creole",
+      "seedWord": "role",
+      "rhymeKey": "OW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K R IY1 OW2 L",
+        "confidence": "high",
+        "why": "The last syllable is a full, closed OW-L with secondary stress, so it has the key of 'role'."
+      },
+      "wordhood": {
+        "word": "creole",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A common noun for a language or people of mixed heritage, also a cuisine style."
+      }
+    },
+    {
+      "word": "petrol",
+      "seedWord": "role",
+      "rhymeKey": "OW L",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last syllable is a weak 'ul' after EH, not OW-L, so it does not match 'role'."
+      },
+      "wordhood": {
+        "word": "petrol",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "British English word for gasoline."
+      }
+    },
+    {
+      "word": "peanuts",
+      "seedWord": "klutz",
+      "rhymeKey": "AH T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P IY1 N AH2 T S",
+        "confidence": "high",
+        "why": "The final 'nuts' carries secondary stress and has the same AH-T-S rime as 'klutz'."
+      },
+      "wordhood": {
+        "word": "peanuts",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Regular plural of peanut."
+      }
+    },
+    {
+      "word": "peanut",
+      "seedWord": "hut",
+      "rhymeKey": "AH T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P IY1 N AH2 T",
+        "confidence": "high",
+        "why": "'nut' keeps secondary stress, so the last syllable has the rime AH T."
+      },
+      "wordhood": {
+        "word": "peanut",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An edible legume seed."
+      }
+    },
+    {
+      "word": "birdhouse",
+      "seedWord": "mouse",
+      "rhymeKey": "AW S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B ER1 D HH AW2 S",
+        "confidence": "high",
+        "why": "The compound ends in house with secondary stress, which has the rime AW-S, the same as mouse."
+      },
+      "wordhood": {
+        "word": "birdhouse",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common compound noun."
+      }
+    },
+    {
+      "word": "shootout",
+      "seedWord": "about",
+      "rhymeKey": "AW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "SH UW1 T AW2 T",
+        "confidence": "high",
+        "why": "The compound's last part, out, keeps secondary stress with the rime AW-T, the same as about."
+      },
+      "wordhood": {
+        "word": "shootout",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a gunfight or tiebreaker."
+      }
+    },
+    {
+      "word": "phoneme",
+      "seedWord": "steam",
+      "rhymeKey": "IY M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "F OW1 N IY2 M",
+        "confidence": "high",
+        "why": "The final syllable carries secondary stress and has the key IY M, same as \"steam\"."
+      },
+      "wordhood": {
+        "word": "phoneme",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Linguistics term for a distinct sound unit."
+      }
+    },
+    {
+      "word": "airdrop",
+      "seedWord": "hop",
+      "rhymeKey": "AA P",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 R D R AA2 P",
+        "confidence": "high",
+        "why": "This compound's last part keeps secondary stress on AA P, as in hop."
+      },
+      "wordhood": {
+        "word": "airdrop",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard noun and verb for dropping supplies from aircraft."
+      }
+    },
+    {
+      "word": "contributes",
+      "seedWord": "grassroots",
+      "rhymeKey": "UW T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AH0 N T R IH1 B Y UW2 T S",
+        "confidence": "medium",
+        "why": "The closed final syllable 'utes' (closed by T, not only by -s) carries secondary stress, giving the key UW T S."
+      },
+      "wordhood": {
+        "word": "contributes",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Third-person singular of contribute."
+      }
+    },
+    {
+      "word": "distributes",
+      "seedWord": "grassroots",
+      "rhymeKey": "UW T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D IH0 S T R IH1 B Y UW2 T S",
+        "confidence": "medium",
+        "why": "The closed final syllable 'utes' carries secondary stress, giving the key UW T S."
+      },
+      "wordhood": {
+        "word": "distributes",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Third-person singular of distribute."
+      }
+    },
+    {
+      "word": "solutes",
+      "seedWord": "grassroots",
+      "rhymeKey": "UW T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S AA1 L UW2 T S",
+        "confidence": "medium",
+        "why": "The final syllable 'lutes' has a full vowel closed by T, so it carries secondary stress and the key is UW T S."
+      },
+      "wordhood": {
+        "word": "solutes",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of solute."
+      }
+    },
+    {
+      "word": "statutes",
+      "seedWord": "grassroots",
+      "rhymeKey": "UW T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S T AE1 CH UW2 T S",
+        "confidence": "medium",
+        "why": "The final syllable 'utes' has a full vowel closed by T, so it carries secondary stress and the key is UW T S."
+      },
+      "wordhood": {
+        "word": "statutes",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of statute."
+      }
+    },
+    {
+      "word": "tributes",
+      "seedWord": "grassroots",
+      "rhymeKey": "UW T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "T R IH1 B Y UW2 T S",
+        "confidence": "medium",
+        "why": "The final syllable 'utes' has a full vowel closed by T, so it carries secondary stress and the key is UW T S."
+      },
+      "wordhood": {
+        "word": "tributes",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of tribute."
+      }
+    },
+    {
+      "word": "playbook",
+      "seedWord": "hook",
+      "rhymeKey": "UH K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P L EY1 B UH2 K",
+        "confidence": "high",
+        "why": "It is a compound whose last part 'book' keeps secondary stress and rhymes with 'hook'."
+      },
+      "wordhood": {
+        "word": "playbook",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Compound noun for a book of plays or a set of strategies."
+      }
+    },
+    {
+      "word": "foxtrot",
+      "seedWord": "plot",
+      "rhymeKey": "AA T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "F AA1 K S T R AA2 T",
+        "confidence": "high",
+        "why": "The final syllable has secondary stress and the key AA T, the same as plot."
+      },
+      "wordhood": {
+        "word": "foxtrot",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A dance and a radio alphabet word."
+      }
+    },
+    {
+      "word": "kumquat",
+      "seedWord": "plot",
+      "rhymeKey": "AA T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AH1 M K W AA2 T",
+        "confidence": "high",
+        "why": "The final syllable is a full vowel with secondary stress, and AA T matches plot."
+      },
+      "wordhood": {
+        "word": "kumquat",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A small citrus fruit."
+      }
+    },
+    {
+      "word": "polyglot",
+      "seedWord": "plot",
+      "rhymeKey": "AA T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P AA1 L IY0 G L AA2 T",
+        "confidence": "high",
+        "why": "The final syllable has secondary stress and the key AA T, the same as plot."
+      },
+      "wordhood": {
+        "word": "polyglot",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Noun/adjective for a person who speaks many languages."
+      }
+    },
+    {
+      "word": "subplot",
+      "seedWord": "plot",
+      "rhymeKey": "AA T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S AH1 B P L AA2 T",
+        "confidence": "high",
+        "why": "It is a compound that ends in plot, and the last part keeps secondary stress."
+      },
+      "wordhood": {
+        "word": "subplot",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a secondary plot in a story."
+      }
+    },
+    {
+      "word": "bookmark",
+      "seedWord": "bark",
+      "rhymeKey": "AA R K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B UH1 K M AA2 R K",
+        "confidence": "high",
+        "why": "Compound whose last part \"mark\" keeps secondary stress and has the key AA R K."
+      },
+      "wordhood": {
+        "word": "bookmark",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common noun and verb."
+      }
+    },
+    {
+      "word": "aesthete",
+      "seedWord": "feet",
+      "rhymeKey": "IY T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 S TH IY2 T",
+        "confidence": "high",
+        "why": "The final syllable has a full IY vowel with secondary stress, giving IY T."
+      },
+      "wordhood": {
+        "word": "aesthete",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a person who appreciates beauty."
+      }
+    },
+    {
+      "word": "glandule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "G L AE1 N JH UW2 L",
+        "confidence": "medium",
+        "why": "The last syllable is a full closed UW L with secondary stress, as in 'module', so it matches 'cool'."
+      },
+      "wordhood": {
+        "word": "glandule",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Rare English word for a small gland."
+      }
+    },
+    {
+      "word": "globule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "G L AA1 B Y UW2 L",
+        "confidence": "medium",
+        "why": "The last syllable is a full closed UW L with secondary stress, so it matches 'cool'."
+      },
+      "wordhood": {
+        "word": "globule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a small round particle or drop."
+      }
+    },
+    {
+      "word": "microtubule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AY2 K R OW0 T UW1 B Y UW2 L",
+        "confidence": "medium",
+        "why": "The last syllable -ule is a full vowel in a closed syllable, so it carries secondary stress and has the key UW-L."
+      },
+      "wordhood": {
+        "word": "microtubule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A cellular structure; standard biology term."
+      }
+    },
+    {
+      "word": "miniscule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M IH1 N AH0 S K Y UW2 L",
+        "confidence": "high",
+        "why": "The final -scule is a full UW-L syllable with secondary stress."
+      },
+      "wordhood": {
+        "word": "miniscule",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Common variant spelling of minuscule, listed in many dictionaries."
+      }
+    },
+    {
+      "word": "module",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AA1 JH UW2 L",
+        "confidence": "high",
+        "why": "A full vowel in a closed last syllable carries secondary stress, and the key is UW-L."
+      },
+      "wordhood": {
+        "word": "module",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A self-contained unit or component."
+      }
+    },
+    {
+      "word": "nodule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N AA1 JH UW2 L",
+        "confidence": "high",
+        "why": "The final -ule is a full UW-L syllable with secondary stress, like module."
+      },
+      "wordhood": {
+        "word": "nodule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A small lump or swelling."
+      }
+    },
+    {
+      "word": "ovule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "OW1 V Y UW2 L",
+        "confidence": "high",
+        "why": "The final -ule is a full UW-L syllable with secondary stress."
+      },
+      "wordhood": {
+        "word": "ovule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A plant structure that becomes a seed."
+      }
+    },
+    {
+      "word": "pustule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P AH1 S CH UW2 L",
+        "confidence": "medium",
+        "why": "The full-vowel reading of -ule (UW-L) is heard in General American, so it matches cool."
+      },
+      "wordhood": {
+        "word": "pustule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English medical term for a small pus-filled blister."
+      }
+    },
+    {
+      "word": "reschedule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY0 S K EH1 JH UW2 L",
+        "confidence": "high",
+        "why": "The final -ule is a full UW-L syllable with secondary stress."
+      },
+      "wordhood": {
+        "word": "reschedule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English verb meaning to schedule again."
+      }
+    },
+    {
+      "word": "reticule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R EH1 T IH0 K Y UW2 L",
+        "confidence": "medium",
+        "why": "The final -ule is a full UW-L syllable with secondary stress."
+      },
+      "wordhood": {
+        "word": "reticule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A small drawstring handbag, an English word."
+      }
+    },
+    {
+      "word": "schedule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S K EH1 JH UW2 L",
+        "confidence": "medium",
+        "why": "The full-vowel closed last syllable 'ule' takes secondary stress, as with 'module', so the key is UW L."
+      },
+      "wordhood": {
+        "word": "schedule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun and verb."
+      }
+    },
+    {
+      "word": "tubule",
+      "seedWord": "cool",
+      "rhymeKey": "UW L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "T UW1 B Y UW2 L",
+        "confidence": "high",
+        "why": "The final 'ule' is a full vowel in a closed syllable with secondary stress, so the key is UW L."
+      },
+      "wordhood": {
+        "word": "tubule",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a small tube, especially in anatomy."
+      }
+    },
+    {
+      "word": "armoire",
+      "seedWord": "guitar",
+      "rhymeKey": "AA R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AA0 R M W AA1 R",
+        "confidence": "high",
+        "why": "Stress falls on the final AA R, which matches \"guitar\"."
+      },
+      "wordhood": {
+        "word": "armoire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a large wardrobe, borrowed from French and listed in English dictionaries."
+      }
+    },
+    {
+      "word": "costar",
+      "seedWord": "guitar",
+      "rhymeKey": "AA R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K OW1 S T AA2 R",
+        "confidence": "high",
+        "why": "Compound whose last part \"star\" keeps secondary stress with AA R."
+      },
+      "wordhood": {
+        "word": "costar",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English verb and noun for appearing as a co-star in a film."
+      }
+    },
+    {
+      "word": "exemplar",
+      "seedWord": "guitar",
+      "rhymeKey": "AA R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH0 G Z EH1 M P L AA2 R",
+        "confidence": "medium",
+        "why": "The common variant has a full AA vowel with secondary stress in the closed final syllable."
+      },
+      "wordhood": {
+        "word": "exemplar",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard noun for a model or example."
+      }
+    },
+    {
+      "word": "insofar",
+      "seedWord": "guitar",
+      "rhymeKey": "AA R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH2 N S OW0 F AA1 R",
+        "confidence": "high",
+        "why": "It ends in \"far\", with stressed AA R."
+      },
+      "wordhood": {
+        "word": "insofar",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English adverb, as in 'insofar as'."
+      }
+    },
+    {
+      "word": "quasar",
+      "seedWord": "guitar",
+      "rhymeKey": "AA R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K W EY1 Z AA2 R",
+        "confidence": "medium",
+        "why": "The final syllable is said with a full AA vowel carrying secondary stress, as in \"star\"."
+      },
+      "wordhood": {
+        "word": "quasar",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An English astronomy term for a quasi-stellar radio source."
+      }
+    },
+    {
+      "word": "sonar",
+      "seedWord": "guitar",
+      "rhymeKey": "AA R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S OW1 N AA2 R",
+        "confidence": "high",
+        "why": "The final syllable is said with a full AA vowel carrying secondary stress, as in \"car\"."
+      },
+      "wordhood": {
+        "word": "sonar",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for sound-based detection."
+      }
+    },
+    {
+      "word": "fiat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "F AY1 AE2 T",
+        "confidence": "medium",
+        "why": "One accepted reading, 'FY-at', has a full AE and secondary stress in the last syllable, giving AE T."
+      },
+      "wordhood": {
+        "word": "fiat",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun meaning an authoritative decree (also a car brand, but a common word)."
+      }
+    },
+    {
+      "word": "abject",
+      "seedWord": "deflect",
+      "rhymeKey": "EH K T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AE1 B JH EH2 K T",
+        "confidence": "high",
+        "why": "The closed final syllable has a full EH with secondary stress, giving the key EH K T as in deflect."
+      },
+      "wordhood": {
+        "word": "abject",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English adjective meaning wretched or hopeless."
+      }
+    },
+    {
+      "word": "prospect",
+      "seedWord": "deflect",
+      "rhymeKey": "EH K T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P R AA1 S P EH2 K T",
+        "confidence": "high",
+        "why": "The final syllable has a full EH with secondary stress and ends in K T, matching deflect."
+      },
+      "wordhood": {
+        "word": "prospect",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common noun and verb meaning a possibility or to search for minerals."
+      }
+    },
+    {
+      "word": "airdrops",
+      "seedWord": "triceratops",
+      "rhymeKey": "AA P S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 R D R AA2 P S",
+        "confidence": "high",
+        "why": "Compound whose last part \"drops\" keeps secondary stress, giving the key AA2 P S like \"triceratops\"."
+      },
+      "wordhood": {
+        "word": "airdrops",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural or third-person form of airdrop."
+      }
+    },
+    {
+      "word": "pronoun",
+      "seedWord": "town",
+      "rhymeKey": "AW N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P R OW1 N AW2 N",
+        "confidence": "high",
+        "why": "It ends in the secondary-stressed AW N, the same as town."
+      },
+      "wordhood": {
+        "word": "pronoun",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Grammatical term for a word that substitutes for a noun."
+      }
+    },
+    {
+      "word": "coyotes",
+      "seedWord": "police",
+      "rhymeKey": "IY S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "It ends in the key OW T S or IY Z, never IY S as in \"police\"."
+      },
+      "wordhood": {
+        "word": "coyotes",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of coyote."
+      }
+    },
+    {
+      "word": "earpiece",
+      "seedWord": "police",
+      "rhymeKey": "IY S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH1 R P IY2 S",
+        "confidence": "high",
+        "why": "Compound whose last part \"piece\" keeps secondary stress, giving IY S."
+      },
+      "wordhood": {
+        "word": "earpiece",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard compound noun."
+      }
+    },
+    {
+      "word": "cataract",
+      "seedWord": "act",
+      "rhymeKey": "AE K T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AE1 T ER0 AE2 K T",
+        "confidence": "high",
+        "why": "The final syllable is AE2 K T, matching 'act'."
+      },
+      "wordhood": {
+        "word": "cataract",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word for a waterfall or an eye condition."
+      }
+    },
+    {
+      "word": "subcompact",
+      "seedWord": "act",
+      "rhymeKey": "AE K T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S AH1 B K AA2 M P AE2 K T",
+        "confidence": "high",
+        "why": "It is a compound ending in 'compact', whose final syllable is AE2 K T, matching 'act'."
+      },
+      "wordhood": {
+        "word": "subcompact",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun/adjective for a car smaller than a compact."
+      }
+    },
+    {
+      "word": "catalog",
+      "seedWord": "hog",
+      "rhymeKey": "AA G",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AE1 T AH0 L AO2 G",
+        "confidence": "high",
+        "why": "Final syllable is a full vowel closed by a consonant, so it carries secondary stress, and AA and AO are read as the same vowel, giving the rime of \"hog\"."
+      },
+      "wordhood": {
+        "word": "catalog",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "American spelling of catalogue; a standard noun and verb."
+      }
+    },
+    {
+      "word": "dialog",
+      "seedWord": "hog",
+      "rhymeKey": "AA G",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AY1 AH0 L AO2 G",
+        "confidence": "high",
+        "why": "The closed final syllable has a full vowel with secondary stress, and AO and AA are the same vowel, so it has the rime of \"hog\"."
+      },
+      "wordhood": {
+        "word": "dialog",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Accepted American spelling of dialogue."
+      }
+    },
+    {
+      "word": "prologue",
+      "seedWord": "hog",
+      "rhymeKey": "AA G",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P R OW1 L AO2 G",
+        "confidence": "high",
+        "why": "The final syllable \"logue\" has secondary stress and the rime AO G, which matches \"hog\"."
+      },
+      "wordhood": {
+        "word": "prologue",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An introductory section of a work."
+      }
+    },
+    {
+      "word": "cortex",
+      "seedWord": "flex",
+      "rhymeKey": "EH K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AO1 R T EH2 K S",
+        "confidence": "high",
+        "why": "The closed final syllable has a full vowel with secondary stress, giving EH-K-S, the same as flex."
+      },
+      "wordhood": {
+        "word": "cortex",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Anatomical and botanical term."
+      }
+    },
+    {
+      "word": "ibex",
+      "seedWord": "flex",
+      "rhymeKey": "EH K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AY1 B EH2 K S",
+        "confidence": "high",
+        "why": "The closed final syllable has a full vowel with secondary stress, giving EH-K-S, the same as flex."
+      },
+      "wordhood": {
+        "word": "ibex",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A wild mountain goat with large curved horns."
+      }
+    },
+    {
+      "word": "index",
+      "seedWord": "flex",
+      "rhymeKey": "EH K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH1 N D EH2 K S",
+        "confidence": "high",
+        "why": "The closed final syllable has a full vowel with secondary stress, giving EH-K-S, the same as flex."
+      },
+      "wordhood": {
+        "word": "index",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun and verb."
+      }
+    },
+    {
+      "word": "prospects",
+      "seedWord": "flex",
+      "rhymeKey": "EH K S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "It ends in EH-K-T-S, which has an extra T compared with flex's EH-K-S."
+      },
+      "wordhood": {
+        "word": "prospects",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of 'prospect', a common English noun."
+      }
+    },
+    {
+      "word": "reflex",
+      "seedWord": "flex",
+      "rhymeKey": "EH K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY1 F L EH2 K S",
+        "confidence": "high",
+        "why": "The closed last syllable keeps a full vowel with secondary stress, so the key is EH K S, the same as flex."
+      },
+      "wordhood": {
+        "word": "reflex",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English noun for an automatic response."
+      }
+    },
+    {
+      "word": "vortex",
+      "seedWord": "flex",
+      "rhymeKey": "EH K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "V AO1 R T EH2 K S",
+        "confidence": "high",
+        "why": "The last syllable has a full EH with secondary stress and ends in K S, matching flex."
+      },
+      "wordhood": {
+        "word": "vortex",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A whirling mass of fluid or air."
+      }
+    },
+    {
+      "word": "napalm",
+      "seedWord": "bomb",
+      "rhymeKey": "AA M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N EY1 P AA2 M",
+        "confidence": "high",
+        "why": "The l is silent and the last syllable is a full AA vowel plus M, which matches 'bomb'."
+      },
+      "wordhood": {
+        "word": "napalm",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A common noun for a gelled incendiary fuel."
+      }
+    },
+    {
+      "word": "pompom",
+      "seedWord": "bomb",
+      "rhymeKey": "AA M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P AA1 M P AA2 M",
+        "confidence": "high",
+        "why": "The second syllable is a full AA vowel plus M with secondary stress, so it is a rhyme for 'bomb'."
+      },
+      "wordhood": {
+        "word": "pompom",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A fluffy ball used as decoration or by cheerleaders."
+      }
+    },
+    {
+      "word": "wigwam",
+      "seedWord": "bomb",
+      "rhymeKey": "AA M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "W IH1 G W AA2 M",
+        "confidence": "high",
+        "why": "The final syllable 'wam' is a full AA vowel plus M with secondary stress, which matches 'bomb'."
+      },
+      "wordhood": {
+        "word": "wigwam",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A dome-shaped Native American dwelling, listed in standard dictionaries."
+      }
+    },
+    {
+      "word": "bombast",
+      "seedWord": "vast",
+      "rhymeKey": "AE S T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B AA1 M B AE2 S T",
+        "confidence": "high",
+        "why": "The final closed syllable is a full AE with secondary stress, giving AE S T."
+      },
+      "wordhood": {
+        "word": "bombast",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English noun for pompous speech."
+      }
+    },
+    {
+      "word": "chaos",
+      "seedWord": "cross",
+      "rhymeKey": "AA S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K EY1 AA2 S",
+        "confidence": "medium",
+        "why": "The closed final syllable has a full vowel with secondary stress, so the key is AA S, which is the same as AO S in cross."
+      },
+      "wordhood": {
+        "word": "chaos",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word."
+      }
+    },
+    {
+      "word": "ethos",
+      "seedWord": "cross",
+      "rhymeKey": "AA S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IY1 TH AA2 S",
+        "confidence": "medium",
+        "why": "The full vowel in the closed final syllable takes secondary stress, giving the key AA S, which matches AO S."
+      },
+      "wordhood": {
+        "word": "ethos",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard word for the characteristic spirit of a culture or group."
+      }
+    },
+    {
+      "word": "pathos",
+      "seedWord": "cross",
+      "rhymeKey": "AA S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P EY1 TH AA2 S",
+        "confidence": "medium",
+        "why": "The full vowel in the closed final syllable takes secondary stress, giving the key AA S, which matches AO S."
+      },
+      "wordhood": {
+        "word": "pathos",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Quality evoking pity or sadness."
+      }
+    },
+    {
+      "word": "chevron",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last syllable is a weak 'ruhn' (AH0 N), so it does not have the AO N key of 'lawn'."
+      },
+      "wordhood": {
+        "word": "chevron",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English word for a V-shaped band or pattern, also a brand, but a common noun."
+      }
+    },
+    {
+      "word": "cyclotron",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S AY1 K L AH0 T R AA2 N",
+        "confidence": "high",
+        "why": "The final 'tron' has a full AA vowel plus N with secondary stress, and AA and AO are merged, so it matches 'lawn'."
+      },
+      "wordhood": {
+        "word": "cyclotron",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A type of particle accelerator."
+      }
+    },
+    {
+      "word": "decathlon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D IH0 K AE1 TH L AA2 N",
+        "confidence": "medium",
+        "why": "The final 'lon' is a full AA vowel in a closed syllable, so it carries secondary stress and matches 'lawn'."
+      },
+      "wordhood": {
+        "word": "decathlon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A ten-event athletic contest."
+      }
+    },
+    {
+      "word": "doggone",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AO1 G G AO1 N",
+        "confidence": "high",
+        "why": "The last syllable 'gone' is stressed AO N, which is the same key as 'lawn'."
+      },
+      "wordhood": {
+        "word": "doggone",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Informal mild expletive or adjective."
+      }
+    },
+    {
+      "word": "electron",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH0 L EH1 K T R AA2 N",
+        "confidence": "high",
+        "why": "Final syllable is a full vowel in a closed syllable with secondary stress, giving AA N."
+      },
+      "wordhood": {
+        "word": "electron",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard science term."
+      }
+    },
+    {
+      "word": "eon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IY1 AA2 N",
+        "confidence": "medium",
+        "why": "The final syllable is said with a full 'ah' vowel (EE-on), so it has the AA N key."
+      },
+      "wordhood": {
+        "word": "eon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A variant spelling of aeon."
+      }
+    },
+    {
+      "word": "ganglion",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last syllable is a weak 'uhn' after the stressed vowel, so the key is not AA N."
+      },
+      "wordhood": {
+        "word": "ganglion",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Anatomical term for a cluster of nerve cells."
+      }
+    },
+    {
+      "word": "icon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AY1 K AA2 N",
+        "confidence": "high",
+        "why": "The final syllable has a full AA vowel with secondary stress, giving AA N."
+      },
+      "wordhood": {
+        "word": "icon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word for a symbol or revered figure."
+      }
+    },
+    {
+      "word": "interferon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH2 N T ER0 F IH1 R AA2 N",
+        "confidence": "medium",
+        "why": "The final syllable is a full AA vowel in a closed syllable, so it carries secondary stress and gives AA N."
+      },
+      "wordhood": {
+        "word": "interferon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A protein released by cells in response to viruses."
+      }
+    },
+    {
+      "word": "krypton",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K R IH1 P T AA2 N",
+        "confidence": "medium",
+        "why": "It is commonly said with a full 'ton' (AA N) in the last syllable, which counts as secondary stress."
+      },
+      "wordhood": {
+        "word": "krypton",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A noble gas element; also a common noun."
+      }
+    },
+    {
+      "word": "marzipan",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last syllable has AE N ('pan'), not AA N."
+      },
+      "wordhood": {
+        "word": "marzipan",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Almond paste confection."
+      }
+    },
+    {
+      "word": "neon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N IY1 AA2 N",
+        "confidence": "high",
+        "why": "The final syllable is a full AA vowel with secondary stress, giving AA N."
+      },
+      "wordhood": {
+        "word": "neon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A noble gas element and a type of lighting."
+      }
+    },
+    {
+      "word": "neuron",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N UH1 R AA2 N",
+        "confidence": "high",
+        "why": "The full vowel in the closed last syllable carries secondary stress, giving the key AA N, which matches AO N in 'lawn'."
+      },
+      "wordhood": {
+        "word": "neuron",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A nerve cell."
+      }
+    },
+    {
+      "word": "orangutan",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last syllable is AE N ('tan'), which is not the AO N of 'lawn'."
+      },
+      "wordhood": {
+        "word": "orangutan",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A great ape."
+      }
+    },
+    {
+      "word": "oxymoron",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AA2 K S IH0 M AO1 R AA2 N",
+        "confidence": "high",
+        "why": "The final syllable has secondary stress on AA N, which matches 'lawn'."
+      },
+      "wordhood": {
+        "word": "oxymoron",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A figure of speech combining contradictory terms."
+      }
+    },
+    {
+      "word": "python",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P AY1 TH AA2 N",
+        "confidence": "high",
+        "why": "The full vowel in the closed last syllable 'thon' carries secondary stress, giving AA N."
+      },
+      "wordhood": {
+        "word": "python",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A common noun for a large snake, and also a programming language name."
+      }
+    },
+    {
+      "word": "recon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY1 K AA2 N",
+        "confidence": "high",
+        "why": "The final syllable is read AA N with secondary stress, which matches 'lawn'."
+      },
+      "wordhood": {
+        "word": "recon",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Informal but dictionary-listed clipped form of 'reconnaissance'."
+      }
+    },
+    {
+      "word": "tampon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "T AE1 M P AA2 N",
+        "confidence": "high",
+        "why": "The final syllable 'pon' is a full AA N with secondary stress, which matches 'lawn'."
+      },
+      "wordhood": {
+        "word": "tampon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for an absorbent plug."
+      }
+    },
+    {
+      "word": "telethon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "T EH1 L AH0 TH AA2 N",
+        "confidence": "high",
+        "why": "The final syllable 'thon' is a full AA N with secondary stress, which matches 'lawn'."
+      },
+      "wordhood": {
+        "word": "telethon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a long fundraising TV broadcast."
+      }
+    },
+    {
+      "word": "xenon",
+      "seedWord": "lawn",
+      "rhymeKey": "AA N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "Z IY1 N AA2 N",
+        "confidence": "high",
+        "why": "The final syllable 'non' is a full AA N with secondary stress, which matches 'lawn'."
+      },
+      "wordhood": {
+        "word": "xenon",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A chemical element, a noble gas."
+      }
+    },
+    {
+      "word": "doorknob",
+      "seedWord": "snob",
+      "rhymeKey": "AA B",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AO1 R N AA2 B",
+        "confidence": "high",
+        "why": "Compound whose last part \"knob\" keeps secondary stress and rhymes with \"snob\"."
+      },
+      "wordhood": {
+        "word": "doorknob",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A knob for opening a door."
+      }
+    },
+    {
+      "word": "anthrax",
+      "seedWord": "wax",
+      "rhymeKey": "AE K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AE1 N TH R AE2 K S",
+        "confidence": "high",
+        "why": "The final syllable is AE2 K S, which matches the key of 'wax'."
+      },
+      "wordhood": {
+        "word": "anthrax",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for the disease and its bacterium."
+      }
+    },
+    {
+      "word": "cossacks",
+      "seedWord": "wax",
+      "rhymeKey": "AE K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 S AE2 K S",
+        "confidence": "high",
+        "why": "The final syllable has a full AE closed by K, with plural S, so the key is AE-K-S."
+      },
+      "wordhood": {
+        "word": "cossacks",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Plural of Cossack, a member of a people; often capitalized but a common noun in dictionaries."
+      }
+    },
+    {
+      "word": "kayaks",
+      "seedWord": "wax",
+      "rhymeKey": "AE K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AY1 AE2 K S",
+        "confidence": "high",
+        "why": "The final syllable is a full AE2 K S, matching 'wax'."
+      },
+      "wordhood": {
+        "word": "kayaks",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of kayak."
+      }
+    },
+    {
+      "word": "thorax",
+      "seedWord": "wax",
+      "rhymeKey": "AE K S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "TH AO1 R AE2 K S",
+        "confidence": "high",
+        "why": "The final syllable is AE2 K S, matching 'wax'."
+      },
+      "wordhood": {
+        "word": "thorax",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for the chest or middle body segment."
+      }
+    },
+    {
+      "word": "autoradiograph",
+      "seedWord": "graph",
+      "rhymeKey": "AE F",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AO2 T OW0 R EY1 D IY0 OW0 G R AE2 F",
+        "confidence": "high",
+        "why": "Compound ending in 'graph' with secondary stress on the final AE."
+      },
+      "wordhood": {
+        "word": "autoradiograph",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Technical English noun for an image made by radiation from a specimen, listed in dictionaries."
+      }
+    },
+    {
+      "word": "aphrodisiac",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AE2 F R AH0 D IH1 Z IY0 AE2 K",
+        "confidence": "high",
+        "why": "Full vowel in the closed final syllable takes secondary stress, giving AE K."
+      },
+      "wordhood": {
+        "word": "aphrodisiac",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun/adjective for something that arouses desire."
+      }
+    },
+    {
+      "word": "bivouac",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B IH1 V W AE2 K",
+        "confidence": "medium",
+        "why": "Final -ac is a full AE vowel in a closed syllable with secondary stress, giving AE K."
+      },
+      "wordhood": {
+        "word": "bivouac",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English noun and verb for a temporary camp."
+      }
+    },
+    {
+      "word": "egomaniac",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IY2 G OW0 M EY1 N IY0 AE2 K",
+        "confidence": "high",
+        "why": "Final -ac carries secondary stress as AE K."
+      },
+      "wordhood": {
+        "word": "egomaniac",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English noun."
+      }
+    },
+    {
+      "word": "hemophiliac",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH IY2 M AH0 F IH1 L IY0 AE2 K",
+        "confidence": "high",
+        "why": "Final -ac carries secondary stress as AE K."
+      },
+      "wordhood": {
+        "word": "hemophiliac",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a person with hemophilia."
+      }
+    },
+    {
+      "word": "hypochondriac",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH AY2 P AH0 K AA1 N D R IY0 AE2 K",
+        "confidence": "high",
+        "why": "Final -ac carries secondary stress as AE K."
+      },
+      "wordhood": {
+        "word": "hypochondriac",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun for a person excessively worried about illness."
+      }
+    },
+    {
+      "word": "kayak",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AY1 AE2 K",
+        "confidence": "high",
+        "why": "Final -ak is a full AE vowel in a closed syllable with secondary stress, giving AE K."
+      },
+      "wordhood": {
+        "word": "kayak",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A type of canoe; common English noun."
+      }
+    },
+    {
+      "word": "kleptomaniac",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K L EH2 P T AH0 M EY1 N IY0 AE2 K",
+        "confidence": "high",
+        "why": "Final full-vowel closed syllable -ac carries secondary stress with rime AE-K, matching 'back'."
+      },
+      "wordhood": {
+        "word": "kleptomaniac",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A person with a compulsion to steal."
+      }
+    },
+    {
+      "word": "sumac",
+      "seedWord": "back",
+      "rhymeKey": "AE K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S UW1 M AE2 K",
+        "confidence": "medium",
+        "why": "The last syllable is a full AE vowel closed by K and takes secondary stress, so the key is AE-K."
+      },
+      "wordhood": {
+        "word": "sumac",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a shrub or the spice made from it."
+      }
+    },
+    {
+      "word": "biomass",
+      "seedWord": "glass",
+      "rhymeKey": "AE S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B AY1 OW0 M AE2 S",
+        "confidence": "high",
+        "why": "The final syllable 'mass' has secondary stress and the rime AE S, which matches 'glass'."
+      },
+      "wordhood": {
+        "word": "biomass",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English noun."
+      }
+    },
+    {
+      "word": "zigzag",
+      "seedWord": "rag",
+      "rhymeKey": "AE G",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "Z IH1 G Z AE2 G",
+        "confidence": "high",
+        "why": "Final syllable carries secondary stress with AE G, matching 'rag'."
+      },
+      "wordhood": {
+        "word": "zigzag",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A line or course with sharp turns, also used as a verb."
+      }
+    },
+    {
+      "word": "chromatogram",
+      "seedWord": "damn",
+      "rhymeKey": "AE M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K R OW1 M AE1 T AH0 G R AE2 M",
+        "confidence": "high",
+        "why": "Final syllable 'gram' carries secondary stress with AE M, matching 'damn'."
+      },
+      "wordhood": {
+        "word": "chromatogram",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Scientific term for the output of chromatography."
+      }
+    },
+    {
+      "word": "deprogram",
+      "seedWord": "damn",
+      "rhymeKey": "AE M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D IY0 P R OW1 G R AE2 M",
+        "confidence": "high",
+        "why": "Last syllable 'gram' keeps secondary stress with AE M."
+      },
+      "wordhood": {
+        "word": "deprogram",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "To free someone from indoctrination."
+      }
+    },
+    {
+      "word": "imam",
+      "seedWord": "damn",
+      "rhymeKey": "AE M",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "Stressed final vowel is AA (ih-MAHM), not AE, so the rime differs from 'damn'."
+      },
+      "wordhood": {
+        "word": "imam",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English word for a Muslim prayer leader."
+      }
+    },
+    {
+      "word": "birdman",
+      "seedWord": "man",
+      "rhymeKey": "AE N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B ER1 D M AE2 N",
+        "confidence": "high",
+        "why": "Compound whose last part 'man' keeps secondary stress."
+      },
+      "wordhood": {
+        "word": "birdman",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Listed in dictionaries as a noun for an aviator or bird-catcher."
+      }
+    },
+    {
+      "word": "iceman",
+      "seedWord": "man",
+      "rhymeKey": "AE N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AY1 S M AE2 N",
+        "confidence": "high",
+        "why": "Compound ending in 'man' with secondary stress."
+      },
+      "wordhood": {
+        "word": "iceman",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A man who sells or delivers ice; a standard compound."
+      }
+    },
+    {
+      "word": "marzipan",
+      "seedWord": "man",
+      "rhymeKey": "AE N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AA1 R Z AH0 P AE2 N",
+        "confidence": "high",
+        "why": "Full vowel AE in closed last syllable carries secondary stress, giving AE N."
+      },
+      "wordhood": {
+        "word": "marzipan",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Almond paste confection."
+      }
+    },
+    {
+      "word": "orangutan",
+      "seedWord": "man",
+      "rhymeKey": "AE N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AO0 R AE1 NG AH0 T AE2 N",
+        "confidence": "medium",
+        "why": "Final 'tan' has a full AE vowel with secondary stress, matching AE N."
+      },
+      "wordhood": {
+        "word": "orangutan",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A great ape."
+      }
+    },
+    {
+      "word": "spiderman",
+      "seedWord": "man",
+      "rhymeKey": "AE N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S P AY1 D ER0 M AE2 N",
+        "confidence": "high",
+        "why": "Compound ending in 'man' with secondary stress."
+      },
+      "wordhood": {
+        "word": "spiderman",
+        "verdict": "name",
+        "confidence": "high",
+        "why": "A Marvel character and brand, not a dictionary word."
+      }
+    },
+    {
+      "word": "tribesman",
+      "seedWord": "man",
+      "rhymeKey": "AE N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The last syllable is a weak 'uhn' (M AH0 N), not the full AE of 'man'."
+      },
+      "wordhood": {
+        "word": "tribesman",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a male member of a tribe."
+      }
+    },
+    {
+      "word": "woodsman",
+      "seedWord": "man",
+      "rhymeKey": "AE N",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The last syllable is a weak 'uhn' (M AH0 N), not the full AE of 'man'."
+      },
+      "wordhood": {
+        "word": "woodsman",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A person who lives or works in the woods."
+      }
+    },
+    {
+      "word": "admonishment",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The final '-ment' is a weak syllable, so the last stressed vowel is the earlier AA."
+      },
+      "wordhood": {
+        "word": "admonishment",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard noun meaning an admonition or reprimand."
+      }
+    },
+    {
+      "word": "announcement",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last stressed vowel is AW, and the final '-ment' is weak."
+      },
+      "wordhood": {
+        "word": "announcement",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun."
+      }
+    },
+    {
+      "word": "battlement",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The final '-ment' is normally weak, so the last stress is on the first syllable."
+      },
+      "wordhood": {
+        "word": "battlement",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard architectural term for a fortification parapet."
+      }
+    },
+    {
+      "word": "comment",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 M EH2 N T",
+        "confidence": "high",
+        "why": "The closed final syllable has a full EH vowel with secondary stress, giving EH N T like 'event'."
+      },
+      "wordhood": {
+        "word": "comment",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word."
+      }
+    },
+    {
+      "word": "compliment",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 M P L AH0 M EH2 N T",
+        "confidence": "medium",
+        "why": "A full-vowel 'ment' with secondary stress is a common reading, giving EH N T."
+      },
+      "wordhood": {
+        "word": "compliment",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English word."
+      }
+    },
+    {
+      "word": "disfigurement",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The final -ment is a weak syllable (AH0 N T) and the last stressed syllable is 'fig', so the Rhyme Key is wrong."
+      },
+      "wordhood": {
+        "word": "disfigurement",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Noun for a disfiguring mark or condition."
+      }
+    },
+    {
+      "word": "document",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AA1 K Y AH0 M EH2 N T",
+        "confidence": "medium",
+        "why": "The verb 'document' is said with secondary stress on a full EH in the closed last syllable, giving EH N T."
+      },
+      "wordhood": {
+        "word": "document",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A written or electronic record; also a verb."
+      }
+    },
+    {
+      "word": "portent",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P AO1 R T EH2 N T",
+        "confidence": "medium",
+        "why": "The last syllable has a full EH vowel closed by N T, so it carries secondary stress and matches EH N T."
+      },
+      "wordhood": {
+        "word": "portent",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An omen or sign of something to come."
+      }
+    },
+    {
+      "word": "preannouncement",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last stressed syllable is 'nounce' (AW1 N S M AH0 N T), and -ment is weak."
+      },
+      "wordhood": {
+        "word": "preannouncement",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Regular pre- compound meaning an announcement made in advance; used in business."
+      }
+    },
+    {
+      "word": "reorient",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY2 AO1 R IY0 EH2 N T",
+        "confidence": "medium",
+        "why": "The 'orient' verb ending has a full EH with secondary stress, giving EH N T."
+      },
+      "wordhood": {
+        "word": "reorient",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English verb meaning to orient again."
+      }
+    },
+    {
+      "word": "vestment",
+      "seedWord": "event",
+      "rhymeKey": "EH N T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The stressed syllable is 'vest' (EH1 S T M AH0 N T), and -ment is weak, so the Rhyme Key differs."
+      },
+      "wordhood": {
+        "word": "vestment",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A ceremonial garment worn by clergy."
+      }
+    },
+    {
+      "word": "rewind",
+      "seedWord": "mind",
+      "rhymeKey": "AY N D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY0 W AY1 N D",
+        "confidence": "high",
+        "why": "Verb stress falls on the final syllable, so the key is AY-N-D, the same as mind."
+      },
+      "wordhood": {
+        "word": "rewind",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English verb."
+      }
+    },
+    {
+      "word": "nonsense",
+      "seedWord": "expense",
+      "rhymeKey": "EH N S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N AA1 N S EH2 N S",
+        "confidence": "high",
+        "why": "The final syllable 'sense' has a full EH vowel with secondary stress, matching 'expense'."
+      },
+      "wordhood": {
+        "word": "nonsense",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common noun meaning meaningless words or ideas."
+      }
+    },
+    {
+      "word": "aspired",
+      "seedWord": "hardwired",
+      "rhymeKey": "AY ER D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AH0 S P AY1 ER0 D",
+        "confidence": "high",
+        "why": "Stressed AY + r + d matches hardwired, whose last stressed syllable is AY2 ER0 D."
+      },
+      "wordhood": {
+        "word": "aspired",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Past tense of aspire."
+      }
+    },
+    {
+      "word": "attired",
+      "seedWord": "hardwired",
+      "rhymeKey": "AY ER D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AH0 T AY1 ER0 D",
+        "confidence": "high",
+        "why": "Stressed AY + r + d matches the Rhyme Key of hardwired."
+      },
+      "wordhood": {
+        "word": "attired",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Past tense/participle of attire."
+      }
+    },
+    {
+      "word": "expired",
+      "seedWord": "hardwired",
+      "rhymeKey": "AY ER D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH0 K S P AY1 ER0 D",
+        "confidence": "high",
+        "why": "Stressed AY + r + d matches the Rhyme Key of hardwired."
+      },
+      "wordhood": {
+        "word": "expired",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Past tense of expire."
+      }
+    },
+    {
+      "word": "mired",
+      "seedWord": "hardwired",
+      "rhymeKey": "AY ER D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AY1 ER0 D",
+        "confidence": "high",
+        "why": "Stressed AY + r + d matches the Rhyme Key of hardwired."
+      },
+      "wordhood": {
+        "word": "mired",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Past tense of mire."
+      }
+    },
+    {
+      "word": "reacquired",
+      "seedWord": "hardwired",
+      "rhymeKey": "AY ER D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY0 AH0 K W AY1 ER0 D",
+        "confidence": "high",
+        "why": "Stressed AY1 ER0 D matches the Rhyme Key of hardwired (AY2 ER0 D)."
+      },
+      "wordhood": {
+        "word": "reacquired",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Past tense of 'reacquire'."
+      }
+    },
+    {
+      "word": "bookstand",
+      "seedWord": "band",
+      "rhymeKey": "AE N D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B UH1 K S T AE2 N D",
+        "confidence": "high",
+        "why": "This is a compound whose last part 'stand' keeps secondary stress and has the rime AE N D."
+      },
+      "wordhood": {
+        "word": "bookstand",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Compound noun for a stand that holds books."
+      }
+    },
+    {
+      "word": "ribald",
+      "seedWord": "bald",
+      "rhymeKey": "AA L D",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R AY1 B AO2 L D",
+        "confidence": "medium",
+        "why": "The 'RYE-bawld' pronunciation ends in a full AO vowel closed by L D, which matches 'bald'."
+      },
+      "wordhood": {
+        "word": "ribald",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English adjective meaning crudely humorous."
+      }
+    },
+    {
+      "word": "oblong",
+      "seedWord": "belong",
+      "rhymeKey": "AA NG",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AA1 B L AO2 NG",
+        "confidence": "high",
+        "why": "Its last syllable is AO NG with secondary stress, and AA and AO merge, so it matches belong."
+      },
+      "wordhood": {
+        "word": "oblong",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Elongated rectangular shape."
+      }
+    },
+    {
+      "word": "oolong",
+      "seedWord": "belong",
+      "rhymeKey": "AA NG",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "UW1 L AO2 NG",
+        "confidence": "high",
+        "why": "Its last syllable is AO NG with secondary stress, which matches belong."
+      },
+      "wordhood": {
+        "word": "oolong",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A type of partly fermented tea, used in English."
+      }
+    },
+    {
+      "word": "cohorts",
+      "seedWord": "quartz",
+      "rhymeKey": "AO R T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K OW1 HH AO2 R T S",
+        "confidence": "high",
+        "why": "The last stressed syllable is AO R T S, the same as quartz."
+      },
+      "wordhood": {
+        "word": "cohorts",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of cohort."
+      }
+    },
+    {
+      "word": "escorts",
+      "seedWord": "quartz",
+      "rhymeKey": "AO R T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 S K AO2 R T S",
+        "confidence": "high",
+        "why": "The final syllable AO R T S carries secondary stress and matches quartz."
+      },
+      "wordhood": {
+        "word": "escorts",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of escort, or third-person singular of the verb."
+      }
+    },
+    {
+      "word": "exports",
+      "seedWord": "quartz",
+      "rhymeKey": "AO R T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 K S P AO2 R T S",
+        "confidence": "high",
+        "why": "The final syllable AO R T S carries secondary stress and matches quartz."
+      },
+      "wordhood": {
+        "word": "exports",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of export, or third-person singular of the verb."
+      }
+    },
+    {
+      "word": "electrons",
+      "seedWord": "bronze",
+      "rhymeKey": "AA N Z",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH0 L EH1 K T R AA2 N Z",
+        "confidence": "high",
+        "why": "The final syllable carries secondary stress and is closed by n, so the Rhyme Key is AA N Z, the same as bronze."
+      },
+      "wordhood": {
+        "word": "electrons",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Regular plural of electron."
+      }
+    },
+    {
+      "word": "neurons",
+      "seedWord": "bronze",
+      "rhymeKey": "AA N Z",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N UH1 R AA2 N Z",
+        "confidence": "high",
+        "why": "The final syllable is a full AA closed by N Z, which matches the key of bronze."
+      },
+      "wordhood": {
+        "word": "neurons",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Regular plural of neuron."
+      }
+    },
+    {
+      "word": "orangutans",
+      "seedWord": "bronze",
+      "rhymeKey": "AA N Z",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The last syllable has AE (or a weak vowel) before N Z, not AA."
+      },
+      "wordhood": {
+        "word": "orangutans",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Regular plural of orangutan."
+      }
+    },
+    {
+      "word": "tampons",
+      "seedWord": "bronze",
+      "rhymeKey": "AA N Z",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "T AE1 M P AA2 N Z",
+        "confidence": "high",
+        "why": "The final syllable has a full AA with secondary stress and ends in N Z, matching bronze."
+      },
+      "wordhood": {
+        "word": "tampons",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of tampon."
+      }
+    },
+    {
+      "word": "zircons",
+      "seedWord": "bronze",
+      "rhymeKey": "AA N Z",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "Z ER1 K AA2 N Z",
+        "confidence": "high",
+        "why": "The final syllable has a full AA closed by N Z, which matches bronze."
+      },
+      "wordhood": {
+        "word": "zircons",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of zircon, a mineral used as a gemstone."
+      }
+    },
+    {
+      "word": "marveled",
+      "seedWord": "upheld",
+      "rhymeKey": "EH L D",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last stressed vowel is AA before R V AH L D, which is not the EH L D of 'upheld'."
+      },
+      "wordhood": {
+        "word": "marveled",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "American past tense of marvel."
+      }
+    },
+    {
+      "word": "cosmos",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 Z M OW2 S",
+        "confidence": "medium",
+        "why": "The common KOZ-mohs reading has a full, closed OW-S final syllable, matching 'diagnose'."
+      },
+      "wordhood": {
+        "word": "cosmos",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English word for the universe, also a flower."
+      }
+    },
+    {
+      "word": "dextrose",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D EH1 K S T R OW2 S",
+        "confidence": "high",
+        "why": "The final syllable is a full, closed OW-S with secondary stress, matching 'diagnose'."
+      },
+      "wordhood": {
+        "word": "dextrose",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A simple sugar, glucose."
+      }
+    },
+    {
+      "word": "ethnos",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "low",
+        "why": "The usual reading ends in AA-S or a weak 'us', not OW-S."
+      },
+      "wordhood": {
+        "word": "ethnos",
+        "verdict": "word",
+        "confidence": "low",
+        "why": "A rare term for an ethnic group or people, found in some dictionaries, though it began as a Greek word."
+      }
+    },
+    {
+      "word": "kudos",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "Said K UW1 D AA2 S (rime AA S) or K UW1 D OW2 Z (ends in Z), so it never ends in OW S."
+      },
+      "wordhood": {
+        "word": "kudos",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English word meaning praise or acclaim."
+      }
+    },
+    {
+      "word": "lactose",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "L AE1 K T OW2 S",
+        "confidence": "high",
+        "why": "The closed final syllable has a full OW vowel with secondary stress, giving the key OW S."
+      },
+      "wordhood": {
+        "word": "lactose",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Milk sugar."
+      }
+    },
+    {
+      "word": "maltose",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AO1 L T OW2 S",
+        "confidence": "high",
+        "why": "The final -tose has secondary-stressed OW S, matching the key of diagnose."
+      },
+      "wordhood": {
+        "word": "maltose",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A sugar made of two glucose units."
+      }
+    },
+    {
+      "word": "sucrose",
+      "seedWord": "diagnose",
+      "rhymeKey": "OW S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S UW1 K R OW2 S",
+        "confidence": "high",
+        "why": "The final -rose is said OW2 S, with a closed full vowel and secondary stress."
+      },
+      "wordhood": {
+        "word": "sucrose",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for table sugar."
+      }
+    },
+    {
+      "word": "airboat",
+      "seedWord": "float",
+      "rhymeKey": "OW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 R B OW2 T",
+        "confidence": "high",
+        "why": "It is a compound whose last part, boat, keeps secondary stress and has the key OW T."
+      },
+      "wordhood": {
+        "word": "airboat",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Compound noun for a flat-bottomed propeller-driven boat."
+      }
+    },
+    {
+      "word": "compote",
+      "seedWord": "float",
+      "rhymeKey": "OW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AA1 M P OW2 T",
+        "confidence": "high",
+        "why": "The full vowel in the closed last syllable carries secondary stress, giving the Rhyme Key OW T."
+      },
+      "wordhood": {
+        "word": "compote",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English word for fruit stewed in syrup."
+      }
+    },
+    {
+      "word": "coyote",
+      "seedWord": "float",
+      "rhymeKey": "OW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AY1 OW2 T",
+        "confidence": "medium",
+        "why": "The two-syllable form 'KY-oat' is common in General American and ends in OW T with secondary stress."
+      },
+      "wordhood": {
+        "word": "coyote",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A North American wild canine."
+      }
+    },
+    {
+      "word": "homozygote",
+      "seedWord": "float",
+      "rhymeKey": "OW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH OW2 M OW0 Z AY1 G OW2 T",
+        "confidence": "high",
+        "why": "The last syllable is a full closed OW T with secondary stress, so the Rhyme Key matches."
+      },
+      "wordhood": {
+        "word": "homozygote",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A genetics term for an organism with identical alleles."
+      }
+    },
+    {
+      "word": "zygote",
+      "seedWord": "float",
+      "rhymeKey": "OW T",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "Z AY1 G OW2 T",
+        "confidence": "high",
+        "why": "The last syllable is a full closed OW T with secondary stress."
+      },
+      "wordhood": {
+        "word": "zygote",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A cell formed by the union of two gametes."
+      }
+    },
+    {
+      "word": "admire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AH0 D M AY1 ER0",
+        "confidence": "high",
+        "why": "The stress falls on the final syllable, which has the rime AY-ER, the same as hire."
+      },
+      "wordhood": {
+        "word": "admire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English verb."
+      }
+    },
+    {
+      "word": "afire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AH0 F AY1 ER0",
+        "confidence": "high",
+        "why": "The stress falls on the final syllable, which has the rime AY-ER, the same as hire."
+      },
+      "wordhood": {
+        "word": "afire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English adjective/adverb meaning on fire."
+      }
+    },
+    {
+      "word": "aspire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AH0 S P AY1 ER0",
+        "confidence": "high",
+        "why": "The stress falls on the final syllable, which has the rime AY-ER, the same as hire."
+      },
+      "wordhood": {
+        "word": "aspire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English verb."
+      }
+    },
+    {
+      "word": "backfire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B AE1 K F AY2 ER0",
+        "confidence": "high",
+        "why": "The compound's last part, fire, keeps secondary stress with the rime AY-ER, the same as hire."
+      },
+      "wordhood": {
+        "word": "backfire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English verb and noun."
+      }
+    },
+    {
+      "word": "brushfire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B R AH1 SH F AY2 ER0",
+        "confidence": "high",
+        "why": "Compound whose last part 'fire' keeps secondary stress and has the Rhyme Key AY-ER."
+      },
+      "wordhood": {
+        "word": "brushfire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard compound noun for a fire in brush."
+      }
+    },
+    {
+      "word": "crossfire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K R AO1 S F AY2 ER0",
+        "confidence": "high",
+        "why": "Compound ending in 'fire' with secondary stress on AY, which matches the key of 'hire'."
+      },
+      "wordhood": {
+        "word": "crossfire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard compound meaning intersecting gunfire."
+      }
+    },
+    {
+      "word": "dire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AY1 ER0",
+        "confidence": "high",
+        "why": "Same AY-ER rime as 'hire', with only the onset consonant different."
+      },
+      "wordhood": {
+        "word": "dire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Adjective meaning dreadful or urgent."
+      }
+    },
+    {
+      "word": "esquire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EH1 S K W AY2 ER0",
+        "confidence": "high",
+        "why": "The final syllable AY-ER is stressed, and the secondary stress counts."
+      },
+      "wordhood": {
+        "word": "esquire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A courtesy title and an English noun."
+      }
+    },
+    {
+      "word": "expire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH0 K S P AY1 ER0",
+        "confidence": "high",
+        "why": "Stress falls on the final AY-ER, the same key as 'hire'."
+      },
+      "wordhood": {
+        "word": "expire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard verb."
+      }
+    },
+    {
+      "word": "haywire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH EY1 W AY2 ER0",
+        "confidence": "high",
+        "why": "Compound ending in 'wire' with secondary stress on AY-ER."
+      },
+      "wordhood": {
+        "word": "haywire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English adjective or noun, as in 'go haywire'."
+      }
+    },
+    {
+      "word": "hellfire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH EH1 L F AY2 ER0",
+        "confidence": "high",
+        "why": "Compound ending in 'fire' with secondary stress on AY-ER."
+      },
+      "wordhood": {
+        "word": "hellfire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English compound noun for the fires of hell."
+      }
+    },
+    {
+      "word": "inquire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH0 N K W AY1 ER0",
+        "confidence": "high",
+        "why": "Final stressed AY-ER matches the key of 'hire'."
+      },
+      "wordhood": {
+        "word": "inquire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English verb meaning to ask."
+      }
+    },
+    {
+      "word": "inspire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "IH0 N S P AY1 ER0",
+        "confidence": "high",
+        "why": "Last stressed syllable is AY plus er/r, the same key as hire."
+      },
+      "wordhood": {
+        "word": "inspire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English verb."
+      }
+    },
+    {
+      "word": "ire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "AY1 ER0",
+        "confidence": "high",
+        "why": "Same AY plus er/r rime as hire; it is a homophone."
+      },
+      "wordhood": {
+        "word": "ire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun meaning anger."
+      }
+    },
+    {
+      "word": "lyre",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "L AY1 ER0",
+        "confidence": "high",
+        "why": "Same AY plus er/r rime as hire; it is a homophone."
+      },
+      "wordhood": {
+        "word": "lyre",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A stringed musical instrument."
+      }
+    },
+    {
+      "word": "mire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M AY1 ER0",
+        "confidence": "high",
+        "why": "Same AY plus er/r rime as hire."
+      },
+      "wordhood": {
+        "word": "mire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Swampy ground or to bog down."
+      }
+    },
+    {
+      "word": "perspire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P ER0 S P AY1 ER0",
+        "confidence": "high",
+        "why": "Stress falls on the final AY plus er/r, matching hire."
+      },
+      "wordhood": {
+        "word": "perspire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English verb meaning to sweat."
+      }
+    },
+    {
+      "word": "reacquire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY2 AH0 K W AY1 ER0",
+        "confidence": "high",
+        "why": "Stress falls on the final AY plus er/r, matching hire."
+      },
+      "wordhood": {
+        "word": "reacquire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A regular re- prefixed verb meaning to acquire again."
+      }
+    },
+    {
+      "word": "rehire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY0 HH AY1 ER0",
+        "confidence": "high",
+        "why": "It ends in hire, so the key is the same."
+      },
+      "wordhood": {
+        "word": "rehire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English verb meaning to hire again."
+      }
+    },
+    {
+      "word": "respire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IH0 S P AY1 ER0",
+        "confidence": "high",
+        "why": "Stress falls on the final AY plus er/r, matching hire."
+      },
+      "wordhood": {
+        "word": "respire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English verb meaning to breathe."
+      }
+    },
+    {
+      "word": "shire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "SH AY1 ER0",
+        "confidence": "high",
+        "why": "Rhyme Key is AY + r, the same as hire; after AY, er and plain r read as the same."
+      },
+      "wordhood": {
+        "word": "shire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English word for a county or a breed of horse."
+      }
+    },
+    {
+      "word": "spire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S P AY1 ER0",
+        "confidence": "high",
+        "why": "Same AY + r rime as hire."
+      },
+      "wordhood": {
+        "word": "spire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a tapering structure on a tower."
+      }
+    },
+    {
+      "word": "squire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S K W AY1 ER0",
+        "confidence": "high",
+        "why": "Same AY + r rime as hire."
+      },
+      "wordhood": {
+        "word": "squire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun and verb for a landowner or an escort."
+      }
+    },
+    {
+      "word": "vampire",
+      "seedWord": "hire",
+      "rhymeKey": "AY ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "V AE1 M P AY2 ER0",
+        "confidence": "high",
+        "why": "The last syllable carries secondary stress on AY + r, which matches hire."
+      },
+      "wordhood": {
+        "word": "vampire",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A common English noun for a blood-drinking undead creature."
+      }
+    },
+    {
+      "word": "turret",
+      "seedWord": "skirt",
+      "rhymeKey": "ER T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "'Turret' ends in ER1 AH0 T, which has an extra weak syllable and a different final consonant from 'skirt' (ER1 T)."
+      },
+      "wordhood": {
+        "word": "turret",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A small tower on a building or a gun housing on a tank or ship."
+      }
+    },
+    {
+      "word": "prequel",
+      "seedWord": "motel",
+      "rhymeKey": "EH L",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The last syllable is usually a weak AH0 L, and the weak-ul equivalence only applies after eye, oh, oo, ow and oy, so it does not match EH L."
+      },
+      "wordhood": {
+        "word": "prequel",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A work portraying events before an earlier work."
+      }
+    },
+    {
+      "word": "quantifiable",
+      "seedWord": "motel",
+      "rhymeKey": "EH L",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "It ends in unstressed AH0 B AH0 L, with extra syllables after the stressed vowel, so the key differs."
+      },
+      "wordhood": {
+        "word": "quantifiable",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English adjective meaning able to be measured."
+      }
+    },
+    {
+      "word": "trowel",
+      "seedWord": "motel",
+      "rhymeKey": "EH L",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "Its key is AW1 AH0 L, which is not EH L."
+      },
+      "wordhood": {
+        "word": "trowel",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a small hand tool for digging or spreading."
+      }
+    },
+    {
+      "word": "yokel",
+      "seedWord": "motel",
+      "rhymeKey": "EH L",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "Its key is OW1 K AH0 L, which is not EH L."
+      },
+      "wordhood": {
+        "word": "yokel",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A rustic, unsophisticated country person."
+      }
+    },
+    {
+      "word": "acorn",
+      "seedWord": "worn",
+      "rhymeKey": "AO R N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "EY1 K AO2 R N",
+        "confidence": "high",
+        "why": "The full vowel in the closed last syllable keeps secondary stress, giving the rime AO R N."
+      },
+      "wordhood": {
+        "word": "acorn",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common noun for the oak nut."
+      }
+    },
+    {
+      "word": "capricorn",
+      "seedWord": "worn",
+      "rhymeKey": "AO R N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AE1 P R AH0 K AO2 R N",
+        "confidence": "high",
+        "why": "The final syllable has secondary stress and the rime AO R N."
+      },
+      "wordhood": {
+        "word": "capricorn",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Usually capitalized as a zodiac sign, but also appears in dictionaries as a common noun for the goat-like sign."
+      }
+    },
+    {
+      "word": "leghorn",
+      "seedWord": "worn",
+      "rhymeKey": "AO R N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "L EH1 G HH AO2 R N",
+        "confidence": "high",
+        "why": "It is a compound whose last part, 'horn', keeps secondary stress with the rime AO R N."
+      },
+      "wordhood": {
+        "word": "leghorn",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A breed of chicken, also a type of straw plait."
+      }
+    },
+    {
+      "word": "newborn",
+      "seedWord": "worn",
+      "rhymeKey": "AO R N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "N UW1 B AO2 R N",
+        "confidence": "high",
+        "why": "It is a compound ending in 'born', which has the rime AO R N."
+      },
+      "wordhood": {
+        "word": "newborn",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A recently born baby; also an adjective."
+      }
+    },
+    {
+      "word": "synapse",
+      "seedWord": "collapse",
+      "rhymeKey": "AE P S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S IH1 N AE2 P S",
+        "confidence": "high",
+        "why": "The final syllable is said with a full AE vowel and secondary stress, giving AE P S."
+      },
+      "wordhood": {
+        "word": "synapse",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun for a junction between nerve cells."
+      }
+    },
+    {
+      "word": "shipwreck",
+      "seedWord": "neck",
+      "rhymeKey": "EH K",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "SH IH1 P R EH2 K",
+        "confidence": "high",
+        "why": "In this compound, -wreck keeps secondary stress with the key EH-K, the same as neck."
+      },
+      "wordhood": {
+        "word": "shipwreck",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun and verb."
+      }
+    },
+    {
+      "word": "hornpipe",
+      "seedWord": "swipe",
+      "rhymeKey": "AY P",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH AO1 R N P AY2 P",
+        "confidence": "high",
+        "why": "In this compound, -pipe keeps secondary stress with the key AY-P, the same as swipe."
+      },
+      "wordhood": {
+        "word": "hornpipe",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A musical instrument and a dance."
+      }
+    },
+    {
+      "word": "skydive",
+      "seedWord": "hive",
+      "rhymeKey": "AY V",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S K AY1 D AY2 V",
+        "confidence": "high",
+        "why": "In this compound, -dive keeps secondary stress with the key AY-V, the same as hive."
+      },
+      "wordhood": {
+        "word": "skydive",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English verb meaning to jump from an aircraft with a parachute."
+      }
+    },
+    {
+      "word": "mutagen",
+      "seedWord": "pen",
+      "rhymeKey": "EH N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M Y UW1 T AH0 JH EH2 N",
+        "confidence": "medium",
+        "why": "The closed last syllable has a full vowel with secondary stress, giving EH N like 'pen'."
+      },
+      "wordhood": {
+        "word": "mutagen",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An agent that causes genetic mutation."
+      }
+    },
+    {
+      "word": "dower",
+      "seedWord": "power",
+      "rhymeKey": "AW ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AW1 ER0",
+        "confidence": "high",
+        "why": "It has the same AW ER rime as power."
+      },
+      "wordhood": {
+        "word": "dower",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A dower is a widow's share of her husband's estate, or a dowry."
+      }
+    },
+    {
+      "word": "hydropower",
+      "seedWord": "power",
+      "rhymeKey": "AW ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "HH AY1 D R OW0 P AW2 ER0",
+        "confidence": "high",
+        "why": "It is a compound ending in power, with secondary stress on AW ER."
+      },
+      "wordhood": {
+        "word": "hydropower",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard compound noun for power from moving water."
+      }
+    },
+    {
+      "word": "downpour",
+      "seedWord": "core",
+      "rhymeKey": "AO R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D AW1 N P AO2 R",
+        "confidence": "high",
+        "why": "This compound's last part 'pour' keeps secondary stress and has the same AO-R rime as 'core'."
+      },
+      "wordhood": {
+        "word": "downpour",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common word for a heavy rain."
+      }
+    },
+    {
+      "word": "furor",
+      "seedWord": "core",
+      "rhymeKey": "AO R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "F Y UH1 R AO2 R",
+        "confidence": "medium",
+        "why": "One common reading ends in a full AO2 R syllable, which matches the rime of 'core'."
+      },
+      "wordhood": {
+        "word": "furor",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun meaning an outburst of public excitement."
+      }
+    },
+    {
+      "word": "metaphor",
+      "seedWord": "core",
+      "rhymeKey": "AO R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "M EH1 T AH0 F AO2 R",
+        "confidence": "high",
+        "why": "The final syllable is a full AO2 R with secondary stress, matching 'core'."
+      },
+      "wordhood": {
+        "word": "metaphor",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A figure of speech."
+      }
+    },
+    {
+      "word": "pedicure",
+      "seedWord": "core",
+      "rhymeKey": "AO R",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "It ends in the UH-R of 'cure', which stays apart from the AO-R of 'core'."
+      },
+      "wordhood": {
+        "word": "pedicure",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A cosmetic treatment of the feet and toenails."
+      }
+    },
+    {
+      "word": "pompadour",
+      "seedWord": "core",
+      "rhymeKey": "AO R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P AA1 M P AH0 D AO2 R",
+        "confidence": "medium",
+        "why": "The final syllable is read AO2 R, matching 'core'."
+      },
+      "wordhood": {
+        "word": "pompadour",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A hairstyle with hair swept up high from the forehead."
+      }
+    },
+    {
+      "word": "signor",
+      "seedWord": "core",
+      "rhymeKey": "AO R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S IY0 N Y AO1 R",
+        "confidence": "high",
+        "why": "The stress falls on the last syllable, 'nyor', which has the AO-R rime of 'core'."
+      },
+      "wordhood": {
+        "word": "signor",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Listed in English dictionaries as a variant of signore, an Italian title of address."
+      }
+    },
+    {
+      "word": "subplots",
+      "seedWord": "ersatz",
+      "rhymeKey": "AA T S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S AH1 B P L AA2 T S",
+        "confidence": "high",
+        "why": "Its key is AA T S, the same as ersatz (ER1 S AA2 T S)."
+      },
+      "wordhood": {
+        "word": "subplots",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Plural of subplot."
+      }
+    },
+    {
+      "word": "brimstone",
+      "seedWord": "loan",
+      "rhymeKey": "OW N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "B R IH1 M S T OW2 N",
+        "confidence": "high",
+        "why": "This is a compound whose last part, 'stone', keeps a secondary stress, so it rhymes with 'loan'."
+      },
+      "wordhood": {
+        "word": "brimstone",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English noun meaning sulfur."
+      }
+    },
+    {
+      "word": "ketone",
+      "seedWord": "loan",
+      "rhymeKey": "OW N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K IY1 T OW2 N",
+        "confidence": "high",
+        "why": "The final syllable is a full OW-N with secondary stress, matching 'loan'."
+      },
+      "wordhood": {
+        "word": "ketone",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A class of organic compounds in chemistry."
+      }
+    },
+    {
+      "word": "provolone",
+      "seedWord": "loan",
+      "rhymeKey": "OW N",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P R OW2 V AH0 L OW1 N",
+        "confidence": "high",
+        "why": "Stress falls on the final OW-N, which has the key of 'loan'."
+      },
+      "wordhood": {
+        "word": "provolone",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An English word for a type of Italian cheese."
+      }
+    },
+    {
+      "word": "sextuplet",
+      "seedWord": "let",
+      "rhymeKey": "EH T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "low",
+        "why": "The final syllable is usually a weak AH0/IH0 T, and the stress falls on the earlier syllable."
+      },
+      "wordhood": {
+        "word": "sextuplet",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "One of six babies born at one birth; also a musical group of six."
+      }
+    },
+    {
+      "word": "sorbet",
+      "seedWord": "let",
+      "rhymeKey": "EH T",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "It ends in the vowel EY (sor-BAY), not EH T."
+      },
+      "wordhood": {
+        "word": "sorbet",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A frozen fruit dessert, an English word."
+      }
+    },
+    {
+      "word": "coenzyme",
+      "seedWord": "time",
+      "rhymeKey": "AY M",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K OW0 EH1 N Z AY2 M",
+        "confidence": "high",
+        "why": "The final syllable has AY2 M, the same Rhyme Key as time."
+      },
+      "wordhood": {
+        "word": "coenzyme",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard biochemistry term."
+      }
+    },
+    {
+      "word": "camembert",
+      "seedWord": "air",
+      "rhymeKey": "EH R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AE1 M AH0 M B EH2 R",
+        "confidence": "high",
+        "why": "The final syllable carries secondary stress with EH + R, matching the key of 'air'."
+      },
+      "wordhood": {
+        "word": "camembert",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English common noun for the cheese, in dictionaries lowercase."
+      }
+    },
+    {
+      "word": "corsair",
+      "seedWord": "air",
+      "rhymeKey": "EH R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "K AO1 R S EH2 R",
+        "confidence": "high",
+        "why": "The last syllable is EH + R with secondary stress, same as 'air'."
+      },
+      "wordhood": {
+        "word": "corsair",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English word for a pirate or privateer."
+      }
+    },
+    {
+      "word": "ploughshare",
+      "seedWord": "air",
+      "rhymeKey": "EH R",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P L AW1 SH EH2 R",
+        "confidence": "high",
+        "why": "This compound's last part 'share' keeps secondary stress and rhymes with 'air'."
+      },
+      "wordhood": {
+        "word": "ploughshare",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "British spelling of plowshare, the cutting blade of a plough."
+      }
+    },
+    {
+      "word": "casualness",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "It ends in an unstressed weak 'nuss', not the EH-S key of 'chess'."
+      },
+      "wordhood": {
+        "word": "casualness",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Regular noun formed from casual plus -ness."
+      }
+    },
+    {
+      "word": "duress",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "D UH0 R EH1 S",
+        "confidence": "high",
+        "why": "Stress falls on the final syllable, EH1 S, which is the same key as 'chess'."
+      },
+      "wordhood": {
+        "word": "duress",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard word for coercion or threat."
+      }
+    },
+    {
+      "word": "empress",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "Stress is on the first syllable and the key is EH M P R AH S, not EH S."
+      },
+      "wordhood": {
+        "word": "empress",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A female emperor or an emperor's wife."
+      }
+    },
+    {
+      "word": "flavorless",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last syllable is a weak 'lus', so only an unstressed ending matches."
+      },
+      "wordhood": {
+        "word": "flavorless",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard American spelling of an English adjective."
+      }
+    },
+    {
+      "word": "fontes",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The stressed vowel is followed by N and a final syllable (F AA1 N T IY0 Z or similar), not EH S."
+      },
+      "wordhood": {
+        "word": "fontes",
+        "verdict": "not-a-word",
+        "confidence": "medium",
+        "why": "Latin plural of 'fons' or a surname, not an English word."
+      }
+    },
+    {
+      "word": "gutless",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The last stressed vowel is the AH in 'gut', followed by 'less' with a weak vowel, so the key is not EH S."
+      },
+      "wordhood": {
+        "word": "gutless",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English adjective meaning cowardly."
+      }
+    },
+    {
+      "word": "inclusiveness",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "Stress falls on 'clu' (UW1), and the final syllable is a weak 'nes'."
+      },
+      "wordhood": {
+        "word": "inclusiveness",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Regular noun form of inclusive."
+      }
+    },
+    {
+      "word": "intrusiveness",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "Stress falls on 'tru' (UW1), and the final syllable is a weak 'nes'."
+      },
+      "wordhood": {
+        "word": "intrusiveness",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Regular noun form of intrusive."
+      }
+    },
+    {
+      "word": "morales",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "The stressed syllable is 'ral' (AA/AE) and the word ends in z, so it lacks the EH S key."
+      },
+      "wordhood": {
+        "word": "morales",
+        "verdict": "name",
+        "confidence": "high",
+        "why": "A Spanish surname."
+      }
+    },
+    {
+      "word": "morones",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The stressed vowel is OW or AO, and the word ends in z."
+      },
+      "wordhood": {
+        "word": "morones",
+        "verdict": "word",
+        "confidence": "medium",
+        "why": "Plural of moron (also a Spanish surname), a valid English plural form is 'morons' but 'morones' is a rare variant plural of moron in older usage."
+      }
+    },
+    {
+      "word": "princess",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P R IH1 N S EH2 S",
+        "confidence": "high",
+        "why": "The closed final syllable has a full vowel with secondary stress, giving the key EH S."
+      },
+      "wordhood": {
+        "word": "princess",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common noun for a royal daughter or a prince's wife."
+      }
+    },
+    {
+      "word": "reprocess",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R IY0 P R AA1 S EH2 S",
+        "confidence": "high",
+        "why": "Like 'process', the final syllable has a full EH with secondary stress, giving the key EH S."
+      },
+      "wordhood": {
+        "word": "reprocess",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English verb meaning to process again."
+      }
+    },
+    {
+      "word": "thankfulness",
+      "seedWord": "chess",
+      "rhymeKey": "EH S",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "high",
+        "why": "The stressed vowel is AE, and the final syllables are weak."
+      },
+      "wordhood": {
+        "word": "thankfulness",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun formed from thankful plus -ness."
+      }
+    },
+    {
+      "word": "squirrel",
+      "seedWord": "curl",
+      "rhymeKey": "ER L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "S K W ER1 L",
+        "confidence": "medium",
+        "why": "The common one-syllable American 'skwurl' has the same rime ER1 L as 'curl'."
+      },
+      "wordhood": {
+        "word": "squirrel",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Common English noun for a bushy-tailed rodent."
+      }
+    },
+    {
+      "word": "sharpshooter",
+      "seedWord": "computer",
+      "rhymeKey": "UW D ER",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "SH AA1 R P SH UW2 T ER0",
+        "confidence": "high",
+        "why": "The Rhyme Key UW T ER matches 'computer', and the secondary stress on 'shoot' counts."
+      },
+      "wordhood": {
+        "word": "sharpshooter",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English compound noun for a skilled marksman."
+      }
+    },
+    {
+      "word": "imbecile",
+      "seedWord": "smile",
+      "rhymeKey": "AY L",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "General American says it with a weak final syllable (IH1 M B AH0 S AH0 L), so it has no AY vowel before L."
+      },
+      "wordhood": {
+        "word": "imbecile",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "English noun meaning a stupid person."
+      }
+    },
+    {
+      "word": "pedophile",
+      "seedWord": "smile",
+      "rhymeKey": "AY L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P EH1 D AH0 F AY2 L",
+        "confidence": "high",
+        "why": "The final syllable keeps secondary stress on AY2 L, the same Rhyme Key as smile."
+      },
+      "wordhood": {
+        "word": "pedophile",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English noun for an adult sexually attracted to children."
+      }
+    },
+    {
+      "word": "penile",
+      "seedWord": "smile",
+      "rhymeKey": "AY L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "P IY1 N AY2 L",
+        "confidence": "medium",
+        "why": "The common US reading ends in AY2 L, which matches smile."
+      },
+      "wordhood": {
+        "word": "penile",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "Standard English adjective meaning relating to the penis."
+      }
+    },
+    {
+      "word": "projectile",
+      "seedWord": "smile",
+      "rhymeKey": "AY L",
+      "rhyme": {
+        "verdict": "no-rhyme",
+        "reading": null,
+        "confidence": "medium",
+        "why": "General American usually says it with a weak final syllable (-təl), and the -tile reading is not widespread."
+      },
+      "wordhood": {
+        "word": "projectile",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "An object propelled through the air."
+      }
+    },
+    {
+      "word": "reptile",
+      "seedWord": "smile",
+      "rhymeKey": "AY L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "R EH1 P T AY2 L",
+        "confidence": "high",
+        "why": "The final syllable has AY2 L, so the Rhyme Key matches smile."
+      },
+      "wordhood": {
+        "word": "reptile",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A standard English noun for a cold-blooded vertebrate class."
+      }
+    },
+    {
+      "word": "woodpile",
+      "seedWord": "smile",
+      "rhymeKey": "AY L",
+      "rhyme": {
+        "verdict": "rhyme",
+        "reading": "W UH1 D P AY2 L",
+        "confidence": "high",
+        "why": "It is a compound whose last part, pile, keeps secondary stress and rhymes with smile."
+      },
+      "wordhood": {
+        "word": "woodpile",
+        "verdict": "word",
+        "confidence": "high",
+        "why": "A pile of wood, usually firewood; a standard compound."
+      }
+    }
+  ]
+}
