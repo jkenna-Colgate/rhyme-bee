@@ -716,6 +716,15 @@ yearling(1) Y ER1 L IH0 NG
 # scored for `calm` and `bomb`; it is "AHSH-rum", the last vowel a schwa.
 ashram AA1 SH R AH0 M
 
+# subsection, rectangle, bifocal, orgasm (#290): upstream marks the vowel before the final
+# "-shun", "-gle", "-cal" and "-zum" unstressed. Each rhymed only because stress promotion
+# stressed it in the syllabic consonant rule's reading, which promotion no longer reads.
+# Each carries a light stress, so they keep `section`, `angle`, `focal` and `chasm`.
+subsection S AH1 B S EH2 K SH AH0 N
+rectangle R EH1 K T AE2 NG G AH0 L
+bifocal B AY1 F OW2 K AH0 L
+orgasm AO1 R G AE2 Z AH0 M
+
 # nares (#240): upstream `N AE1 R Z` is one syllable; it is two, "NAIR-eez".
 nares N EH1 R IY0 Z
 

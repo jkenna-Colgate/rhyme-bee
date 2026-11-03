@@ -519,6 +519,20 @@ this amendment, and it also removes #86's own cases (`clergyman`, `dutiful`,
   before it lands.
 - **Guardrails.** The committed set must survive untouched.
 
+**Built, 2026-11-03 ([#290](https://github.com/jkenna-Colgate/rhyme-bee/issues/290)).**
+"Closed before rule 2 ran" had two readings: never promote a vowel rule 2
+exposed, or promote one whose consonants before the dropped schwa cannot
+start a syllable (`subsection`'s "k-sh"). The maintainer chose the first, and
+to fix its leftovers by hand rather than with a narrower rule: below about a
+hundred words, a correction beats another rule's reach. Built, it took 71
+words off a family on 19 keys: 36 `-ual` words leaving `cool` (33 of its
+Answers; it keeps 56, in band), #86's shapes and their `-woman` kin (23),
+and 12 others. Four of those were real rhymes and are corrected in
+`data/supplement.dict` with the light stress they carry (`subsection`,
+`rectangle`, `bifocal`, `orgasm`); `coarticulation` is left out of the
+`-ation` family. No other scheduled day changes. The `-ual` words are now Weak
+Rhymes for `cool`: accepted, with no Points.
+
 ### What was not made a rule
 
 **Promotion's own errors on a weak ending.** The same review found
