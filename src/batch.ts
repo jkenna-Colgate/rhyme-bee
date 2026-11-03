@@ -370,17 +370,19 @@ export function judgeCallCap(plan: Pick<BatchCallPlan, "seeds" | "maxJudgeCalls"
  * looks of two runs each. The Judge may be asked nothing on the looks, and at
  * most `judgeCallCap` rhyme calls a look with a wordhood call per 20 of the
  * Candidates those hold; the hunt's calls come on top. So does the Tier
- * question (#295), asked once the looks are done of each word they wrote in
- * with no knownness: none at fewest, and at most a call per `TIER_BATCH` of
- * every Candidate a look's rhyme calls could hold, as though each were one.
+ * question (#295), asked once per Batch after the looks are done, of every
+ * word they wrote in with no knownness: none at fewest, and at most a call per
+ * `TIER_BATCH` of every Candidate all the looks' rhyme calls could hold, as
+ * though each were one.
  */
 export function batchCost(plan: BatchCallPlan, models: { player: string; judge: string }): ModelCost[] {
   const hunt = plan.hunt.rhyme + plan.hunt.wordhood;
   const cap = judgeCallCap(plan);
-  const perLook = cap + Math.ceil((cap * RHYME_BATCH) / WORDHOOD_BATCH) + Math.ceil((cap * RHYME_BATCH) / TIER_BATCH);
+  const perLook = cap + Math.ceil((cap * RHYME_BATCH) / WORDHOOD_BATCH);
+  const tier = Math.ceil((plan.gate.n * cap * RHYME_BATCH) / TIER_BATCH);
   const legs = [
     { model: models.player, fewest: plan.seeds * 2, most: plan.seeds * plan.gate.n * 2 },
-    { model: models.judge, fewest: hunt, most: hunt + plan.gate.n * perLook },
+    { model: models.judge, fewest: hunt, most: hunt + plan.gate.n * perLook + tier },
   ];
   const costs: ModelCost[] = [];
   for (const leg of legs) {
