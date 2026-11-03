@@ -75,13 +75,15 @@ describe("a date resolves to that day's Seed Word, pinned to its Rhyme Key", () 
     expect(seed?.rhymeKey).toBe(first.rhymeKey);
   });
 
-  it("shows kennel on 2026-11-11 (#239), and sentimental on no day (#264)", () => {
-    // sentimental sits in both the t-said and t-dropped families; leading the
+  it("shows fetid on 2026-11-11 (#289), and kennel and sentimental on no day (#264)", () => {
+    // sentimental sat in both the t-said and t-dropped families; leading the
     // second as well showed and spoke the same word twice (ADR-0012). It is
-    // not heard one way either, so its first day went to incidental.
-    expect(seedForDate(schedule, "2026-11-11")).toEqual({ word: "kennel", rhymeKey: "EH N AH L" });
+    // not heard one way either, so its first day went to incidental. The
+    // t-dropped `-ental` readings are gone (ADR-0011, 2026-11-02), which left
+    // kennel's family far below the band, so its day went to fetid.
+    expect(seedForDate(schedule, "2026-11-11")).toEqual({ word: "fetid", rhymeKey: "EH D AH D" });
     expect(seedForDate(schedule, "2026-08-17")).toEqual({ word: "incidental", rhymeKey: "EH N T AH L" });
-    expect(days.filter((day) => day.seed === "sentimental")).toEqual([]);
+    expect(days.filter((day) => day.seed === "sentimental" || day.seed === "kennel")).toEqual([]);
   });
 });
 
