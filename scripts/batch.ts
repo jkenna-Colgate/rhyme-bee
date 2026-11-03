@@ -120,7 +120,8 @@ import {
   type JudgedItem,
   type JudgeItem,
 } from "./judgeRun.ts";
-import { rulingList, tierAgreement, type NoFalseAcceptsResult, type RulingItem } from "../src/noFalseAccepts.ts";
+import { rulingList, type NoFalseAcceptsResult } from "../src/noFalseAccepts.ts";
+import { tierAgreement, type RulingItem } from "../src/rulingList.ts";
 import {
   huntCalls,
   huntResults,

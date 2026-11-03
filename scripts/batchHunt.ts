@@ -25,6 +25,12 @@ import { rhymeBatches, WORDHOOD_BATCH, type RhymeRuling } from "../src/judge.ts"
 import {
   huntAnswers,
   noFalseAcceptsResult,
+  type HuntedAnswer,
+  type HuntRuling,
+  type ListedAnswer,
+  type NoFalseAcceptsResult,
+} from "../src/noFalseAccepts.ts";
+import {
   parseDecision,
   parseTier,
   parseUndecided,
@@ -33,12 +39,8 @@ import {
   tierPrompt,
   undecidedPrompt,
   type Decision,
-  type HuntedAnswer,
-  type HuntRuling,
-  type ListedAnswer,
-  type NoFalseAcceptsResult,
   type RulingItem,
-} from "../src/noFalseAccepts.ts";
+} from "../src/rulingList.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Schedule } from "../src/schedule.ts";
