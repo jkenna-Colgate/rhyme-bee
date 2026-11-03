@@ -444,3 +444,45 @@ describe("a stressed vowel before r is written one way (#263)", () => {
     expect(() => index.pinSeed("graybeard", "IH R D")).toThrow(/generated variant/);
   });
 });
+
+describe("stress promotion stops at a vowel the syllabic consonant rule exposed (#290, #86)", () => {
+  // Readings exactly as the source dictionary writes them. Dropping the schwa
+  // of `-ual` or `-man` leaves last a vowel that was never in a closed final
+  // syllable, and the maintainer ruled none of these a Rhyme on the key that
+  // promoting it would make (ADR-0011, amendment of 2026-11-02).
+  const keysOf = (word: string, readings: Pronunciation[]) => {
+    const t = target([[word, readings]]);
+    applyNormalisation(t);
+    return t.pronunciations.get(word)!.map(rhymeKeyOf);
+  };
+
+  it.each<[string, Pronunciation[]]>([
+    ["annual", [["AE1", "N", "Y", "UW0", "AH0", "L"]]],
+    ["manual", [["M", "AE1", "N", "Y", "UW0", "AH0", "L"]]],
+    ["ritual", [["R", "IH1", "CH", "UW0", "AH0", "L"]]],
+    ["usual", [["Y", "UW1", "ZH", "AH0", "W", "AH0", "L"], ["Y", "UW1", "ZH", "UW0", "AH0", "L"]]],
+  ])("gives `%s` no reading on `UW L`", (word, readings) => {
+    expect(keysOf(word, readings)).not.toContain("UW L");
+  });
+
+  it.each<[string, string, Pronunciation[]]>([
+    ["module", "UW L", [["M", "AA1", "JH", "UW0", "L"]]],
+    ["nodule", "UW L", [["N", "AA1", "JH", "UW0", "L"]]],
+    ["schedule", "UW L", [["S", "K", "EH1", "JH", "UH0", "L"], ["S", "K", "EH1", "JH", "UW0", "L"]]],
+    ["scheduled", "UW L D", [["S", "K", "EH1", "JH", "UH0", "L", "D"], ["S", "K", "EH1", "JH", "UW0", "L", "D"]]],
+  ])("keeps `%s` on `%s`, whose final syllable was closed as written", (word, key, readings) => {
+    expect(keysOf(word, readings)).toContain(key);
+  });
+
+  it.each<[string, string, Pronunciation[]]>([
+    ["clergyman", "IY M N", [["K", "L", "ER1", "JH", "IY0", "M", "AH0", "N"]]],
+    ["dutiful", "IY F L", [["D", "UW1", "T", "IY0", "F", "AH0", "L"]]],
+    ["wearisome", "IY S M", [["W", "IH1", "R", "IY0", "S", "AH0", "M"]]],
+  ])("gives `%s` no invented Rhyme Key `%s`", (word, key, readings) => {
+    expect(keysOf(word, readings)).not.toContain(key);
+  });
+
+  it("still gives `cruel` the syllabic reading on `UW L`, its vowel stressed as written", () => {
+    expect(keysOf("cruel", [["K", "R", "UW1", "AH0", "L"]])).toContain("UW L");
+  });
+});

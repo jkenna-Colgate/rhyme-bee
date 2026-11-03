@@ -500,9 +500,11 @@ renewals(1) R IH0 N UW1 L Z
 # royals (#253): `royal` scores on OY L; the plural joins OY L Z, with `boils` (#232).
 royals R OY1 AH0 L Z
 royals(1) R OY1 L Z
-# spirituals (#253): `spiritual` scores on UW L; the plural joins UW L Z (#232).
-spirituals S P IH1 R IH0 CH UW2 AH0 L Z
-spirituals(1) S P IH1 R IH0 CH UW2 L Z
+# spirituals (#253, then #290): the plural reads as `spiritual` does. Until 2026-11-03 that
+# was on UW L, and the plural joined UW L Z (#232) with a syllabic reading of its own; since
+# the ruling below ("-ual words" under "#290, 2026-11-03"), its "oo" is unstressed, so it
+# carries one reading and no longer joins `fools`.
+spirituals S P IH1 R IH0 CH UW0 AH0 L Z
 # vials (#253): `vial` scores on AY L; the plural joins AY L Z, with `miles` (#232).
 vials V AY1 AH0 L Z
 vials(1) V AY1 L Z
@@ -715,6 +717,33 @@ yearling(1) Y ER1 L IH0 NG
 # ashram (#240): upstream `AE1 SH R AA0 M` let stress promotion stress the last vowel, so it
 # scored for `calm` and `bomb`; it is "AHSH-rum", the last vowel a schwa.
 ashram AA1 SH R AH0 M
+
+# subsection, rectangle, bifocal, orgasm (#290): upstream marks the vowel before the final
+# "-shun", "-gle", "-cal" and "-zum" unstressed. Each rhymed only because stress promotion
+# stressed it in the syllabic consonant rule's reading, which promotion no longer reads.
+# Each carries a light stress, so they keep `section`, `angle`, `focal` and `chasm`.
+subsection S AH1 B S EH2 K SH AH0 N
+rectangle R EH1 K T AE2 NG G AH0 L
+bifocal B AY1 F OW2 K AH0 L
+orgasm AO1 R G AE2 Z AH0 M
+
+# -ual words (#290, 2026-11-03): the maintainer ruled that every "-ual" word gets one verdict
+# for `cool`. An "oo" before "-al" rhymes on UW L only when it carries the word's main stress
+# (`dual`, `cruel`, `accrual`, `renewal`, `fuel`); otherwise it does not, as `ritual` does
+# not. Upstream marks the "oo" of these with secondary stress (UW2), which scored them for
+# `cool` while `annual` and `ritual` were refused. Each "oo" is written UW0 here, and every
+# other upstream reading of the word is kept.
+actually AE1 K CH UW0 AH0 L IY0
+actually(1) AE1 K CH L IY0
+actually(2) AE1 K SH AH0 L IY0
+contextual K AA2 N T EH1 K S CH UW0 AH0 L
+homosexuals HH OW2 M OW0 S EH1 K SH UW0 AH0 L Z
+spiritual S P IH1 R IH0 CH UW0 AH0 L
+textual T EH1 K S CH UW0 AH0 L
+unusual AH0 N Y UW1 ZH UW0 AH0 L
+unusual(1) AH0 N Y UW1 ZH W AH0 L
+unusually AH0 N Y UW1 ZH UW0 AH0 L IY0
+unusually(1) AH0 N Y UW1 ZH W AH0 L IY0
 
 # nares (#240): upstream `N AE1 R Z` is one syllable; it is two, "NAIR-eez".
 nares N EH1 R IY0 Z

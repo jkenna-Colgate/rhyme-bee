@@ -5,13 +5,13 @@
  * defect, the way `demotions.test.ts` pins the leaked-name defect — a test
  * that fails against today's curation and passes once Schwa Twins are merged.
  *
- * `subsection`'s reading is CMUdict's own, unmodified: normalisation (frozen,
- * untouched by this fix) composes stress promotion with the syllabic-consonant
- * rule to give it exactly the three Rhyme Keys the real index carries —
- * `AH B S EH K SH AH N`, `AH B S EH K SH N`, `EH K SH N` — verified against
- * the shipped `dist-data/` index artifact before writing this fixture. None of the
- * three is `EH K SH AH N`, which is the whole of the bug: on a Seed pinned
- * there, `subsection` had nothing to match.
+ * `subsection` is written here with the syllabic n, the way a source
+ * transcribing /ˈsʌbˌsɛkʃn̩/ writes it, so its only Rhyme Key is `EH K SH N`.
+ * That is not `EH K SH AH N`, which is the whole of the bug: on a Seed pinned
+ * there, `subsection` had nothing to match. The fixture used to be CMUdict's
+ * own reading, which reached `EH K SH N` only through stress promotion of the
+ * syllabic consonant rule's reading; promotion no longer reads those (#290),
+ * and the real word is now corrected in `data/supplement.dict` instead.
  */
 
 import { describe, expect, it } from "vitest";
@@ -26,8 +26,8 @@ function makeSubsectionIndex(): RhymeIndex {
   const pronunciations = new Map<string, Pronunciation[]>([
     ["rejection", p("R", "IH0", "JH", "EH1", "K", "SH", "AH0", "N")],
     ["objection", p("AH0", "B", "JH", "EH1", "K", "SH", "AH0", "N")],
-    // CMUdict's real, unmodified transcription of `subsection`.
-    ["subsection", p("S", "AH1", "B", "S", "EH0", "K", "SH", "AH0", "N")],
+    // `subsection` with the syllabic n written, and no schwa before it.
+    ["subsection", p("S", "AH1", "B", "S", "EH2", "K", "SH", "N")],
   ]);
   return buildSlice(
     {
