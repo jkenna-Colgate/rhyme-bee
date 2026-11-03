@@ -32,12 +32,15 @@
  * Then the **No False Accepts** half (#268, `scripts/batchHunt.ts`): every scored
  * Answer whose Wiktionary readings (`data/wiktionary.tsv`, fetched by name with
  * `npm run sources:fetch -- wiktionary.tsv`, and checked before anything is
- * called) all miss the Seed Word's Rhyme Key, or that the names data holds, is
+ * called) all miss the Seed Word's Rhyme Key, or that the names data holds, or
+ * that reaches the key only through readings Normalisation appended (#297), is
  * put to the Judge, rhyme and wordhood apart. Nothing it rules lands by itself:
  * a high-confidence ruling that an Answer is no Rhyme, a name or not a word goes
  * on a ruling list, and the maintainer rules on each in the sitting (a
- * correction, a Demotion, or leave it). The gate passes a day when no listed
- * Answer is left unruled and none corrected or demoted is still scored.
+ * correction, a Demotion, or leave it). On a day the Judge holds one Answer
+ * sent as appended only, every such Answer that day goes on the list as one
+ * group, the held ones marked. The gate passes a day when no listed Answer is
+ * left unruled and none corrected or demoted is still scored.
  *
  * The same list then puts every ruling the looks made or met that said Rhyme
  * and landed nothing, whatever its confidence (#293; ADR-0021, 2026-11-02
@@ -120,7 +123,7 @@ import {
   type JudgedItem,
   type JudgeItem,
 } from "./judgeRun.ts";
-import { rulingList, type NoFalseAcceptsResult } from "../src/noFalseAccepts.ts";
+import { huntListing, type NoFalseAcceptsResult } from "../src/noFalseAccepts.ts";
 import { tierAgreement, type Decision, type RulingItem } from "../src/rulingList.ts";
 import {
   huntCalls,
@@ -212,7 +215,8 @@ console.error(
   `    about 1 to 3 a look for 3 Seed Words, and at most ${maxJudgeCalls} rhyme calls a look ` +
   `(${maxJudgeCallsGiven === undefined ? `${JUDGE_CALLS_PER_SEED} per Seed Word; --max-judge-calls overrides it` : "--max-judge-calls"})\n` +
   `  Trust gate: k = ${gate.k} within n = ${gate.n} looks; off key above ${offKeyRatio} to 1\n` +
-  `  No False Accepts hunt, Judge (${JUDGE_MODEL}): ${huntPlan.sent} scored Answers sent on today's index, ` +
+  `  No False Accepts hunt, Judge (${JUDGE_MODEL}): ${huntPlan.sent} scored Answers sent on today's index ` +
+  `(${huntPlan.appendedOnly} of them on the key only through readings Normalisation appended), ` +
   `${huntPlan.rhyme} rhyme calls and ${huntPlan.wordhood} wordhood calls (recounted after the looks land)\n` +
   `  Tier question, Judge (${JUDGE_MODEL}): one call per ${TIER_BATCH} words the looks write in with no knownness, ` +
   "after the hunt and before the ruling list; none if they write in none",
@@ -425,7 +429,10 @@ let huntAsked: { days: HuntDay[]; leg: HuntLeg } | null = null;
 if (!stopped) {
   const huntDays = planHunt(index, days.filter((d) => !d.notChecked).map((d) => ({ ...d.seed, rhymeKey: d.rhymeKey })), scheduleRaw.scoring, wiktionary);
   const planned = huntCalls(huntDays);
-  console.error(`\nNo False Accepts: ${planned.sent} scored Answers to the Judge, ${planned.rhyme} rhyme and ${planned.wordhood} wordhood calls`);
+  console.error(
+    `\nNo False Accepts: ${planned.sent} scored Answers to the Judge (${planned.appendedOnly} sent as appended only), ` +
+    `${planned.rhyme} rhyme and ${planned.wordhood} wordhood calls`,
+  );
   const leg = await orUsageStop(judgeHunt(huntDays, { model: JUDGE_MODEL, run }));
   noteLeg(leg);
   huntAsked = { days: huntDays, leg };
@@ -451,13 +458,16 @@ if (!stopped && untiered.length) {
 //
 // Put only now, after the Batch's last model call, so a usage stop never lands
 // while the maintainer is typing (#293): the hunted Answers the Judge doubts,
+// then each day's group of Answers only Normalisation puts on the key (#297),
 // then the rhymes it ruled in the looks and left undecided, then the words the
 // looks wrote in that have no knownness, to Tier (#294) with the Judge's answer
 // filled in (#295).
 
 const undecided = undecidedRhymes(lookRulings, readDeclines());
+const listing = huntAsked ? huntListing(huntAsked.leg.rulings) : { answers: [], groups: [] };
 const rulingItems: RulingItem[] = [
-  ...(huntAsked ? rulingList(huntAsked.leg.rulings).map((listed): RulingItem => ({ kind: "hunted", listed })) : []),
+  ...listing.answers.map((listed): RulingItem => ({ kind: "hunted", listed })),
+  ...listing.groups.map((group): RulingItem => ({ kind: "appended-group", group })),
   ...undecided.map((rhyme): RulingItem => ({ kind: "undecided", rhyme })),
   ...untiered.map((word): RulingItem => {
     const judge = tierRulings.get(word.word);
@@ -534,8 +544,11 @@ const reportPath = writeRunReport(date, stem, run, {
   noFalseAccepts: hunt
     ? {
         note:
-          "The hunt (#268): scored Answers with no Wiktionary reading on the Seed Word's Rhyme Key, or in the names data, " +
-          "put to the Judge. Nothing it ruled landed by itself; what landed is what the maintainer decided.",
+          "The hunt (#268): scored Answers with no Wiktionary reading on the Seed Word's Rhyme Key (another-key), " +
+          "in the names data (names-hit), or on the key only through readings Normalisation appended (appended-only, #297), " +
+          "put to the Judge. Nothing it ruled landed by itself; what landed is what the maintainer decided. On a day the Judge " +
+          "held an appended-only Answer, every appended-only Answer that day was listed as one group (groups), the held ones " +
+          "marked; a decided word with inGroup true was listed so, and empty doubts mean the Judge did not hold it.",
         seeds: hunt.days.map((d) => ({
           seedWord: d.seedWord,
           rhymeKey: d.rhymeKey,
@@ -548,7 +561,13 @@ const reportPath = writeRunReport(date, stem, run, {
           verdict: r.rhyme.verdict, reading: r.rhyme.reading, confidence: r.rhyme.confidence, why: r.rhyme.why,
           ...(r.wordhood ? { wordhood: r.wordhood.verdict, wordhoodConfidence: r.wordhood.confidence, wordhoodWhy: r.wordhood.why } : {}),
         })),
-        decided: hunt.settled.map((s) => ({ word: s.listed.answer.word, seedWord: s.listed.seedWord, doubts: s.listed.doubts, decision: s.decision, wrote: s.wrote })),
+        groups: listing.groups.map((g) => ({
+          seedWord: g.seedWord, rhymeKey: g.rhymeKey,
+          words: g.members.map((m) => m.answer.word), held: g.members.filter((m) => m.doubts.length).map((m) => m.answer.word),
+        })),
+        decided: hunt.settled.map((s) => ({
+          word: s.listed.answer.word, seedWord: s.listed.seedWord, doubts: s.listed.doubts, inGroup: s.inGroup, decision: s.decision, wrote: s.wrote,
+        })),
       }
     : null,
   undecidedRhymes: {

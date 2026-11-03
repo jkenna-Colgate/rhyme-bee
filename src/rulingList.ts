@@ -1,10 +1,11 @@
 /**
  * The Batch's **ruling list** (#268, #292 to #295): every item a Batch puts to
  * the maintainer after its last model call, what the maintainer is shown for
- * each, and how what they type is read. There are three kinds of item: a hunted
- * Answer the Judge doubts (chosen by `noFalseAccepts.ts`, which gates the day
- * on the rulings), a rhyme the Judge left undecided, and a written-in word with
- * no knownness to Tier. Each kind has its own prompt and parser, and a parser
+ * each, and how what they type is read. There are four kinds of item: a hunted
+ * Answer the Judge doubts and a day's group of Answers only Normalisation puts
+ * on the key (both chosen by `noFalseAccepts.ts`, which gates the day on the
+ * rulings), a rhyme the Judge left undecided, and a written-in word with no
+ * knownness to Tier. Each kind has its own prompt and parser, and a parser
  * returns only its own kind's Decisions. This module calls no model, reads no
  * file and writes none; `scripts/batchHunt.ts` asks and writes.
  */
@@ -12,7 +13,7 @@
 import type { UndecidedRhyme, UntieredWord } from "./batch.ts";
 import type { DemotionReason } from "./demotions.ts";
 import { agreementOver, phonemesOf, readingReachesKey, type Agreement, type TierAnswer, type TierRuling } from "./judge.ts";
-import type { ListedAnswer } from "./noFalseAccepts.ts";
+import type { AppendedGroup, ListedAnswer } from "./noFalseAccepts.ts";
 import { isVowelSound, type Pronunciation, type RhymeKey } from "./phonology.ts";
 
 // ---- the maintainer's ruling ---------------------------------------------------
@@ -82,12 +83,15 @@ export type Decision =
 
 /**
  * One item of the sitting's ruling list, all put after the Batch's last model
- * call: a hunted Answer the Judge doubts (#268), a rhyme it left undecided
- * (#293), or a word the Batch wrote in that has no knownness, to Tier (#294),
- * with the Judge's answer to the Tier question as the default (#295).
+ * call: a hunted Answer the Judge doubts (#268), a day's group of Answers only
+ * Normalisation puts on the key (#297), a rhyme it left undecided (#293), or a
+ * word the Batch wrote in that has no knownness, to Tier (#294), with the
+ * Judge's answer to the Tier question as the default (#295). Each word in a
+ * group is ruled as a hunted Answer is, with the same prompt and parser.
  */
 export type RulingItem =
   | { kind: "hunted"; listed: ListedAnswer }
+  | { kind: "appended-group"; group: AppendedGroup }
   | { kind: "undecided"; rhyme: UndecidedRhyme }
   | { kind: "tier"; untiered: UntieredWord; judge?: TierRuling };
 

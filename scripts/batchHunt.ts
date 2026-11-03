@@ -4,9 +4,13 @@
  * sitting. The rules are `src/noFalseAccepts.ts`; this file reads the extract,
  * calls the model, asks the maintainer and writes what they decide.
  *
+ * A day the Judge held an Answer on that only Normalisation puts on the key
+ * goes on the list as a group of every such Answer that day (#297), each word
+ * ruled as a hunted Answer is.
+ *
  * The same sitting puts the rhymes the Judge ruled in the looks and left
  * undecided (#293), and the words the looks wrote in that have no knownness,
- * to Tier (#294), so one ruling list holds all three kinds of item.
+ * to Tier (#294), so one ruling list holds all four kinds of item.
  *
  * Every write goes through a path the Editor's Pass already uses: a correction
  * or a keep through `applyCorrection` (`data/supplement.dict`, replacing the
@@ -25,6 +29,7 @@ import { rhymeBatches, WORDHOOD_BATCH, type RhymeRuling, type TierAnswer } from 
 import {
   huntAnswers,
   noFalseAcceptsResult,
+  type AppendedGroup,
   type HuntedAnswer,
   type HuntRuling,
   type ListedAnswer,
@@ -103,7 +108,11 @@ export function planHunt(
   scoring: ScoringConfig,
   extract: WiktionaryExtract,
 ): HuntDay[] {
-  const facts = { wiktionaryReadings: (w: string) => wiktionaryReadings(extract, w), isName: (w: string) => index.isName(w) };
+  const facts = {
+    wiktionaryReadings: (w: string) => wiktionaryReadings(extract, w),
+    isName: (w: string) => index.isName(w),
+    readingsOf: (w: string) => index.readingsOf(w),
+  };
   return seeds.flatMap((s) => {
     const session = sessionOn(index, s.seedWord, s.rhymeKey, scoring);
     if ("failed" in session) return [];
@@ -112,11 +121,20 @@ export function planHunt(
   });
 }
 
-/** The calls the Judge's two questions take for a hunt, before any is made. */
-export function huntCalls(days: readonly HuntDay[]): { sent: number; rhyme: number; wordhood: number } {
-  const pairs = days.flatMap((d) => d.hunted.map((h) => ({ word: h.word, seedWord: d.seedWord, rhymeKey: d.rhymeKey })));
+/**
+ * The calls the Judge's two questions take for a hunt, before any is made, and
+ * how many of the Answers sent were sent as appended only (#297), which the
+ * count already holds.
+ */
+export function huntCalls(days: readonly HuntDay[]): { sent: number; appendedOnly: number; rhyme: number; wordhood: number } {
+  const pairs = days.flatMap((d) => d.hunted.map((h) => ({ word: h.word, seedWord: d.seedWord, rhymeKey: d.rhymeKey, reasons: h.reasons })));
   const words = new Set(pairs.map((p) => p.word)).size;
-  return { sent: pairs.length, rhyme: rhymeBatches(pairs).length, wordhood: Math.ceil(words / WORDHOOD_BATCH) };
+  return {
+    sent: pairs.length,
+    appendedOnly: pairs.filter((p) => p.reasons.includes("appended-only")).length,
+    rhyme: rhymeBatches(pairs).length,
+    wordhood: Math.ceil(words / WORDHOOD_BATCH),
+  };
 }
 
 export interface HuntLeg {
@@ -138,16 +156,24 @@ export async function judgeHunt(days: readonly HuntDay[], opts: { model: string;
   return { rulings, calls, answeredBy };
 }
 
-/** What the maintainer decided on one item of the ruling list, and what was written for it. */
+/** One word the maintainer rules on: an item of the list, or one member of a day's group, ruled as a hunted Answer. */
+type RuledItem = Exclude<RulingItem, { kind: "appended-group" }>;
+
+/**
+ * What the maintainer decided on one word of the ruling list, and what was
+ * written for it. A group's members are settled one by one, each as a hunted
+ * Answer with the group it was listed in.
+ */
 export interface Settled {
-  item: RulingItem;
+  item: RuledItem;
+  group?: AppendedGroup;
   decision: Decision;
   wrote: string | null;
 }
 
-/** The hunted Answers settled, each with its listing, which is what the gate reads. */
-export function settledHunted(settled: readonly Settled[]): { listed: ListedAnswer; decision: Decision; wrote: string | null }[] {
-  return settled.flatMap((s) => (s.item.kind === "hunted" ? [{ listed: s.item.listed, decision: s.decision, wrote: s.wrote }] : []));
+/** The hunted Answers settled, a group's members among them, each with its listing, which is what the gate reads. */
+export function settledHunted(settled: readonly Settled[]): { listed: ListedAnswer; inGroup: boolean; decision: Decision; wrote: string | null }[] {
+  return settled.flatMap((s) => (s.item.kind === "hunted" ? [{ listed: s.item.listed, inGroup: !!s.group, decision: s.decision, wrote: s.wrote }] : []));
 }
 
 /** Wiktionary's readings of a word, as ARPAbet before Normalisation, which the build applies. */
@@ -173,16 +199,35 @@ const BATCH_TIER_VERDICT = { answer: "answer-common", bonus: "bonus" } as const 
 type SittingContext = { index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex };
 
 /** The item's word and the Rhyme Key it is ruled on. */
-const itemPair = (item: RulingItem): { word: string; rhymeKey: RhymeKey } =>
+const itemPair = (item: RuledItem): { word: string; rhymeKey: RhymeKey } =>
   item.kind === "hunted" ? { word: item.listed.answer.word, rhymeKey: item.listed.rhymeKey }
   : item.kind === "undecided" ? item.rhyme
   : item.untiered;
 
+/** The words of the list in the order they are put: a day's group opens into its members, each a hunted Answer. */
+function ruledItems(items: readonly RulingItem[]): { item: RuledItem; group?: AppendedGroup }[] {
+  return items.flatMap((item) => item.kind === "appended-group"
+    ? item.group.members.map((listed) => ({ item: { kind: "hunted" as const, listed }, group: item.group }))
+    : [{ item }]);
+}
+
+/** What the maintainer is shown before a day's group, once (#297): why the whole day is listed, and which words the Judge held. */
+function groupLines(group: AppendedGroup): string[] {
+  const held = group.members.filter((m) => m.doubts.length).map((m) => m.answer.word);
+  return [
+    `${group.seedWord} /${group.rhymeKey}/: ${group.members.length} Answers only Normalisation puts on the key, listed together ` +
+    `because the Judge held ${held.join(", ")}. The Judge is an alarm for the day here, not a verdict on each word: ` +
+    "rule the words of one shape alike.",
+  ];
+}
+
 /**
  * What the maintainer is shown for one item before the prompt, and the parser
- * that reads their answer. Each kind of item has its own prompt and parser.
+ * that reads their answer. Each kind of item has its own prompt and parser. A
+ * member of a day's group is shown as a hunted Answer, marked held or not, with
+ * the Judge's reasoning shown only for those it held.
  */
-function presentItem(item: RulingItem, index: RhymeIndex, extract: WiktionaryExtract): { lines: string[]; parse: (input: string) => Decision | null } {
+function presentItem(item: RuledItem, index: RhymeIndex, extract: WiktionaryExtract): { lines: string[]; parse: (input: string) => Decision | null } {
   if (item.kind === "tier") {
     const { untiered, judge } = item;
     return {
@@ -208,11 +253,16 @@ function presentItem(item: RulingItem, index: RhymeIndex, extract: WiktionaryExt
   const listed = item.listed;
   const word = listed.answer.word;
   const shown = shownReadings(index.readingsOf(word), wiktionaryOffered(extract, word));
+  const held = listed.doubts.length > 0;
   return {
     lines: [
-      `${word} for ${listed.seedWord} /${listed.rhymeKey}/: ${listed.doubts.join(", ")}`,
-      `  Judge, rhyme: ${listed.rhyme.verdict} (${listed.rhyme.confidence}) ${listed.rhyme.why}`,
-      ...(listed.wordhood ? [`  Judge, wordhood: ${listed.wordhood.verdict} (${listed.wordhood.confidence}) ${listed.wordhood.why}`] : []),
+      `${word} for ${listed.seedWord} /${listed.rhymeKey}/: ${held ? listed.doubts.join(", ") : "not held, listed with its day's group"}`,
+      ...(held
+        ? [
+            `  Judge, rhyme: ${listed.rhyme.verdict} (${listed.rhyme.confidence}) ${listed.rhyme.why}`,
+            ...(listed.wordhood ? [`  Judge, wordhood: ${listed.wordhood.verdict} (${listed.wordhood.confidence}) ${listed.wordhood.why}`] : []),
+          ]
+        : []),
       `  sent for: ${listed.answer.reasons.join(", ")}`,
       ...(extract.get(word) ?? []).map((ipa) => `  Wiktionary (IPA): ${ipa}`),
       ...rulingPrompt(shown).map((line) => `  ${line}`),
@@ -225,17 +275,21 @@ function presentItem(item: RulingItem, index: RhymeIndex, extract: WiktionaryExt
  * Put the ruling list to the maintainer, one item at a time, and write each
  * ruling as it is made. It is called after the Batch's last model call, so a
  * usage stop never lands mid-sitting. With no terminal to ask, the list is
- * printed and every item is left unruled: a hunted Answer then fails the day's
- * gate, and a rhyme the Judge left undecided or a word to Tier is listed as
+ * printed and every item is left unruled: a hunted Answer, a group's members
+ * among them, then fails the day's gate, and a rhyme the Judge left undecided or a word to Tier is listed as
  * skipped.
  */
 export async function settleRulingList(items: readonly RulingItem[], ctx: SittingContext): Promise<Settled[]> {
   const settled: Settled[] = [];
   const asking = process.stdin.isTTY ? createInterface({ input: process.stdin, output: process.stderr }) : null;
   const count = (kind: RulingItem["kind"]) => items.filter((i) => i.kind === kind).length;
+  const ruled = ruledItems(items);
   if (items.length) {
+    const grouped = ruled.filter((r) => r.group).length;
     console.error(
       `\nThe ruling list: ${count("hunted")} scored Answers the Judge doubts at high confidence, each scored until you rule; ` +
+      `${count("appended-group")} days' groups of Answers only Normalisation puts on the key (${grouped} words), ` +
+      "listed because the Judge held one of the day's, each scored until you rule; " +
       `${count("undecided")} rhymes the Judge ruled and left undecided, each landing nothing until you rule; ` +
       `and ${count("tier")} words this Batch wrote in with no knownness, each a Bonus Word until you Tier it.`,
     );
@@ -248,10 +302,11 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
     openIndex: ctx.loadIndex, rebuild: async () => rebuild(), source,
   });
   try {
-    for (const [i, item] of items.entries()) {
+    for (const [i, { item, group }] of ruled.entries()) {
       const { word, rhymeKey } = itemPair(item);
       const { lines, parse } = presentItem(item, index, ctx.extract);
-      console.error(`\n[${i + 1}/${items.length}] ${lines[0]}`);
+      if (group && ruled[i - 1]?.group !== group) for (const line of groupLines(group)) console.error(`\n${line}`);
+      console.error(`\n[${i + 1}/${ruled.length}] ${lines[0]}`);
       for (const line of lines.slice(1)) console.error(line);
       let decision: Decision = { kind: "unruled" };
       while (asking) {
@@ -288,7 +343,7 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
         wrote = `data/tier-overrides.csv: ${word} ${verdict}`;
       }
       if (wrote) console.error(`  wrote ${wrote}`);
-      settled.push({ item, decision, wrote });
+      settled.push({ item, ...(group ? { group } : {}), decision, wrote });
     }
   } finally {
     asking?.close();

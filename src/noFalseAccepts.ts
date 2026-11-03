@@ -7,7 +7,7 @@
  *
  * ## The hunt
  *
- * A scored Answer is put to the Judge when it has either
+ * A scored Answer is put to the Judge when it has any of these reasons:
  *
  * - **another key**: Wiktionary has General American readings for it and none of
  *   them has the Seed Word's Rhyme Key (directly or by its Schwa Twin). One
@@ -15,7 +15,12 @@
  *   this is the agreement the research measured at 96.7% (#221). Or
  * - a **names hit**: the names data holds it. That is no doubt by itself (7% of
  *   scheduled Answers are in the names data, nearly all ordinary words), so it
- *   only sends the word to the Judge.
+ *   only sends the word to the Judge. Or
+ * - **appended only** (#297; ADR-0021, 2026-11-02 amendment): every reading the
+ *   game holds on the key (or its Schwa Twin) is one Normalisation appended, so
+ *   a rule put it there and no source did. Wiktionary's readings go through the
+ *   same rules, so their agreeing confirms nothing, and the word is sent though
+ *   they agree. The selection is `appendedReadings.ts`'s.
  *
  * The Judge is asked the rhyme question and, apart from it, the wordhood one.
  *
@@ -31,7 +36,13 @@
  * current readings are shown numbered, with Wiktionary's offered as additions,
  * so a word half right (`environmental`, two readings with the t and two
  * without) keeps the half that is. Below high confidence the Answer is left
- * alone, and a doubtful Answer stays scored until it is ruled. What the
+ * alone, and a doubtful Answer stays scored until it is ruled.
+ *
+ * An Answer sent as appended only is listed by its day (#297). When the Judge
+ * holds any one of them, every appended-only Answer on that day goes on the
+ * list as one group, the held ones marked, so words of one shape get one
+ * ruling; when it holds none, none of them is listed for this reason. Each word
+ * in a group is ruled as any listed Answer is, and is listed once. What the
  * maintainer is shown and how a ruling is read are the ruling list's, in
  * `rulingList.ts`, which holds every kind of item a Batch puts to them; this
  * module chooses the hunted Answers that go on it and gates the day after.
@@ -47,14 +58,16 @@
  * on nobody's word.
  */
 
+import { reachesKeyOnlyByAppended, type MarkedReading } from "./appendedReadings.ts";
 import { readingsReachKey, type RhymeRuling, type WordhoodRuling } from "./judge.ts";
 import { rhymeKeyOf, type Pronunciation, type RhymeKey } from "./phonology.ts";
+import { schwaTwinOf } from "./schwaTwins.ts";
 import type { Decision } from "./rulingList.ts";
 
 // ---- the hunt ------------------------------------------------------------------
 
 /** Why the hunt sent an Answer to the Judge. */
-export type HuntReason = "another-key" | "names-hit";
+export type HuntReason = "another-key" | "names-hit" | "appended-only";
 
 export interface HuntedAnswer {
   word: string;
@@ -69,16 +82,21 @@ export interface AnswerFacts {
   wiktionaryReadings: (word: string) => readonly Pronunciation[];
   /** Whether the names data holds it. */
   isName: (word: string) => boolean;
+  /** The game's readings, each marked if Normalisation appended it (`RhymeIndex.readingsOf`). */
+  readingsOf: (word: string) => readonly MarkedReading[];
 }
 
 /** The scored Answers of one Seed Word the hunt puts to the Judge, in alphabetical order. */
 export function huntAnswers(answers: readonly string[], seedKey: RhymeKey, facts: AnswerFacts): HuntedAnswer[] {
+  const twin = schwaTwinOf(seedKey);
+  const seedKeys = twin === null ? [seedKey] : [seedKey, twin];
   const out: HuntedAnswer[] = [];
   for (const word of [...new Set(answers)].sort()) {
     const readings = facts.wiktionaryReadings(word);
     const reasons: HuntReason[] = [];
     if (readings.length > 0 && !readingsReachKey(readings, seedKey)) reasons.push("another-key");
     if (facts.isName(word)) reasons.push("names-hit");
+    if (reachesKeyOnlyByAppended(facts.readingsOf(word), seedKeys)) reasons.push("appended-only");
     if (reasons.length === 0) continue;
     const keys = [...new Set(readings.map(rhymeKeyOf).filter((k): k is RhymeKey => k !== null))];
     out.push({ word, reasons, wiktionaryKeys: keys });
@@ -101,18 +119,58 @@ export interface HuntRuling {
 /** What a high-confidence ruling doubts about a scored Answer. */
 export type Doubt = "no-rhyme" | "name" | "not-a-word";
 
+/** A ruling as it is listed, with what it doubts. A member of a day's group the Judge did not hold doubts nothing. */
 export interface ListedAnswer extends HuntRuling {
   doubts: Doubt[];
+}
+
+/** What a ruling holds the Answer for: each high-confidence doubt it has, if any. */
+function doubtsOf(r: HuntRuling): Doubt[] {
+  const doubts: Doubt[] = [];
+  if (r.rhyme.verdict === "no-rhyme" && r.rhyme.confidence === "high") doubts.push("no-rhyme");
+  if (r.wordhood?.confidence === "high" && (r.wordhood.verdict === "name" || r.wordhood.verdict === "not-a-word")) doubts.push(r.wordhood.verdict);
+  return doubts;
 }
 
 /** The rulings that go on the maintainer's list: those with a high-confidence doubt, in the order given. */
 export function rulingList(rulings: readonly HuntRuling[]): ListedAnswer[] {
   return rulings.flatMap((r) => {
-    const doubts: Doubt[] = [];
-    if (r.rhyme.verdict === "no-rhyme" && r.rhyme.confidence === "high") doubts.push("no-rhyme");
-    if (r.wordhood?.confidence === "high" && (r.wordhood.verdict === "name" || r.wordhood.verdict === "not-a-word")) doubts.push(r.wordhood.verdict);
+    const doubts = doubtsOf(r);
     return doubts.length ? [{ ...r, doubts }] : [];
   });
+}
+
+/**
+ * Every Answer on one day sent because only Normalisation puts it on the key,
+ * listed together because the Judge held at least one of them (#297). The
+ * Judge is an alarm for the day, not a verdict on each word: on `event` it held
+ * `vestment` and passed `comment`, which has the same shape, and two such words
+ * ruled apart would be a Trust failure of their own. A held member carries its
+ * doubts; the others carry none.
+ */
+export interface AppendedGroup {
+  seedWord: string;
+  rhymeKey: RhymeKey;
+  members: ListedAnswer[];
+}
+
+/**
+ * The hunt's part of the ruling list: the groups of the days the Judge held an
+ * appended-only Answer on, and every other Answer with a high-confidence doubt,
+ * each in the order given. A word in a group is listed there alone, whatever
+ * other reason it was sent for, so no word is put to the maintainer twice.
+ */
+export function huntListing(rulings: readonly HuntRuling[]): { answers: ListedAnswer[]; groups: AppendedGroup[] } {
+  const appendedOnly = (r: HuntRuling) => r.answer.reasons.includes("appended-only");
+  const heldDays = new Set(rulings.filter((r) => appendedOnly(r) && doubtsOf(r).length).map((r) => r.seedWord));
+  const grouped = (r: HuntRuling) => heldDays.has(r.seedWord) && appendedOnly(r);
+  const groups: AppendedGroup[] = [];
+  for (const r of rulings.filter(grouped)) {
+    let group = groups.find((g) => g.seedWord === r.seedWord);
+    if (!group) groups.push((group = { seedWord: r.seedWord, rhymeKey: r.rhymeKey, members: [] }));
+    group.members.push({ ...r, doubts: doubtsOf(r) });
+  }
+  return { answers: rulingList(rulings.filter((r) => !grouped(r))), groups };
 }
 
 // ---- the gate ------------------------------------------------------------------
