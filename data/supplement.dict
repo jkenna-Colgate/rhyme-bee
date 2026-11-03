@@ -500,9 +500,11 @@ renewals(1) R IH0 N UW1 L Z
 # royals (#253): `royal` scores on OY L; the plural joins OY L Z, with `boils` (#232).
 royals R OY1 AH0 L Z
 royals(1) R OY1 L Z
-# spirituals (#253): `spiritual` scores on UW L; the plural joins UW L Z (#232).
-spirituals S P IH1 R IH0 CH UW2 AH0 L Z
-spirituals(1) S P IH1 R IH0 CH UW2 L Z
+# spirituals (#253, then #290): the plural reads as `spiritual` does. Until 2026-11-03 that
+# was on UW L, and the plural joined UW L Z (#232) with a syllabic reading of its own; since
+# the ruling below ("-ual words" under "#290, 2026-11-03"), its "oo" is unstressed, so it
+# carries one reading and no longer joins `fools`.
+spirituals S P IH1 R IH0 CH UW0 AH0 L Z
 # vials (#253): `vial` scores on AY L; the plural joins AY L Z, with `miles` (#232).
 vials V AY1 AH0 L Z
 vials(1) V AY1 L Z
@@ -725,6 +727,24 @@ rectangle R EH1 K T AE2 NG G AH0 L
 bifocal B AY1 F OW2 K AH0 L
 orgasm AO1 R G AE2 Z AH0 M
 
+# -ual words (#290, 2026-11-03): the maintainer ruled that every "-ual" word gets one verdict
+# for `cool`. An "oo" before "-al" rhymes on UW L only when it carries the word's main stress
+# (`dual`, `cruel`, `accrual`, `renewal`, `fuel`); otherwise it does not, as `ritual` does
+# not. Upstream marks the "oo" of these with secondary stress (UW2), which scored them for
+# `cool` while `annual` and `ritual` were refused. Each "oo" is written UW0 here, and every
+# other upstream reading of the word is kept.
+actually AE1 K CH UW0 AH0 L IY0
+actually(1) AE1 K CH L IY0
+actually(2) AE1 K SH AH0 L IY0
+contextual K AA2 N T EH1 K S CH UW0 AH0 L
+homosexuals HH OW2 M OW0 S EH1 K SH UW0 AH0 L Z
+spiritual S P IH1 R IH0 CH UW0 AH0 L
+textual T EH1 K S CH UW0 AH0 L
+unusual AH0 N Y UW1 ZH UW0 AH0 L
+unusual(1) AH0 N Y UW1 ZH W AH0 L
+unusually AH0 N Y UW1 ZH UW0 AH0 L IY0
+unusually(1) AH0 N Y UW1 ZH W AH0 L IY0
+
 # nares (#240): upstream `N AE1 R Z` is one syllable; it is two, "NAIR-eez".
 nares N EH1 R IY0 Z
 
@@ -770,6 +790,37 @@ spirituality S P IH2 R IH0 CH UW2 AE1 L AH0 T IY0
 stupidity S T UW0 P IH1 D IH0 T IY0
 theatricality TH IY0 AE2 T R AH0 K AE1 L AH0 T IY0
 triviality T R IH2 V IY0 AE1 L AH0 T IY0
+
+# --- Corrections (`-ental` readings with the t dropped, ruled no Rhyme for `kennel`, #289) ---
+#
+# CMUdict holds each of these words twice, once with the t of "-ental" and once without
+# (`gentle` said "jennle"). The t-dropped reading put the `incidental` family in `kennel`'s
+# (2026-11-11). The maintainer ruled on 2026-11-02 that they do not rhyme with `kennel`
+# (ADR-0011, 2026-11-02 amendment), so each word keeps only its readings with that t, and
+# still rhymes with `incidental`. Normalisation still appends the reduced "-ntl" form. A t
+# dropped elsewhere in the word (`sentimental` "sennimental") is out of scope and kept.
+# `interdental` and `nonjudgmental` are derived from `dental` and `judgmental`.
+accidental AE2 K S AH0 D EH1 N T AH0 L
+continental K AA2 N T AH0 N EH1 N T AH0 L
+dental D EH1 N T AH0 L
+detrimental D EH2 T R AH0 M EH1 N T AH0 L
+developmental D IH0 V EH2 L AH0 P M EH1 N T AH0 L
+elemental EH2 L AH0 M EH1 N T AH0 L
+environmental IH0 N V AY2 R AH0 N M EH1 N T AH0 L
+fundamental F AH2 N D AH0 M EH1 N T AH0 L
+gentle JH EH1 N T AH0 L
+instrumental IH2 N S T R AH0 M EH1 N T AH0 L
+judgmental JH AH0 JH M EH1 N T AH0 L
+monumental M AA2 N Y AH0 M EH1 N T AH0 L
+monumental(1) M AA2 N Y UW0 M EH1 N T AH0 L
+occidental AA2 K S AH0 D EH1 N T AH0 L
+oriental AO2 R IY0 EH1 N T AH0 L
+sentimental S EH2 N T AH0 M EH1 N T AH0 L
+sentimental(1) S EH2 N AH0 M EH1 N T AH0 L
+supplemental S AH2 P L AH0 M EH1 N T AH0 L
+transcendental T R AE2 N S AH0 N D EH1 N T AH0 L
+transcontinental T R AE2 N Z K AA2 N T IH0 N EH1 N T AH0 L
+transcontinental(1) T R AE2 N Z K AA2 N IH0 N EH1 N T AH0 L
 
 # --- Adds by the Judge: a Missing Reading ruled a Rhyme at high confidence, its
 # reading reaching the Rhyme Key and the word found to be a word (ADR-0011,
