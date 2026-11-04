@@ -25,9 +25,12 @@
  * many out. The two figures are both right and are not interchangeable: the
  * request modules and `web/src/editor/add.ts` quote 370,105, because what they
  * bound is the shape of a word in that file, and this quotes what the build
- * came out with.) That 2.4 seconds is what makes rebuild-on-Submit an act
- * rather than an interruption; the "four minutes" some older comments quote is
- * stale (#152).
+ * came out with.) That 2.4 seconds is what made rebuild-on-Submit an act
+ * rather than an interruption. It has since grown: timed again on 2026-11-04
+ * (#152) the rebuild is about 30 seconds, of which writing the artifact is
+ * still 3 and the Continuity check the build now ends with (#256) is the rest.
+ * The "four minutes" older comments quoted for it matches no timing of the
+ * rebuild.
  *
  * ## Why `npm run build:index` and not `tsx` directly
  *

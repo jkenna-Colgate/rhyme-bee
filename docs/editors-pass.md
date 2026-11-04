@@ -6,7 +6,7 @@ game. Every command below is real, every output shown was captured from a real
 run, and every step that writes something says how to undo it.
 
 The pass is meant to be run the night before a date goes live, so nothing it
-finds is ever urgent. Budget about ten minutes plus a four-minute index rebuild
+finds is ever urgent. Budget about ten minutes plus a half-minute index rebuild
 in step 7.
 
 | What it writes | Where | Undo |
@@ -518,7 +518,7 @@ Before committing anything, rebuild and re-read. This is the fastest way to see
 what an add actually did, and it does not need a deploy:
 
 ```
-npm run build:index      # about four minutes
+npm run build:index      # about thirty seconds
 npm run editor:read
 ```
 
@@ -605,7 +605,7 @@ the Rhyme Index needs rebuilding and says which branch it took:
 Rebuilding the Rhyme Index: an input is newer than the artifact (data/supplement.dict).
 ```
 
-A supplement change **does** trigger the rebuild — about four minutes. A
+A supplement change **does** trigger the rebuild, about thirty seconds. A
 `data/schedule.json` change does not, since the Index never reads it, and that
 deploy takes seconds:
 
@@ -613,7 +613,7 @@ deploy takes seconds:
 Skipping the Rhyme Index rebuild: no Index input has changed since it was built.
 ```
 
-The predicate errs toward rebuilding, so the worst case is a wasted four minutes
+The predicate errs toward rebuilding, so the worst case is a wasted half-minute
 rather than a bundle shipping a judge that predates the fix it was made for. The
 Worker, the bundle and the index go up as one version.
 
@@ -656,7 +656,7 @@ git checkout -- data/
 
 That restores both `data/supplement.dict` and `data/deferred-readings.jsonl`.
 One wrinkle: restoring a file updates its timestamp, so the built Index now
-looks stale and your next `npm run deploy` will rebuild for four minutes even
+looks stale and your next `npm run deploy` will rebuild for half a minute even
 though nothing really changed. Harmless, and worth knowing so it is not a
 mystery.
 
