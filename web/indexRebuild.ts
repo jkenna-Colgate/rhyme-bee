@@ -18,19 +18,16 @@
  * means a build that throws takes a child process down rather than the server
  * the maintainer is working in.
  *
- * The cost is a process start, and the whole rebuild was measured at **2.4
- * seconds** on the maintainer's machine (133,523 pronunciations, 370,079
+ * The cost is a process start. Rebuild-on-Submit was chosen when the whole
+ * rebuild was measured at **2.4 seconds** on the maintainer's machine (133,523 pronunciations, 370,079
  * words — the wordhood set the build ends with, which is 26 short of the
  * 370,105 lines `data/words.txt` holds because `data/demotions.txt` takes that
  * many out. The two figures are both right and are not interchangeable: the
  * request modules and `web/src/editor/add.ts` quote 370,105, because what they
  * bound is the shape of a word in that file, and this quotes what the build
- * came out with.) That 2.4 seconds is what made rebuild-on-Submit an act
- * rather than an interruption. It has since grown: timed again on 2026-11-04
- * (#152) the rebuild is about 30 seconds, of which writing the artifact is
- * still 3 and the Continuity check the build now ends with (#256) is the rest.
- * The "four minutes" older comments quoted for it matches no timing of the
- * rebuild.
+ * came out with.), short enough to make it an act rather than an
+ * interruption. What the rebuild takes now is timed in the `scripts/deploy.ts`
+ * header.
  *
  * ## Why `npm run build:index` and not `tsx` directly
  *
@@ -98,8 +95,8 @@ export interface RebuildDeps {
  * How long the build gets before it is abandoned — the value the dev server's
  * `rebuildIndex` is bound with.
  *
- * Measured at 2.4 seconds, so five minutes is not a guess at the duration — it
- * is the answer to a build that is not going to finish at all, and it errs long
+ * Five minutes is not a guess at the rebuild's duration (that is timed in the
+ * `scripts/deploy.ts` header): it is the answer to a build that is not going to finish at all, and it errs long
  * for the same reason the agent timeout does. Too short abandons a build that
  * would have succeeded, and what it leaves behind is genuinely unknown:
  * `killTree` ends the build, but the kill races the write, so the artifact on

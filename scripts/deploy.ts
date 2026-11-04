@@ -16,11 +16,7 @@
  * should not have to be right about which kind of change they just made, at
  * speed, at night; `indexStaleness` decides, and errs toward rebuilding, so the
  * worst case is a wasted half-minute rather than a bundle shipping a judge that
- * predates the fix it was made for. An older version of this comment called the
- * rebuild four minutes, which no timing of the rebuild bears out; if four
- * minutes was ever real it was the untimed upload, which every deploy pays
- * whether or not it rebuilds. The no-flag doctrine rests on the hazard of
- * misjudging a change, and that is the same at thirty seconds.
+ * predates the fix it was made for.
  *
  * A shell with no logic of its own: the predicate is in `indexArtifact.ts` and
  * tested there, and this runs the same three npm scripts in the same order the

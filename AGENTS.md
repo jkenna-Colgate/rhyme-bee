@@ -40,7 +40,9 @@ them.
 `vitest.config.ts` exists for one exclusion: `.claude/worktrees/`, where agent
 checkouts keep their own copy of every test file. Without it a bare `npm test`
 walks into them and reports several times the real suite — and passes, which is
-the dangerous direction to be wrong in. The real suite is 107 files.
+the dangerous direction to be wrong in. The real suite is the count
+`git ls-files '*.test.*' '*.spec.*' | wc -l` prints, and the "Test Files" total
+`npm test` reports must equal it.
 
 ## Scratch scripts
 

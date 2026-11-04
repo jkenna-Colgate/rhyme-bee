@@ -238,8 +238,8 @@ export interface IndexStaleness {
  * artifact, or missing, or is there no artifact at all.
  *
  * **The two errors are not symmetric, and this is not neutral between them.** A
- * checkout or a re-save bumps a timestamp and costs a wasted rebuild (about thirty
- * seconds, timed in `deploy.ts`). The
+ * checkout or a re-save bumps a timestamp and costs a wasted rebuild (timed in
+ * `deploy.ts`). The
  * reverse — shipping a bundle whose judge lacks the fix just made — is silent
  * and reaches players, who have no way to see it. So anything unclear rebuilds:
  * a missing artifact, a missing input, an input whose timestamp merely ties.
