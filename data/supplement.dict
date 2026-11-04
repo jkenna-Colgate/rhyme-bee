@@ -791,6 +791,188 @@ stupidity S T UW0 P IH1 D IH0 T IY0
 theatricality TH IY0 AE2 T R AH0 K AE1 L AH0 T IY0
 triviality T R IH2 V IY0 AE1 L AH0 T IY0
 
+# --- Corrections (a stray stress on the final "-ee", ruled 2026-11-04, #284) ---
+#
+# CMUdict marks the unstressed final "-ee" of these words IY2, as it did the -ity
+# words above, so each had the bare Rhyme Key IY: `thirty` and `apology` scored for
+# `tree` and were refused for `dirty` and `geology`. The maintainer ruled each word
+# by ear on 2026-11-04: these are said with no beat at the end, so the final vowel
+# is IY0 on every reading, and a playable inflection with the same mark
+# (`companies`, `libraries`) gets its own line. Words ruled to keep a beat
+# (`bumblebee`, `turnkey`, `apogee`) have no line here. A second upstream error in
+# the same reading is corrected with it, because this entry replaces the reading:
+# `antinomy` and `astilbe` had lost a consonant; `mixology`, `phenomenology` and
+# `psychopathology` had G for JH; `peyote` had AO for OW and `tomography` OW for
+# AA; `inquiry` had a reading with no stress and a doubled R; `actuary` carried
+# two primary stresses; `library` had its secondary stress on the "-ee" instead of
+# the "-rar-" (as `dictionary` has it); `maxillary` was stressed the British way;
+# `predominately` was spelled out as `predominantly`; and `-oscopy` had OW0 where
+# `microscopy` has AH0. A stray secondary stress earlier in the word went too
+# (`imaginatively`, `indisputably`, `liberally`, `spiritually`, `staggeringly`,
+# the second of `epidemiologically`'s). `realty` loses its "RILL-ih-tee"
+# reading, a mispronunciation that would have scored it for `facility`.
+# Built by `.scratch/284/lines.py`.
+actuary AE1 K CH UW0 EH2 R IY0
+agnostically AE0 G N AA1 S T IH0 K L IY0
+agonizingly AE1 G AH0 N AY2 Z IH0 NG L IY0
+anarchy AE1 N ER0 K IY0
+antinomy AE0 N T IH1 N AH0 M IY0
+apologetically AH0 P AA2 L AH0 JH EH1 T IH0 K L IY0
+apology AH0 P AA1 L AH0 JH IY0
+apostrophe AH0 P AA1 S T R AH0 F IY0
+astilbe AH0 S T IH1 L B IY0
+barkey B AA1 R K IY0
+beastly B IY1 S T L IY0
+blanky B L AE1 NG K IY0
+bolly B AO1 L IY0
+bougie B UW1 ZH IY0
+calliope K AH0 L AY1 AH0 P IY0
+carby K AA1 R B IY0
+catchy K AE1 CH IY0
+circumstantially S ER2 K AH0 M S T AE1 N SH AH0 L IY0
+cognoscenti K AA2 G N AO0 SH EH1 N T IY0
+colossally K AH0 L AA1 S AH0 L IY0
+company K AH1 M P AH0 N IY0
+compassionately K AH0 M P AE1 SH AH0 N AH0 T L IY0
+crappie K R AE1 P IY0
+crappy K R AE1 P IY0
+culturally K AH1 L CH ER0 AH0 L IY0
+daintily D EY1 N T AH0 L IY0
+dubiously D UW1 B IY0 AH0 S L IY0
+ducky D AH1 K IY0
+dynamically D AY0 N AE1 M IH0 K L IY0
+electrobiology IH2 L EH2 K T R OW0 B AY0 AA1 L AH0 JH IY0
+electronically IH2 L EH2 K T R AA1 N IH0 K AH0 L IY0
+electronically(1) IH0 L EH2 K T R AA1 N IH0 K L IY0
+elegantly EH1 L IH0 G AH0 N T L IY0
+elegy EH1 L AH0 JH IY0
+enquiry IH0 N K W AY1 R IY0
+epidemiologically EH2 P AH0 D IY2 M IY0 AH0 L AA1 JH IH0 K L IY0
+epistemology EH0 P IH2 S T AH0 M AA1 L AH0 JH IY0
+eponymy EH0 P AO1 N IH0 M IY0
+feathery F EH1 DH ER0 IY0
+feathery(1) F EH1 DH R IY0
+fusty F AH1 S T IY0
+gemini JH EH1 M AH0 N AY2
+gemini(1) JH EH1 M AH0 N IY0
+hawkey HH AO1 K IY0
+idiosyncrasy IH2 D IY0 OW0 S IH1 N K R AH0 S IY0
+imaginatively IH2 M AE1 JH AH0 N AH0 T IH0 V L IY0
+incrementally IH2 N K R AH0 M EH1 N T AH0 L IY0
+indigenously IH2 N D IH1 JH AH0 N AH0 S L IY0
+indignantly IH2 N D IH1 G N AH0 N T L IY0
+indirectly IH2 N D ER0 EH1 K T L IY0
+indiscriminately IH2 N D IH0 S K R IH1 M AH0 N AH0 T L IY0
+indisputably IH2 N D IH1 S P Y UW0 T AH0 B L IY0
+inquiry IH2 N K W AY1 R IY0
+inquiry(1) IH1 N K W ER0 IY0
+instinctively IH2 N S T IH1 NG K T IH0 V L IY0
+institutionally IH2 N S T IH0 T UW1 SH AH0 N AH0 L IY0
+institutionally(1) IH2 N S T IH0 T UW1 SH N AH0 L IY0
+insufficiency IH2 N S AH0 F IH1 SH AH0 N S IY0
+kabuki K AH0 B UW1 K IY0
+laryngoscopy L AA2 R IH0 N G AA1 S K AH0 P IY0
+laterally L AE1 T ER0 AH0 L IY0
+liberally L IH1 B ER0 AH0 L IY0
+liberty L IH1 B ER0 T IY0
+library L AY1 B R EH2 R IY0
+lordly L AO1 R D L IY0
+lordy L AO1 R D IY0
+machete M AH0 SH EH1 T IY0
+machete(1) M AH0 CH EH1 T IY0
+maxillary M AE1 K S AH0 L EH2 R IY0
+mercifully M ER1 S IH0 F AH0 L IY0
+mercifully(1) M ER1 S IH0 F L IY0
+milady M IH0 L EY1 D IY0
+minestrone M IH2 N AH0 S T R OW1 N IY0
+mixology M IH0 K S AA1 L AH0 JH IY0
+moiety M OY1 AH0 T IY0
+mythology M AH0 TH AA1 L AH0 JH IY0
+nobody N OW1 B AA2 D IY0
+nobody(1) N OW1 B AH0 D IY0
+obloquy AO1 B L AH0 K W IY0
+origami AO2 R IY0 G AA1 M IY0
+panini P AH0 N IY1 N IY0
+paparazzi P AA2 P AA0 R AO1 Z IY0
+petty P EH1 T IY0
+peyote P EY0 OW1 T IY0
+phenomenology F IH0 N AA2 M AH0 N AA1 L AH0 JH IY0
+phonology F AH0 N AA1 L AH0 JH IY0
+pointedly P OY1 N T IH0 D L IY0
+pointedly(1) P OY1 N AH0 D L IY0
+polygamy P AH0 L IH1 G AH0 M IY0
+pony P OW1 N IY0
+predominantly P R IH2 D AA1 M AH0 N AH0 N T L IY0
+predominately P R IH2 D AA1 M AH0 N AH0 T L IY0
+probably P R AA1 B AH0 B L IY0
+probably(1) P R AA1 B L IY0
+probationary P R OW0 B EY1 SH AH0 N EH2 R IY0
+proctoscopy P R AA2 K T AA1 S K AH0 P IY0
+psychopathology S AY2 K OW0 P AH0 TH AA1 L AH0 JH IY0
+purportedly P ER0 P AO1 R T IH0 D L IY0
+realty R IY1 AH0 L T IY0
+realty(1) R IY1 L T IY0
+reveille R EH1 V AH0 L IY0
+rhinoplasty R AY2 N OW0 P L AE1 S T IY0
+rhinoplasty(1) R IH2 N OW0 P L AE1 S T IY0
+satiety S AA0 T AY1 AH0 T IY0
+shitty SH IH1 T IY0
+skulduggery S K AH0 L D AH1 G ER0 IY0
+slutty S L AH1 T IY0
+smutty S M AH1 T IY0
+snotty S N AO1 T IY0
+soli S OW1 L IY0
+somebody S AH1 M B AA2 D IY0
+somebody(1) S AH1 M B AH0 D IY0
+sophistry S AO1 F IH0 S T R IY0
+soupy S UW1 P IY0
+spanky S P AE1 N K IY0
+speedy S P IY1 D IY0
+spiritually S P IH1 R IH0 CH UW0 AH0 L IY0
+staggeringly S T AE1 G ER0 IH0 NG L IY0
+starry S T AA1 R IY0
+startlingly S T AA1 R T L IH0 NG L IY0
+stereotypically S T EH2 R IY0 OW0 T IH1 P IH0 K AH0 L IY0
+stochastically S T OW0 K AE1 S T IH0 K AH0 L IY0
+stogie S T OW1 G IY0
+sunday S AH1 N D EY2
+sunday(1) S AH1 N D IY0
+tatty T AE1 T IY0
+taxonomy T AE2 K S AO1 N AH0 M IY0
+teleology T IY1 L IY0 AO2 L AH0 JH IY0
+theatrically TH IY0 AE1 T R IH0 K AH0 L IY0
+theatrically(1) TH IY0 AE1 T R IH0 K L IY0
+thirty TH ER1 D IY0
+thirty(1) TH ER1 T IY0
+timpani T IH1 M P AH0 N IY0
+tomography T AH0 M AA1 G R AH0 F IY0
+tonsillectomy T AA2 N S IH0 L EH1 K T AH0 M IY0
+twinkly T W IH1 NG K AH0 L IY0
+twitchy T W IH1 CH IY0
+wadi W AA1 D IY0
+wallaby W AA1 L AH0 B IY0
+weighty W EY1 T IY0
+whitey W AY1 T IY0
+whitey(1) HH W AY1 T IY0
+actuaries AE1 K CH UW0 EH2 R IY0 Z
+apologies AH0 P AA1 L AH0 JH IY0 Z
+apostrophes AH0 P AA1 S T R AH0 F IY0 Z
+calliopes K AH0 L AY1 AH0 P IY0 Z
+companies K AH1 M P AH0 N IY0 Z
+idiosyncrasies IH2 D IY0 OW0 S IH1 N K R AH0 S IY0 Z
+liberties L IH1 B ER0 T IY0 Z
+libraries L AY1 B R EH2 R IY0 Z
+machetes M AH0 SH EH1 T IY0 Z
+machetes(1) M AH0 CH EH1 T IY0 Z
+nobodies N OW1 B AA2 D IY0 Z
+nobodies(1) N OW1 B AH0 D IY0 Z
+stogies S T OW1 G IY0 Z
+sundays S AH1 N D EY2 Z
+sundays(1) S AH1 N D IY0 Z
+taxonomies T AE2 K S AO1 N AH0 M IY0 Z
+tonsillectomies T AA2 N S IH0 L EH1 K T AH0 M IY0 Z
+wallabies W AA1 L AH0 B IY0 Z
+
 # --- Corrections (`-ental` readings with the t dropped, ruled no Rhyme for `kennel`, #289) ---
 #
 # CMUdict holds each of these words twice, once with the t of "-ental" and once without
