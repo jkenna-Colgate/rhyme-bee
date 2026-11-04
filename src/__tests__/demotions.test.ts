@@ -193,4 +193,14 @@ describe("the committed demotion list", () => {
   it.each(["kate", "troy", "heinz", "algiers", "marx"])("holds %s", (word) => {
     expect(entries.find((e) => e.word === word)?.reason).toBe("proper-noun");
   });
+
+  // #284: names the word list held, which scored for `tree` on a stray IY2.
+  it.each(["hawaii", "jeremy", "maggie", "djibouti", "tuskegee"])("holds %s as a name (#284)", (word) => {
+    expect(entries.find((e) => e.word === word)?.reason).toBe("proper-noun");
+  });
+
+  // #284: ruled not a name, so the reading is fixed and the word stays a word.
+  it.each(["roundtree", "spanky"])("leaves %s a word (#284)", (word) => {
+    expect(entries.find((e) => e.word === word)).toBeUndefined();
+  });
 });

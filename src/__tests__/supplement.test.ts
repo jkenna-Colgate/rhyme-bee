@@ -452,3 +452,55 @@ describe("the hand-written readings of #253", () => {
     expect(after.adjudicate(after.pinSeed("trick"), "magic").outcome).not.toBe("answer");
   });
 });
+
+describe("the stray final stress of #284", () => {
+  /**
+   * CMUdict marks the unstressed final "-ee" of these words IY2, which gives
+   * them the bare Rhyme Key IY. Built once without the committed supplement and
+   * once with it, as #253's rows are.
+   */
+  const UPSTREAM: [string, Pronunciation[]][] = [
+    ["thirty", [["TH", "ER1", "D", "IY2"], ["TH", "ER1", "T", "IY2"]]],
+    ["dirty", [["D", "ER1", "T", "IY0"]]],
+    ["apology", [["AH0", "P", "AA1", "L", "AH0", "JH", "IY2"]]],
+    ["geology", [["JH", "IY0", "AA1", "L", "AH0", "JH", "IY0"]]],
+    ["companies", [["K", "AH1", "M", "P", "AH0", "N", "IY2", "Z"]]],
+    // Ruled said with a beat at the end, so no line is written for it.
+    ["bumblebee", [["B", "AH1", "M", "B", "AH0", "L", "B", "IY2"]]],
+    ["tree", [["T", "R", "IY1"]]],
+    ["trees", [["T", "R", "IY1", "Z"]]],
+  ];
+  const words = UPSTREAM.map(([w]) => w);
+  const upstream: TestInputs = {
+    pronunciations: UPSTREAM,
+    words,
+    prevalence: words.map((w): [string, number] => [w, 2.4]),
+  };
+  const committed = readFileSync(
+    fileURLToPath(new URL("../../data/supplement.dict", import.meta.url)),
+    "utf8",
+  );
+  const before = makeTestIndex(upstream);
+  const after = makeTestIndex({ ...upstream, supplement: committed });
+
+  it.each([
+    ["dirty", "thirty"],
+    ["geology", "apology"],
+  ])("scores %s for %s once the supplement is read, and not before", (word, seed) => {
+    expect(before.adjudicate(before.pinSeed(seed), word).outcome).not.toBe("answer");
+    expect(after.adjudicate(after.pinSeed(seed), word).outcome).toBe("answer");
+  });
+
+  it.each([
+    ["thirty", "tree"],
+    ["apology", "tree"],
+    ["companies", "trees"],
+  ])("stops %s scoring for %s", (word, seed) => {
+    expect(before.adjudicate(before.pinSeed(seed), word).outcome).toBe("answer");
+    expect(after.adjudicate(after.pinSeed(seed), word).outcome).not.toBe("answer");
+  });
+
+  it("leaves bumblebee, said with a beat on its -bee, scoring for tree", () => {
+    expect(after.adjudicate(after.pinSeed("tree"), "bumblebee").outcome).toBe("answer");
+  });
+});
