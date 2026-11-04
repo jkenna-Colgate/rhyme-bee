@@ -1168,3 +1168,11 @@ around AH0 R AW1 N D
 leprechaun L EH1 P R AH0 K AO2 N
 # playground: correction approved on a Batch's No False Accepts ruling list (#268), against AW N — replaces every reading the pinned sources hold for this word (ADR-0009).
 playground P L EY1 G R AW2 N D
+# betted (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-04) ruled it a Rhyme for `fetid` on EH D AH D at high confidence.
+betted B EH1 T AH0 D
+# wetted (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-04) ruled it a Rhyme for `fetid` on EH D AH D at high confidence.
+wetted W EH1 T AH0 D
+# sledded (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-04) ruled it a Rhyme for `fetid` on EH D AH D at high confidence.
+sledded S L EH1 D IH0 D
+# treaded (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-04) ruled it a Rhyme for `fetid` on EH D AH D at high confidence.
+treaded T R EH1 D IH0 D

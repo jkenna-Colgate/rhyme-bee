@@ -28,6 +28,9 @@
     "feet": [
       {"date":"2026-11-01","rhymeKey":"IY T","trust":"pass","failuresPerLook":[4,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":11,"listed":0,"unruled":[],"stillScored":[]}}
     ],
+    "fetid": [
+      {"date":"2026-11-04","rhymeKey":"EH D AH D","trust":"pass","failuresPerLook":[2,2,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-04.batch.seeds.fetid.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "grassroots": [
       {"date":"2026-11-01","rhymeKey":"UW T S","trust":"pass","failuresPerLook":[2,3,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
     ],
