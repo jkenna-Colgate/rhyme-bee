@@ -68,3 +68,36 @@ nepal proper-noun
 neptune proper-noun       # the planet and the Roman god
 tudor proper-noun         # the English royal house
 scott proper-noun
+
+# --- Names that scored for `tree` on a stray final IY2 (#284) ---
+#
+# Measured by #284: words the word list holds, ending in an IY2, that read as
+# names. The maintainer left each unruled on 2026-11-04 as a name or a word they
+# had never heard of; every one is a name. `roundtree` and `spanky` were ruled
+# not names and keep their wordhood.
+araby proper-noun         # Arabia, in verse
+briony proper-noun
+chevy proper-noun         # the car
+cheyney proper-noun
+cory proper-noun
+dalai proper-noun         # only in `Dalai Lama`
+djibouti proper-noun
+elysee proper-noun        # the Paris palace
+genesee proper-noun       # the river and county
+hawaii proper-noun
+jeremy proper-noun
+kali proper-noun          # the Hindu goddess
+kenny proper-noun
+kory proper-noun
+kylie proper-noun
+libby proper-noun
+maggie proper-noun
+meiji proper-noun         # the Japanese era
+montmorency proper-noun
+paty proper-noun
+paulie proper-noun
+ricky proper-noun
+takeuchi proper-noun
+tuskegee proper-noun
+winfree proper-noun
+zuni proper-noun          # the Pueblo people
