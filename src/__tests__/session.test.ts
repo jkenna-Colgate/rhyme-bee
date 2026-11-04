@@ -42,7 +42,7 @@ import {
   toResult,
   type PlayState,
   type PuzzleContext,
-  type RankTier,
+  type LadderRank,
   type ScoringConfig,
 } from "../session.ts";
 
@@ -72,7 +72,7 @@ interface PlayRow {
   /** Cumulative Score after this Submission. */
   score: number;
   /** Resolved Rank (its index on the ladder) after this Submission. */
-  rankTier: number;
+  rankIndex: number;
   /** Rank change this Submission triggered, by index on the ladder, if any. */
   rankChange?: { from: number; to: number };
   /** Answers found and Bonus Words collected after this Submission. */
@@ -85,17 +85,17 @@ interface PlayRow {
 // 5 Troubadour(25%), 6 Bard(40%), 7 Wordsmith(50%), 8 Laureate(70%),
 // 9 Shakespeare(100%).
 const script: PlayRow[] = [
-  { submission: "late", verdict: { outcome: "answer" }, scoreDelta: 4, score: 4, rankTier: 2, rankChange: { from: 0, to: 2 }, found: 1, foundBonus: 0, note: "accept an Answer" },
-  { submission: "hat", verdict: { outcome: "rejected", reason: "does-not-rhyme" }, scoreDelta: 0, score: 4, rankTier: 2, found: 1, foundBonus: 0, note: "non-rhyme rejection, state unchanged" },
-  { submission: "defenestrate", verdict: { outcome: "answer" }, scoreDelta: 14, score: 18, rankTier: 5, rankChange: { from: 2, to: 5 }, found: 2, foundBonus: 0, note: "rare Answer: length 12 + rare bonus 2" },
-  { submission: "late", verdict: { outcome: "rejected", reason: "already-submitted" }, scoreDelta: 0, score: 18, rankTier: 5, found: 2, foundBonus: 0, note: "repeat of a found Answer" },
-  { submission: "objurgate", verdict: { outcome: "bonus" }, scoreDelta: 0, score: 18, rankTier: 5, found: 2, foundBonus: 1, note: "Bonus Word: zero Score, foundBonus grows" },
-  { submission: "kate", verdict: { outcome: "rejected", reason: "proper-noun" }, scoreDelta: 0, score: 18, rankTier: 5, found: 2, foundBonus: 1, note: "proper-noun rejection" },
-  { submission: "eight", verdict: { outcome: "answer" }, scoreDelta: 5, score: 23, rankTier: 6, rankChange: { from: 5, to: 6 }, found: 3, foundBonus: 1, note: "crosses a Rank threshold" },
-  { submission: "collate", verdict: { outcome: "answer" }, scoreDelta: 7, score: 30, rankTier: 7, rankChange: { from: 6, to: 7 }, found: 4, foundBonus: 1, note: "crosses another threshold" },
-  { submission: "gate", verdict: { outcome: "answer" }, scoreDelta: 4, score: 34, rankTier: 7, found: 5, foundBonus: 1, note: "Score rises within the same Rank" },
-  { submission: "impregnate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 44, rankTier: 8, rankChange: { from: 7, to: 8 }, found: 6, foundBonus: 1, note: "reaches the top named tier (Laureate, 70%)" },
-  { submission: "adjudicate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 54, rankTier: 9, rankChange: { from: 8, to: 9 }, found: 7, foundBonus: 1, note: "every Answer found -> perfect-game tier (100%)" },
+  { submission: "late", verdict: { outcome: "answer" }, scoreDelta: 4, score: 4, rankIndex: 2, rankChange: { from: 0, to: 2 }, found: 1, foundBonus: 0, note: "accept an Answer" },
+  { submission: "hat", verdict: { outcome: "rejected", reason: "does-not-rhyme" }, scoreDelta: 0, score: 4, rankIndex: 2, found: 1, foundBonus: 0, note: "non-rhyme rejection, state unchanged" },
+  { submission: "defenestrate", verdict: { outcome: "answer" }, scoreDelta: 14, score: 18, rankIndex: 5, rankChange: { from: 2, to: 5 }, found: 2, foundBonus: 0, note: "rare Answer: length 12 + rare bonus 2" },
+  { submission: "late", verdict: { outcome: "rejected", reason: "already-submitted" }, scoreDelta: 0, score: 18, rankIndex: 5, found: 2, foundBonus: 0, note: "repeat of a found Answer" },
+  { submission: "objurgate", verdict: { outcome: "bonus" }, scoreDelta: 0, score: 18, rankIndex: 5, found: 2, foundBonus: 1, note: "Bonus Word: zero Score, foundBonus grows" },
+  { submission: "kate", verdict: { outcome: "rejected", reason: "proper-noun" }, scoreDelta: 0, score: 18, rankIndex: 5, found: 2, foundBonus: 1, note: "proper-noun rejection" },
+  { submission: "eight", verdict: { outcome: "answer" }, scoreDelta: 5, score: 23, rankIndex: 6, rankChange: { from: 5, to: 6 }, found: 3, foundBonus: 1, note: "crosses a Rank threshold" },
+  { submission: "collate", verdict: { outcome: "answer" }, scoreDelta: 7, score: 30, rankIndex: 7, rankChange: { from: 6, to: 7 }, found: 4, foundBonus: 1, note: "crosses another threshold" },
+  { submission: "gate", verdict: { outcome: "answer" }, scoreDelta: 4, score: 34, rankIndex: 7, found: 5, foundBonus: 1, note: "Score rises within the same Rank" },
+  { submission: "impregnate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 44, rankIndex: 8, rankChange: { from: 7, to: 8 }, found: 6, foundBonus: 1, note: "reaches the top named Rank (Laureate, 70%)" },
+  { submission: "adjudicate", verdict: { outcome: "answer" }, scoreDelta: 10, score: 54, rankIndex: 9, rankChange: { from: 8, to: 9 }, found: 7, foundBonus: 1, note: "every Answer found -> perfect-game Rank (100%)" },
 ];
 
 describe("session play-through (fixture `ate` Puzzle)", () => {
@@ -108,7 +108,7 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
 
   it("starts empty: nothing found, bottom Rank, zero Score", () => {
     expect(score(context, emptyPlayState)).toBe(0);
-    expect(rank(context, emptyPlayState).tier).toBe(0);
+    expect(rank(context, emptyPlayState).index).toBe(0);
     expect(progress(context, emptyPlayState)).toEqual({ found: 0, totalAnswers: 7, foundBonus: 0 });
   });
 
@@ -141,11 +141,11 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
       });
 
       // Resolved Rank and the Rank-change event.
-      expect(rank(context, next).tier).toBe(row.rankTier);
+      expect(rank(context, next).index).toBe(row.rankIndex);
       if (row.rankChange) {
         expect(result.rankChange).toBeDefined();
-        expect(result.rankChange?.from.tier).toBe(row.rankChange.from);
-        expect(result.rankChange?.to.tier).toBe(row.rankChange.to);
+        expect(result.rankChange?.from.index).toBe(row.rankChange.from);
+        expect(result.rankChange?.to.index).toBe(row.rankChange.to);
       } else {
         expect(result.rankChange).toBeUndefined();
       }
@@ -159,7 +159,7 @@ describe("session play-through (fixture `ate` Puzzle)", () => {
       date: "2026-07-23",
       seed: "ate",
       finalScore: 54,
-      finalRank: { tier: 9, label: "Shakespeare", threshold: 100 },
+      finalRank: { index: 9, label: "Shakespeare", threshold: 100 },
       found: 7,
       totalAnswers: 7,
     });
@@ -338,7 +338,7 @@ describe("the Reveal (fixture `ate` Puzzle)", () => {
 
 // --- Supporting suite: ladder boundaries against a synthetic context -----------
 
-const LADDER: RankTier[] = [
+const LADDER: LadderRank[] = [
   { threshold: 0, label: "bottom" },
   { threshold: 25, label: "quarter" },
   { threshold: 50, label: "half" },
@@ -388,36 +388,36 @@ const boundaryAnswers = [
 interface RankRow {
   found: string[];
   pct: number;
-  tier: number;
+  index: number;
   label: string;
   note: string;
 }
 
 const rankRows: RankRow[] = [
-  { found: [], pct: 0, tier: 0, label: "bottom", note: "0% resolves to the bottom Rank" },
-  { found: ["a"], pct: 24, tier: 0, label: "bottom", note: "just below a threshold does not trigger" },
-  { found: ["a", "b"], pct: 25, tier: 1, label: "quarter", note: ">= threshold triggers exactly at the line" },
-  { found: ["a", "b", "c"], pct: 50, tier: 2, label: "half", note: "next Rank at its threshold" },
-  { found: ["a", "b", "c", "d"], pct: 100, tier: 3, label: "all", note: "every Answer -> top Rank" },
+  { found: [], pct: 0, index: 0, label: "bottom", note: "0% resolves to the bottom Rank" },
+  { found: ["a"], pct: 24, index: 0, label: "bottom", note: "just below a threshold does not trigger" },
+  { found: ["a", "b"], pct: 25, index: 1, label: "quarter", note: ">= threshold triggers exactly at the line" },
+  { found: ["a", "b", "c"], pct: 50, index: 2, label: "half", note: "next Rank at its threshold" },
+  { found: ["a", "b", "c", "d"], pct: 100, index: 3, label: "all", note: "every Answer -> top Rank" },
 ];
 
 describe("rank ladder boundaries (synthetic context)", () => {
   const context = synthContext(boundaryAnswers, 100);
 
   for (const row of rankRows) {
-    it(`${row.pct}% -> tier ${row.tier} (${row.note})`, () => {
+    it(`${row.pct}% -> Rank ${row.index} (${row.note})`, () => {
       const state: PlayState = { foundAnswers: row.found, foundBonus: [], ended: false };
       const resolved = rank(context, state);
-      expect(resolved.tier).toBe(row.tier);
+      expect(resolved.index).toBe(row.index);
       expect(resolved.label).toBe(row.label);
-      expect(resolved.threshold).toBe(LADDER[row.tier]!.threshold);
+      expect(resolved.threshold).toBe(LADDER[row.index]!.threshold);
     });
   }
 
   it("returns the bottom Rank when maxScore is 0 (no divide-by-zero)", () => {
     const degenerate = synthContext([], 0);
     const resolved = rank(degenerate, emptyPlayState);
-    expect(resolved).toEqual({ tier: 0, label: "bottom", threshold: 0 });
+    expect(resolved).toEqual({ index: 0, label: "bottom", threshold: 0 });
   });
 });
 
@@ -436,7 +436,7 @@ describe("Session facade over the core (fixture `ate` Puzzle)", () => {
     expect(session.puzzle).toBe(session.context.puzzle);
     expect(session.seed).toEqual(context.seed);
     expect(session.score()).toBe(0);
-    expect(session.rank().tier).toBe(0);
+    expect(session.rank().index).toBe(0);
   });
 
   it("submit returns a new Session carrying the found word, leaving the original intact", () => {

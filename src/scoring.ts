@@ -10,8 +10,11 @@
  * game scores with, not a parallel re-implementation.
  */
 
-/** One Rank on the ladder: the percentage-of-maximum it triggers at. */
-export interface RankTier {
+/**
+ * One Rank as the ladder defines it: its name and the percentage-of-maximum it
+ * triggers at. The Rank a player holds (`Rank` in `session.ts`) adds its index.
+ */
+export interface LadderRank {
   threshold: number;
   label: string;
 }
@@ -26,7 +29,7 @@ export interface ScoringConfig {
   /** Flat points a rare Answer earns on top of its length. */
   rareBonus: number;
   /** Ordered Ranks (ascending threshold); the player's Rank is the highest reached. */
-  rankLadder: RankTier[];
+  rankLadder: LadderRank[];
 }
 
 /**
@@ -46,7 +49,7 @@ export interface ScoringConfig {
  *
  * They stay pure config data: nothing outside this array knows a Rank by name.
  */
-export const DEFAULT_RANK_LADDER: RankTier[] = [
+export const DEFAULT_RANK_LADDER: LadderRank[] = [
   { threshold: 0, label: "Beginner" },
   { threshold: 2, label: "First Verse" },
   { threshold: 5, label: "Budding Poet" },

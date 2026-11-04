@@ -15,7 +15,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { DEFAULT_RANK_LADDER, type RankTier } from "../../src/scoring.ts";
+import { DEFAULT_RANK_LADDER, type LadderRank } from "../../src/scoring.ts";
 import { shareRank, type ShareContext } from "../src/share/shareGesture.ts";
 import { shareTargetFor, shareTargets } from "../src/share/shareTargets.ts";
 
@@ -23,7 +23,7 @@ const ORIGIN = "https://example.test";
 const LAUREATE = { label: "Laureate" };
 
 /** The URL the build wrote for a Rank, derived rather than written out. */
-function urlFor(label: string, ladder: RankTier[] = DEFAULT_RANK_LADDER): string {
+function urlFor(label: string, ladder: LadderRank[] = DEFAULT_RANK_LADDER): string {
   const target = shareTargetFor(ladder, ORIGIN, label);
   if (target === undefined) throw new Error(`no share target for ${label}`);
   return target.url;
@@ -135,7 +135,7 @@ describe("shareRank", () => {
   });
 
   it("shares against the ladder it is given rather than the shipped one", async () => {
-    const ladder: RankTier[] = [
+    const ladder: LadderRank[] = [
       { threshold: 0, label: "Novice" },
       { threshold: 60, label: "Trouvère" },
     ];
