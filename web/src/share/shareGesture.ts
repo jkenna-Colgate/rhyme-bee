@@ -32,7 +32,7 @@
  * so a link this module sends is a link some file exists for.
  */
 
-import type { RankTier } from "../../../src/scoring.ts";
+import type { LadderRank } from "../../../src/scoring.ts";
 import { shareTargetFor } from "./shareTargets.ts";
 
 /**
@@ -61,7 +61,7 @@ export interface ShareContext {
   /** Where this build is served from, for the absolute URL the card needs. */
   origin: string;
   /** The Rank ladder the player's Rank came from. */
-  ladder: RankTier[];
+  ladder: LadderRank[];
   /** The native share sheet, where the browser has one. */
   share?: (data: { url: string }) => Promise<void>;
   /** Writing to the clipboard, the fallback where it does not. */
