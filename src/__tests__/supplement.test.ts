@@ -346,6 +346,43 @@ describe("the committed supplement", () => {
     );
     expect(malformed).toEqual([]);
   });
+
+  it("keeps the t after n before a weak vowel, where CMUdict also drops it (#299)", () => {
+    // CMUdict also holds each of these said without the t ("senner", "twenny"),
+    // which made `center` a rhyme for `tenor` and `dentals` one for `kennels`.
+    expect(entries.get("center")).toEqual([["S", "EH1", "N", "T", "ER0"]]);
+    expect(entries.get("twenty")).toEqual([["T", "W", "EH1", "N", "T", "IY0"]]);
+    expect(entries.get("dentals")).toEqual([["D", "EH1", "N", "T", "AH0", "L", "Z"]]);
+    expect(entries.get("santa")).toEqual([["S", "AE1", "N", "T", "AH0"]]);
+    // `counted` is dropped two ways upstream, "COWN-id" and "COWN-uhd".
+    expect(entries.get("counted")).toEqual([["K", "AW1", "N", "T", "IH0", "D"]]);
+  });
+
+  it("leaves the t dropped after n before s, and in a cluster, to CMUdict (#299)", () => {
+    // `cents` and `sense` are one sound; `facts` said "fax" was not ruled on.
+    expect(entries.get("cents")).toBeUndefined();
+    expect(entries.get("facts")).toBeUndefined();
+  });
+
+  it("holds no reading with the t after n dropped before a weak vowel beside one that keeps it (#299)", () => {
+    const tDropped = [...entries].flatMap(([word, readings]) =>
+      readings
+        .filter((dropped) =>
+          readings.some((full) =>
+            full.some(
+              (p, i) =>
+                p === "T" &&
+                full[i - 1] === "N" &&
+                /0$/.test(full[i + 1] ?? "") &&
+                [...full.slice(0, i), ...full.slice(i + 1)].join(" ").replace(/\d/g, "") ===
+                  dropped.join(" ").replace(/\d/g, ""),
+            ),
+          ),
+        )
+        .map((reading) => `${word} ${reading.join(" ")}`),
+    );
+    expect(tDropped).toEqual([]);
+  });
 });
 
 describe("the hand-written readings of #253", () => {
