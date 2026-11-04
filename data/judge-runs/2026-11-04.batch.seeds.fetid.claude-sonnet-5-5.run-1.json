@@ -1,0 +1,642 @@
+{
+  "date": "2026-11-04",
+  "command": "batch --seeds fetid",
+  "run": 1,
+  "model": "claude-sonnet-5-5",
+  "playerModel": "claude-sonnet-5-5",
+  "answeredBy": [
+    "claude-sonnet-5-5"
+  ],
+  "calls": {
+    "player": 4,
+    "rhyme": 3,
+    "wordhood": 2,
+    "tier": 0,
+    "fromCache": 0
+  },
+  "settings": {
+    "gate": {
+      "k": 1,
+      "n": 3
+    },
+    "offKeyRatio": 5,
+    "maxJudgeCalls": 2
+  },
+  "candidatesJudged": 11,
+  "note": "A Batch (#267). Trust failures are Candidates the Judge rules a Rhyme with a reading that reaches the key, leaving out Unconfirmed Rhymes and suggested Demotions; a Rhyme the game accepts, after the look's corrections, as a Bonus Word whose knownness is below the Answer line is listed under excusedAsRare and not counted. Every write is listed under writes; the index was rebuilt after each look that landed one.",
+  "seedsPlayed": [
+    {
+      "seedWord": "fetid",
+      "date": null,
+      "rhymeKey": "EH D AH D",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        2,
+        2,
+        0
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "regretted",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": true,
+              "keyCount": {
+                "withReading": 68,
+                "onKey": 0,
+                "topOther": {
+                  "rhymeKey": "IY D AH D",
+                  "words": 26
+                },
+                "offKey": true
+              },
+              "wordsTyped": 82,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "edited",
+                "credited",
+                "heeded",
+                "needed",
+                "seeded",
+                "weeded",
+                "pleaded",
+                "kneaded",
+                "speeded",
+                "acceded",
+                "conceded",
+                "receded",
+                "seceded",
+                "impeded",
+                "proceeded",
+                "exceeded",
+                "succeeded",
+                "repeated",
+                "completed",
+                "defeated",
+                "deleted",
+                "seated",
+                "heated",
+                "treated",
+                "cheated",
+                "greeted",
+                "meeted",
+                "tweeted",
+                "fleeted",
+                "bleated",
+                "pleated",
+                "wheeded",
+                "needed",
+                "readied",
+                "beaded",
+                "deeded",
+                "guided",
+                "decided",
+                "provided",
+                "divided",
+                "resided",
+                "presided",
+                "glided",
+                "slided",
+                "chided",
+                "derided",
+                "elided",
+                "collided",
+                "confided",
+                "decided",
+                "resided",
+                "abided",
+                "sided",
+                "tided",
+                "brided",
+                "prided",
+                "elected",
+                "selected",
+                "rejected",
+                "neglected",
+                "respected",
+                "expected",
+                "inspected",
+                "corrected",
+                "directed",
+                "protected",
+                "detected",
+                "connected",
+                "reflected",
+                "affected",
+                "effected",
+                "infected",
+                "injected",
+                "objected",
+                "suspected",
+                "collected",
+                "erected",
+                "dissected",
+                "perfected",
+                "projected",
+                "subjected",
+                "rededicated"
+              ]
+            },
+            {
+              "attempt": 2,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 12,
+                "onKey": 10,
+                "topOther": {
+                  "rhymeKey": "AA R T",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 27,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "regretted",
+                "petted",
+                "setted",
+                "betted",
+                "netted",
+                "jetted",
+                "wetted",
+                "fretted",
+                "sweated",
+                "threatened",
+                "debted",
+                "abetted",
+                "begetted",
+                "let it",
+                "get it",
+                "bet it",
+                "set it",
+                "wet it",
+                "forget it",
+                "sweetheart",
+                "indebted",
+                "sweated",
+                "jetted",
+                "vetted",
+                "whetted",
+                "yetted",
+                "fetted"
+              ]
+            }
+          ],
+          "score": 71,
+          "maxScore": 283,
+          "share": 0.2509,
+          "rank": "Troubadour",
+          "candidates": [
+            "setted",
+            "betted",
+            "wetted",
+            "threatened",
+            "debted",
+            "begetted",
+            "sweetheart",
+            "yetted",
+            "fetted"
+          ],
+          "trustFailures": [
+            "betted",
+            "wetted"
+          ],
+          "excusedAsRare": []
+        },
+        {
+          "look": 2,
+          "example": "regretted",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 21,
+                "onKey": 20,
+                "topOther": {
+                  "rhymeKey": "EH D ER D",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 24,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "regretted",
+                "petted",
+                "netted",
+                "vetted",
+                "wetted",
+                "fretted",
+                "sweated",
+                "abetted",
+                "indebted",
+                "dreaded",
+                "headed",
+                "bedded",
+                "shredded",
+                "sledded",
+                "wedded",
+                "threaded",
+                "breaded",
+                "embedded",
+                "beheaded",
+                "redheaded",
+                "treaded",
+                "jetted",
+                "lettered",
+                "sweatered"
+              ]
+            }
+          ],
+          "score": 143,
+          "maxScore": 297,
+          "share": 0.4815,
+          "rank": "Bard",
+          "candidates": [
+            "sledded",
+            "treaded",
+            "lettered",
+            "sweatered"
+          ],
+          "trustFailures": [
+            "sledded",
+            "treaded"
+          ],
+          "excusedAsRare": []
+        },
+        {
+          "look": 3,
+          "example": "regretted",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 22,
+                "onKey": 20,
+                "topOther": {
+                  "rhymeKey": "EH D AH T",
+                  "words": 2
+                },
+                "offKey": false
+              },
+              "wordsTyped": 22,
+              "answeredBy": [
+                "claude-sonnet-5-5"
+              ],
+              "words": [
+                "regretted",
+                "petted",
+                "netted",
+                "jetted",
+                "vetted",
+                "wetted",
+                "fretted",
+                "sweated",
+                "abetted",
+                "headed",
+                "bedded",
+                "shredded",
+                "wedded",
+                "dreaded",
+                "threaded",
+                "sledded",
+                "embedded",
+                "beheaded",
+                "redheaded",
+                "unwedded",
+                "credit",
+                "edit"
+              ]
+            }
+          ],
+          "score": 143,
+          "maxScore": 311,
+          "share": 0.4598,
+          "rank": "Bard",
+          "candidates": [
+            "credit",
+            "edit"
+          ],
+          "trustFailures": [],
+          "excusedAsRare": []
+        }
+      ]
+    }
+  ],
+  "untested": [],
+  "writes": {
+    "readings": [
+      {
+        "word": "betted",
+        "reading": "B EH1 T AH0 D"
+      },
+      {
+        "word": "wetted",
+        "reading": "W EH1 T AH0 D"
+      },
+      {
+        "word": "sledded",
+        "reading": "S L EH1 D IH0 D"
+      },
+      {
+        "word": "treaded",
+        "reading": "T R EH1 D IH0 D"
+      }
+    ],
+    "unconfirmedRhymes": [],
+    "suggestedDemotions": [
+      {
+        "word": "debted",
+        "rhymeKey": "EH D AH D",
+        "reason": "not-a-word"
+      },
+      {
+        "word": "fetted",
+        "rhymeKey": "EH D AH D",
+        "reason": "not-a-word"
+      }
+    ]
+  },
+  "rulings": [
+    {
+      "word": "setted",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "betted",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "B EH1 T AH0 D",
+      "confidence": "high",
+      "why": "Stressed EH then T, a weak vowel and D, which is the same key as fetid (EH1 T AH0 D).",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Rare but attested past tense/participle of 'bet' (standard form is 'bet').",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "wetted",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "W EH1 T AH0 D",
+      "confidence": "high",
+      "why": "It has the same EH1 T AH0 D key as fetid.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Valid past tense/participle of 'wet'.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "threatened",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "The key is EH1 T AH0 N D, with an extra weak n syllable, so it does not match fetid.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "debted",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "D EH1 T AH0 D",
+      "confidence": "high",
+      "why": "The silent b leaves EH1 T AH0 D, matching fetid's key.",
+      "reachesKey": true,
+      "wouldLand": "demotion",
+      "wordhood": "not-a-word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "'Debt' is a noun; 'debted' is not a standard English word, though 'indebted' is.",
+      "look": 1,
+      "landed": "suggested-demotion"
+    },
+    {
+      "word": "begetted",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "sweetheart",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "The last stressed vowel is AA before R T, which is not EH T AH D.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "yetted",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "fetted",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F EH1 T AH0 D",
+      "confidence": "high",
+      "why": "It has the same EH1 T AH0 D key as fetid, and it is a homophone.",
+      "reachesKey": true,
+      "wouldLand": "demotion",
+      "wordhood": "not-a-word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "No standard English verb 'fet'; this is not a recognized word.",
+      "look": 1,
+      "landed": "suggested-demotion"
+    },
+    {
+      "word": "sledded",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S L EH1 D IH0 D",
+      "confidence": "high",
+      "why": "The d between EH1 and the weak vowel is read as the quick tap, the same as t in fetid. That gives EH1 DX IH0 D, which matches fetid.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Past tense of the verb 'sled' (to ride a sled).",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "treaded",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "T R EH1 D IH0 D",
+      "confidence": "high",
+      "why": "It is pronounced like 'tread' plus -ed, with the d read as the tap. That gives EH1 DX IH0 D, which matches fetid.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Recognized as a past tense of 'tread' (nonstandard but attested) and also an adjective meaning having a tread.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "lettered",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Its key is EH1 T ER0 D, with an r-colored final syllable. That differs from fetid's EH1 T IH0 D.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "sweatered",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "credit",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "The medial d/t taps match, but credit ends in final T (EH1 D IH0 T) while fetid ends in final D (EH1 T IH0 D), so the Rhyme Keys differ.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 3,
+      "landed": "nothing"
+    },
+    {
+      "word": "edit",
+      "seedWord": "fetid",
+      "rhymeKey": "EH D AH D",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Edit ends in final T (EH1 D IH0 T) while fetid ends in final D, so the final consonant differs.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 3,
+      "landed": "nothing"
+    }
+  ],
+  "noFalseAccepts": {
+    "note": "The hunt (#268): scored Answers with no Wiktionary reading on the Seed Word's Rhyme Key (another-key), in the names data (names-hit), or on the key only through readings Normalisation appended (appended-only, #297), put to the Judge. Nothing it ruled landed by itself; what landed is what the maintainer decided. On a day the Judge held an appended-only Answer, every appended-only Answer that day was listed as one group (groups), the held ones marked; a decided word with inGroup true was listed so, and empty doubts mean the Judge did not hold it.",
+    "seeds": [
+      {
+        "seedWord": "fetid",
+        "rhymeKey": "EH D AH D",
+        "answers": 38,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": []
+      }
+    ],
+    "rulings": [],
+    "groups": [],
+    "decided": []
+  },
+  "undecidedRhymes": {
+    "note": "Rulings of the Judge's in the looks that said Rhyme and landed nothing, whatever their confidence, put to the maintainer in the sitting (#293). A confirm wrote its reading beside the word's others, a decline a Decline for the word and the Rhyme Key; a skip wrote nothing and is listed under skipped.",
+    "listed": 0,
+    "decided": [],
+    "skipped": []
+  },
+  "tiered": {
+    "note": "Words the looks wrote in that have no knownness, so each was a Bonus Word whatever it is, put to the maintainer to Tier in the sitting (#294), with the Judge's answer to the Tier question as the default (#295). An Answer or a Bonus Word wrote an unlocked Tier verdict to data/tier-overrides.csv, which the next build applies; a skip wrote nothing and is listed under skipped. The Judge's answer landed nothing by itself. agreement compares it with the maintainer's ruling over the words both answered, overall and at each confidence ([agreed, compared]).",
+    "listed": 0,
+    "decided": [],
+    "skipped": [],
+    "agreement": {
+      "words": 0,
+      "compared": 0,
+      "agreed": 0,
+      "rate": null,
+      "byConfidence": {
+        "high": [
+          0,
+          0
+        ],
+        "medium": [
+          0,
+          0
+        ],
+        "low": [
+          0,
+          0
+        ]
+      }
+    }
+  }
+}
