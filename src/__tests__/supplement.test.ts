@@ -541,3 +541,92 @@ describe("the stray final stress of #284", () => {
     expect(after.adjudicate(after.pinSeed("tree"), "bumblebee").outcome).toBe("answer");
   });
 });
+
+describe("the weak endings stress promotion stressed (#298)", () => {
+  /**
+   * CMUdict writes these endings with a full vowel, unstressed, and stress
+   * promotion stresses it: `gutless` scored for `chess` and `comment` for
+   * `event`. Built once without the committed supplement and once with it, as
+   * #284's rows are.
+   */
+  const UPSTREAM: [string, Pronunciation[]][] = [
+    ["gutless", [["G", "AH1", "T", "L", "EH0", "S"]]],
+    ["thankfulness", [["TH", "AE1", "NG", "K", "F", "AH0", "L", "N", "EH0", "S"]]],
+    ["comment", [["K", "AA1", "M", "EH0", "N", "T"]]],
+    [
+      "document",
+      [
+        ["D", "AA1", "K", "Y", "AH0", "M", "EH0", "N", "T"],
+        ["D", "AA1", "K", "Y", "UW0", "M", "EH0", "N", "T"],
+      ],
+    ],
+    ["iceman", [["AY1", "S", "M", "AE0", "N"]]],
+    [
+      "craftsmen",
+      [
+        ["K", "R", "AE1", "F", "T", "S", "M", "EH0", "N"],
+        ["K", "R", "AE1", "F", "S", "M", "EH0", "N"],
+      ],
+    ],
+    ["yokel", [["Y", "OW1", "K", "EH0", "L"]]],
+    ["template", [["T", "EH1", "M", "P", "L", "AH0", "T"], ["T", "EH1", "M", "P", "L", "EY0", "T"]]],
+    ["fortune", [["F", "AO1", "R", "CH", "AH0", "N"], ["F", "AO1", "R", "CH", "UW0", "N"]]],
+    [
+      "darnedest",
+      [
+        ["D", "AA1", "R", "N", "D", "EH0", "S", "T"],
+        ["D", "AA1", "R", "N", "EH0", "S", "T"],
+      ],
+    ],
+    // Ruled right, or said with a beat on the ending, so no line is written.
+    ["empress", [["EH1", "M", "P", "R", "EH0", "S"]]],
+    ["portent", [["P", "AO1", "R", "T", "EH0", "N", "T"]]],
+    ["foment", [["F", "OW1", "M", "EH0", "N", "T"]]],
+    ["spiderman", [["S", "P", "AY1", "D", "ER0", "M", "AE0", "N"]]],
+    ["chess", [["CH", "EH1", "S"]]],
+    ["event", [["IH0", "V", "EH1", "N", "T"]]],
+    ["man", [["M", "AE1", "N"]]],
+    ["pen", [["P", "EH1", "N"]]],
+    ["motel", [["M", "OW0", "T", "EH1", "L"]]],
+    ["ate", [["EY1", "T"]]],
+    ["noon", [["N", "UW1", "N"]]],
+    ["suggest", [["S", "AH0", "G", "JH", "EH1", "S", "T"]]],
+  ];
+  const words = UPSTREAM.map(([w]) => w);
+  const upstream: TestInputs = {
+    pronunciations: UPSTREAM,
+    words,
+    prevalence: words.map((w): [string, number] => [w, 2.4]),
+  };
+  const committed = readFileSync(
+    fileURLToPath(new URL("../../data/supplement.dict", import.meta.url)),
+    "utf8",
+  );
+  const before = makeTestIndex(upstream);
+  const after = makeTestIndex({ ...upstream, supplement: committed });
+
+  it.each([
+    ["gutless", "chess"],
+    ["thankfulness", "chess"],
+    ["comment", "event"],
+    ["document", "event"],
+    ["iceman", "man"],
+    ["craftsmen", "pen"],
+    ["yokel", "motel"],
+    ["template", "ate"],
+    ["fortune", "noon"],
+    ["darnedest", "suggest"],
+  ])("stops %s scoring for %s", (word, seed) => {
+    expect(before.adjudicate(before.pinSeed(seed), word).outcome).toBe("answer");
+    expect(after.adjudicate(after.pinSeed(seed), word).outcome).not.toBe("answer");
+  });
+
+  it.each([
+    ["empress", "chess"],
+    ["portent", "event"],
+    ["foment", "event"],
+    ["spiderman", "man"],
+  ])("leaves %s, said with a beat on its ending, scoring for %s", (word, seed) => {
+    expect(after.adjudicate(after.pinSeed(seed), word).outcome).toBe("answer");
+  });
+});
