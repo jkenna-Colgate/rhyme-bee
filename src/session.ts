@@ -30,14 +30,14 @@ import {
 import { isAccepted, type Verdict } from "./verdict.ts";
 
 // The scoring primitive (`scoreEntry`, `ScoringConfig`, `DEFAULT_SCORING_CONFIG`,
-// `RankTier`, `DEFAULT_RANK_LADDER`) lives in `scoring.ts` so curation scores a
+// `LadderRank`, `DEFAULT_RANK_LADDER`) lives in `scoring.ts` so curation scores a
 // candidate's Difficulty with the identical points function (ADR-0007). They are
 // re-exported here so the session's existing public surface is unchanged.
 export {
   DEFAULT_RANK_LADDER,
   DEFAULT_SCORING_CONFIG,
   scoreEntry,
-  type RankTier,
+  type LadderRank,
   type ScoringConfig,
 } from "./scoring.ts";
 
@@ -81,11 +81,11 @@ export const emptyPlayState: PlayState = { foundAnswers: [], foundBonus: [], end
 
 /**
  * A resolved Rank: which Rank on the ladder the player holds, with its label and
- * threshold. `tier` is its zero-based index on the ladder (named to match the Rank shape
- * the session issue pins, `{ tier, label, threshold }`).
+ * threshold. `index` is its zero-based position on the ladder. The shape is never
+ * stored: a Rank is derived from the found words each time it is read.
  */
 export interface Rank {
-  tier: number;
+  index: number;
   label: string;
   threshold: number;
 }
@@ -210,7 +210,7 @@ export function applySubmission(
     verdict,
     scoreDelta: score(context, nextState) - score(context, state),
   };
-  if (rankAfter.tier !== rankBefore.tier) {
+  if (rankAfter.index !== rankBefore.index) {
     result.rankChange = { from: rankBefore, to: rankAfter };
   }
   return { state: nextState, result };
@@ -242,7 +242,7 @@ export function rank(context: PuzzleContext, state: PlayState): Rank {
     else break;
   }
   const reached = ladder[chosen] ?? { threshold: 0, label: "" };
-  return { tier: chosen, label: reached.label, threshold: reached.threshold };
+  return { index: chosen, label: reached.label, threshold: reached.threshold };
 }
 
 /** How far through the Puzzle: Answers found of the total, and Bonus Words collected. */

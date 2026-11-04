@@ -40,7 +40,7 @@ The decisive reason is that **`add` must be server-side regardless**: it appends
 
 - **The plugin gets tests.** `AGENTS.md` records that the Worker routes were tested despite a convention calling transport untested, and the convention lost. This plugin is the same shape and carries the same expectation — method handling, the refusal path, and validation apart from the transport around it.
 
-- **Rebuild on write, always; no preview mode.** A full `npm run build:index` is **2.3 s** (133k pronunciations, 370k words, a 15 MB artifact), and reloading the built index is 510 ms. That is cheap enough that every figure shown is the real artifact, which removes preview-versus-truth as a category of bug. *(Distinct from the four-minute figure in `docs/editors-pass.md`, which is the deploy.)*
+- **Rebuild on write, always; no preview mode.** A full `npm run build:index` is **2.3 s** (133k pronunciations, 370k words, a 15 MB artifact), and reloading the built index is 510 ms. That is cheap enough that every figure shown is the real artifact, which removes preview-versus-truth as a category of bug. *(Amended 2026-11-04, #152: `npm run build:index` was timed again on this date, and now ends with the Continuity check (#256); the figures are in the `scripts/deploy.ts` header. The deploy's upload was not timed.)*
 
 - **Tier previews exactly client-side; `add` does not.** Moving a word between the two lists and recomputing `measureAnswers` needs only its length and knownness, both already in the day's payload — the same arithmetic, so optimistic UI carries no divergence risk and judgements feel instant with a batched rebuild. An add changes pronunciations, coverage and normalisation, and can only be believed after a rebuild.
 

@@ -19,14 +19,14 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_RANK_LADDER, type RankTier } from "../../src/scoring.ts";
+import { DEFAULT_RANK_LADDER, type LadderRank } from "../../src/scoring.ts";
 import { GAME_NAME } from "../src/brand.ts";
 import { shareTargetFor, shareTargets, type ShareTarget } from "../src/share/shareTargets.ts";
 
 const ORIGIN = "https://example.test";
 
 /** Every ladder the projection is required to be total over, not merely the shipped one. */
-const AWKWARD_LADDERS: Record<string, RankTier[]> = {
+const AWKWARD_LADDERS: Record<string, LadderRank[]> = {
   "the shipped ladder": DEFAULT_RANK_LADDER,
   "an empty ladder": [],
   "a single Rank": [{ threshold: 0, label: "Beginner" }],

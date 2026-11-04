@@ -103,13 +103,13 @@ around it, then `wrangler deploy`. The Worker, the bundle and the index go up as
 half-updated site, and no player ever gets a bundle that names an index the
 deploy has not uploaded.
 
-Roughly four minutes, almost all of it the index build — **unless no Rhyme Index
-input has changed since the artifact was built, in which case the deploy skips
-the rebuild and takes seconds.** It decides that for itself and says which
+The index build and the bundle build are timed in the `scripts/deploy.ts`
+header; the upload is not, because timing it means deploying. **If no Rhyme Index input has changed since the artifact was built, the deploy
+skips the rebuild.** It decides that for itself and says which
 branch it took; there is deliberately no flag, so there is no fast path to reach
 for by mistake. A Seed Word swap edits `data/schedule.json`, which the Index
 never reads, and is the case this exists for. The predicate errs toward
-rebuilding: a wasted four minutes is visible, and shipping a bundle whose judge
+rebuilding: a wasted rebuild is visible, and shipping a bundle whose judge
 predates the fix it was made for is not.
 
 To see what would be uploaded without uploading it,

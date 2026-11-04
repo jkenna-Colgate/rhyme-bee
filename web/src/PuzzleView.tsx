@@ -32,7 +32,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { playableSeeds } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex, SeedWord } from "../../src/rhymeIndex.ts";
 import { localCalendarDate } from "../../src/schedule.ts";
-import type { RankTier } from "../../src/scoring.ts";
+import type { LadderRank } from "../../src/scoring.ts";
 import type { Session, SubmissionResult } from "../../src/session.ts";
 import {
   appealedVerdict,
@@ -692,7 +692,7 @@ const SHARE_NOTICE: Record<ShareOutcome, string | null> = {
  * for the same reason Free Play does not: every press would fail, and an
  * interface should never offer something inert.
  */
-function ShareRankButton({ label, ladder }: { label: string; ladder: RankTier[] }) {
+function ShareRankButton({ label, ladder }: { label: string; ladder: LadderRank[] }) {
   const [outcome, setOutcome] = useState<ShareOutcome | null>(null);
   const [sharing, setSharing] = useState(false);
   const capabilities = browserShareCapabilities();

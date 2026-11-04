@@ -22,13 +22,13 @@ describe("the default Rank ladder", () => {
   });
 
   it("ascends strictly, so the highest Rank reached is unambiguous", () => {
-    const thresholds = DEFAULT_RANK_LADDER.map((tier) => tier.threshold);
+    const thresholds = DEFAULT_RANK_LADDER.map((rank) => rank.threshold);
     const ascending = thresholds.slice(1).every((t, i) => t > thresholds[i]!);
     expect(ascending).toBe(true);
   });
 
   it("names every Rank differently, so a promotion always reads as one", () => {
-    const labels = DEFAULT_RANK_LADDER.map((tier) => tier.label);
+    const labels = DEFAULT_RANK_LADDER.map((rank) => rank.label);
     expect(new Set(labels).size).toBe(labels.length);
   });
 

@@ -1,11 +1,12 @@
 /**
- * The staleness predicate: does this deploy need the four-minute Rhyme Index
+ * The staleness predicate: does this deploy need the Rhyme Index
  * rebuild, or only the bundle?
  *
  * Load-bearing because its failure is silent. If it wrongly reports fresh, the
  * deploy ships a bundle whose judge predates the fix that was just made, and
  * nothing anywhere says so — the player just meets the same wrong rejection
- * again. Wrongly reporting stale costs four minutes and is visible. Every case
+ * again. Wrongly reporting stale costs a rebuild (about thirty seconds, timed in
+ * `deploy.ts`) and is visible. Every case
  * here is written from that asymmetry.
  *
  * The input list is asserted against the real repository, since that is where
@@ -123,7 +124,7 @@ describe("the Rhyme Index input list", () => {
 
   it("does not hold the committed schedule", () => {
     // The schedule is read by the web bundle and never by the Index. Treating
-    // it as an input would reinstate exactly the four minutes this removes.
+    // it as an input would reinstate exactly the rebuild this removes.
     expect(inputs).not.toContain("/data/schedule.json");
   });
 
@@ -216,8 +217,8 @@ describe("the staleness predicate", () => {
   });
 
   it("does not report stale when only the committed schedule was touched", () => {
-    // A Seed Word swap. This is the whole point of the predicate: seconds, not
-    // four minutes, for a change the judge cannot see.
+    // A Seed Word swap. This is the whole point of the predicate: the bundle, not
+    // the rebuild too, for a change the judge cannot see.
     const { root } = repo();
     touch(resolve(root, "data/schedule.json"));
     expect(indexStaleness(root).stale).toBe(false);

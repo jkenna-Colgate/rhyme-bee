@@ -5,8 +5,12 @@
 # the rest of data/, this file is committed and survives the rebuild.
 #
 #   - A word absent upstream is ADDED and granted wordhood (but a name is never
-#     laundered into a word). It carries no prevalence, so it tiers as a Bonus
-#     Word until the deferred prevalence machinery lands (#56).
+#     laundered into a word). Nothing here carries prevalence: an added word
+#     tiers on whatever row data/prevalence.csv has for it, and as a Bonus Word
+#     when it has none, unless data/tier-overrides.csv says otherwise. Being
+#     added says nothing about which: measured 2026-11-04 (#152), 206 of the 407
+#     added words have a prevalence row and 201 do not (343 of all 594 distinct
+#     words here). The figures drift as words are added.
 #   - A word already upstream has its pronunciation CORRECTED — the entry here
 #     OVERRIDES the upstream reading, it does not add a variant alongside it.
 #

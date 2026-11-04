@@ -28,11 +28,11 @@
  * today, a projection that quietly assumed the shipped labels would be a guard
  * that stops guarding the moment something does.
  *
- * **Nothing from the rhyme engine but a type.** `RankTier` is imported and
+ * **Nothing from the rhyme engine but a type.** `LadderRank` is imported and
  * nothing is given back: `src/` gains no knowledge of URLs or images.
  */
 
-import type { RankTier } from "../../../src/scoring.ts";
+import type { LadderRank } from "../../../src/scoring.ts";
 import { GAME_NAME } from "../brand.ts";
 
 /** Where the generated pages and badges live, under the build output root. */
@@ -123,7 +123,7 @@ function slugify(label: string): string {
  * free. Both cases produce an ugly URL for a ladder nobody has written; neither
  * produces a missing badge.
  */
-export function shareTargets(ladder: RankTier[], origin: string): ShareTarget[] {
+export function shareTargets(ladder: LadderRank[], origin: string): ShareTarget[] {
   const root = origin.replace(/\/+$/, "");
   const taken = new Set<string>();
 
@@ -172,7 +172,7 @@ export function shareTargets(ladder: RankTier[], origin: string): ShareTarget[] 
  * told so rather than handed a link that resolves to nothing.
  */
 export function shareTargetFor(
-  ladder: RankTier[],
+  ladder: LadderRank[],
   origin: string,
   label: string,
 ): ShareTarget | undefined {

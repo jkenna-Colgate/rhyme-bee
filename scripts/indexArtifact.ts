@@ -192,7 +192,7 @@ const OPTIONAL_DATA_INPUTS = new Set(["tier-overrides.csv", "tier-moves.csv"]);
  * The sweep is every module in `src/` plus the two scripts the build is made
  * of, rather than the import graph `build-index.ts` actually pulls in.
  * Resolving imports would be more precise and is the wrong trade: the cost of
- * over-reaching is an occasional unnecessary four minutes during development,
+ * over-reaching is an occasional unnecessary rebuild during development,
  * and the cost of under-reaching reaches players. `src/` is the engine, and
  * nearly all of it is in that graph already. The rest of `scripts/` is not —
  * the play REPL and the Editor's Pass cannot change a verdict — so it is left
@@ -238,7 +238,8 @@ export interface IndexStaleness {
  * artifact, or missing, or is there no artifact at all.
  *
  * **The two errors are not symmetric, and this is not neutral between them.** A
- * checkout or a re-save bumps a timestamp and costs a wasted four minutes. The
+ * checkout or a re-save bumps a timestamp and costs a wasted rebuild (timed in
+ * `deploy.ts`). The
  * reverse — shipping a bundle whose judge lacks the fix just made — is silent
  * and reaches players, who have no way to see it. So anything unclear rebuilds:
  * a missing artifact, a missing input, an input whose timestamp merely ties.

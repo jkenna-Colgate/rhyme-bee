@@ -44,7 +44,10 @@ function withoutHashComments(text: string): string {
  *     no longer `not-a-known-word` — *unless* it is a name, which the supplement
  *     never launders into a valid word (name-hood is not overridden).
  *
- * A supplemented word carries no prevalence, so it tiers as a Bonus Word.
+ * The supplement itself carries no prevalence and touches none: a supplemented
+ * word tiers on its `prevalence.csv` row if it has one, and as a Bonus Word if
+ * not. About half the added words have a row (#152; the header of
+ * `data/supplement.dict` has the measured figures).
  */
 export function applySupplement(text: string, target: SupplementTarget): void {
   const supplement = parseCmudict(withoutHashComments(text));

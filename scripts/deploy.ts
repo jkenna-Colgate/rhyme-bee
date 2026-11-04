@@ -3,16 +3,20 @@
  *
  *   npm run deploy
  *
- * Rebuild the Rhyme Index, build the web bundle, upload. The rebuild is four
- * minutes and the other two are seconds, and a great many deploys do not need
- * it — a Seed Word swap changes `data/schedule.json`, which the Index never
- * reads, so the bundle is the only thing that has to change.
+ * Rebuild the Rhyme Index, build the web bundle, upload. Timed on the
+ * maintainer's machine on 2026-11-04 (#152): `npm run build:index` is about 30
+ * seconds, of which writing the artifact is 3 and the Continuity check over the
+ * Schedule (#256) is the other 27 or so; `npm run --prefix web build` is 2
+ * seconds. The upload (`wrangler deploy`, which carries the 15 MB index) was not
+ * timed, because timing it means deploying. A great many deploys do not need
+ * the rebuild: a Seed Word swap changes `data/schedule.json`, which the Index
+ * never reads, so the bundle is the only thing that has to change.
  *
  * **There is exactly one deploy command and no fast-path flag.** The editor
  * should not have to be right about which kind of change they just made, at
  * speed, at night; `indexStaleness` decides, and errs toward rebuilding, so the
- * worst case is a wasted four minutes rather than a bundle shipping a judge
- * that predates the fix it was made for.
+ * worst case is a wasted half-minute rather than a bundle shipping a judge that
+ * predates the fix it was made for.
  *
  * A shell with no logic of its own: the predicate is in `indexArtifact.ts` and
  * tested there, and this runs the same three npm scripts in the same order the
@@ -37,7 +41,7 @@ if (staleness.stale) {
 run("npm run --prefix web build");
 run("npm run --prefix web deploy");
 
-/** Why the rebuild is happening, so a four-minute wait is never a mystery. */
+/** Why the rebuild is happening, so a half-minute wait is never a mystery. */
 function explain(reason: string | null, input: string | undefined): string {
   const name = input === undefined ? "" : ` (${resolve(input).slice(root.length + 1)})`;
   switch (reason) {

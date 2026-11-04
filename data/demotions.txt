@@ -13,11 +13,22 @@
 #                        misspelling, a Latin fragment. It loses wordhood and is
 #                        rejected as a non-word. It is NOT called a name.
 #
-# The list is deliberately BOUNDED: these are the words a human read, surfaced by
-# the #89 measurement (in-band Seed families surviving on three or fewer native
-# words, plus every Seed representative of three characters or fewer) and by #51.
-# It is not, and must not become, "make the names filter correct" — there is
-# always another surname in the word list. Widening it means measuring again.
+# The list is deliberately BOUNDED: every line is a word a human read and ruled
+# on, never one a rule generated. It is curated from two populations:
+#
+#   1. The words surfaced by the #89 measurement (in-band Seed families surviving
+#      on three or fewer native words, plus every Seed representative of three
+#      characters or fewer) and by #51. These are the sectioned lines below.
+#   2. Words appearing in scheduled Puzzles, demoted while an editor reads a day
+#      (#150: from a Decline, from the day's readout, from a pasted list) or rules
+#      in a Batch. That population is finite and enumerable, the words of the
+#      Schedule's days, each read once, so lines appended from it are the same
+#      hand-curation extended, not a widening of the bound.
+#
+# It is not, and must not become, "make the names filter correct": the names
+# data holds 9,133 words that are also in the word list, `heart`, `faith` and
+# `joy` among them, and there is always another surname. Widening it beyond
+# those two populations means measuring again.
 #
 # A word is left alone unless it is clearly not an English word. Ambiguous cases
 # stay: `hertz` is the SI unit, `laird` a Scottish landowner, `schmalz` a variant
