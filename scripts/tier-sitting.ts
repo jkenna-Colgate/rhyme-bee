@@ -14,7 +14,7 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { playableSeeds } from "../src/curation.ts";
+import { DEFAULT_PLAYABLE_BAND, playableSeeds } from "../src/curation.ts";
 import { parseLabelSet } from "../src/judgeLabels.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
@@ -33,6 +33,7 @@ import {
   marksOf,
   measured,
   placeLines,
+  REPLACE_DAY_UNDER,
   type DayAtLines,
   type Lines,
   type MarkedWord,
@@ -155,18 +156,18 @@ function place(args: string[]) {
   const before = consequencesAt(today, { days, pool });
   const at = consequencesAt(placed.inForce, { days, pool });
   console.log(`\nat the placed lines, across ${days.length} scheduled days:`);
-  console.log(`  Answers that change Tier: ${at.tierChanges.length}; nearest the line: ${at.tierChanges.slice(0, 30).map((c) => `${c.word} ${c.knownness.toFixed(2)}`).join(", ")}`);
+  console.log(`  Answers that become Bonus Words: ${at.answersToBonus.length}; nearest the line: ${at.answersToBonus.slice(0, 30).map((c) => `${c.word} ${c.knownness.toFixed(2)}`).join(", ")}`);
   const list = (label: string, ds: DayAtLines[], was: DayAtLines[]) => {
     console.log(`  ${label}: ${ds.length} (today ${was.length})`);
     for (const d of ds.slice(0, 40)) console.log(`    ${dayLine(d)}`);
     if (ds.length > 40) console.log(`    and ${ds.length - 40} more`);
   };
-  list("days under 20 Answers", at.daysUnder20, before.daysUnder20);
-  list("days under 10 Answers", at.daysUnder10, before.daysUnder10);
+  list(`days under ${DEFAULT_PLAYABLE_BAND.min} Answers, the size band's floor`, at.daysUnderBand, before.daysUnderBand);
+  list(`days under ${REPLACE_DAY_UNDER} Answers, to replace`, at.daysToReplace, before.daysToReplace);
   console.log(`  Seed Words below the Answer line: ${at.seedWordsBelowLine.length}${at.seedWordsBelowLine.length ? ": " + at.seedWordsBelowLine.map((d) => `${d.seedWord} ${d.seedKnownness?.toFixed(2) ?? "unmeasured"}`).join(", ") : ""}`);
   list("days with Difficulty 0", at.difficultyZero, before.difficultyZero);
   console.log(`  weeks out of ramp order: ${at.weeksOutOfRamp.length} (today ${before.weeksOutOfRamp.length})${at.weeksOutOfRamp.length ? ": weeks " + at.weeksOutOfRamp.join(", ") : ""}`);
-  console.log(`  replacement Seed Words for days under 10, from the ${pool.length} unscheduled in the Seed pool (each still needs its Batch):${at.replacements.length ? "" : " no day needs one"}`);
+  console.log(`  replacement Seed Words for days under ${REPLACE_DAY_UNDER}, from the ${pool.length} unscheduled in the Seed pool (each still needs its Batch):${at.replacements.length ? "" : " no day needs one"}`);
   for (const r of at.replacements) console.log(`    ${r.date} ${r.seedWord}: ${r.candidates.join(", ") || "none big enough"}`);
 }
 

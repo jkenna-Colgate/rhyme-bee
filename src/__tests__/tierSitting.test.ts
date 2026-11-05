@@ -209,13 +209,13 @@ describe("what the placed lines would do", () => {
   ];
   const at = consequencesAt(LINES, { days, pool });
 
-  it("lists the Answers that change Tier, and keeps an editor's verdict where it stands", () => {
-    expect(at.tierChanges.map((c) => c.word).sort()).toEqual(many("c", 10, 0).map((a) => a.word).sort());
+  it("lists the Answers that become Bonus Words, and keeps an editor's verdict where it stands", () => {
+    expect(at.answersToBonus.map((c) => c.word).sort()).toEqual(many("c", 10, 0).map((a) => a.word).sort());
   });
 
   it("finds the days under 20 and under 10 Answers, and the Seed Words below the Answer line", () => {
-    expect(at.daysUnder20.map((d) => [d.date, d.answerCount])).toEqual([["2026-11-02", 15], ["2026-11-03", 7]]);
-    expect(at.daysUnder10.map((d) => d.seedWord)).toEqual(["cup"]);
+    expect(at.daysUnderBand.map((d) => [d.date, d.answerCount])).toEqual([["2026-11-02", 15], ["2026-11-03", 7]]);
+    expect(at.daysToReplace.map((d) => d.seedWord)).toEqual(["cup"]);
     expect(at.seedWordsBelowLine.map((d) => d.seedWord)).toEqual(["cup"]);
   });
 

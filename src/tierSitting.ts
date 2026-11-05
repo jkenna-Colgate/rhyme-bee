@@ -20,7 +20,7 @@ import { standingVerdict, type LabelSet } from "./judgeLabels.ts";
 import { weekdayOf, type PuzzleFacts } from "./schedule.ts";
 import { DEFAULT_SCORING_CONFIG, type ScoringConfig } from "./scoring.ts";
 import { verdictForValue } from "./tierOverride.ts";
-import type { Tier } from "./verdict.ts";
+import { tierFor, type Tier } from "./verdict.ts";
 
 /** One Answer on a scheduled day, as the built index holds it. */
 export interface SittingAnswer {
@@ -364,7 +364,7 @@ export interface PoolFamily {
 
 export interface ConsequenceContext {
   days: readonly SittingDay[];
-  /** The unscheduled Seed pool, where a day under 10 Answers looks for a replacement. */
+  /** The unscheduled Seed pool, where a day to replace looks for a replacement. */
   pool: readonly PoolFamily[];
 }
 
@@ -378,19 +378,30 @@ export interface DayAtLines {
   difficulty: number;
 }
 
-export interface TierChange {
+/**
+ * A scheduled Answer the lines make a Bonus Word. Only today's Answers are
+ * measured, so a Tier can change in this direction alone.
+ */
+export interface AnswerToBonus {
   word: string;
   knownness: number;
-  from: Tier;
-  to: Tier;
 }
 
+/**
+ * A day with fewer Answers than this is replaced, with a Seed Word the
+ * maintainer picks (#307). A day under the size band's floor but not under
+ * this is accepted: play grows it back as Bonus Words are promoted.
+ */
+export const REPLACE_DAY_UNDER = 10;
+
 export interface Consequences {
-  /** Every scheduled Answer whose Tier the lines change, once per word. */
-  tierChanges: TierChange[];
+  /** Every scheduled Answer the lines make a Bonus Word, once per word. */
+  answersToBonus: AnswerToBonus[];
   days: DayAtLines[];
-  daysUnder20: DayAtLines[];
-  daysUnder10: DayAtLines[];
+  /** Days under the size band's floor (`DEFAULT_PLAYABLE_BAND.min`). */
+  daysUnderBand: DayAtLines[];
+  /** Days under `REPLACE_DAY_UNDER`, which are replaced. */
+  daysToReplace: DayAtLines[];
   seedWordsBelowLine: DayAtLines[];
   difficultyZero: DayAtLines[];
   /** The weeks, of more than one day, whose Difficulty no longer rises Monday to Sunday. */
@@ -400,7 +411,7 @@ export interface Consequences {
 
 export interface ConsequenceOptions {
   scoring: ScoringConfig;
-  /** How many replacement Seed Words to offer for each day under 10. */
+  /** How many replacement Seed Words to offer for each day to replace. */
   replacementsPerDay: number;
   /** A replacement must hold at least this many Answers at the lines: the size band's floor. */
   replacementMinAnswers: number;
@@ -412,28 +423,38 @@ export const DEFAULT_CONSEQUENCE_OPTIONS: ConsequenceOptions = {
   replacementMinAnswers: DEFAULT_PLAYABLE_BAND.min,
 };
 
+/** The scoring config with its rare line moved to the candidate one. */
+const scoringAt = (lines: Lines, scoring: ScoringConfig): ScoringConfig => ({ ...scoring, rareKnownnessCutoff: lines.rareLine });
+
 /**
- * A word's Tier and rarity at a pair of lines. A verdict holds its Tier at any
- * lines, an `answer-rare` verdict staying rare: its sentinel moves with the
- * lines (#307), so it says nothing about where they sit.
+ * A built value as it would read at the candidate lines. The `bonus` and
+ * `answer-common` sentinels sit outside every line the sitting can place, so
+ * they read as they are. The `answer-rare` sentinel moves with the lines, to
+ * sit between them (#307), so it is read at the Answer line itself: an Answer,
+ * and rare whenever the rare line sits above the Answer line.
  */
-function standingAt(knownness: number | null, lines: Lines): { tier: Tier; rare: boolean } {
-  if (knownness === null) return { tier: "bonus", rare: false };
-  const verdict = verdictForValue(knownness);
-  if (verdict === "bonus") return { tier: "bonus", rare: false };
-  if (verdict === "answer-common") return { tier: "answer", rare: false };
-  if (verdict === "answer-rare") return { tier: "answer", rare: true };
-  return knownness >= lines.answerLine ? { tier: "answer", rare: knownness < lines.rareLine } : { tier: "bonus", rare: false };
+function valueAt(knownness: number, lines: Lines): number {
+  return verdictForValue(knownness) === "answer-rare" ? lines.answerLine : knownness;
 }
 
-/** A family's Answers at the lines, measured by the one Difficulty definition curation uses. */
+/**
+ * A word's Tier at a pair of lines, by the index's own comparison (`tierFor`).
+ * A word with no knownness is a Bonus Word at any lines (ADR-0003).
+ */
+function tierAt(knownness: number | null, lines: Lines): Tier {
+  return knownness === null ? "bonus" : tierFor(valueAt(knownness, lines), lines.answerLine);
+}
+
+/**
+ * A family's Answers at the lines, measured by the one Difficulty definition
+ * curation uses, whose rarity test is the scorer's own (`isRare`) at the
+ * candidate rare line.
+ */
 function measureAt(answers: readonly SittingAnswer[], lines: Lines, scoring: ScoringConfig): PuzzleFacts {
   const kept = answers
-    .map((a) => ({ a, at: standingAt(a.knownness, lines) }))
-    .filter(({ at }) => at.tier === "answer")
-    // Rarity is settled above, so it is handed to the measurer as a knownness either side of the rare line.
-    .map(({ a, at }) => ({ length: a.length, knownness: at.rare ? -Infinity : Infinity }));
-  return measureAnswers(kept, scoring);
+    .filter((a) => tierAt(a.knownness, lines) === "answer")
+    .map((a) => ({ length: a.length, knownness: valueAt(a.knownness!, lines) }));
+  return measureAnswers(kept, scoringAt(lines, scoring));
 }
 
 const median = (xs: readonly number[]): number => {
@@ -466,12 +487,11 @@ export function consequencesAt(
     };
   });
 
-  const changed = new Map<string, TierChange>();
+  const toBonus = new Map<string, AnswerToBonus>();
   for (const d of context.days) {
     for (const a of d.answers) {
-      if (a.knownness === null || changed.has(a.word)) continue;
-      const to = standingAt(a.knownness, lines).tier;
-      if (to !== "answer") changed.set(a.word, { word: a.word, knownness: a.knownness, from: "answer", to });
+      if (a.knownness === null || toBonus.has(a.word)) continue;
+      if (tierAt(a.knownness, lines) === "bonus") toBonus.set(a.word, { word: a.word, knownness: a.knownness });
     }
   }
 
@@ -486,12 +506,12 @@ export function consequencesAt(
     .map(([week]) => week)
     .sort((a, b) => a - b);
 
-  const daysUnder10 = days.filter((d) => d.answerCount < 10);
+  const daysToReplace = days.filter((d) => d.answerCount < REPLACE_DAY_UNDER);
   const pool = context.pool
-    .filter((p) => standingAt(p.seedKnownness, lines).tier === "answer")
+    .filter((p) => tierAt(p.seedKnownness, lines) === "answer")
     .map((p) => ({ seedWord: p.seedWord, facts: measureAt(p.answers, lines, opts.scoring) }))
     .filter((p) => p.facts.answerCount >= opts.replacementMinAnswers);
-  const replacements = daysUnder10.map((d) => {
+  const replacements = daysToReplace.map((d) => {
     // The slot's place in the ramp: where its weekday's days sit at the new lines.
     const weekday = weekdayOf(d.date);
     const target = median(days.filter((o) => weekdayOf(o.date) === weekday).map((o) => o.difficulty));
@@ -503,11 +523,11 @@ export function consequencesAt(
   });
 
   return {
-    tierChanges: [...changed.values()].sort((a, b) => b.knownness - a.knownness || a.word.localeCompare(b.word)),
+    answersToBonus: [...toBonus.values()].sort((a, b) => b.knownness - a.knownness || a.word.localeCompare(b.word)),
     days,
-    daysUnder20: days.filter((d) => d.answerCount < 20),
-    daysUnder10,
-    seedWordsBelowLine: days.filter((d) => standingAt(d.seedKnownness, lines).tier !== "answer"),
+    daysUnderBand: days.filter((d) => d.answerCount < DEFAULT_PLAYABLE_BAND.min),
+    daysToReplace,
+    seedWordsBelowLine: days.filter((d) => tierAt(d.seedKnownness, lines) !== "answer"),
     difficultyZero: days.filter((d) => d.difficulty === 0),
     weeksOutOfRamp,
     replacements,
