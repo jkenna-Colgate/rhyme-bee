@@ -21,12 +21,18 @@ import type { RhymeKey } from "./phonology.ts";
 
 // ---- the file ------------------------------------------------------------------
 
-export type Question = "rhyme" | "wordhood";
+/**
+ * `tier` is the Tier sitting's question (#309): would a player hunting rhymes
+ * come up with the word? The Judge is never asked it; the set records the
+ * maintainer's marks the Answer and rare lines are placed from.
+ */
+export type Question = "rhyme" | "wordhood" | "tier";
 
 /** The verdicts a person may give, by the question the set asks. `out` is a pair shown and left unruled. */
 const VERDICTS: Record<Question, ReadonlySet<string>> = {
   rhyme: new Set(["rhyme", "no-rhyme", "out"]),
   wordhood: new Set(["word", "not-a-word"]),
+  tier: new Set(["easy", "hard-find", "bonus"]),
 };
 
 export interface LabelVerdict {
@@ -80,7 +86,7 @@ const obj = (x: unknown, where: string): Record<string, unknown> => need(!!x && 
 export function parseLabelSet(json: unknown): LabelSet {
   const o = obj(json, "the file");
   const question = str(o, "question", "the header");
-  if (question !== "rhyme" && question !== "wordhood") throw new Error(`label set: the question is rhyme or wordhood, not ${question}`);
+  if (question !== "rhyme" && question !== "wordhood" && question !== "tier") throw new Error(`label set: the question is rhyme, wordhood or tier, not ${question}`);
   const pairs = need(Array.isArray(o.pairs), o.pairs as unknown[], "needs pairs").map((x, i): LabelledPair => {
     const p = obj(x, `pair ${i}`);
     const where = `pair ${i} (${String(p.word)})`;

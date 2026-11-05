@@ -25,18 +25,22 @@ const PREVALENCE_COLUMN = "Prevalence";
  * Parse the word-prevalence norms as CSV with a header naming a word column and
  * a prevalence column. Returns lemma -> score. Rows with an unparseable score
  * are skipped rather than defaulted, so a bad row never masquerades as data.
+ *
+ * `column` reads another numeric column of the same rows instead: the Tier
+ * sitting (#309) reads word frequency, `FreqZipfUS`, to compare it with
+ * knownness. The build reads only the prevalence column.
  */
-export function parsePrevalenceCsv(text: string): Map<string, number> {
+export function parsePrevalenceCsv(text: string, column: string = PREVALENCE_COLUMN): Map<string, number> {
   const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
   const out = new Map<string, number>();
   if (lines.length === 0) return out;
 
   const header = splitCsvRow(lines[0]!);
   const wordCol = header.indexOf(WORD_COLUMN);
-  const prevCol = header.indexOf(PREVALENCE_COLUMN);
+  const prevCol = header.indexOf(column);
   if (wordCol === -1 || prevCol === -1) {
     throw new Error(
-      `Prevalence CSV missing columns "${WORD_COLUMN}"/"${PREVALENCE_COLUMN}". Found: ${header.join(", ")}`,
+      `Prevalence CSV missing columns "${WORD_COLUMN}"/"${column}". Found: ${header.join(", ")}`,
     );
   }
 
