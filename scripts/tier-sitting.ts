@@ -144,6 +144,7 @@ function place(args: string[]) {
 
   console.log(`\nAnswer line: ${placed.answerLine === null ? "not placed: the highest band is half or more B" : placed.answerLine.toFixed(2)}`);
   console.log(`rare line: ${placed.rareLine === null ? "not placed: no band at or above the Answer line has an E majority" : placed.rareLine.toFixed(2)}`);
+  console.log("  (looked for only at or above the Answer line: a band below it holds no Answers to be rare, so an E majority there places nothing)");
   console.log(`rare line keeping today's rare share (${pct(placed.rareShare)} of Answers): ${placed.rareShareLine.toFixed(3)}`);
   console.log(`measured below at: Answer line ${placed.inForce.answerLine.toFixed(2)}, rare line ${placed.inForce.rareLine.toFixed(3)}`);
 

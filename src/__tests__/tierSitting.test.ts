@@ -141,6 +141,13 @@ describe("placing the rare line", () => {
     expect(placed.inForce).toEqual({ answerLine: 0.75, rareLine: 1.25 });
   });
 
+  it("looks for it only at or above the Answer line, so an E majority below that line does not place it", () => {
+    // Band 0 is all E, but the B majorities in bands 1 and 2 put the Answer line at 0.75.
+    const placed = placeLines(SCHEDULED, sitting("EEEE", "BBBB", "BBBH", "HHEE", "HEEE", "EEEE", "EEEE", "EEEE", "EEEE", "EEEE"));
+    expect(placed.answerLine).toBe(0.75);
+    expect(placed.rareLine).toBe(1);
+  });
+
   it("falls back to the line that keeps today's rare share when too few words are E to place one", () => {
     const placed = placeLines(SCHEDULED, sitting("BBBB", "BBBH", "BBHE", "BHHE", "HHEE", "HHEE", "HHHE", "HHEE", "HHEE", "HHEE"));
     expect(placed.rareLine).toBeNull();
