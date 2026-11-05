@@ -28,11 +28,18 @@ import type { RhymeKey } from "./phonology.ts";
  */
 export type Question = "rhyme" | "wordhood" | "tier";
 
+/**
+ * The Tier sitting's three marks, as the marks file spells them: E (easy), H
+ * (hard find) and B (Bonus). The one list the parser, the sitting's `Mark` type
+ * and the marking page all read.
+ */
+export const TIER_MARKS = ["easy", "hard-find", "bonus"] as const;
+
 /** The verdicts a person may give, by the question the set asks. `out` is a pair shown and left unruled. */
 const VERDICTS: Record<Question, ReadonlySet<string>> = {
   rhyme: new Set(["rhyme", "no-rhyme", "out"]),
   wordhood: new Set(["word", "not-a-word"]),
-  tier: new Set(["easy", "hard-find", "bonus"]),
+  tier: new Set(TIER_MARKS),
 };
 
 export interface LabelVerdict {

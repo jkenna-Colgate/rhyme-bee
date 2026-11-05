@@ -9,14 +9,25 @@
  * the tier question, for `data/judge-labels/`.
  */
 
-import type { SittingItem } from "../src/tierSitting.ts";
+import { TIER_MARKS } from "../src/judgeLabels.ts";
+import type { DrawOptions, Mark, SittingItem } from "../src/tierSitting.ts";
+
+/** How the page shows each mark: its key, its button and its meaning. */
+const SHOWN: Record<Mark, { key: string; button: string; term: string; meaning: string }> = {
+  easy: { key: "e", button: "<u>E</u>asy", term: "E (easy)", meaning: "Most players would think of it." },
+  "hard-find": { key: "h", button: "<u>H</u>ard find", term: "H (hard find)", meaning: "Some would, with effort." },
+  bonus: { key: "b", button: "<u>B</u>onus", term: "B (Bonus)", meaning: "A real word nobody hunting rhymes would come up with." },
+};
+
+const lower = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
 
 export interface SittingPage {
   set: string;
   labeller: string;
   /** The built index the sample was drawn from, so a sample is never mixed with another build's. */
   indexHash: string;
-  seed: number;
+  /** The draw the sample came from: its seed, and how many words from how wide a band. */
+  draw: DrawOptions;
   items: SittingItem[];
 }
 
@@ -24,6 +35,10 @@ export interface SittingPage {
 const embed = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c");
 
 export function sittingPage(page: SittingPage): string {
+  const drawn = `about ${page.draw.perBand} per ${page.draw.bands.width} band of knownness`;
+  const meanings = TIER_MARKS.map((m) => `${m}: ${lower(SHOWN[m].meaning)}`).join(" ");
+  const buttons = TIER_MARKS.map((m) => `  <button data-mark="${m}">${SHOWN[m].button}</button>\n`).join("");
+  const terms = TIER_MARKS.map((m) => `  <dt>${SHOWN[m].term}</dt><dd>${SHOWN[m].meaning}</dd>\n`).join("");
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -50,10 +65,7 @@ export function sittingPage(page: SittingPage): string {
 <p class="prompt">hunting rhymes for <strong id="seed"></strong>:</p>
 <p class="word" id="word"></p>
 <div class="marks">
-  <button data-mark="easy"><u>E</u>asy</button>
-  <button data-mark="hard-find"><u>H</u>ard find</button>
-  <button data-mark="bonus"><u>B</u>onus</button>
-</div>
+${buttons}</div>
 <div class="nav">
   <button id="prev">&larr; back</button>
   <button id="next">next &rarr;</button>
@@ -61,10 +73,7 @@ export function sittingPage(page: SittingPage): string {
 </div>
 <div class="strip" id="strip"></div>
 <dl>
-  <dt>E (easy)</dt><dd>Most players would think of it.</dd>
-  <dt>H (hard find)</dt><dd>Some would, with effort.</dd>
-  <dt>B (Bonus)</dt><dd>A real word nobody hunting rhymes would come up with.</dd>
-</dl>
+${terms}</dl>
 <footer>
   <label>Labeller <input id="labeller"></label>
   <button id="save">Save marks</button>
@@ -72,7 +81,8 @@ export function sittingPage(page: SittingPage): string {
   Keys: E, H, B mark; &larr; and &rarr; step.</p>
 </footer>
 <script>
-const SITTING = ${embed({ set: page.set, labeller: page.labeller, indexHash: page.indexHash, seed: page.seed, items: page.items })};
+const SITTING = ${embed({ set: page.set, labeller: page.labeller, indexHash: page.indexHash, seed: page.draw.seed, items: page.items })};
+const KEYS = ${embed(Object.fromEntries(TIER_MARKS.map((m) => [SHOWN[m].key, m])))};
 const KEY = "rhyme-bee:tier-sitting:" + SITTING.set + ":" + SITTING.indexHash;
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 let state = { at: 0, labeller: SITTING.labeller, marks: {} };
@@ -123,8 +133,8 @@ function save() {
     rules: ["#307"],
     tuning: false,
     notes: [
-      "The Tier sitting (#309): Answers drawn from the scheduled days, about 15 per 0.25 band of knownness, marked with knownness hidden.",
-      "easy: most players would think of it. hard-find: some would, with effort. bonus: a real word nobody hunting rhymes would come up with.",
+      ${embed(`The Tier sitting (#309): Answers drawn from the scheduled days, ${drawn}, marked with knownness hidden.`)},
+      ${embed(meanings)},
       "Drawn from index " + SITTING.indexHash + " with seed " + SITTING.seed + ".",
     ],
     pairs: SITTING.items.map((i) => {
@@ -149,9 +159,7 @@ $("labeller").oninput = (e) => { state.labeller = e.target.value; keep(); };
 document.addEventListener("keydown", (e) => {
   if (e.target instanceof HTMLInputElement) return;
   const k = e.key.toLowerCase();
-  if (k === "e") mark("easy");
-  else if (k === "h") mark("hard-find");
-  else if (k === "b") mark("bonus");
+  if (Object.hasOwn(KEYS, k)) mark(KEYS[k]);
   else if (e.key === "ArrowLeft") go(state.at - 1);
   else if (e.key === "ArrowRight") go(state.at + 1);
 });

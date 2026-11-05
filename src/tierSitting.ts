@@ -16,7 +16,7 @@
  */
 
 import { DEFAULT_PLAYABLE_BAND, measureAnswers } from "./curation.ts";
-import { standingVerdict, type LabelSet } from "./judgeLabels.ts";
+import { standingVerdict, TIER_MARKS, type LabelSet } from "./judgeLabels.ts";
 import { weekdayOf, type PuzzleFacts } from "./schedule.ts";
 import { DEFAULT_SCORING_CONFIG, type ScoringConfig } from "./scoring.ts";
 import { verdictForValue } from "./tierOverride.ts";
@@ -148,7 +148,7 @@ export function drawSample(days: readonly SittingDay[], opts: DrawOptions = DEFA
 // ---- placement ----------------------------------------------------------------
 
 /** The three marks, as the marks file spells them. */
-export type Mark = "easy" | "hard-find" | "bonus";
+export type Mark = (typeof TIER_MARKS)[number];
 
 /** One marked word, with what the index measures of it at placement time. */
 export interface MarkedWord {

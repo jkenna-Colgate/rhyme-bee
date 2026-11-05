@@ -95,7 +95,7 @@ function draw(args: string[]) {
   const { index, hash } = loadIndex();
   const items = drawSample(scheduledDays(index));
   mkdirSync(dirname(out), { recursive: true });
-  writeFileSync(out, sittingPage({ set, labeller, indexHash: hash, seed: DEFAULT_DRAW.seed, items }));
+  writeFileSync(out, sittingPage({ set, labeller, indexHash: hash, draw: DEFAULT_DRAW, items }));
   // Counted here, in the terminal, and never on the page.
   const perBand = new Map<number, number>();
   for (const item of items) {
