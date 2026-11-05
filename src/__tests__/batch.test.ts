@@ -345,7 +345,7 @@ describe("what a look counts as a Trust failure", () => {
   it("excuses a Rhyme the game accepts as a Bonus Word whose knownness measures it as rare, and says so", () => {
     // `hod` for `nod`: the game is right not to score it, which is its Tier's question and not Trust's.
     expect(trustFailures([
-      { word: "hod", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.2 } },
+      { word: "hod", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.2, byVerdict: false } },
       { word: "snored", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "rejected" } },
     ], LINE)).toEqual({ failures: ["snored"], excused: ["hod"] });
   });
@@ -353,7 +353,7 @@ describe("what a look counts as a Trust failure", () => {
   it("counts a Rhyme the game accepts as a Bonus Word with no knownness, which is how a common word ends up one by accident", () => {
     // `fool` for `cool`, missing from the prevalence data.
     expect(trustFailures([
-      { word: "fool", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: null } },
+      { word: "fool", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: null, byVerdict: false } },
     ], LINE)).toEqual({ failures: ["fool"], excused: [] });
   });
 
@@ -380,15 +380,15 @@ describe("what a look counts as a Trust failure", () => {
 
   it("counts a Bonus Word whose knownness is at the Answer line, which the game could only have Tiered by mistake", () => {
     expect(trustFailures([
-      { word: "lard", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: LINE } },
+      { word: "lard", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: LINE, byVerdict: false } },
     ], LINE)).toEqual({ failures: ["lard"], excused: [] });
   });
 
   it("excuses nothing that was never a failure: a rare Bonus Word ruled no Rhyme, an Unconfirmed Rhyme, a Demotion", () => {
     expect(trustFailures([
-      { word: "pard", ruling: { verdict: "no-rhyme", reachesKey: false, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.1 } },
+      { word: "pard", ruling: { verdict: "no-rhyme", reachesKey: false, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.1, byVerdict: false } },
       { word: "clique", ruling: { verdict: "rhyme", reachesKey: true, landed: "unconfirmed-rhyme" }, game: { outcome: "unconfirmed" } },
-      { word: "marx", ruling: { verdict: "rhyme", reachesKey: true, landed: "suggested-demotion" }, game: { outcome: "bonus", knownness: 0.1 } },
+      { word: "marx", ruling: { verdict: "rhyme", reachesKey: true, landed: "suggested-demotion" }, game: { outcome: "bonus", knownness: 0.1, byVerdict: false } },
     ], LINE)).toEqual({ failures: [], excused: [] });
   });
 });

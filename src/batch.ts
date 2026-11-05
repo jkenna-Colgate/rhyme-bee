@@ -171,7 +171,7 @@ export function lookAttempt(offKey: readonly boolean[]): LookAttempt {
  * editor's Bonus Word Tier verdict stands on it (`data/tier-overrides.csv`).
  */
 export type CandidateGame =
-  | { outcome: "bonus"; knownness: number | null; byVerdict?: boolean }
+  | { outcome: "bonus"; knownness: number | null; byVerdict: boolean }
   | { outcome: Exclude<Verdict["outcome"], "bonus"> };
 
 /**
@@ -224,7 +224,7 @@ export function trustFailures(candidates: readonly LookCandidate[], answerLine: 
   for (const { word, ruling: r, game } of candidates) {
     if (!(r?.verdict === "rhyme" && r.reachesKey && r.landed !== "unconfirmed-rhyme" && r.landed !== "suggested-demotion")) continue;
     const judged = game?.outcome === "bonus" &&
-      (game.byVerdict === true || (game.knownness !== null && game.knownness < answerLine));
+      (game.byVerdict || (game.knownness !== null && game.knownness < answerLine));
     (judged ? trust.excused : trust.failures).push(word);
   }
   return trust;
