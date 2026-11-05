@@ -30,8 +30,8 @@
  *   arrives with the ordered candidate list `RhymeIndex#tier` would consult, and
  *   the measured value of each candidate that has a prevalence row of its own,
  *   both computed in Node by the index's own `Derivation` (see
- *   `web/editorTierPayload.ts`). All this module does with them is take the first
- *   candidate that has a value, which is what the build does with the same list.
+ *   `web/editorTierPayload.ts`). All this module does with them is pick one by
+ *   `knownStem`, which is what the build does with the same list.
  *
  * `web/__tests__/retier.test.ts` holds that claim to account the only way worth
  * doing: every case builds the fixture index a second time with the override
@@ -50,6 +50,7 @@
  */
 
 import { measureAnswers } from "../../../src/curation.ts";
+import { knownStem } from "../../../src/lemmatise.ts";
 import type { PuzzleFacts } from "../../../src/schedule.ts";
 import {
   layeredValue,
@@ -184,15 +185,9 @@ export function retierDay(lists: DayLists, state: TierPickerState): RetieredDay 
 
     const candidates = candidatesOf.get(entry.word);
     if (candidates !== undefined) {
-      knownness = null;
-      for (const candidate of candidates) {
-        const value = valueOf(candidate);
-        if (value !== undefined) {
-          knownness = value;
-          source = candidate;
-          break;
-        }
-      }
+      const known = knownStem(candidates, valueOf);
+      knownness = known?.value ?? null;
+      source = known?.stem ?? null;
     }
 
     return {
