@@ -7,9 +7,9 @@
  * ## Why the lemma walk is computed here and not there
  *
  * A word's knownness is not read off its own spelling. `RhymeIndex#tier` walks
- * `Derivation.lemmaCandidates` and takes the first candidate the prevalence data
- * knows, which is why `gates` scores as `gate` and why an override on a lemma
- * reaches the derived forms that have no row of their own. Reproducing that walk
+ * `Derivation.lemmaCandidates` and takes the word's own row, or else its
+ * best-known stem (`knownStem`), which is why `gates` scores as `gate` and why
+ * an override on a lemma reaches the derived forms that have no row of their own. Reproducing that walk
  * in the browser would mean reproducing `Derivation`, and `Derivation` is not a
  * spelling rule: it checks that a short `-s` form *sounds* like its base plus an
  * S, against readings the browser does not have and would have to be sent
@@ -31,6 +31,7 @@
  * the only honest source for both, so this module is handed them directly.
  */
 
+import { knownStem } from "../src/lemmatise.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import { parseTierMoves } from "../src/tierMoves.ts";
 import { parseTierOverrides, resolveTierOverrides } from "../src/tierOverride.ts";
@@ -142,11 +143,8 @@ export function reachOf(
   const reached: string[] = [];
   for (const [candidateWord] of index.wordhoodEntries()) {
     if (candidateWord === word) continue;
-    for (const candidate of index.derivation.lemmaCandidates(candidateWord)) {
-      if (values(candidate) === undefined) continue;
-      if (candidate === word) reached.push(candidateWord);
-      break;
-    }
+    const known = knownStem(index.derivation.lemmaCandidates(candidateWord), values);
+    if (known?.stem === word) reached.push(candidateWord);
   }
   return reached.sort();
 }

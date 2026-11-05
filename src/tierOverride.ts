@@ -25,6 +25,7 @@
  */
 
 import { normaliseWord } from "./cmudict.ts";
+import { knownStem } from "./lemmatise.ts";
 import { splitCsvRow } from "./pipeline.ts";
 import { isRare, type ScoringConfig } from "./scoring.ts";
 import { parseTierMoves } from "./tierMoves.ts";
@@ -340,11 +341,11 @@ export interface StandingTierInput {
 export function standingTierOf(input: StandingTierInput): (word: string) => Tier {
   const layersOf = standingLayers(input.overrides, input.moves ?? "");
   return (word) => {
-    for (const candidate of input.lemmaCandidates(normaliseWord(word))) {
-      const value = layeredValue(layersOf(candidate), input.measured.get(candidate));
-      if (value !== undefined) return tierFor(value, input.knownnessThreshold);
-    }
-    return "bonus";
+    const known = knownStem(
+      input.lemmaCandidates(normaliseWord(word)),
+      (candidate) => layeredValue(layersOf(candidate), input.measured.get(candidate)),
+    );
+    return known === null ? "bonus" : tierFor(known.value, input.knownnessThreshold);
   };
 }
 

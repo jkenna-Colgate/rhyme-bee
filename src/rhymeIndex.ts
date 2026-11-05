@@ -29,6 +29,7 @@ import {
   WEAK_ER,
 } from "./normalise.ts";
 import { Derivation, IndexDataSource } from "./derivation.ts";
+import { knownStem } from "./lemmatise.ts";
 import { respell } from "./respelling.ts";
 import { schwaTwinOf } from "./schwaTwins.ts";
 import { tierFor, type Tier, type Verdict } from "./verdict.ts";
@@ -647,6 +648,17 @@ export class RhymeIndex {
     return this.#tier(normaliseWord(word));
   }
 
+  /**
+   * The word `tierOf` read the knownness from: the word itself when it has a
+   * row, otherwise the stem `knownStem` chose over the built values (verdicts
+   * layered in), or null when nothing has a row. Public so another signal from
+   * the same prevalence data (word frequency, at the Tier sitting) can be read
+   * through the very word knownness was, rather than a stem chosen again.
+   */
+  knownStemOf(word: string): string | null {
+    return this.#knownStem(normaliseWord(word))?.stem ?? null;
+  }
+
   /** The Answer line: a knownness at or above it makes an Answer, and below it a Bonus Word. */
   get knownnessThreshold(): number {
     return this.#config.knownnessThreshold;
@@ -691,6 +703,7 @@ export class RhymeIndex {
    * Tier a rhyming, wordhood-valid word by knownness. Lemmatise before the
    * lookup (never before rhyme matching). A word absent from the prevalence data
    * defaults to Bonus, so a coverage gap never refuses a real word (ADR-0003).
+   * A word with no row of its own reads as its best-known stem (`knownStem`).
    *
    * Lemmatised through the readings, not the spelling alone: `ups` tiers on `up`
    * because it sounds like `up` + S, and `has` keeps its own standing because it
@@ -698,15 +711,18 @@ export class RhymeIndex {
    * gets here and the derivation verdict curation reads are one rule.
    */
   #tier(word: string): { tier: Tier; knownness: number | null } {
-    for (const candidate of this.derivation.lemmaCandidates(word)) {
-      const score = this.#data.prevalence.get(candidate);
-      if (score !== undefined) {
-        return {
-          tier: tierFor(score, this.#config.knownnessThreshold),
-          knownness: score,
-        };
-      }
-    }
-    return { tier: "bonus", knownness: null };
+    const known = this.#knownStem(word);
+    if (known === null) return { tier: "bonus", knownness: null };
+    return {
+      tier: tierFor(known.value, this.#config.knownnessThreshold),
+      knownness: known.value,
+    };
+  }
+
+  #knownStem(word: string): { stem: string; value: number } | null {
+    return knownStem(
+      this.derivation.lemmaCandidates(word),
+      (candidate) => this.#data.prevalence.get(candidate),
+    );
   }
 }

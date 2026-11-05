@@ -8,9 +8,9 @@
  * Rhyme Keys, and only the surface form is the rhyme the player intended.
  *
  * Rule-based and deliberately conservative. It returns an ordered list of
- * candidate lemmas (most-specific first); the caller takes the first that the
- * prevalence data knows. A richer morphological lemmatiser can replace this
- * without changing the contract.
+ * candidate lemmas (the word first, then most-specific first); `knownStem` picks
+ * the one its knownness is read from. A richer morphological lemmatiser can
+ * replace this without changing the contract.
  *
  * A three-letter `-s` form gets no base here, because on spelling alone it does
  * not deserve one: `Derivation.lemmaCandidates` adds it for the callers that
@@ -18,12 +18,47 @@
  * why — and go through it rather than here whenever readings are available.
  */
 
+import { STEM_EXCEPTIONS } from "./stemExceptions.ts";
+
+/**
+ * The candidate a word's knownness is read from, and the value it carries: the
+ * word's own row when it has one, and otherwise the best-known candidate stem
+ * that has a row (#313). Taking the first stem instead read `plates` as `plat`,
+ * `bussed` as `buss` and `cured` as `cur`, filing words everybody knows as Bonus
+ * Words. The few stems the best-known one gets wrong are pinned in
+ * `stemExceptions.ts`, which `lemmaCandidates` consults before any rule runs.
+ *
+ * `candidates` is a `lemmaCandidates` list, so its first entry is the word.
+ * `valueOf` is whatever the caller reads knownness from: the built prevalence,
+ * or measured prevalence with the standing verdicts layered over it. Every walk
+ * that tiers a word goes through here, so they cannot disagree on which stem wins.
+ */
+export function knownStem(
+  candidates: readonly string[],
+  valueOf: (candidate: string) => number | undefined,
+): { stem: string; value: number } | null {
+  const [word, ...stems] = candidates;
+  if (word === undefined) return null;
+  const own = valueOf(word);
+  if (own !== undefined) return { stem: word, value: own };
+  let best: { stem: string; value: number } | null = null;
+  for (const stem of stems) {
+    const value = valueOf(stem);
+    // Strictly greater, so a tie goes to the more specific stem, listed first.
+    if (value !== undefined && (best === null || value > best.value)) best = { stem, value };
+  }
+  return best;
+}
+
 function dedupe(candidates: string[]): string[] {
   return [...new Set(candidates.filter((c) => c.length > 0))];
 }
 
 export function lemmaCandidates(word: string): string[] {
   const w = word.trim().toLowerCase();
+  // A stem exception names the one stem the word reads as, and no rule runs.
+  const excepted = STEM_EXCEPTIONS.get(w);
+  if (excepted !== undefined) return [w, excepted];
   const candidates = [w];
 
   // plural / third-person: -ies -> -y, -es, -s

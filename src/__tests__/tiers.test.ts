@@ -37,6 +37,58 @@ describe("lemmatise before the knownness lookup, not before rhyme matching", () 
   });
 });
 
+describe("a word with no row of its own reads as its best-known stem (#313)", () => {
+  // Real prevalence values, so the stems compete as they do in the built index.
+  const stems = makeTestIndex({
+    prevalence: [
+      ["bus", 2.227], ["buss", 0.010],
+      ["cure", 2.576], ["cur", 0.403],
+      ["ache", 2.167], ["ach", -0.346],
+    ],
+  });
+
+  it.each([
+    ["bussed", "bus"],
+    ["cured", "cure"],
+    ["ached", "ache"],
+  ])("reads %j as %j, the best-known stem, not the first one the lemmatiser finds", (form, stem) => {
+    expect(stems.tierOf(form)).toEqual(stems.tierOf(stem));
+  });
+
+  it("keeps a word's own row over a better-known stem", () => {
+    const own = makeTestIndex({ prevalence: [["cured", 0.5], ["cure", 2.576]] });
+    expect(own.tierOf("cured")).toEqual({ tier: "bonus", knownness: 0.5 });
+  });
+
+  it("still reads dying as die, not dye", () => {
+    const dying = makeTestIndex({ prevalence: [["die", 2.334], ["dye", 2.245]] });
+    expect(dying.tierOf("dying").knownness).toBe(2.334);
+  });
+
+  it.each([
+    ["hissed", "hiss", "his"],
+    ["severed", "sever", "severe"],
+    ["canvassed", "canvass", "canvas"],
+  ])("reads %j as %j, its stem exception, and not as the better-known %j", (form, stem, wrong) => {
+    const excepted = makeTestIndex({
+      prevalence: [["hiss", 2.031], ["his", 2.352], ["sever", 1.913], ["severe", 2.346],
+        ["canvass", 1.043], ["canvas", 2.240]],
+    });
+    expect(excepted.tierOf(form)).toEqual(excepted.tierOf(stem));
+    expect(excepted.tierOf(form)).not.toEqual(excepted.tierOf(wrong));
+  });
+
+  it("names the word its knownness was read from, so another signal can be read through the same word", () => {
+    // The index's values are the built ones, an editor's verdict already layered in:
+    // a Bonus Word verdict on `bus` (-3.0) hands `bussed` to `buss`.
+    const verdict = makeTestIndex({ prevalence: [["bus", -3.0], ["buss", 0.010], ["cured", 0.5], ["cure", 2.576]] });
+    expect(stems.knownStemOf("bussed")).toBe("bus");
+    expect(verdict.knownStemOf("bussed")).toBe("buss");
+    expect(verdict.knownStemOf("cured")).toBe("cured");
+    expect(verdict.knownStemOf("hissed")).toBeNull();
+  });
+});
+
 describe("a three-letter plural tiers on its base, when the sound agrees (issue #97)", () => {
   const shortPlurals = makeShortPluralIndex();
 

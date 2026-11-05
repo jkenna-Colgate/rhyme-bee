@@ -28,6 +28,13 @@ describe("parsePrevalenceCsv", () => {
     expect(map.has("bad")).toBe(false);
   });
 
+  it("reads another column of the same rows when named, as the Tier sitting reads word frequency", () => {
+    const csv = "Word,Prevalence,FreqZipfUS\nlordship,2.11,2.9\nguardianship,2.19,1.6\n";
+    const map = parsePrevalenceCsv(csv, "FreqZipfUS");
+    expect(map.get("lordship")).toBe(2.9);
+    expect(map.get("guardianship")).toBe(1.6);
+  });
+
   it("throws when the named columns are absent", () => {
     expect(() => parsePrevalenceCsv("a,b\n1,2\n")).toThrow(/missing columns/);
   });
