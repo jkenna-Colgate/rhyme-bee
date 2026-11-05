@@ -347,27 +347,41 @@ describe("what a look counts as a Trust failure", () => {
     expect(trustFailures([
       { word: "hod", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.2 } },
       { word: "snored", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "rejected" } },
-    ], LINE)).toEqual({ failures: ["snored"], excusedAsRare: ["hod"] });
+    ], LINE)).toEqual({ failures: ["snored"], excused: ["hod"] });
   });
 
   it("counts a Rhyme the game accepts as a Bonus Word with no knownness, which is how a common word ends up one by accident", () => {
     // `fool` for `cool`, missing from the prevalence data.
     expect(trustFailures([
       { word: "fool", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: null } },
-    ], LINE)).toEqual({ failures: ["fool"], excusedAsRare: [] });
+    ], LINE)).toEqual({ failures: ["fool"], excused: [] });
+  });
+
+  it("excuses a Rhyme the game accepts as a Bonus Word by an editor's Tier verdict, and says so", () => {
+    // `guardianship` for `ship`: the editor has judged players would not come up with it, whatever its knownness.
+    expect(trustFailures([
+      { word: "guardianship", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.9, byVerdict: true } },
+      { word: "snored", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "rejected" } },
+    ], LINE)).toEqual({ failures: ["snored"], excused: ["guardianship"] });
+  });
+
+  it("excuses a Bonus Word with no knownness when an editor's Tier verdict put it there", () => {
+    expect(trustFailures([
+      { word: "meathook", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: null, byVerdict: true } },
+    ], LINE)).toEqual({ failures: [], excused: ["meathook"] });
   });
 
   it("counts a Rhyme the look fixed into an Answer, in that look", () => {
     // `nightgown` for `down`: it had no reading, one was written in, and the rebuild made it an Answer.
     expect(trustFailures([
       { word: "nightgown", ruling: { verdict: "rhyme", reachesKey: true, landed: "reading" }, game: { outcome: "answer" } },
-    ], LINE)).toEqual({ failures: ["nightgown"], excusedAsRare: [] });
+    ], LINE)).toEqual({ failures: ["nightgown"], excused: [] });
   });
 
   it("counts a Bonus Word whose knownness is at the Answer line, which the game could only have Tiered by mistake", () => {
     expect(trustFailures([
       { word: "lard", ruling: { verdict: "rhyme", reachesKey: true, landed: "nothing" }, game: { outcome: "bonus", knownness: LINE } },
-    ], LINE)).toEqual({ failures: ["lard"], excusedAsRare: [] });
+    ], LINE)).toEqual({ failures: ["lard"], excused: [] });
   });
 
   it("excuses nothing that was never a failure: a rare Bonus Word ruled no Rhyme, an Unconfirmed Rhyme, a Demotion", () => {
@@ -375,7 +389,7 @@ describe("what a look counts as a Trust failure", () => {
       { word: "pard", ruling: { verdict: "no-rhyme", reachesKey: false, landed: "nothing" }, game: { outcome: "bonus", knownness: 0.1 } },
       { word: "clique", ruling: { verdict: "rhyme", reachesKey: true, landed: "unconfirmed-rhyme" }, game: { outcome: "unconfirmed" } },
       { word: "marx", ruling: { verdict: "rhyme", reachesKey: true, landed: "suggested-demotion" }, game: { outcome: "bonus", knownness: 0.1 } },
-    ], LINE)).toEqual({ failures: [], excusedAsRare: [] });
+    ], LINE)).toEqual({ failures: [], excused: [] });
   });
 });
 
