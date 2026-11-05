@@ -117,20 +117,54 @@ describe("comparing the signals", () => {
 
   it("finds the best single cut on each signal, and the share of marks it agrees with on B against E and H", () => {
     const signals = compareSignals(marks);
-    expect(signals.knownness).toEqual({ cut: 0.2, agreement: 5 / 7 });
-    expect(signals.frequency).toEqual({ cut: 2.5, agreement: 1 });
+    // A cut sits midway between the last word it calls B and the first it does not.
+    expect(signals.knownness.cut).toBeCloseTo(0.15, 9);
+    expect(signals.knownness.agreement).toBe(5 / 7);
+    expect(signals.frequency).toMatchObject({ cut: 2, agreement: 1 });
     expect(signals.combined.agreement).toBe(1);
   });
 
   it("lets knownness set a minimum under frequency when neither alone separates the marks", () => {
     const signals = compareSignals([...marks, marked("abecedarian", 0.05, 3.2, "B")]);
     expect(signals.frequency.agreement).toBe(7 / 8);
-    expect(signals.combined).toEqual({ knownnessMinimum: 0.1, frequencyCut: 2.5, agreement: 1 });
+    expect(signals.combined.knownnessMinimum).toBeCloseTo(0.075, 9);
+    expect(signals.combined).toMatchObject({ frequencyCut: 2, agreement: 1 });
   });
 
-  it("reads a word with no frequency as below every frequency cut", () => {
+  it("reads a word with no frequency as less frequent than any word that has one", () => {
     const signals = compareSignals([marked("hod", 1, null, "B"), marked("cod", 1, 3, "E")]);
-    expect(signals.frequency).toEqual({ cut: 3, agreement: 1 });
+    expect(signals.frequency).toMatchObject({ cut: 3, agreement: 1 });
+  });
+
+  it("scores each mark held out, by the cut fitted to all the other marks", () => {
+    // In sample, a cut at 0.3 calls only `a` B and gets three of four. Held out, each
+    // mark is cut on the other three: `b` on a, c and d (0.8, calling it B), `c` on
+    // a, b and d (0.3, not), `a` on b, c and d (none called B), and only `d` comes out right.
+    const signals = compareSignals([
+      marked("a", 0.1, null, "B"),
+      marked("b", 0.5, null, "E"),
+      marked("c", 0.6, null, "B"),
+      marked("d", 1.0, null, "E"),
+    ]);
+    expect(signals.knownness.agreement).toBe(3 / 4);
+    expect(signals.knownness.heldOut).toBe(1 / 4);
+  });
+
+  it("reports how far the combined signal beats knownness, in sample and held out", () => {
+    // Knownness separates the marks but for `e`, a B among the Es; frequency is noise
+    // that happens to put `e` lowest. In sample the combined signal catches `e` on it,
+    // and held out it cannot, as nothing else on the noise points that way.
+    const signals = compareSignals([
+      marked("a", 0.1, 3, "B"),
+      marked("b", 0.2, 3, "B"),
+      marked("c", 1.0, 2, "E"),
+      marked("d", 1.1, 2.5, "E"),
+      marked("e", 1.2, 1, "B"),
+    ]);
+    expect(signals.knownness).toMatchObject({ agreement: 4 / 5, heldOut: 4 / 5 });
+    expect(signals.combined).toMatchObject({ agreement: 1, heldOut: 4 / 5 });
+    expect(signals.combinedOverKnownness.agreement).toBeCloseTo(0.2, 9);
+    expect(signals.combinedOverKnownness.heldOut).toBe(0);
   });
 });
 

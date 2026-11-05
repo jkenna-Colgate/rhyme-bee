@@ -148,10 +148,14 @@ function place(args: string[]) {
   console.log(`rare line keeping today's rare share (${pct(placed.rareShare)} of Answers): ${placed.rareShareLine.toFixed(3)}`);
   console.log(`measured below at: Answer line ${placed.inForce.answerLine.toFixed(2)}, rare line ${placed.inForce.rareLine.toFixed(3)}`);
 
-  console.log("\nseparating B from E and H (best single cut, share of marks it agrees with):");
-  console.log(`  knownness alone: B below ${f2(signals.knownness.cut)}, ${pct(signals.knownness.agreement)}`);
-  console.log(`  frequency alone: B below ${f2(signals.frequency.cut)}, ${pct(signals.frequency.agreement)}`);
-  console.log(`  knownness minimum ${f2(signals.combined.knownnessMinimum)}, frequency above it below ${f2(signals.combined.frequencyCut)}: ${pct(signals.combined.agreement)}`);
+  console.log("\nseparating B from E and H (best single cut; share of marks it agrees with in sample, and held out one at a time):");
+  const scores = (s: { agreement: number; heldOut: number }) => `${pct(s.agreement)} in sample, ${pct(s.heldOut)} held out`;
+  const margin = (x: number) => `${x >= 0 ? "+" : ""}${(x * 100).toFixed(1)} points`;
+  console.log(`  knownness alone: B below ${f2(signals.knownness.cut)}: ${scores(signals.knownness)}`);
+  console.log(`  frequency alone: B below ${f2(signals.frequency.cut)}: ${scores(signals.frequency)}`);
+  console.log(`  knownness minimum ${f2(signals.combined.knownnessMinimum)}, frequency above it below ${f2(signals.combined.frequencyCut)}: ${scores(signals.combined)}`);
+  console.log(`  combined minus knownness: ${margin(signals.combinedOverKnownness.agreement)} in sample, ${margin(signals.combinedOverKnownness.heldOut)} held out`);
+  console.log("  (the combined signal holds every knownness cut, so in sample it cannot lose; read the held-out margin)");
 
   const pool = unscheduledPool(index, days);
   const before = consequencesAt(today, { days, pool });

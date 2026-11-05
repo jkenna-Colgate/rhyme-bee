@@ -296,60 +296,155 @@ export function placeLines(
 
 // ---- which signal separates the marks -------------------------------------------
 
-/** A single cut on one signal: a word below it is called B, and the share of marks that call agrees with. */
-export interface SignalCut {
-  cut: number;
+/**
+ * How well a signal agrees with the marks, two ways. `agreement` is in sample:
+ * the cut is fitted to every mark and scored on the same marks, so a signal with
+ * more cuts to tune scores higher whether or not it predicts better. `heldOut`
+ * is leave-one-out: each mark is scored by the cut fitted to all the others,
+ * which is the figure that says how the signal would do on marks not yet given.
+ */
+export interface SignalScore {
   agreement: number;
+  heldOut: number;
+}
+
+/** A single cut on one signal, fitted to every mark: a word below it is called B. */
+export interface SignalCut extends SignalScore {
+  cut: number;
 }
 
 export interface SignalComparison {
   knownness: SignalCut;
   frequency: SignalCut;
   /** Knownness as a minimum, with frequency deciding above it: B when below either. */
-  combined: { knownnessMinimum: number; frequencyCut: number; agreement: number };
+  combined: SignalScore & { knownnessMinimum: number; frequencyCut: number };
+  /**
+   * The combined signal's score minus knownness alone's. The combined signal
+   * holds every knownness cut as a special case, so in sample it can never
+   * fall below knownness; only the held-out margin can say it predicts better.
+   */
+  combinedOverKnownness: SignalScore;
+}
+
+/** Ascending, with -Infinity (no frequency) safe to compare. */
+const ascending = (a: number, b: number) => (a < b ? -1 : a > b ? 1 : 0);
+
+/**
+ * Every cut worth trying on a signal, as the values fitted fall: one that calls
+ * nothing B (-Infinity), one midway between each pair of neighbouring values
+ * (a cut calls B everything strictly below it), and one that calls everything B
+ * (Infinity). Midway, so a held-out word between two fitted values is called
+ * by whichever it sits nearer. Just above a word with no frequency, the cut
+ * sits at the next value up.
+ */
+function cutsOf(values: readonly number[]): number[] {
+  const distinct = [...new Set(values)].sort(ascending);
+  const cuts = [-Infinity];
+  for (let i = 1; i < distinct.length; i++) {
+    const below = distinct[i - 1]!;
+    cuts.push(Number.isFinite(below) ? (below + distinct[i]!) / 2 : distinct[i]!);
+  }
+  cuts.push(Infinity);
+  return cuts;
+}
+
+/** The best cut on one signal over the `fit` marks, by how many it agrees with; of equally good cuts, the lowest. */
+function fitCut(values: readonly number[], isB: readonly boolean[], fit: readonly number[]): { cut: number; agreed: number } {
+  let best = { cut: -Infinity, agreed: -1 };
+  for (const cut of cutsOf(fit.map((i) => values[i]!))) {
+    let agreed = 0;
+    for (const i of fit) if (values[i]! < cut === isB[i]) agreed++;
+    if (agreed > best.agreed) best = { cut, agreed };
+  }
+  return best;
 }
 
 /**
- * Every cut worth trying on a signal: each distinct value (a cut at a value
- * calls B everything strictly below it, so the lowest calls nothing B), and
- * one above them all, which calls everything B.
+ * The best knownness minimum and frequency cut over the `fit` marks: the
+ * lowest minimum, then the lowest cut, of equally good pairs. For each minimum,
+ * the words at or above it are swept once in frequency order.
  */
-function cutsOf(values: readonly number[]): number[] {
-  const distinct = [...new Set(values.filter((v) => Number.isFinite(v)))].sort((a, b) => a - b);
-  return [...distinct, Infinity];
+function fitCombined(
+  k: readonly number[],
+  f: readonly number[],
+  isB: readonly boolean[],
+  fit: readonly number[],
+): { knownnessMinimum: number; frequencyCut: number; agreed: number } {
+  const byFrequency = [...fit].sort((a, b) => ascending(f[a]!, f[b]!));
+  const frequencyCuts = cutsOf(fit.map((i) => f[i]!));
+  let best = { knownnessMinimum: -Infinity, frequencyCut: -Infinity, agreed: -1 };
+  for (const knownnessMinimum of cutsOf(fit.map((i) => k[i]!))) {
+    // Below the minimum a word is called B whatever its frequency; above it, frequency decides.
+    let belowAgreed = 0;
+    let aboveNotB = 0;
+    for (const i of fit) {
+      if (k[i]! < knownnessMinimum) belowAgreed += isB[i] ? 1 : 0;
+      else aboveNotB += isB[i] ? 0 : 1;
+    }
+    let next = 0;
+    let calledBRight = 0;
+    let calledBWrong = 0;
+    for (const frequencyCut of frequencyCuts) {
+      for (; next < byFrequency.length && f[byFrequency[next]!]! < frequencyCut; next++) {
+        const i = byFrequency[next]!;
+        if (k[i]! < knownnessMinimum) continue;
+        if (isB[i]) calledBRight++;
+        else calledBWrong++;
+      }
+      const agreed = belowAgreed + calledBRight + aboveNotB - calledBWrong;
+      if (agreed > best.agreed) best = { knownnessMinimum, frequencyCut, agreed };
+    }
+  }
+  return best;
+}
+
+/** Leave-one-out: the share of marks a rule fitted to all the other marks calls right. */
+function heldOut(isB: readonly boolean[], calledBWithout: (held: number, fit: number[]) => boolean): number {
+  const all = isB.map((_, i) => i);
+  let agreed = 0;
+  for (const held of all) if (calledBWithout(held, all.filter((i) => i !== held)) === isB[held]) agreed++;
+  return all.length === 0 ? 0 : agreed / all.length;
 }
 
 /**
  * How well each signal, on its own and together, separates the B marks from
- * the E and H marks: the best single cut for each, and the share of marks it
- * agrees with. Of equally good cuts the lowest is reported. A word with no
- * frequency sits below every frequency cut.
+ * the E and H marks: the best single cut for each, the share of marks it agrees
+ * with in sample, and the share held out. Of equally good cuts the lowest is
+ * reported. A word with no frequency reads as less frequent than any word that
+ * has one.
  */
 export function compareSignals(marks: readonly MarkedWord[]): SignalComparison {
   const isB = marks.map((m) => m.mark === "bonus");
   const k = marks.map((m) => m.knownness);
   const f = marks.map((m) => m.frequency ?? -Infinity);
-  const agreement = (calledB: (i: number) => boolean) => {
-    let agreed = 0;
-    for (let i = 0; i < marks.length; i++) if (calledB(i) === isB[i]) agreed++;
-    return marks.length === 0 ? 0 : agreed / marks.length;
+  const all = marks.map((_, i) => i);
+  const share = (agreed: number) => (marks.length === 0 ? 0 : agreed / marks.length);
+
+  const single = (values: number[]): SignalCut => {
+    const fitted = fitCut(values, isB, all);
+    return {
+      cut: fitted.cut,
+      agreement: share(fitted.agreed),
+      heldOut: heldOut(isB, (held, fit) => values[held]! < fitCut(values, isB, fit).cut),
+    };
   };
-  const best = (values: number[]): SignalCut => {
-    let out: SignalCut = { cut: -Infinity, agreement: -1 };
-    for (const cut of cutsOf(values)) {
-      const a = agreement((i) => values[i]! < cut);
-      if (a > out.agreement) out = { cut, agreement: a };
-    }
-    return out;
+  const knownness = single(k);
+  const fitted = fitCombined(k, f, isB, all);
+  const combined = {
+    knownnessMinimum: fitted.knownnessMinimum,
+    frequencyCut: fitted.frequencyCut,
+    agreement: share(fitted.agreed),
+    heldOut: heldOut(isB, (held, fit) => {
+      const rule = fitCombined(k, f, isB, fit);
+      return k[held]! < rule.knownnessMinimum || f[held]! < rule.frequencyCut;
+    }),
   };
-  let combined = { knownnessMinimum: -Infinity, frequencyCut: -Infinity, agreement: -1 };
-  for (const knownnessMinimum of cutsOf(k)) {
-    for (const frequencyCut of cutsOf(f)) {
-      const a = agreement((i) => k[i]! < knownnessMinimum || f[i]! < frequencyCut);
-      if (a > combined.agreement) combined = { knownnessMinimum, frequencyCut, agreement: a };
-    }
-  }
-  return { knownness: best(k), frequency: best(f), combined };
+  return {
+    knownness,
+    frequency: single(f),
+    combined,
+    combinedOverKnownness: { agreement: combined.agreement - knownness.agreement, heldOut: combined.heldOut - knownness.heldOut },
+  };
 }
 
 // ---- what the placed lines would do ---------------------------------------------
