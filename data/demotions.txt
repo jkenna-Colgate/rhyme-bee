@@ -114,3 +114,4 @@ takeuchi proper-noun
 tuskegee proper-noun
 winfree proper-noun
 zuni proper-noun          # the Pueblo people
+finns proper-noun         # the people, as `zuni`

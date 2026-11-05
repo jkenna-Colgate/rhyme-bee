@@ -33,5 +33,4 @@ export const STEM_EXCEPTIONS: ReadonlyMap<string, string> = new Map([
   ["enveloped", "envelop"], // the verb, not `envelope`
   ["enveloping", "envelop"], // the verb, not `envelope`
   ["psyched", "psych"], // `psyched up`, not `psyche`
-  ["finns", "finn"], // the people, not `fin`
 ]);
