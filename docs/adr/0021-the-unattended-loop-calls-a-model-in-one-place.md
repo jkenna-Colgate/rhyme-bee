@@ -190,6 +190,9 @@ what the No False Accepts hunt sends. It is decided and not built.
   Counting it costs noise and nothing more, since a failing day still ships.
   Against this Batch, 4 of the 10 failed days pass. Not counting unmeasured
   words either would have passed 8, and was rejected for the `fool` case.
+  Since #308 (decided in #280) an editor's Bonus Word Tier verdict excuses a
+  rhyme the same way a knownness below the Answer line does: either is the
+  game judging that players would not come up with the word.
 - **The sitting puts to the maintainer what it would otherwise leave
   behind.** Seven of this Batch's Judge rulings said Rhyme and landed nothing,
   most of them medium-confidence Overrules (`house` and `douse` for `arouse`,

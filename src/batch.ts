@@ -42,6 +42,7 @@ import { rulingKey, type JudgeRulingRecord, type Landed } from "./judgeLanding.t
 import type { Pronunciation, RhymeKey } from "./phonology.ts";
 import type { RhymeIndex } from "./rhymeIndex.ts";
 import { addDays, isCalendarDate, scheduledDayFor, type Schedule } from "./schedule.ts";
+import type { TierVerdict } from "./tierOverride.ts";
 import type { Verdict } from "./verdict.ts";
 
 // ---- the block -----------------------------------------------------------------
@@ -165,16 +166,22 @@ export function lookAttempt(offKey: readonly boolean[]): LookAttempt {
 
 /**
  * What the game does with a Candidate's word once the look's corrections are
- * in: the outcome a Submission of it gets, and a Bonus Word's knownness, which
- * is null when the prevalence data has no value for it.
+ * in: the outcome a Submission of it gets, and for a Bonus Word its knownness,
+ * which is null when the prevalence data has no value for it, and whether an
+ * editor's Bonus Word Tier verdict stands on it (`data/tier-overrides.csv`).
  */
 export type CandidateGame =
-  | { outcome: "bonus"; knownness: number | null }
+  | { outcome: "bonus"; knownness: number | null; byVerdict?: boolean }
   | { outcome: Exclude<Verdict["outcome"], "bonus"> };
 
-/** A Candidate's game, read off the verdict the index gives a Submission of it. */
-export function candidateGame(verdict: Verdict): CandidateGame {
-  return verdict.outcome === "bonus" ? { outcome: "bonus", knownness: verdict.knownness } : { outcome: verdict.outcome };
+/**
+ * A Candidate's game, read off the verdict the index gives a Submission of it
+ * and the editor's standing Tier verdict on the word, if any.
+ */
+export function candidateGame(verdict: Verdict, tierVerdict?: TierVerdict): CandidateGame {
+  return verdict.outcome === "bonus"
+    ? { outcome: "bonus", knownness: verdict.knownness, byVerdict: tierVerdict === "bonus" }
+    : { outcome: verdict.outcome };
 }
 
 /** One Candidate of a look, with the Judge's ruling on it: made in this look, or read back from its record. */
@@ -186,10 +193,13 @@ export interface LookCandidate {
   game?: CandidateGame;
 }
 
-/** A look's Trust failures, and the Rhymes it did not count because the game is right to accept them as rare Bonus Words. */
+/**
+ * A look's Trust failures, and the Rhymes it did not count because the game
+ * accepts them as Bonus Words having judged that players would not come up with them.
+ */
 export interface LookTrust {
   failures: string[];
-  excusedAsRare: string[];
+  excused: string[];
 }
 
 /**
@@ -201,18 +211,21 @@ export interface LookTrust {
  * a known failure left alone is found again by every look that types it.
  *
  * A third kind is excused and listed apart (ADR-0021, 2026-11-02 amendment): a
- * Rhyme the game accepts as a Bonus Word whose knownness is below the Answer
- * line, because whether a word scores is its Tier's question and not Trust's.
- * A Bonus Word with no knownness still counts, since that is how a common word
- * (`fool` for `cool`) ends up one by accident; and so does a word the look
- * fixed into an Answer (`nightgown`), which the look found failing.
+ * Rhyme the game accepts as a Bonus Word having judged that players would not
+ * come up with it: by a knownness below the Answer line, or by an editor's
+ * Bonus Word Tier verdict (#308). Whether a word scores is its Tier's question
+ * and not Trust's. A Bonus Word with no knownness and no verdict still counts,
+ * since that is how a common word (`fool` for `cool`) ends up one by accident;
+ * and so does a word the look fixed into an Answer (`nightgown`), which the
+ * look found failing.
  */
 export function trustFailures(candidates: readonly LookCandidate[], answerLine: number): LookTrust {
-  const trust: LookTrust = { failures: [], excusedAsRare: [] };
+  const trust: LookTrust = { failures: [], excused: [] };
   for (const { word, ruling: r, game } of candidates) {
     if (!(r?.verdict === "rhyme" && r.reachesKey && r.landed !== "unconfirmed-rhyme" && r.landed !== "suggested-demotion")) continue;
-    const rare = game?.outcome === "bonus" && game.knownness !== null && game.knownness < answerLine;
-    (rare ? trust.excusedAsRare : trust.failures).push(word);
+    const judged = game?.outcome === "bonus" &&
+      (game.byVerdict === true || (game.knownness !== null && game.knownness < answerLine));
+    (judged ? trust.excused : trust.failures).push(word);
   }
   return trust;
 }

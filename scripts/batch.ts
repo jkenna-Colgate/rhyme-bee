@@ -101,6 +101,7 @@ import {
   type TrustResult,
 } from "../src/batch.ts";
 import { parseDeclines } from "../src/declines.ts";
+import { standingLayers } from "../src/tierOverride.ts";
 import { judgeQuestion, readingReachesKey, TIER_BATCH, type TierAnswer, type TierRuling } from "../src/judge.ts";
 import { planJudging, rulingKey, type JudgeRulingRecord } from "../src/judgeLanding.ts";
 import type { PuzzleContext } from "../src/session.ts";
@@ -183,6 +184,10 @@ trustVerdict([0], gate); // refuses an n that leaves no look after a fix, before
 
 const BATCHES = resolve(root, "data/batches.json");
 const DECLINES = resolve(root, "data/declines.txt");
+const readOrEmpty = (path: string) => (existsSync(path) ? readFileSync(path, "utf8") : "");
+/** Each word's standing Tier layers, read fresh, so a Trust tally sees the verdicts the index was built with. */
+const readTierLayers = () =>
+  standingLayers(readOrEmpty(resolve(root, "data/tier-overrides.csv")), readOrEmpty(resolve(root, "data/tier-moves.csv")));
 
 const date = today();
 const { raw: scheduleRaw, schedule } = readScheduleFile();
@@ -274,8 +279,8 @@ interface Look {
   example: string | null;
   play?: SyntheticPlay;
   trustFailures?: string[];
-  /** Rhymes not counted because the game accepts them as Bonus Words whose knownness measures them as rare. */
-  excusedAsRare?: string[];
+  /** Rhymes not counted because the game accepts them as Bonus Words, by a knownness below the Answer line or an editor's Bonus Word verdict. */
+  excused?: string[];
 }
 interface Day {
   seed: BatchSeed;
@@ -393,6 +398,7 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
   }
 
   // Count each day's Trust failures, and give the gate's verdict.
+  const tierLayers = readTierLayers();
   for (const d of looked) {
     const look = d.looks.at(-1)!;
     const seed = contexts.get(d)!.seed;
@@ -404,18 +410,18 @@ for (let lookNo = 1; lookNo <= gate.n && !stopped; lookNo++) {
       return {
         word: c.word,
         ruling: { verdict: r.verdict, reachesKey: fresh ? fresh.reachesKey : r.verdict === "rhyme" && readingReachesKey(r.reading, r.rhymeKey), landed: r.landed },
-        game: candidateGame(index.adjudicate(seed, c.word)),
+        game: candidateGame(index.adjudicate(seed, c.word), tierLayers(c.word).verdict),
       };
     });
     const trust = trustFailures(candidates, index.knownnessThreshold);
     look.trustFailures = trust.failures;
-    look.excusedAsRare = trust.excusedAsRare;
+    look.excused = trust.excused;
     d.failuresPerLook.push(trust.failures.length);
     const verdict = trustVerdict(d.failuresPerLook, gate);
     if (verdict !== "look-again") d.result = verdict;
     console.error(
       `  ${d.seed.seedWord}: ${trust.failures.length} Trust failures${trust.failures.length ? ` (${trust.failures.join(", ")})` : ""}` +
-      `${trust.excusedAsRare.length ? `, ${trust.excusedAsRare.length} excused as rare Bonus Words (${trust.excusedAsRare.join(", ")})` : ""}` +
+      `${trust.excused.length ? `, ${trust.excused.length} excused as Bonus Words players would not come up with (${trust.excused.join(", ")})` : ""}` +
       `${d.result ? `, ${d.result}` : ""}`,
     );
   }
@@ -507,7 +513,7 @@ const reportPath = writeRunReport(date, stem, run, {
   note:
     "A Batch (#267). Trust failures are Candidates the Judge rules a Rhyme with a reading that reaches the key, " +
     "leaving out Unconfirmed Rhymes and suggested Demotions; a Rhyme the game accepts, after the look's corrections, " +
-    "as a Bonus Word whose knownness is below the Answer line is listed under excusedAsRare and not counted. Every write is listed under writes; the index was " +
+    "as a Bonus Word whose knownness is below the Answer line, or on an editor's Bonus Word Tier verdict, is listed under excused and not counted. Every write is listed under writes; the index was " +
     "rebuilt after each look that landed one.",
   ...(stopped ? { stopped } : {}),
   seedsPlayed: days.map((d) => ({
@@ -530,7 +536,7 @@ const reportPath = writeRunReport(date, stem, run, {
             rank: l.play.rank,
             candidates: l.play.candidates.map((c) => c.word),
             trustFailures: l.trustFailures ?? null,
-            excusedAsRare: l.excusedAsRare ?? null,
+            excused: l.excused ?? null,
           }
         : {}),
     })),
