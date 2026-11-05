@@ -108,7 +108,7 @@ export function bandEdge(band: number, bands: BandOptions): number {
 }
 
 /** A knownness that was measured, rather than compiled from a verdict. */
-function measured(knownness: number | null): knownness is number {
+export function measured(knownness: number | null): knownness is number {
   return knownness !== null && verdictForValue(knownness) === null;
 }
 

@@ -77,6 +77,16 @@ describe("a word with no row of its own reads as its best-known stem (#313)", ()
     expect(excepted.tierOf(form)).toEqual(excepted.tierOf(stem));
     expect(excepted.tierOf(form)).not.toEqual(excepted.tierOf(wrong));
   });
+
+  it("names the word its knownness was read from, so another signal can be read through the same word", () => {
+    // The index's values are the built ones, an editor's verdict already layered in:
+    // a Bonus Word verdict on `bus` (-3.0) hands `bussed` to `buss`.
+    const verdict = makeTestIndex({ prevalence: [["bus", -3.0], ["buss", 0.010], ["cured", 0.5], ["cure", 2.576]] });
+    expect(stems.knownStemOf("bussed")).toBe("bus");
+    expect(verdict.knownStemOf("bussed")).toBe("buss");
+    expect(verdict.knownStemOf("cured")).toBe("cured");
+    expect(verdict.knownStemOf("hissed")).toBeNull();
+  });
 });
 
 describe("a three-letter plural tiers on its base, when the sound agrees (issue #97)", () => {

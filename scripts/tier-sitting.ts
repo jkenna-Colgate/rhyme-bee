@@ -16,7 +16,6 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { playableSeeds } from "../src/curation.ts";
 import { parseLabelSet } from "../src/judgeLabels.ts";
-import { knownStem } from "../src/lemmatise.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeKey } from "../src/phonology.ts";
@@ -24,7 +23,6 @@ import { splitFamily, type RhymeIndex } from "../src/rhymeIndex.ts";
 import { parseSchedule } from "../src/schedule.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { testSeedWord } from "../src/seedWord.ts";
-import { verdictForValue } from "../src/tierOverride.ts";
 import {
   bandEdge,
   bandOf,
@@ -33,6 +31,7 @@ import {
   DEFAULT_DRAW,
   drawSample,
   marksOf,
+  measured,
   placeLines,
   type DayAtLines,
   type Lines,
@@ -117,20 +116,18 @@ function place(args: string[]) {
   const set = parseLabelSet(JSON.parse(readFileSync(file, "utf8")));
   const labeller = flag(args, "labeller", set.labelledBy[0] ?? "");
   const { index, hash } = loadIndex();
-  const csv = readFileSync(resolve(root, "data/prevalence.csv"), "utf8");
-  const prevalence = parsePrevalenceCsv(csv);
-  const frequency = parsePrevalenceCsv(csv, "FreqZipfUS");
+  const frequency = parsePrevalenceCsv(readFileSync(resolve(root, "data/prevalence.csv"), "utf8"), "FreqZipfUS");
 
   const marks: MarkedWord[] = [];
   const skipped: string[] = [];
   for (const m of marksOf(set, labeller)) {
     const knownness = index.tierOf(m.word).knownness;
-    if (knownness === null || verdictForValue(knownness) !== null) {
+    if (!measured(knownness)) {
       skipped.push(m.word);
       continue;
     }
-    // Frequency is read through the stem knownness is read from, so the two signals describe the same word.
-    const stem = knownStem(index.derivation.lemmaCandidates(m.word), (c) => prevalence.get(c))?.stem ?? m.word;
+    // Frequency is read through the very word the index read knownness from, so the two signals describe the same word.
+    const stem = index.knownStemOf(m.word) ?? m.word;
     marks.push({ word: m.word, knownness, frequency: frequency.get(stem) ?? null, mark: m.mark });
   }
 

@@ -648,6 +648,17 @@ export class RhymeIndex {
     return this.#tier(normaliseWord(word));
   }
 
+  /**
+   * The word `tierOf` read the knownness from: the word itself when it has a
+   * row, otherwise the stem `knownStem` chose over the built values (verdicts
+   * layered in), or null when nothing has a row. Public so another signal from
+   * the same prevalence data (word frequency, at the Tier sitting) can be read
+   * through the very word knownness was, rather than a stem chosen again.
+   */
+  knownStemOf(word: string): string | null {
+    return this.#knownStem(normaliseWord(word))?.stem ?? null;
+  }
+
   /** The Answer line: a knownness at or above it makes an Answer, and below it a Bonus Word. */
   get knownnessThreshold(): number {
     return this.#config.knownnessThreshold;
@@ -700,14 +711,18 @@ export class RhymeIndex {
    * gets here and the derivation verdict curation reads are one rule.
    */
   #tier(word: string): { tier: Tier; knownness: number | null } {
-    const known = knownStem(
-      this.derivation.lemmaCandidates(word),
-      (candidate) => this.#data.prevalence.get(candidate),
-    );
+    const known = this.#knownStem(word);
     if (known === null) return { tier: "bonus", knownness: null };
     return {
       tier: tierFor(known.value, this.#config.knownnessThreshold),
       knownness: known.value,
     };
+  }
+
+  #knownStem(word: string): { stem: string; value: number } | null {
+    return knownStem(
+      this.derivation.lemmaCandidates(word),
+      (candidate) => this.#data.prevalence.get(candidate),
+    );
   }
 }
