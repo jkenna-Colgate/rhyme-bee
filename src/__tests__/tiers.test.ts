@@ -1,11 +1,12 @@
 /**
  * Slice: the Answer / Bonus tier split by word prevalence, with lemmatisation
  * before the knownness lookup only. Includes the two design assumptions turned
- * into tests: that `defenestrate` outranks `objurgate`, and that `gates` is not
+ * into tests: that `docility` is an Answer and `servility` is not, and that `gates` is not
  * misfiled merely because the prevalence data lists only `gate`.
  */
 
 import { describe, expect, it } from "vitest";
+import { DEFAULT_SCORING_CONFIG, isRare } from "../scoring.ts";
 import { isTiered } from "../verdict.ts";
 import { KNOWNNESS_THRESHOLD, makeTestIndex } from "../__fixtures__/index.ts";
 import { makeShortPluralIndex } from "../__fixtures__/shortPlurals.ts";
@@ -13,18 +14,22 @@ import { makeShortPluralIndex } from "../__fixtures__/shortPlurals.ts";
 const index = makeTestIndex();
 const ate = index.pinSeed("ate");
 
-describe("the ADR-0003 assumption, as a test", () => {
-  it("ranks defenestrate as an Answer and objurgate as a Bonus Word", () => {
-    expect(index.adjudicate(ate, "defenestrate").outcome).toBe("answer");
-    expect(index.adjudicate(ate, "objurgate").outcome).toBe("bonus");
+describe("the ADR-0003 anchor, as a test", () => {
+  // The Tier sitting (#310) placed the Answer line at 1.00 and the rare line
+  // at 1.278, and named `docility` (1.03, for `facility`) the anchor: a word a
+  // player hunting rhymes for `facility` will produce, if not often. `servility`
+  // (0.84) is one they recognise and will not produce, so it sits below.
+  const facility = index.pinSeed("facility");
+
+  it("ranks docility as an Answer and servility as a Bonus Word", () => {
+    expect(index.adjudicate(facility, "docility").outcome).toBe("answer");
+    expect(index.adjudicate(facility, "servility").outcome).toBe("bonus");
   });
 
-  it("scores defenestrate strictly above objurgate", () => {
-    const known = index.adjudicate(ate, "defenestrate");
-    const obscure = index.adjudicate(ate, "objurgate");
-    if (isTiered(known) && isTiered(obscure)) {
-      expect(known.knownness!).toBeGreaterThan(obscure.knownness!);
-    }
+  it("makes docility a rare Answer, so it earns the rare bonus", () => {
+    const { knownness } = index.tierOf("docility");
+    expect(isRare(knownness, DEFAULT_SCORING_CONFIG)).toBe(true);
+    expect(isRare(index.tierOf("facility").knownness, DEFAULT_SCORING_CONFIG)).toBe(false);
   });
 });
 

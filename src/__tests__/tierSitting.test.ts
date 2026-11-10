@@ -53,8 +53,8 @@ describe("drawing the sample", () => {
   it("takes what a short band has, and nothing outside 0.0 to 2.5 or carrying an editor's verdict", () => {
     const sample = drawSample([
       day("ship", [["lordship", 2.11], ["guardianship", 2.19], ["worship", 2.6], ["consulship", -0.4], ["hardship", null]]),
-      // 3.0, 0.6 and -3.0 are what an editor's Tier verdict compiles to: no measured knownness.
-      day("cup", [["teacup", 3.0], ["buttercup", 0.6], ["hiccup", 1.3]]),
+      // 3.0, 1.1 and -3.0 are what an editor's Tier verdict compiles to: no measured knownness.
+      day("cup", [["teacup", 3.0], ["buttercup", 1.1], ["hiccup", 1.3]]),
     ]);
     expect(sample.map((s) => s.word).sort()).toEqual(["guardianship", "hiccup", "lordship"]);
   });
@@ -185,10 +185,11 @@ describe("placing the rare line", () => {
   it("falls back to the line that keeps today's rare share when too few words are E to place one", () => {
     const placed = placeLines(SCHEDULED, sitting("BBBB", "BBBH", "BBHE", "BHHE", "HHEE", "HHEE", "HHHE", "HHEE", "HHEE", "HHEE"));
     expect(placed.rareLine).toBeNull();
-    // 28 of 100 Answers are rare today. Above a line of 0.75 sit 70, so 19 stay rare:
-    // the line falls between the 19th and the 20th, at 1.2 and 1.225.
-    expect(placed.rareShareLine).toBeCloseTo(1.2125, 6);
-    expect(placed.inForce.rareLine).toBeCloseTo(1.2125, 6);
+    // The Answer at 1.1 reads as an editor's `answer-rare` verdict and is left
+    // out, so 28 of 99 Answers are rare today. Above a line of 0.75 sit 69, so 19
+    // stay rare: the line falls between the 19th and the 20th, at 1.225 and 1.25.
+    expect(placed.rareShareLine).toBeCloseTo(1.2375, 6);
+    expect(placed.inForce.rareLine).toBeCloseTo(1.2375, 6);
   });
 });
 
@@ -237,7 +238,7 @@ describe("what the placed lines would do", () => {
     // Mon: 12 common and 3 rare survive the line, so 15 Answers; 10 fall to Bonus Word.
     { date: "2026-11-02", week: 1, seedWord: "ship", rhymeKey: "IH P", seedKnownness: 2, answers: [...many("a", 12, 2), ...many("r", 3, 1.2), ...many("c", 10, 0.5)] },
     // Tue: a Seed Word below the line, and 7 Answers, two of them held by an editor's verdict (common and rare).
-    { date: "2026-11-03", week: 1, seedWord: "cup", rhymeKey: "AH P", seedKnownness: 0.8, answers: [...many("u", 5, 2), five("teacup", 3.0), five("buttercup", 0.6)] },
+    { date: "2026-11-03", week: 1, seedWord: "cup", rhymeKey: "AH P", seedKnownness: 0.8, answers: [...many("u", 5, 2), five("teacup", 3.0), five("buttercup", 1.1)] },
     // Mon: no rare Answer at all.
     { date: "2026-11-09", week: 2, seedWord: "ate", rhymeKey: "EY T", seedKnownness: 2, answers: many("e", 25, 2) },
     { date: "2026-11-10", week: 2, seedWord: "fine", rhymeKey: "AY N", seedKnownness: 2, answers: [...many("f", 20, 2), ...many("g", 5, 1.2)] },

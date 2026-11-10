@@ -7,7 +7,7 @@
     "max": 120
   },
   "scoring": {
-    "rareKnownnessCutoff": 0.7,
+    "rareKnownnessCutoff": 1.278,
     "rareBonus": 2,
     "rankLadder": [
       {

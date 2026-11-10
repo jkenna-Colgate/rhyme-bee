@@ -16,9 +16,9 @@
  * from scratch. The rebuild is the independent source of truth, and it is the
  * one the acceptance criterion names.
  *
- * Everything is built at the shipped threshold rather than the fixture's own
- * 1.0, so that a case combining a demotion with a Tier verdict meets the
- * sentinels calibrated for it (ADR-0015).
+ * Everything is built at the shipped Answer line, so that a case combining a
+ * demotion with a Tier verdict meets the sentinels calibrated for it
+ * (ADR-0015). Since the Tier sitting (#310) it is 1.0, the fixture's own.
  */
 
 import { describe, expect, it } from "vitest";
@@ -26,13 +26,14 @@ import { measureAnswers } from "../../src/curation.ts";
 import { serialiseDemotion, type Demotion } from "../../src/demotions.ts";
 import type { PuzzleEntry, RhymeIndex } from "../../src/rhymeIndex.ts";
 import { TIER_OVERRIDE_HEADER } from "../../src/tierOverride.ts";
+import { ANSWER_LINE } from "../../src/verdict.ts";
 import { buildTestIndex, makeTestIndex, type TestInputs } from "../../src/__fixtures__/index.ts";
 import { tierPickerState } from "../editorTierPayload.ts";
 import { demotedWords, showsDemotionReassurance, withoutDemoted } from "../src/editor/demote.ts";
 import { retierDay, type DayLists } from "../src/editor/retier.ts";
 
 /** See `retier.test.ts`: the override sentinels are calibrated for this. */
-const SHIPPED_THRESHOLD = 0.0;
+const SHIPPED_THRESHOLD = ANSWER_LINE;
 
 /** The fixture's `-ate` family — the widest one it has, and the Tutorial's Seed. */
 const ATE = { seed: "ate", key: "EY T" };
@@ -113,7 +114,7 @@ describe("a demotion takes the word out of the day", () => {
     const built = index();
     const lists = listsOf(built, ATE);
     // `sate` is absent from the fixture's prevalence data, so it defaults to a
-    // Bonus Word — the one this family holds at the shipped threshold.
+    // Bonus Word at any Answer line.
     const sate: Demotion = { word: "sate", reason: "not-a-known-word" };
     const rebuilt = listsOf(index({ demotions: demotionFile(sate) }), ATE);
     const before = measureAnswers(lists.answers);

@@ -81,15 +81,16 @@ export function notAVerdict(value: string): string {
  * override cannot introduce a second tiering path that drifts from the first.
  *
  * These are **not free parameters**. `bonus` and `answer-common` sit outside the
- * observed data range (-2.11 to +2.58) deliberately. `0.6` is boxed — the Answer
- * threshold below it, `rareKnownnessCutoff` (0.7) above — so it has no wide
- * margin: it clears a threshold nudge to 0.5 and is covered by `checkTierSentinels`
- * on the other side. The cost of storing numbers is that a verdict's meaning
+ * observed data range (-2.11 to +2.58) deliberately. `1.1` is boxed — the Answer
+ * line (1.00) below it, `rareKnownnessCutoff` (1.278) above — so it has no wide
+ * margin: it clears a nudge of either line by a few hundredths and is covered by
+ * `checkTierSentinels` beyond that. It was 0.6 until the Tier sitting moved both
+ * lines (#310, #311). The cost of storing numbers is that a verdict's meaning
  * depends on where two knobs sit, and that guard is how the cost is paid.
  */
 export const VERDICT_VALUE: Record<PatchingVerdict, number> = {
   bonus: -3.0,
-  "answer-rare": 0.6,
+  "answer-rare": 1.1,
   "answer-common": 3.0,
 };
 
