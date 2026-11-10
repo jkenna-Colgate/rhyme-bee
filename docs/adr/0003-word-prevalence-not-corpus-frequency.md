@@ -1,5 +1,7 @@
 # Answers and Bonus Words are split by word prevalence, not corpus frequency
 
+**Status:** amended 2026-11-10. The test is Retrieval: an Answer is a word a player hunting rhymes would produce, and prevalence is the proxy it is measured by. The Answer line is 1.00, placed from the maintainer's marks in the Tier sitting (#310), and the anchor word is `docility` (1.03, for `facility`). Prevalence stays the axis: held out, it called the marks better than frequency or the two combined. `defenestrate` (0.25) is a Bonus Word.
+
 A rhyming word is counted as an **Answer** if a reasonable player could be expected to know it, and treated as a **Bonus Word** — accepted and celebrated, but uncounted — if almost nobody knows it. That line is drawn using psycholinguistic **word prevalence** data rather than corpus frequency.
 
 ## Why not frequency
@@ -62,3 +64,41 @@ cruder automated fallback is corpus frequency plus a small hand-maintained
 allow-list of famous-rare words; this is the approach this ADR rejects for the
 general case, but with a human allow-list carrying the `defenestrate`-shaped
 exceptions it degrades acceptably.
+
+## Amendment, 2026-11-10: the test is Retrieval, and the sitting placed the line
+
+**The test.** The opening asks whether "a reasonable player could be expected to
+know" a word. That is recognition, and it is what the prevalence data measures.
+What the Answer/Bonus split is really drawn on is Retrieval: whether a player,
+given the Seed Word, will produce the word from nothing (GLOSSARY.md). Prevalence
+is the proxy for it, and an upper bound: nobody produces a word they do not know.
+The line at 0.0 was placed to keep `defenestrate` an Answer, and it made Answers of
+words nearly everybody recognises and almost nobody would think of.
+
+**Where the line came from.** The maintainer marked 150 Answers drawn from the
+scheduled days, 15 from each 0.25 band of knownness from 0.0 to 2.5, with the
+knownness hidden: E (a player would produce it easily), H (a player would produce
+it, with effort) or B (a player would not produce it). The marks came out 68 E,
+27 H and 55 B, and are committed in `data/judge-labels/tier-1.json` (#309, #310).
+B is the majority in every band below 1.00 and in none from 1.00 up, so the
+Answer line is **1.00** (`ANSWER_LINE` in `src/verdict.ts`).
+
+**The comparison.** Holding out one mark at a time, knownness alone called 81.3% of
+the marks right, frequency 73.3%, and the two combined 77.3% (0.7 points better
+than knownness in sample, 4.0 points worse held out). So the axis stands:
+prevalence, not frequency and not a mix. The objection this ADR opened with still
+holds, now measured rather than argued.
+
+**The anchor word** is `docility` (1.03, marked H), for `facility`: a word a player
+hunting rhymes for `facility` will produce, if not often, and which only just
+clears the line. `servility` (0.84), which almost everybody recognises and few
+would produce, falls below it. `defenestrate` (0.25) is no longer the anchor. It is
+a Bonus Word: famous as a rare word, and still not one a player reaches for when
+hunting rhymes for `ate`. The test in `src/__tests__/tiers.test.ts` that pinned it
+as an Answer now pins `docility` and `servility` instead.
+
+The Resolution's "around 0.0" is superseded. Its probe still stands as a ranking
+result: prevalence orders `defenestrate` above `objurgate`. The rare line moved
+with the Answer line, recorded in ADR-0006 and ADR-0007. ADR-0015 is unchanged:
+the per-word override is still the lever for a ranking inversion, which no line
+can fix.

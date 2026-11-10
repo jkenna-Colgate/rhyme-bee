@@ -1,5 +1,7 @@
 # Scoring is length-dominant with a flat rare bonus; Rank is a percentage of maximum Answer Score
 
+**Status:** amended 2026-11-10. The rare line is 1.278, not 0.7: the line above the new Answer line (1.00) that keeps 9% of Answers rare, ruled after the Tier sitting. `docility`, not `defenestrate`, is the example rare Answer.
+
 An Answer scores on its **length**, plus a small **flat bonus** when it is rare —
 `score(answer) = length + (isRare ? RARE_BONUS : 0)`, default `RARE_BONUS = 2`.
 "Rare" is a fixed line on the knownness scale (`RARE_KNOWNNESS_CUTOFF`, default
@@ -41,3 +43,29 @@ is reachable only by finding every Answer — so the top "all Answers found" tie
 falls out of the same "highest rung at or below the current percentage" rule with
 no special case. The top *named* tier is deliberately gated well below 100% so it
 is a realistic goal, not a demand for perfection.
+
+## Amendment, 2026-11-10: the rare line is 1.278
+
+The Answer line moved from 0.0 to 1.00 (ADR-0003, amended the same day), so a rare
+line of 0.7 sat below every Answer and marked none of them rare. The rare line is
+now **1.278**, and `rareKnownnessCutoff` carries it in `src/scoring.ts` and
+`data/schedule.json`.
+
+**How it was placed.** It is the line that keeps the rare share where it was: 9.0%
+of the Answers on the scheduled days were rare at the old lines, and 1.278 is the
+line above 1.00 below which the same share falls (midway between the last word that
+stays rare and the first that does not, `rareShareLine` in `src/tierSitting.ts`).
+The sitting's marks would place it higher, at 1.75, the lowest band at or above the
+Answer line where E is the majority (#310). The maintainer ruled against that for
+now. At 1.75 the rare share is 28.5%, the median Difficulty 0.34 and 39 days over
+0.5, so a player who finds only the easy words would fall short of Laureate (70%)
+on a typical day. At 1.278 the median Difficulty is 0.11 and no day is over 0.5.
+The rare line can be raised later.
+
+The reason this ADR gave for 0.7, that it kept `defenestrate` comfortably rare, no
+longer applies: `defenestrate` is a Bonus Word. `docility` (1.03), the anchor word,
+is a rare Answer and scores its length plus the rare bonus.
+
+The `answer-rare` sentinel (ADR-0015) is the one value boxed between the two lines,
+so it moved with them, from 0.6 to **1.1**. The build's sentinel check holds it
+there.
