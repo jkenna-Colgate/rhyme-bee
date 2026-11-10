@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from "vitest";
 import { parseLabelSet } from "../judgeLabels.ts";
-import { compareSignals, consequencesAt, drawSample, marksOf, placeLines, type Mark, type MarkedWord, type SittingDay } from "../tierSitting.ts";
+import { compareSignals, consequencesAt, drawSample, marksOf, placeLines, unscheduledPool, type Mark, type MarkedWord, type SittingDay } from "../tierSitting.ts";
 
 const day = (seedWord: string, answers: [string, number | null][], over: Partial<SittingDay> = {}): SittingDay => ({
   date: "2026-11-02",
@@ -269,5 +269,33 @@ describe("what the placed lines would do", () => {
 
   it("offers unscheduled Seed Words for a day under 10, nearest its weekday's Difficulty, each big enough with its Seed Word an Answer", () => {
     expect(at.replacements).toEqual([{ date: "2026-11-03", seedWord: "cup", candidates: ["moon", "bake"] }]);
+  });
+});
+
+describe("the unscheduled Seed pool (#311)", () => {
+  const five = (word: string) => ({ word, length: 5, knownness: 2 });
+  const family = (seedWord: string, rhymeKey: string, answers: string[]) => ({ seedWord, rhymeKey, seedKnownness: 2, answers: answers.map(five) });
+  const days: SittingDay[] = [
+    day("wall", [["ball", 2], ["call", 2]], { rhymeKey: "AA L" }),
+    day("hire", [["fire", 2], ["expire", 2]], { rhymeKey: "AY ER" }),
+  ];
+
+  it("keeps a family no scheduled day holds", () => {
+    const moon = family("moon", "UW N", ["soon", "tune"]);
+    expect(unscheduledPool([moon], days)).toEqual([moon]);
+  });
+
+  it("passes over a family on a Rhyme Key the Schedule holds", () => {
+    expect(unscheduledPool([family("ball", "AA L", ["wall", "call"])], days)).toEqual([]);
+  });
+
+  it("passes over a family whose Seed Word already holds a place under another Rhyme Key", () => {
+    // `wall` leads AA AH L as well as AA L, where it is scheduled.
+    expect(unscheduledPool([family("wall", "AA AH L", ["squall", "brawl"])], days)).toEqual([]);
+  });
+
+  it("passes over a family whose Puzzle a scheduled day already holds under another Rhyme Key spelling", () => {
+    // `expire` on AY R holds the Answers `hire` holds on AY ER: the same Puzzle in a second place.
+    expect(unscheduledPool([family("expire", "AY R", ["fire", "hire"])], days)).toEqual([]);
   });
 });

@@ -39,6 +39,7 @@ import {
   type MarkedWord,
   type PoolFamily,
   type SittingDay,
+  unscheduledPool,
 } from "../src/tierSitting.ts";
 import { indexArtifactPath, readIndexManifest } from "./indexArtifact.ts";
 import { sittingPage } from "./tierSittingPage.ts";
@@ -75,17 +76,17 @@ function scheduledDays(index: RhymeIndex): SittingDay[] {
 }
 
 /** The Seed pool's families that hold no place in the Schedule and whose Seed Word passes the Seed Word test. */
-function unscheduledPool(index: RhymeIndex, days: readonly SittingDay[]): PoolFamily[] {
-  const scheduled = new Set(days.map((d) => d.rhymeKey));
+function unscheduledFamilies(index: RhymeIndex, days: readonly SittingDay[]): PoolFamily[] {
   const families = index.families();
-  return playableSeeds(index)
-    .filter((f) => !scheduled.has(f.rhymeKey) && testSeedWord(index, f.representative, f.rhymeKey).passes)
+  const pool = playableSeeds(index)
+    .filter((f) => testSeedWord(index, f.representative, f.rhymeKey).passes)
     .map((f) => ({
       seedWord: f.representative,
       rhymeKey: f.rhymeKey,
       seedKnownness: index.tierOf(f.representative).knownness,
       answers: splitFamily(families.get(f.rhymeKey)!, f.representative).answers.map((a) => ({ word: a.word, length: a.length, knownness: a.knownness })),
     }));
+  return unscheduledPool(pool, days);
 }
 
 function draw(args: string[]) {
@@ -157,7 +158,7 @@ function place(args: string[]) {
   console.log(`  combined minus knownness: ${margin(signals.combinedOverKnownness.agreement)} in sample, ${margin(signals.combinedOverKnownness.heldOut)} held out`);
   console.log("  (the combined signal holds every knownness cut, so in sample it cannot lose; read the held-out margin)");
 
-  const pool = unscheduledPool(index, days);
+  const pool = unscheduledFamilies(index, days);
   const before = consequencesAt(today, { days, pool });
   const at = consequencesAt(placed.inForce, { days, pool });
   console.log(`\nat the placed lines, across ${days.length} scheduled days:`);
