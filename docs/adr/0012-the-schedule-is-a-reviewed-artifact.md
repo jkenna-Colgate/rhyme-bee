@@ -296,7 +296,7 @@ is still accepted on the terms of the 2026-10-11 amendment.
 
 ### Rejected
 
-**Re-deal the bands from the whole pool.** It would restore the bands across
+**Deal the Schedule again from the whole pool.** It would restore the bands across
 weeks as well as within them, and it moves Seed Words between weeks, so a player
 could meet a Puzzle again within a lap. The within-week ramp is what a player
 reads off the weekday.

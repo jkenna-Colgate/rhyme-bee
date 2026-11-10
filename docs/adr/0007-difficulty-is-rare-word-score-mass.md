@@ -123,10 +123,9 @@ placed by share keeps Difficulty in the range the Schedule was dealt in: at 1.27
 median day's Difficulty is 0.11 and none is over 0.5, where at 1.75 the median is
 0.34 and 39 days are over 0.5.
 
-Every day's Difficulty is re-measured at the new lines, as this ADR's Consequences
-say it must be. What that does to the ramp is the next question. As
-"downstream of `ScoringConfig`" predicts, no week of the 37 still runs Monday
-easiest to Sunday hardest at the new lines, and the weeks are re-sorted once, in #312
-(ADR-0012). Until then the ramp is a property of the deal that the moved line has
-broken, and the size band is advisory: 42 days hold fewer than 20 Answers and none
-fewer than 10.
+Every day's Difficulty was re-measured at the new lines, as this ADR's
+Consequences say it must be. As "downstream of `ScoringConfig`" predicts, no
+week of the 37 still ran Monday easiest to Sunday hardest at the new lines, so
+the weeks were re-sorted once, in #312 (ADR-0012), all but the week then in
+progress. The size band stays advisory: 42 days hold fewer than 20 Answers and
+none fewer than 10.
