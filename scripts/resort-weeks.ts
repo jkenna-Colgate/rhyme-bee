@@ -36,11 +36,17 @@ const after = resortWeeks(schedule, measured, today);
 const before = new Map(schedule.days.map((d) => [d.date, d]));
 const moved = after.days.filter((d) => before.get(d.date)!.seed !== d.seed);
 const weeksChanged = new Set(moved.map((d) => playedWeekOf(schedule, d.date)));
+// Days whose recorded figures change, moved or not: the week holding today keeps its order and is re-recorded.
+const refigured = after.days.filter((d) => {
+  const was = before.get(d.date)!;
+  return was.answerCount !== d.answerCount || was.difficulty !== d.difficulty;
+});
 
 console.log(
   `Re-sort at Answer line ${lines.answerLine}, rare line ${lines.rareLine}, holding played week ${playedWeekOf(schedule, today) + 1} (${today}): ` +
     `${moved.length} day(s) take another Seed Word, in ${weeksChanged.size} of ${(after.days.length - after.days.findIndex((d) => d.date === after.lapStart)) / DAYS_PER_WEEK} week(s).`,
 );
+console.log(`${refigured.length} day(s) record new figures.`);
 for (const d of moved) {
   const was = before.get(d.date)!;
   const from = schedule.days.find((o) => o.seed === d.seed && o.rhymeKey === d.rhymeKey)!;
@@ -70,8 +76,9 @@ const collisions = placeCollisions(after.days.filter((d) => d.date >= after.lapS
 console.log(`One place per Seed Word, Rhyme Key and Puzzle: ${collisions.length === 0 ? "holds" : `${collisions.length} collision(s)`}.`);
 console.log(`The lap is whole weeks: ${parseSchedule({ ...raw, days: after.days }) === null ? "NO" : "yes"}.`);
 
-if (write && moved.length > 0) {
+const changed = moved.length > 0 || refigured.length > 0;
+if (write && changed) {
   console.log(`Wrote ${writeScheduleFile(raw, { days: after.days })}.`);
-} else if (moved.length > 0) {
+} else if (changed) {
   console.log("Nothing written. Pass --write to write data/schedule.json.");
 }

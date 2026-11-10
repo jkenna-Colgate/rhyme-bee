@@ -281,8 +281,10 @@ first six days, and it was sorted as one. No Seed Word joined or left the
 Schedule, so the Seed pool was not read again and no Batch was needed. Each day
 of a re-sorted week records the figures it was sorted on.
 
-**The week holding the date of the run (2026-11-09 to 2026-11-15) was left
-exactly as it was,** so no player meets a Seed Word already played that week.
+**The week holding the date of the run (2026-11-09 to 2026-11-15) kept its
+order,** so no player meets a Seed Word already played that week. Its days
+record their figures at the shipped lines like every other day's, without
+moving.
 Weeks already played this lap were re-sorted too, and come round in ramp order
 on the next lap. 208 of the lap's 259 days took another Seed Word, in 36 weeks.
 A Seed Word moved by up to six days comes round up to six days sooner than a

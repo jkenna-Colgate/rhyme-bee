@@ -71,15 +71,30 @@ describe("re-sorting the weeks", () => {
     expect(seedsFrom(after, "2026-08-10", "2026-08-16")).toEqual(["s7", "s8", "s9", "s10", "s11", "s12", "s6"]);
   });
 
-  it("leaves the week holding today exactly as it is, and re-sorts the weeks already played this lap", () => {
+  it("leaves the week holding today in its order, and re-sorts the weeks already played this lap", () => {
     const before = schedule();
     const after = resortWeeks(before, measured(before, (s) => (s === "spare" ? 0 : -n(s))), "2026-08-12");
 
-    expect(after.days.filter((d) => d.date >= "2026-08-10" && d.date <= "2026-08-16")).toEqual(
-      before.days.filter((d) => d.date >= "2026-08-10" && d.date <= "2026-08-16"),
-    );
+    expect(seedsFrom(after, "2026-08-10", "2026-08-16")).toEqual(["s6", "s7", "s8", "s9", "s10", "s11", "s12"]);
     // The week of 2026-08-17 is ahead of today, and re-sorted.
     expect(seedsFrom(after, "2026-08-17", "2026-08-23")).toEqual(["s19", "s18", "s17", "s16", "s15", "s14", "s13"]);
+  });
+
+  it("records the week holding today at the figures measured now, as every other week is", () => {
+    const before = schedule();
+    // The week of 2026-08-10 holds today; its days were dealt at 30 Answers and Difficulty 0.
+    const after = resortWeeks(before, measured(before, (s) => (s === "spare" ? 0 : n(s) / 100 + 0.00001)), "2026-08-12");
+
+    expect(after.days.find((d) => d.date === "2026-08-10")).toEqual({
+      date: "2026-08-10",
+      weekday: "Mon",
+      week: 2,
+      seed: "s6",
+      rhymeKey: "K s6",
+      answerCount: 40,
+      difficulty: 0.06,
+    });
+    expect(after.days.find((d) => d.date === "2026-08-16")).toMatchObject({ seed: "s12", answerCount: 40, difficulty: 0.12 });
   });
 
   it("re-sorts the week that opens the next lap as it is played: the last listed Monday, then the lap's first six", () => {

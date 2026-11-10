@@ -950,7 +950,7 @@
       "seed": "longstanding",
       "rhymeKey": "AE N D AH NG",
       "answerCount": 22,
-      "difficulty": 0
+      "difficulty": 0.0491
     },
     {
       "date": "2026-11-10",
@@ -958,8 +958,8 @@
       "week": 15,
       "seed": "bark",
       "rhymeKey": "AA R K",
-      "answerCount": 34,
-      "difficulty": 0.0348
+      "answerCount": 30,
+      "difficulty": 0.075
     },
     {
       "date": "2026-11-11",
@@ -976,8 +976,8 @@
       "week": 15,
       "seed": "feet",
       "rhymeKey": "IY T",
-      "answerCount": 79,
-      "difficulty": 0.1041
+      "answerCount": 72,
+      "difficulty": 0.1093
     },
     {
       "date": "2026-11-13",
@@ -985,8 +985,8 @@
       "week": 15,
       "seed": "cool",
       "rhymeKey": "UW L",
-      "answerCount": 88,
-      "difficulty": 0.1479
+      "answerCount": 37,
+      "difficulty": 0.1025
     },
     {
       "date": "2026-11-14",
@@ -994,8 +994,8 @@
       "week": 15,
       "seed": "would",
       "rhymeKey": "UH D",
-      "answerCount": 54,
-      "difficulty": 0.1822
+      "answerCount": 39,
+      "difficulty": 0.0952
     },
     {
       "date": "2026-11-15",
@@ -1003,8 +1003,8 @@
       "week": 15,
       "seed": "guitar",
       "rhymeKey": "AA R",
-      "answerCount": 63,
-      "difficulty": 0.2326
+      "answerCount": 50,
+      "difficulty": 0.1689
     },
     {
       "date": "2026-11-16",
