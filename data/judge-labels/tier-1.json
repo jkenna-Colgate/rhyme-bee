@@ -1,0 +1,2120 @@
+{
+  "set": "tier-1",
+  "question": "tier",
+  "labelledBy": [
+    "jkenna"
+  ],
+  "labelledOn": "2026-11-10",
+  "blind": true,
+  "rules": [
+    "#307"
+  ],
+  "tuning": false,
+  "notes": [
+    "The Tier sitting (#309): Answers drawn from the scheduled days, about 15 per 0.25 band of knownness, marked with knownness hidden.",
+    "easy: most players would think of it. hard-find: some would, with effort. bonus: a real word nobody hunting rhymes would come up with.",
+    "Drawn from index 3eb71c455131cb0a with seed 309."
+  ],
+  "pairs": [
+    {
+      "word": "phonic",
+      "seedWord": "chronic",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA N AH K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "disaffirm",
+      "seedWord": "firm",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "ER M",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "weeper",
+      "seedWord": "gatekeeper",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IY P ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "asymptotic",
+      "seedWord": "idiotic",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA D AH K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "son",
+      "seedWord": "one",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AH N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "confer",
+      "seedWord": "blur",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "kneader",
+      "seedWord": "meter",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IY D ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "proletarian",
+      "seedWord": "humanitarian",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH R IY AH N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "subheading",
+      "seedWord": "bloodletting",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH D AH NG",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "unedifying",
+      "seedWord": "highflying",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY AH NG",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "proselytizer",
+      "seedWord": "visor",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY Z ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "lockout",
+      "seedWord": "about",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AW T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "reprimanding",
+      "seedWord": "longstanding",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE N D AH NG",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "liberalizer",
+      "seedWord": "visor",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY Z ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "milled",
+      "seedWord": "build",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH L D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "cablegram",
+      "seedWord": "damn",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE M",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "volunteer",
+      "seedWord": "engineer",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH R",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "repression",
+      "seedWord": "session",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH SH AH N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "warts",
+      "seedWord": "quartz",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R T S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "ductility",
+      "seedWord": "facility",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH L AH D IY",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "waterfalls",
+      "seedWord": "dolls",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA L Z",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "install",
+      "seedWord": "wall",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "inlayer",
+      "seedWord": "mayor",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "connectivity",
+      "seedWord": "productivity",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH V AH D IY",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "coon",
+      "seedWord": "noon",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "UW N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "send",
+      "seedWord": "depend",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH N D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "dope",
+      "seedWord": "soap",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW P",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "sprat",
+      "seedWord": "cat",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "occident",
+      "seedWord": "event",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH N T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "unsnapped",
+      "seedWord": "adapt",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE P T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "bots",
+      "seedWord": "ersatz",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA T S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "food",
+      "seedWord": "exclude",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "UW D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "bankbook",
+      "seedWord": "hook",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "UH K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "incase",
+      "seedWord": "base",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "racetracks",
+      "seedWord": "wax",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE K S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "instilling",
+      "seedWord": "schilling",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH L AH NG",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "bloodstone",
+      "seedWord": "loan",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "firebrand",
+      "seedWord": "band",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE N D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "transect",
+      "seedWord": "deflect",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH K T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "outliner",
+      "seedWord": "diner",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY N ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "unequipped",
+      "seedWord": "script",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH P T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "quintile",
+      "seedWord": "smile",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "judgmental",
+      "seedWord": "incidental",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH N T AH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "collegiality",
+      "seedWord": "hospitality",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE L AH D IY",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "antidrug",
+      "seedWord": "mug",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AH G",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "corollaries",
+      "seedWord": "miniseries",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH R IY Z",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "whence",
+      "seedWord": "expense",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH N S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "handhold",
+      "seedWord": "hold",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW L D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "anthill",
+      "seedWord": "bill",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "groundnut",
+      "seedWord": "hut",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AH T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "guarantor",
+      "seedWord": "core",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "reed",
+      "seedWord": "succeed",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IY D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "cyclotron",
+      "seedWord": "lawn",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "hagfish",
+      "seedWord": "dish",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH SH",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "ganglion",
+      "seedWord": "lawn",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "baguette",
+      "seedWord": "let",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "decided",
+      "seedWord": "lopsided",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY D AH D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "showboat",
+      "seedWord": "float",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "hoeing",
+      "seedWord": "ongoing",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW AH NG",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "tangential",
+      "seedWord": "confidential",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH N SH AH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "yell",
+      "seedWord": "motel",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "toward",
+      "seedWord": "sword",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "disendow",
+      "seedWord": "cow",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AW",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "legionnaires",
+      "seedWord": "airs",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH R Z",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "skeeter",
+      "seedWord": "meter",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IY D ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "wrack",
+      "seedWord": "back",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "electrifier",
+      "seedWord": "hire",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "interplant",
+      "seedWord": "plant",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE N T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "enfranchiser",
+      "seedWord": "visor",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY Z ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "deplore",
+      "seedWord": "core",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "pawed",
+      "seedWord": "nod",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "coenzyme",
+      "seedWord": "time",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY M",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "nonelection",
+      "seedWord": "rejection",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH K SH AH N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "prepped",
+      "seedWord": "slept",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH P T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "polestar",
+      "seedWord": "guitar",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA R",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "gill",
+      "seedWord": "bill",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "fourfold",
+      "seedWord": "hold",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW L D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "pall",
+      "seedWord": "wall",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "derelict",
+      "seedWord": "addict",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH K T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "asymptote",
+      "seedWord": "float",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "encased",
+      "seedWord": "chaste",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY S T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "mustachioed",
+      "seedWord": "explode",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "subcontract",
+      "seedWord": "act",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE K T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "openwork",
+      "seedWord": "jerk",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "ER K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "lodestar",
+      "seedWord": "guitar",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA R",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "spar",
+      "seedWord": "guitar",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA R",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "rearguard",
+      "seedWord": "guard",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA R D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "preconcert",
+      "seedWord": "skirt",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "ER T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "attester",
+      "seedWord": "investor",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH S T ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "docility",
+      "seedWord": "facility",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH L AH D IY",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "skewed",
+      "seedWord": "exclude",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "UW D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "swearer",
+      "seedWord": "error",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH R ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "undertake",
+      "seedWord": "fake",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "caprice",
+      "seedWord": "police",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IY S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "ideologist",
+      "seedWord": "microbiologist",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA L AH JH AH S T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "stinkbug",
+      "seedWord": "mug",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AH G",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "pretax",
+      "seedWord": "wax",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE K S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "landslip",
+      "seedWord": "ship",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH P",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "remand",
+      "seedWord": "band",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE N D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "teem",
+      "seedWord": "steam",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IY M",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "mammography",
+      "seedWord": "pornography",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA G R AH F IY",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "doubloon",
+      "seedWord": "noon",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "UW N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "met",
+      "seedWord": "let",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "hirsute",
+      "seedWord": "shoot",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "UW T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "refrain",
+      "seedWord": "gain",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "extolled",
+      "seedWord": "hold",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW L D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "fag",
+      "seedWord": "rag",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE G",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "skateboarder",
+      "seedWord": "quarter",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R D ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "tubule",
+      "seedWord": "cool",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "UW L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "interlope",
+      "seedWord": "soap",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OW P",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "inaction",
+      "seedWord": "contraction",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE K SH AH N",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "commodore",
+      "seedWord": "core",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "readership",
+      "seedWord": "ship",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH P",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "woodlot",
+      "seedWord": "plot",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "inept",
+      "seedWord": "slept",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH P T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "unproblematic",
+      "seedWord": "fanatic",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE D AH K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "six",
+      "seedWord": "mix",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH K S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "amidships",
+      "seedWord": "eclipse",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH P S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "logjam",
+      "seedWord": "damn",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE M",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "clod",
+      "seedWord": "nod",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "martingale",
+      "seedWord": "male",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "flail",
+      "seedWord": "male",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "exporter",
+      "seedWord": "quarter",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R D ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "laugher",
+      "seedWord": "locker",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA K ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "needlelike",
+      "seedWord": "like",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AY K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "ovoid",
+      "seedWord": "steroid",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "OY D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "shortstop",
+      "seedWord": "hop",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA P",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "crustaceous",
+      "seedWord": "spacious",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY SH AH S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "distill",
+      "seedWord": "bill",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "flatland",
+      "seedWord": "band",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE N D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "diagrammatic",
+      "seedWord": "fanatic",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE D AH K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "gift",
+      "seedWord": "drift",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH F T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "ampere",
+      "seedWord": "blur",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "ecstatic",
+      "seedWord": "fanatic",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE D AH K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "repack",
+      "seedWord": "back",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "prepossess",
+      "seedWord": "chess",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "chinks",
+      "seedWord": "sphinx",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH NG K S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "spiel",
+      "seedWord": "meal",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IY L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "retrofits",
+      "seedWord": "blitz",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH T S",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "bricklayer",
+      "seedWord": "mayor",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EY ER",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "thou",
+      "seedWord": "cow",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AW",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "crosstalk",
+      "seedWord": "mock",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "georgette",
+      "seedWord": "let",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "pursed",
+      "seedWord": "thirst",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "ER S T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "hard-find",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "hares",
+      "seedWord": "airs",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "EH R Z",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "curatorial",
+      "seedWord": "tutorial",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AO R IY AH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "attack",
+      "seedWord": "back",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE K",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "etymological",
+      "seedWord": "technological",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AA JH AH K AH L",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "nonskid",
+      "seedWord": "grid",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "IH D",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "bonus",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    },
+    {
+      "word": "cast",
+      "seedWord": "vast",
+      "seedReading": null,
+      "rhymeKeyWhenCut": "AE S T",
+      "verdicts": [
+        {
+          "labeller": "jkenna",
+          "verdict": "easy",
+          "on": "2026-11-10",
+          "blind": true
+        }
+      ]
+    }
+  ]
+}
