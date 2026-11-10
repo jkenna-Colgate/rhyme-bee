@@ -524,6 +524,10 @@ skier S K IY1 ER0
 noir N W AA1 R
 # boudoir (#253): upstream `D OY2 R` is the same mistake as `noir`; it is "BOO-dwahr", with `car` (#232).
 boudoir B UW1 D W AA2 R
+# miniseries (#311): upstream reads `S EH2 R IY0 Z`, which put it with `corollaries`; it is
+# "MIH-nee-seer-eez", with `series`, as the derived `subseries` already is (#310).
+miniseries M IH1 N IY0 S IH2 R IY0 Z
+miniseries(1) M IH1 N IH0 S IH2 R IY0 Z
 
 # --- Corrections (a beat on the last syllable that CMUdict does not mark, #233) ---
 #
