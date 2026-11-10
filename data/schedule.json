@@ -254,10 +254,10 @@
       "date": "2026-08-24",
       "weekday": "Mon",
       "week": 4,
-      "seed": "laird",
+      "seed": "aired",
       "rhymeKey": "EH R D",
-      "answerCount": 34,
-      "difficulty": 0
+      "answerCount": 33,
+      "difficulty": 0.0622
     },
     {
       "date": "2026-08-25",
@@ -938,10 +938,10 @@
       "date": "2026-11-08",
       "weekday": "Sun",
       "week": 14,
-      "seed": "schilling",
+      "seed": "filling",
       "rhymeKey": "IH L AH NG",
-      "answerCount": 32,
-      "difficulty": 0.2266
+      "answerCount": 24,
+      "difficulty": 0.0498
     },
     {
       "date": "2026-11-09",
@@ -965,10 +965,10 @@
       "date": "2026-11-11",
       "weekday": "Wed",
       "week": 15,
-      "seed": "fetid",
+      "seed": "regretted",
       "rhymeKey": "EH D AH D",
-      "answerCount": 34,
-      "difficulty": 0.0707
+      "answerCount": 29,
+      "difficulty": 0.205
     },
     {
       "date": "2026-11-12",
@@ -1280,10 +1280,10 @@
       "date": "2026-12-16",
       "weekday": "Wed",
       "week": 20,
-      "seed": "grayling",
+      "seed": "sailing",
       "rhymeKey": "EY L AH NG",
-      "answerCount": 33,
-      "difficulty": 0.0582
+      "answerCount": 31,
+      "difficulty": 0.0898
     },
     {
       "date": "2026-12-17",
@@ -2225,10 +2225,10 @@
       "date": "2027-03-31",
       "weekday": "Wed",
       "week": 35,
-      "seed": "ersatz",
+      "seed": "plots",
       "rhymeKey": "AA T S",
-      "answerCount": 46,
-      "difficulty": 0.0814
+      "answerCount": 41,
+      "difficulty": 0.1475
     },
     {
       "date": "2027-04-01",
@@ -2306,10 +2306,10 @@
       "date": "2027-04-09",
       "weekday": "Fri",
       "week": 36,
-      "seed": "messieurs",
+      "seed": "hers",
       "rhymeKey": "ER Z",
-      "answerCount": 32,
-      "difficulty": 0.1213
+      "answerCount": 26,
+      "difficulty": 0.0317
     },
     {
       "date": "2027-04-10",
