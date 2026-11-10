@@ -65,10 +65,14 @@ function scheduledDays(index: RhymeIndex): SittingDay[] {
   return sittingDays(index, schedule.days);
 }
 
-/** The Seed pool's families that hold no place in the Schedule and whose Seed Word passes the Seed Word test. */
-function unscheduledFamilies(index: RhymeIndex, days: readonly SittingDay[]): PoolFamily[] {
+/**
+ * The Seed pool's families whose Seed Word passes the Seed Word test, each with
+ * its Answers read off the built index for measuring. Scheduled or not:
+ * `unscheduledPool` is the filter that keeps only those holding no place.
+ */
+function passingPoolFamilies(index: RhymeIndex): PoolFamily[] {
   const families = index.families();
-  const pool = playableSeeds(index)
+  return playableSeeds(index)
     .filter((f) => testSeedWord(index, f.representative, f.rhymeKey).passes)
     .map((f) => ({
       seedWord: f.representative,
@@ -76,7 +80,6 @@ function unscheduledFamilies(index: RhymeIndex, days: readonly SittingDay[]): Po
       seedKnownness: index.tierOf(f.representative).knownness,
       answers: splitFamily(families.get(f.rhymeKey)!, f.representative).answers.map((a) => ({ word: a.word, length: a.length, knownness: a.knownness })),
     }));
-  return unscheduledPool(pool, days);
 }
 
 function draw(args: string[]) {
@@ -148,7 +151,7 @@ function place(args: string[]) {
   console.log(`  combined minus knownness: ${margin(signals.combinedOverKnownness.agreement)} in sample, ${margin(signals.combinedOverKnownness.heldOut)} held out`);
   console.log("  (the combined signal holds every knownness cut, so in sample it cannot lose; read the held-out margin)");
 
-  const pool = unscheduledFamilies(index, days);
+  const pool = unscheduledPool(passingPoolFamilies(index), days);
   const before = consequencesAt(today, { days, pool });
   const at = consequencesAt(placed.inForce, { days, pool });
   console.log(`\nat the placed lines, across ${days.length} scheduled days:`);

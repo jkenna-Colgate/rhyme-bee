@@ -462,11 +462,12 @@ const puzzleWords = (seedWord: string, answers: readonly SittingAnswer[]): strin
   [seedWord, ...answers.map((a) => a.word)].sort().join(" ");
 
 /**
- * The Seed pool's families that hold no place in the Schedule: on a Rhyme Key no
- * day holds, led by a word no day is seeded with, and with a Puzzle no day holds
- * under another spelling of its Rhyme Key (Continuity's one-place rule). `wall`
- * leads AA AH L as well as the AA L it is scheduled on, and `expire` on AY R holds
- * the Answers `hire` holds on AY ER; neither is free to give a day (#311).
+ * Of the Seed pool's `families`, those that hold no place among the scheduled
+ * `days`: on a Rhyme Key no day holds, led by a word no day is seeded with,
+ * and with a Puzzle no day holds under another spelling of its Rhyme Key
+ * (Continuity's one-place rule). `wall` leads AA AH L as well as the AA L it is
+ * scheduled on, and `expire` on AY R holds the Answers `hire` holds on AY ER;
+ * neither is free to give a day (#311).
  */
 export function unscheduledPool(families: readonly PoolFamily[], days: readonly SittingDay[]): PoolFamily[] {
   const keys = new Set(days.map((d) => d.rhymeKey));
