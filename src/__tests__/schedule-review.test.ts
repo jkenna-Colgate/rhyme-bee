@@ -245,15 +245,21 @@ describe("the drift check", () => {
     }
   });
 
-  it("holds every committed day inside the bands it was dealt from, except the ones a repair moved out", () => {
+  it("holds every committed day inside the bands it was dealt from, except the ones the moved lines took under the size band", () => {
     // This is the baseline the check is read against: anything new in it is a
-    // real change. The Continuity repair (#256) re-records a repaired day's
-    // figures without recomputing the band, so a day it moved can sit outside.
-    // curl (2027-04-15) went from 20 Answers to 14 when its family split.
+    // real change. The re-sort of the weeks (#312) recorded each day's figures
+    // at the moved Answer line, where 42 days hold fewer than the band's 20
+    // Answers. #307 accepts a day of 10 to 19, so every one of them is
+    // outside on its Answer count alone, and none under 10.
     const drifted = schedule.days
-      .filter((day) => checkDayDrift(day, asRecorded(day), bands).drifted)
-      .map((day) => day.date);
-    expect(drifted).toEqual(["2027-04-15"]);
+      .map((day) => checkDayDrift(day, asRecorded(day), bands))
+      .filter((drift) => drift.drifted);
+    expect(drifted).toHaveLength(42);
+    for (const drift of drifted) {
+      expect(drift.reasons).toEqual(["answer-count-out-of-band"]);
+      expect(drift.recorded.answerCount).toBeGreaterThanOrEqual(10);
+      expect(drift.recorded.answerCount).toBeLessThan(20);
+    }
   });
 
   it("constrains only the size band when the artifact records no weekday for it", () => {

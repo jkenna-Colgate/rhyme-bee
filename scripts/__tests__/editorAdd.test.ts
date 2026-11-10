@@ -471,11 +471,11 @@ describe("an add aimed at a date past the first lap (#257)", () => {
   )!;
 
   it("lands on the Rhyme Key of the day the date repeats", () => {
-    // Tuesday 2027-04-20 repeats Tuesday 2026-08-04, the boulder Puzzle.
+    // Tuesday 2027-04-20 repeats Tuesday 2026-08-04, the cage Puzzle.
     expect(targetIn(schedule, "2027-04-20")).toEqual({
-      target: "OW L D ER",
-      provenance: "2027-04-20, the boulder Puzzle",
-      seed: "boulder",
+      target: "EY JH",
+      provenance: "2027-04-20, the cage Puzzle",
+      seed: "cage",
     });
     expect(targetIn(schedule, "2027-04-20")?.target).toBe(targetIn(schedule, "2026-08-04")?.target);
   });

@@ -64,8 +64,8 @@ describe("a date resolves to that day's Seed Word, pinned to its Rhyme Key", () 
   });
 
   it("resolves a date in the middle to that day's Puzzle and no other", () => {
-    expect(seedForDate(schedule, "2026-08-04")).toEqual({ word: "boulder", rhymeKey: "OW L D ER" });
-    expect(seedForDate(schedule, "2026-12-11")).toEqual({ word: "flex", rhymeKey: "EH K S" });
+    expect(seedForDate(schedule, "2026-08-04")).toEqual({ word: "cage", rhymeKey: "EY JH" });
+    expect(seedForDate(schedule, "2026-12-11")).toEqual({ word: "tracker", rhymeKey: "AE K ER" });
   });
 
   it("pins the Seed Word to the schedule's Rhyme Key rather than leaving it raw", () => {
@@ -94,26 +94,26 @@ describe("the Schedule loops: a date past the last listed day repeats a lap earl
   // whole weeks from Tuesday 2026-08-04 to Monday 2027-04-19. `lopsided`, on
   // 2026-08-03, falls outside it and is a spare.
   const schedule = parseSchedule(artifact);
-  const boulder = { word: "boulder", rhymeKey: "OW L D ER" };
-  const smile = { word: "smile", rhymeKey: "AY L" };
+  const cage = { word: "cage", rhymeKey: "EY JH" };
+  const fake = { word: "fake", rhymeKey: "EY K" };
 
   it("records the date the lap in progress began", () => {
     expect(schedule?.lapStart).toBe("2026-08-04");
   });
 
   it("resolves the lap's first day and its last day as listed", () => {
-    expect(seedForDate(schedule, "2026-08-04")).toEqual(boulder);
-    expect(seedForDate(schedule, "2027-04-19")).toEqual(smile);
+    expect(seedForDate(schedule, "2026-08-04")).toEqual(cage);
+    expect(seedForDate(schedule, "2027-04-19")).toEqual(fake);
   });
 
   it("shows on Tuesday 2027-04-20 the Seed Word of Tuesday 2026-08-04", () => {
-    expect(seedForDate(schedule, "2027-04-20")).toEqual(boulder);
+    expect(seedForDate(schedule, "2027-04-20")).toEqual(cage);
   });
 
   it("wraps again two laps on, on the same weekday", () => {
-    expect(seedForDate(schedule, "2028-01-04")).toEqual(boulder);
-    expect(seedForDate(schedule, "2028-05-12")).toEqual({ word: "flex", rhymeKey: "EH K S" });
-    expect(seedForDate(schedule, "2028-09-18")).toEqual(smile);
+    expect(seedForDate(schedule, "2028-01-04")).toEqual(cage);
+    expect(seedForDate(schedule, "2028-05-12")).toEqual({ word: "tracker", rhymeKey: "AE K ER" });
+    expect(seedForDate(schedule, "2028-09-18")).toEqual(fake);
   });
 
   it("leaves the spare before the lap out of every later lap", () => {
@@ -152,14 +152,14 @@ describe("a listed day's next date on or after today (#257)", () => {
   const day = (seed: string) => schedule.days.find((d) => d.seed === seed)!;
 
   it("is the listed date while that is still ahead, or is today", () => {
-    expect(nextDateOf(schedule, day("boulder"), "2026-08-01")).toBe("2026-08-04");
-    expect(nextDateOf(schedule, day("boulder"), "2026-08-04")).toBe("2026-08-04");
+    expect(nextDateOf(schedule, day("cage"), "2026-08-01")).toBe("2026-08-04");
+    expect(nextDateOf(schedule, day("cage"), "2026-08-04")).toBe("2026-08-04");
   });
 
   it("is a lap or more on once the listed date has gone", () => {
-    expect(nextDateOf(schedule, day("boulder"), "2026-08-05")).toBe("2027-04-20");
-    expect(nextDateOf(schedule, day("smile"), "2027-04-20")).toBe("2028-01-03");
-    expect(nextDateOf(schedule, day("boulder"), "2028-01-04")).toBe("2028-01-04");
+    expect(nextDateOf(schedule, day("cage"), "2026-08-05")).toBe("2027-04-20");
+    expect(nextDateOf(schedule, day("fake"), "2027-04-20")).toBe("2028-01-03");
+    expect(nextDateOf(schedule, day("cage"), "2028-01-04")).toBe("2028-01-04");
   });
 
   it("is none for the spare before the lap once its date has gone", () => {
@@ -169,7 +169,7 @@ describe("a listed day's next date on or after today (#257)", () => {
 
   it("is none for a past day of a Schedule that does not loop", () => {
     const { lapStart: _, ...once } = schedule;
-    expect(nextDateOf(once, day("boulder"), "2026-08-05")).toBeNull();
+    expect(nextDateOf(once, day("cage"), "2026-08-05")).toBeNull();
   });
 });
 

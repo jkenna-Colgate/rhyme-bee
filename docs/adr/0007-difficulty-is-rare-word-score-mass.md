@@ -1,6 +1,6 @@
 # Difficulty is the share of a Puzzle's Score locked in rare words, and the week ramps up it
 
-**Status:** amended 2026-11-10. The rare line Difficulty is measured on is 1.278, placed to keep the rare share of Answers at 9%, above an Answer line of 1.00. Every day's Difficulty was re-measured, and no week holds the ramp until the weeks are re-sorted (#312).
+**Status:** amended 2026-11-10. The rare line Difficulty is measured on is 1.278, placed to keep the rare share of Answers at 9%, above an Answer line of 1.00. Every day's Difficulty was re-measured, and each week was then re-sorted once to hold the ramp again (#312, ADR-0012 amended 2026-11-10).
 
 Within the playable size band, a Puzzle's **Difficulty** is the fraction of its
 maximum achievable Score that lives in **rare** Answers:
