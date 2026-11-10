@@ -254,10 +254,10 @@
       "date": "2026-08-24",
       "weekday": "Mon",
       "week": 4,
-      "seed": "aired",
-      "rhymeKey": "EH R D",
-      "answerCount": 33,
-      "difficulty": 0.0622
+      "seed": "shatter",
+      "rhymeKey": "AE D ER",
+      "answerCount": 20,
+      "difficulty": 0.1034
     },
     {
       "date": "2026-08-25",
@@ -938,10 +938,10 @@
       "date": "2026-11-08",
       "weekday": "Sun",
       "week": 14,
-      "seed": "filling",
-      "rhymeKey": "IH L AH NG",
-      "answerCount": 24,
-      "difficulty": 0.0498
+      "seed": "sign",
+      "rhymeKey": "AY N",
+      "answerCount": 100,
+      "difficulty": 0.0724
     },
     {
       "date": "2026-11-09",
@@ -1280,10 +1280,10 @@
       "date": "2026-12-16",
       "weekday": "Wed",
       "week": 20,
-      "seed": "sailing",
-      "rhymeKey": "EY L AH NG",
-      "answerCount": 31,
-      "difficulty": 0.0898
+      "seed": "quite",
+      "rhymeKey": "AY T",
+      "answerCount": 118,
+      "difficulty": 0.0723
     },
     {
       "date": "2026-12-17",
@@ -1766,10 +1766,10 @@
       "date": "2027-02-08",
       "weekday": "Mon",
       "week": 28,
-      "seed": "carries",
-      "rhymeKey": "EH R IY Z",
-      "answerCount": 55,
-      "difficulty": 0.1207
+      "seed": "arcade",
+      "rhymeKey": "EY D",
+      "answerCount": 108,
+      "difficulty": 0.0936
     },
     {
       "date": "2027-02-09",
@@ -2225,10 +2225,10 @@
       "date": "2027-03-31",
       "weekday": "Wed",
       "week": 35,
-      "seed": "plots",
-      "rhymeKey": "AA T S",
-      "answerCount": 41,
-      "difficulty": 0.1475
+      "seed": "creator",
+      "rhymeKey": "EY D ER",
+      "answerCount": 115,
+      "difficulty": 0.0436
     },
     {
       "date": "2027-04-01",
@@ -2306,10 +2306,10 @@
       "date": "2027-04-09",
       "weekday": "Fri",
       "week": 36,
-      "seed": "hers",
-      "rhymeKey": "ER Z",
-      "answerCount": 26,
-      "difficulty": 0.0317
+      "seed": "seen",
+      "rhymeKey": "IY N",
+      "answerCount": 99,
+      "difficulty": 0.2343
     },
     {
       "date": "2027-04-10",
