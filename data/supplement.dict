@@ -1635,3 +1635,7 @@ wetted W EH1 T AH0 D
 sledded S L EH1 D IH0 D
 # treaded (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-04) ruled it a Rhyme for `fetid` on EH D AH D at high confidence.
 treaded T R EH1 D IH0 D
+# twats (#311): said both "twots" and, as often in American speech, with the vowel of `cat`.
+# Upstream holds only the first; both readings are written so the second is appended, not swapped in.
+twats T W AA1 T S
+twats(2) T W AE1 T S
