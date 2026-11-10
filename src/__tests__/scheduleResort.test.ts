@@ -5,18 +5,21 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { addDays, parseSchedule, seedForDate, type Schedule, type ScheduleDay, type Weekday } from "../schedule.ts";
+import {
+  addDays,
+  daysBetween,
+  DAYS_PER_WEEK,
+  parseSchedule,
+  seedForDate,
+  weekdayOf,
+  type Schedule,
+  type ScheduleDay,
+} from "../schedule.ts";
 import { resortWeeks, type Measured } from "../scheduleResort.ts";
 
-const WEEKDAYS: Weekday[] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-function weekdayOfDate(date: string): Weekday {
-  return WEEKDAYS[(new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7]!;
-}
-
 function day(date: string, seed: string): ScheduleDay {
-  const offset = Math.round((Date.parse(`${date}T00:00:00Z`) - Date.parse("2026-08-03T00:00:00Z")) / 86_400_000);
-  return { date, weekday: weekdayOfDate(date), week: Math.floor(offset / 7) + 1, seed, rhymeKey: `K ${seed}`, answerCount: 30, difficulty: 0 };
+  const week = Math.floor(daysBetween("2026-08-03", date) / DAYS_PER_WEEK) + 1;
+  return { date, weekday: weekdayOf(date), week, seed, rhymeKey: `K ${seed}`, answerCount: 30, difficulty: 0 };
 }
 
 /**

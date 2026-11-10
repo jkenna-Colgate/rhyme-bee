@@ -14,7 +14,7 @@
  */
 
 import { placeCollisions } from "../src/continuity.ts";
-import { localCalendarDate, parseSchedule, weekdayOf, WEEKDAYS, type Weekday } from "../src/schedule.ts";
+import { DAYS_PER_WEEK, localCalendarDate, parseSchedule, weekdayOf, WEEKDAYS, type Weekday } from "../src/schedule.ts";
 import { playedWeekOf, resortWeeks, type Measured } from "../src/scheduleResort.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { consequencesAt } from "../src/tierSitting.ts";
@@ -39,7 +39,7 @@ const weeksChanged = new Set(moved.map((d) => playedWeekOf(schedule, d.date)));
 
 console.log(
   `Re-sort at Answer line ${lines.answerLine}, rare line ${lines.rareLine}, holding played week ${playedWeekOf(schedule, today) + 1} (${today}): ` +
-    `${moved.length} day(s) take another Seed Word, in ${weeksChanged.size} of ${(after.days.length - after.days.findIndex((d) => d.date === after.lapStart)) / 7} week(s).`,
+    `${moved.length} day(s) take another Seed Word, in ${weeksChanged.size} of ${(after.days.length - after.days.findIndex((d) => d.date === after.lapStart)) / DAYS_PER_WEEK} week(s).`,
 );
 for (const d of moved) {
   const was = before.get(d.date)!;
@@ -48,6 +48,9 @@ for (const d of moved) {
 }
 
 // Each played week of the lap, Monday first, measured afresh off the re-sorted days.
+// Not `consequencesAt`'s `weeksOutOfRamp`, which groups by the listed `week`
+// number in date order: the week that opens each lap is played as the last
+// listed Monday then the lap's first six days, which no listed week holds.
 const remeasured = consequencesAt(lines, { days: sittingDays(index, after.days), pool: [] }).days;
 const played = new Map<number, { weekday: string; difficulty: number }[]>();
 for (const d of remeasured.filter((d) => d.date >= after.lapStart!)) {
