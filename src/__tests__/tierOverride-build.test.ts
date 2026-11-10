@@ -40,7 +40,7 @@ function row(over: Partial<TierOverrideRow>): string {
 
 describe("the override layer, merged into the composed build", () => {
   it("tiers an overridden word to Bonus, whatever its measured prevalence said", () => {
-    // collate measures 1.8, which is an Answer at the shipped Answer line —
+    // collate measures 1.8, which is an Answer at the shipped Answer line, so
     // the override is the thing that has to move it.
     const index = makeTestIndex({
       tierOverrides: row({ word: "collate", verdict: "bonus" }),

@@ -35,8 +35,8 @@ const dataDir = resolve(root, "data");
 const outDir = resolve(root, "dist-data");
 
 // The Answer line the Tier sitting placed (#310): `docility` (1.03, for
-// `facility`) is an Answer and `servility` (0.84) a Bonus Word — see ADR-0003,
-// amended. Still tunable per build via the env var, which the sentinel check
+// `facility`) is an Answer and `servility` (0.84) a Bonus Word (see ADR-0003,
+// amended). Still tunable per build via the env var, which the sentinel check
 // below holds to the rare-Answer sentinel.
 const KNOWNNESS_THRESHOLD = process.env.KNOWNNESS_THRESHOLD === undefined
   ? ANSWER_LINE

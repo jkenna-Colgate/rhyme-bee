@@ -51,8 +51,8 @@ import {
 // The `ate` Puzzle's 7 Answers (from the fixture): adjudicate(10,1.7),
 // collate(7,1.8), defenestrate(12,1.5), eight(5,2.5), gate(4,2.4),
 // impregnate(10,1.6), late(4,2.5); Bonus: objurgate, sate. The default rare
-// cutoff (0.7) is tuned for the shipped 0-1 dataset and marks nothing rare on
-// the fixture's z-scale, so we pin a fixture-appropriate cutoff of 1.55 — only
+// cutoff (1.278) sits below all seven, so it marks nothing rare on the fixture,
+// and we pin a fixture-appropriate cutoff of 1.55: only
 // `defenestrate` (1.5) is rare, giving a legible maxScore of 54:
 //   late 4 + defenestrate 12+2 + eight 5 + collate 7 + gate 4 + impregnate 10 + adjudicate 10
 const PLAYTHROUGH_CONFIG: ScoringConfig = {

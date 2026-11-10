@@ -82,7 +82,7 @@ Whether a player, given a Seed Word, will *produce* a word from nothing — as a
 _Avoid_: Recognition (that is the proxy, not the thing), recall, familiarity, corpus frequency
 
 **Score**:
-The player's running point total for a Puzzle, summed over the Answers they have found. Length dominates rarity: an Answer scores mainly on length, with a small flat bonus for a rare (low-knownness) one — so a rare Answer like `docility` scores its eight letters and the bonus on top. Length is the primary driver, but because the rarity bonus is a flat amount, a much rarer short word can occasionally edge past a slightly longer common one. Bonus Words score nothing; they are celebrated, not counted. The formula is configurable and tuned against real play.
+The player's running point total for a Puzzle, summed over the Answers they have found. Length dominates rarity: an Answer scores mainly on length, with a small flat bonus for a rare (low-knownness) one, so a rare Answer like `docility` scores its eight letters and the bonus on top. Length is the primary driver, but because the rarity bonus is a flat amount, a much rarer short word can occasionally edge past a slightly longer common one. Bonus Words score nothing; they are celebrated, not counted. The formula is configurable and tuned against real play.
 _Avoid_: total; "points" as a synonym for the Score itself (points are the per-Answer unit that *sums into* Score — see Points)
 
 **Points**:

@@ -81,8 +81,8 @@ export function notAVerdict(value: string): string {
  * override cannot introduce a second tiering path that drifts from the first.
  *
  * These are **not free parameters**. `bonus` and `answer-common` sit outside the
- * observed data range (-2.11 to +2.58) deliberately. `1.1` is boxed — the Answer
- * line (1.00) below it, `rareKnownnessCutoff` (1.278) above — so it has no wide
+ * observed data range (-2.11 to +2.58) deliberately. `1.1` is boxed, with the Answer
+ * line (1.00) below it, `rareKnownnessCutoff` (1.278) above, so it has no wide
  * margin: it clears a nudge of either line by a few hundredths and is covered by
  * `checkTierSentinels` beyond that. It was 0.6 until the Tier sitting moved both
  * lines (#310, #311). The cost of storing numbers is that a verdict's meaning
