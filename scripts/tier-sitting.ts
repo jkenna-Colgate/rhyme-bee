@@ -18,7 +18,6 @@ import { DEFAULT_PLAYABLE_BAND, playableSeeds } from "../src/curation.ts";
 import { parseLabelSet } from "../src/judgeLabels.ts";
 import { loadRhymeIndex } from "../src/loader.ts";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
-import type { RhymeKey } from "../src/phonology.ts";
 import { splitFamily, type RhymeIndex } from "../src/rhymeIndex.ts";
 import { parseSchedule } from "../src/schedule.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
@@ -42,6 +41,7 @@ import {
   unscheduledPool,
 } from "../src/tierSitting.ts";
 import { indexArtifactPath, readIndexManifest } from "./indexArtifact.ts";
+import { sittingDays } from "./sittingDays.ts";
 import { sittingPage } from "./tierSittingPage.ts";
 
 const root = resolve(import.meta.dirname, "..");
@@ -62,17 +62,7 @@ function loadIndex(): { index: RhymeIndex; hash: string } {
 function scheduledDays(index: RhymeIndex): SittingDay[] {
   const schedule = parseSchedule(JSON.parse(readFileSync(resolve(root, "data/schedule.json"), "utf8")));
   if (!schedule) throw new Error("data/schedule.json does not read as a Schedule");
-  return schedule.days.map((d) => {
-    const puzzle = index.buildPuzzle(index.pinSeed(d.seed, d.rhymeKey as RhymeKey));
-    return {
-      date: d.date,
-      week: d.week,
-      seedWord: d.seed,
-      rhymeKey: d.rhymeKey,
-      seedKnownness: index.tierOf(d.seed).knownness,
-      answers: puzzle.answers.map((a) => ({ word: a.word, length: a.length, knownness: a.knownness })),
-    };
-  });
+  return sittingDays(index, schedule.days);
 }
 
 /** The Seed pool's families that hold no place in the Schedule and whose Seed Word passes the Seed Word test. */
