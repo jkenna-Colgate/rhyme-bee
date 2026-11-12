@@ -1639,3 +1639,5 @@ treaded T R EH1 D IH0 D
 # Upstream holds only the first; both readings are written so the second is appended, not swapped in.
 twats T W AA1 T S
 twats(2) T W AE1 T S
+# cank: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE NG K — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+cank K AE1 NG K
