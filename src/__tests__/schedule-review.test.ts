@@ -245,16 +245,18 @@ describe("the drift check", () => {
     }
   });
 
-  it("holds every committed day inside the bands it was dealt from, except the ones the moved lines took under the size band", () => {
+  it("holds every committed day inside the bands it was dealt from, except the ones under the size band", () => {
     // This is the baseline the check is read against: anything new in it is a
     // real change. The re-sort of the weeks (#312) recorded each day's figures
-    // at the moved Answer line, where 42 days hold fewer than the band's 20
-    // Answers. #307 accepts a day of 10 to 19, so every one of them is
+    // at the moved Answer line, where 42 days held fewer than the band's 20
+    // Answers; 39 still do, the other three being Echoes #316 replaced. #316
+    // drew its 31 replacements with the floor lowered to 14, and 23 of them
+    // hold 14 to 19. #307 accepts a day of 10 to 19, so every one of the 62 is
     // outside on its Answer count alone, and none under 10.
     const drifted = schedule.days
       .map((day) => checkDayDrift(day, asRecorded(day), bands))
       .filter((drift) => drift.drifted);
-    expect(drifted).toHaveLength(42);
+    expect(drifted).toHaveLength(62);
     for (const drift of drifted) {
       expect(drift.reasons).toEqual(["answer-count-out-of-band"]);
       expect(drift.recorded.answerCount).toBeGreaterThanOrEqual(10);
