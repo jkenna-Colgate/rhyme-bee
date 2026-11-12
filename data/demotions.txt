@@ -74,7 +74,10 @@ hiems not-a-known-word       # Latin for winter
 lapides not-a-known-word     # Latin plural of `lapis`
 lbs not-a-known-word         # abbreviation of `pounds`
 oct not-a-known-word         # abbreviation of `October`
+mm not-a-known-word          # abbreviation of `millimetre`; an interjection only in print (#313)
+als not-a-known-word         # abbreviation (ALS), read as a plural of `al` (#313)
 preceeding not-a-known-word  # misspelling of `preceding`
+incase not-a-known-word      # misspelling of `in case`; ruled in the Tier sitting (#310, #311)
 nepal proper-noun
 neptune proper-noun       # the planet and the Roman god
 tudor proper-noun         # the English royal house
@@ -112,3 +115,5 @@ takeuchi proper-noun
 tuskegee proper-noun
 winfree proper-noun
 zuni proper-noun          # the Pueblo people
+finns proper-noun         # the people, as `zuni`
+scots proper-noun         # #311, the people, as `finns`

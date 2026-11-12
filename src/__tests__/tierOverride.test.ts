@@ -27,10 +27,10 @@ import {
   type TierOverrideRow,
 } from "../tierOverride.ts";
 import { DEFAULT_SCORING_CONFIG, isRare } from "../scoring.ts";
-import { tierFor } from "../verdict.ts";
+import { ANSWER_LINE, tierFor } from "../verdict.ts";
 
-/** The shipped build's threshold — an Answer is a word about half of people know. */
-const THRESHOLD = 0.0;
+/** The shipped Answer line, from the Tier sitting (#310): an Answer is a word players produce. */
+const THRESHOLD = ANSWER_LINE;
 
 function row(over: Partial<TierOverrideRow> = {}): TierOverrideRow {
   return {
@@ -46,13 +46,13 @@ function row(over: Partial<TierOverrideRow> = {}): TierOverrideRow {
 describe("the four verdicts", () => {
   it("compiles each verdict to the value ADR-0015 fixed it at", () => {
     expect(VERDICT_VALUE.bonus).toBe(-3.0);
-    expect(VERDICT_VALUE["answer-rare"]).toBe(0.6);
+    expect(VERDICT_VALUE["answer-rare"]).toBe(1.1);
     expect(VERDICT_VALUE["answer-common"]).toBe(3.0);
   });
 
   it("parses a value back to the verdict that produced it", () => {
     expect(verdictForValue(-3.0)).toBe("bonus");
-    expect(verdictForValue(0.6)).toBe("answer-rare");
+    expect(verdictForValue(1.1)).toBe("answer-rare");
     expect(verdictForValue(3.0)).toBe("answer-common");
   });
 
@@ -245,7 +245,7 @@ describe("applyTierOverrides", () => {
     const target = prevalence({});
     applyTierOverrides(serialiseTierOverride(row({ word: "bolder", verdict: "answer-rare", measured: null })), target);
 
-    expect(target.prevalence.get("bolder")).toBe(0.6);
+    expect(target.prevalence.get("bolder")).toBe(1.1);
   });
 
   it("patches nothing for `none`, leaving the measured value in place", () => {
@@ -273,7 +273,7 @@ describe("applyTierOverrides", () => {
       target,
     );
 
-    expect(target.prevalence.get("counterthrust")).toBe(0.6);
+    expect(target.prevalence.get("counterthrust")).toBe(1.1);
   });
 
   it("treats an empty file as the no-op it is", () => {
@@ -461,7 +461,7 @@ describe("checkTierSentinels", () => {
   it("fails when the rare cutoff drops below the rare-Answer sentinel", () => {
     const faults = checkTierSentinels({
       knownnessThreshold: THRESHOLD,
-      scoring: { ...DEFAULT_SCORING_CONFIG, rareKnownnessCutoff: 0.5 },
+      scoring: { ...DEFAULT_SCORING_CONFIG, rareKnownnessCutoff: 1.05 },
     });
 
     expect(faults).toHaveLength(1);
@@ -470,15 +470,25 @@ describe("checkTierSentinels", () => {
   });
 
   it("fails when the knownness threshold rises past the rare-Answer sentinel", () => {
-    // 0.6 is boxed: the Answer threshold below it, the rare cutoff above. It
-    // clears a nudge to 0.5 deliberately and is guarded on both sides.
-    const faults = checkTierSentinels({ knownnessThreshold: 1.0, scoring: DEFAULT_SCORING_CONFIG });
+    // 1.1 is boxed: the Answer line (1.00) below it, the rare line (1.278)
+    // above. It clears a nudge to 1.05 and is guarded on both sides.
+    const faults = checkTierSentinels({ knownnessThreshold: 1.2, scoring: DEFAULT_SCORING_CONFIG });
 
     expect(faults.some((f) => f.verdict === "answer-rare" && f.knob === "knownnessThreshold")).toBe(true);
   });
 
-  it("clears a threshold nudged no further than ADR-0015 allows", () => {
-    expect(checkTierSentinels({ knownnessThreshold: 0.5, scoring: DEFAULT_SCORING_CONFIG })).toEqual([]);
+  it("fails at the lines the sitting replaced, where the sentinel is an ordinary Answer", () => {
+    const faults = checkTierSentinels({
+      knownnessThreshold: 0.0,
+      scoring: { ...DEFAULT_SCORING_CONFIG, rareKnownnessCutoff: 0.7 },
+    });
+
+    expect(faults.map((f) => [f.verdict, f.knob])).toEqual([["answer-rare", "rareKnownnessCutoff"]]);
+  });
+
+  it("clears an Answer line nudged a little either way", () => {
+    expect(checkTierSentinels({ knownnessThreshold: 0.95, scoring: DEFAULT_SCORING_CONFIG })).toEqual([]);
+    expect(checkTierSentinels({ knownnessThreshold: 1.05, scoring: DEFAULT_SCORING_CONFIG })).toEqual([]);
   });
 
   it("fails when the threshold drops below the Bonus sentinel", () => {

@@ -62,9 +62,14 @@ export const DEFAULT_RANK_LADDER: LadderRank[] = [
   { threshold: 100, label: "Shakespeare" },
 ];
 
-/** The shipped defaults; every knob is expected to be tuned against real play. */
+/**
+ * The shipped defaults; every knob is expected to be tuned against real play.
+ * The rare line (1.278) is the Tier sitting's ruling (#310, ADR-0006 amended):
+ * the line above the Answer line that keeps the rare share of Answers at the 9%
+ * it was before the Answer line moved.
+ */
 export const DEFAULT_SCORING_CONFIG: ScoringConfig = {
-  rareKnownnessCutoff: 0.7,
+  rareKnownnessCutoff: 1.278,
   rareBonus: 2,
   rankLadder: DEFAULT_RANK_LADDER,
 };

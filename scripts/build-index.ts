@@ -26,6 +26,7 @@ import { deserialise, serialise } from "../src/serialise.ts";
 import { DEFAULT_SCORING_CONFIG } from "../src/scoring.ts";
 import { checkTierSentinels } from "../src/tierOverride.ts";
 import { listedSeedWords } from "../src/unconfirmedRhymes.ts";
+import { ANSWER_LINE } from "../src/verdict.ts";
 import { MANIFEST_FILENAME, writeIndexArtifact } from "./indexArtifact.ts";
 import { buildRefusal, checkLocalSources } from "./sourceMirror.ts";
 
@@ -33,10 +34,13 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = resolve(root, "data");
 const outDir = resolve(root, "dist-data");
 
-// Default sits between the two probe words so `defenestrate` (+0.25) is an
-// Answer and `objurgate` (-0.43) is a Bonus Word — see ADR-0003's Resolution.
-// Still tunable per build via the env var, and to be sharpened by human review.
-const KNOWNNESS_THRESHOLD = Number(process.env.KNOWNNESS_THRESHOLD ?? "0.0");
+// The Answer line the Tier sitting placed (#310): `docility` (1.03, for
+// `facility`) is an Answer and `servility` (0.84) a Bonus Word (see ADR-0003,
+// amended). Still tunable per build via the env var, which the sentinel check
+// below holds to the rare-Answer sentinel.
+const KNOWNNESS_THRESHOLD = process.env.KNOWNNESS_THRESHOLD === undefined
+  ? ANSWER_LINE
+  : Number(process.env.KNOWNNESS_THRESHOLD);
 
 // The Retrieval override layer's build-time guard (ADR-0015), run before a
 // single byte of data is read. Storing a prevalence value rather than a

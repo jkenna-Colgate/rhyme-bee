@@ -49,6 +49,15 @@ export const REJECTION_MESSAGE: Record<RejectionReason, string> = {
 export type Tier = "answer" | "bonus";
 
 /**
+ * The shipped Answer line, the threshold `npm run build:index` builds at. It is
+ * the Tier sitting's ruling (#310, ADR-0003 amended): 1.00 is where the
+ * maintainer's Retrieval marks placed it, the lowest band from which "a player
+ * would not produce this" is no longer the majority. `docility` (1.03, for
+ * `facility`) is the anchor that just clears it.
+ */
+export const ANSWER_LINE = 1.0;
+
+/**
  * The Answer/Bonus line: a word tiers to Answer when its knownness clears the
  * threshold. The *whole* of the rule — the lemma walk that finds a word's
  * knownness, and the absent-from-the-data default, are the index's job; this is

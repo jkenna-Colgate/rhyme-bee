@@ -524,6 +524,10 @@ skier S K IY1 ER0
 noir N W AA1 R
 # boudoir (#253): upstream `D OY2 R` is the same mistake as `noir`; it is "BOO-dwahr", with `car` (#232).
 boudoir B UW1 D W AA2 R
+# miniseries (#311): upstream reads `S EH2 R IY0 Z`, which put it with `corollaries`; it is
+# "MIH-nee-seer-eez", with `series`, as the derived `subseries` already is (#310).
+miniseries M IH1 N IY0 S IH2 R IY0 Z
+miniseries(1) M IH1 N IH0 S IH2 R IY0 Z
 
 # --- Corrections (a beat on the last syllable that CMUdict does not mark, #233) ---
 #
@@ -1631,3 +1635,7 @@ wetted W EH1 T AH0 D
 sledded S L EH1 D IH0 D
 # treaded (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-04) ruled it a Rhyme for `fetid` on EH D AH D at high confidence.
 treaded T R EH1 D IH0 D
+# twats (#311): said both "twots" and, as often in American speech, with the vowel of `cat`.
+# Upstream holds only the first; both readings are written so the second is appended, not swapped in.
+twats T W AA1 T S
+twats(2) T W AE1 T S

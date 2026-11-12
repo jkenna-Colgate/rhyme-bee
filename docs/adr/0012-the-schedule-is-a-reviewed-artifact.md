@@ -1,6 +1,6 @@
 # The schedule is a reviewed artifact, not an automated eligibility gate
 
-**Status:** amended 2026-10-11, 2026-10-14 and 2026-10-27. The Schedule is still read by a person rather than gated, but it no longer ends: it is a loop dealt once in whole weeks, grows by new weeks put through a Batch, and repairs a day whose Seed Word no longer pins (the same word on its current Rhyme Key, then the family's lead word, then Free Play only when nothing pins, even onto a place another day holds). A Seed Word must be heard one way, and is never an Unconfirmed Rhyme. The Consequences about the run ending are reversed.
+**Status:** amended 2026-10-11, 2026-10-14, 2026-10-27 and 2026-11-10. The Schedule is still read by a person rather than gated, but it no longer ends: it is a loop dealt once in whole weeks, grows by new weeks put through a Batch, and repairs a day whose Seed Word no longer pins (the same word on its current Rhyme Key, then the family's lead word, then Free Play only when nothing pins, even onto a place another day holds). A Seed Word must be heard one way, and is never an Unconfirmed Rhyme. The Consequences about the run ending are reversed. Each week was re-sorted once by Difficulty when the lines moved, the one exception to a place keeping its weekday.
 
 Seed eligibility has been built as a stack of automated gates: a size band
 ([ADR-0004](./0004-puzzles-are-bounded-by-seed-curation.md)), a distinctness gate
@@ -256,3 +256,53 @@ a person decides rather than the order of a loop.
 **Keep the fall-through and let #265 fill the Free Play day.** It hides the
 collision from the one check that exists to find it, and leaves the choice of
 which day keeps its place to the accident above.
+
+## Amendment, 2026-11-10: the weeks were re-sorted once, when the lines moved
+
+Decided in [#280](https://github.com/jkenna-Colgate/rhyme-bee/issues/280) and
+built in [#312](https://github.com/jkenna-Colgate/rhyme-bee/issues/312).
+
+**Moving the Answer and rare lines
+([ADR-0003](./0003-word-prevalence-not-corpus-frequency.md),
+[ADR-0007](./0007-difficulty-is-rare-word-score-mass.md)) re-measured every
+day's Difficulty, and the ramp broke in every week.** The banded deal's
+`Mon < Tue < … < Sun` held because the bands did not overlap, and the drift this
+ADR accepts on that account is a Tier or a reading moving one day at a time. A
+moved line moves every day at once, so no week of the 37 still ramped at the
+shipped lines.
+
+**So each week was re-sorted once, as an exception to "a place keeps its
+weekday".** Every Seed Word stayed in the week it was in, and only the order
+within the week changed, Monday easiest to Sunday hardest by the built index's
+Difficulty at the shipped lines (Answer 1.00, rare 1.278). A tie kept the order
+it was in. A week is a week as it is played: the lap begins on a Tuesday, so the
+week that opens each later lap is the last listed Monday followed by the lap's
+first six days, and it was sorted as one. No Seed Word joined or left the
+Schedule, so the Seed pool was not read again and no Batch was needed. Each day
+of a re-sorted week records the figures it was sorted on.
+
+**The week holding the date of the run (2026-11-09 to 2026-11-15) kept its
+order,** so no player meets a Seed Word already played that week. Its days
+record their figures at the shipped lines like every other day's, without
+moving.
+Weeks already played this lap were re-sorted too, and come round in ramp order
+on the next lap. 208 of the lap's 259 days took another Seed Word, in 36 weeks.
+A Seed Word moved by up to six days comes round up to six days sooner than a
+lap, once.
+
+The re-sort is `resortWeeks` (`src/scheduleResort.ts`), run by
+`npm run schedule:resort`. It is a pure function and may be run again if days
+are swapped within a week, but this amendment records one run, made because the
+lines moved. It is not a rule that the ramp is maintained: drift between laps
+is still accepted on the terms of the 2026-10-11 amendment.
+
+### Rejected
+
+**Deal the Schedule again from the whole pool.** It would restore the bands across
+weeks as well as within them, and it moves Seed Words between weeks, so a player
+could meet a Puzzle again within a lap. The within-week ramp is what a player
+reads off the weekday.
+
+**Leave the ramp broken until the next deal.** There is no next deal: the
+Schedule is a loop dealt once, so a week out of order would stay out of order on
+every lap.

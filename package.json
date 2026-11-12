@@ -14,6 +14,7 @@
     "build:schedule": "tsx scripts/build-schedule.ts",
     "seeds:test": "tsx scripts/seed-word-test.ts",
     "schedule:grow": "tsx scripts/grow-schedule.ts",
+    "schedule:resort": "tsx scripts/resort-weeks.ts",
     "histogram": "tsx scripts/histogram.ts",
     "play": "tsx scripts/play.ts",
     "batch": "tsx scripts/batch.ts",
@@ -25,6 +26,8 @@
     "records:pull": "tsx scripts/pull-session-records.ts",
     "records:replay": "tsx scripts/replay-session-records.ts",
     "tier:moves": "tsx scripts/tier-moves.ts",
+    "tier:draw": "tsx scripts/tier-sitting.ts draw",
+    "tier:place": "tsx scripts/tier-sitting.ts place",
     "sources:fetch": "tsx scripts/fetch-sources.ts",
     "sources:upload": "tsx scripts/upload-source.ts"
   },

@@ -110,6 +110,8 @@ function readSet(name: string): LabelSet {
 async function score(names: string[], withTakenBack: boolean) {
   if (!names.length) throw new Error("name at least one label set");
   const sets = names.map(readSet);
+  // A tier set holds the Tier sitting's marks (#309), a question the Judge is never asked.
+  for (const set of sets) if (set.question === "tier") throw new Error(`${set.set} is a Tier sitting's marks; place the lines with npm run tier:place`);
   const opts = { blindOnly: !withTakenBack };
   const stem = `judge-score.${names.join("+")}.${model}`;
   const run = nextRun(stem);

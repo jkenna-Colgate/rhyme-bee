@@ -15,23 +15,23 @@
  * it is exercised here too: a payload naming the wrong lemma candidates would
  * break these cases in the same breath.
  *
- * Everything is built at the **shipped** threshold rather than the fixture's own
- * 1.0, for the reason `src/__tests__/tierOverride-build.test.ts` gives: the four
- * verdicts' values are sentinels calibrated against the shipped configuration
- * (ADR-0015), and at 1.0 the `answer-rare` sentinel (0.6) would not even be an
- * Answer.
+ * Everything is built at the **shipped** Answer line, for the reason
+ * `src/__tests__/tierOverride-build.test.ts` gives: the four verdicts' values
+ * are sentinels calibrated against the shipped configuration (ADR-0015). Since
+ * the Tier sitting (#310) that line is 1.0, the fixture's own.
  */
 
 import { describe, expect, it } from "vitest";
 import { measureAnswers } from "../../src/curation.ts";
 import type { PuzzleEntry, RhymeIndex } from "../../src/rhymeIndex.ts";
 import { TIER_OVERRIDE_HEADER } from "../../src/tierOverride.ts";
+import { ANSWER_LINE } from "../../src/verdict.ts";
 import { buildTestIndex, makeTestIndex } from "../../src/__fixtures__/index.ts";
 import { tierPickerState } from "../editorTierPayload.ts";
 import { retierDay, type DayLists } from "../src/editor/retier.ts";
 
 /** See `tierOverride-build.test.ts`: the sentinels are calibrated for this. */
-const SHIPPED_THRESHOLD = 0.0;
+const SHIPPED_THRESHOLD = ANSWER_LINE;
 
 /** The fixture's `-ate` family — the widest one it has, and the Tutorial's Seed. */
 const ATE = { seed: "ate", key: "EY T" };
@@ -130,7 +130,7 @@ describe("a verdict moves the word and the figures to where a rebuild would put 
 
     expect(words(retiered.answers)).toEqual(words(rebuilt.answers));
     expect(retiered.facts).toEqual(measureAnswers(rebuilt.answers));
-    // The rare cutoff is 0.7 and the sentinel is 0.6, so this is Score mass
+    // The rare cutoff is 1.278 and the sentinel is 1.1, so this is Score mass
     // moving into Difficulty rather than a word merely changing list.
     expect(retiered.facts.difficulty).toBeGreaterThan(
       measureAnswers(lists.answers).difficulty,

@@ -16,15 +16,16 @@ import { describe, expect, it } from "vitest";
 import { serialiseTierOverride, type TierOverrideRow } from "../tierOverride.ts";
 import { DEFAULT_SCORING_CONFIG, isRare } from "../scoring.ts";
 import { buildTestIndex, makeTestIndex } from "../__fixtures__/index.ts";
+import { ANSWER_LINE } from "../verdict.ts";
 
 /**
- * The shipped threshold (0.0) and the shipped rare cutoff (0.7, via
- * `DEFAULT_SCORING_CONFIG`) — not the fixture's own 1.0 — because the four
- * verdicts' values (`VERDICT_VALUE`) are sentinels calibrated against the
- * *shipped* configuration (ADR-0015). Building at the fixture's usual
- * threshold would test a knob combination no sentinel was chosen for.
+ * The shipped Answer line (1.00) and the shipped rare line (1.278, via
+ * `DEFAULT_SCORING_CONFIG`), both the Tier sitting's ruling (#310), because the
+ * four verdicts' values (`VERDICT_VALUE`) are sentinels calibrated against the
+ * *shipped* configuration (ADR-0015). Building at any other line would test a
+ * knob combination no sentinel was chosen for.
  */
-const SHIPPED_THRESHOLD = 0.0;
+const SHIPPED_THRESHOLD = ANSWER_LINE;
 
 function row(over: Partial<TierOverrideRow>): string {
   return serialiseTierOverride({
@@ -39,14 +40,37 @@ function row(over: Partial<TierOverrideRow>): string {
 
 describe("the override layer, merged into the composed build", () => {
   it("tiers an overridden word to Bonus, whatever its measured prevalence said", () => {
-    // objurgate measures 0.2, which is an Answer at the shipped threshold —
+    // collate measures 1.8, which is an Answer at the shipped Answer line, so
     // the override is the thing that has to move it.
     const index = makeTestIndex({
-      tierOverrides: row({ word: "objurgate", verdict: "bonus" }),
+      tierOverrides: row({ word: "collate", verdict: "bonus" }),
       knownnessThreshold: SHIPPED_THRESHOLD,
     });
 
-    expect(index.tierOf("objurgate")).toEqual({ tier: "bonus", knownness: -3.0 });
+    expect(index.tierOf("collate")).toEqual({ tier: "bonus", knownness: -3.0 });
+  });
+
+  it("tiers words either side of the shipped Answer line as the sitting ruled", () => {
+    // `docility` (1.03) is the anchor that just clears 1.00; `servility` (0.84)
+    // and `objurgate` (0.2) fall below it.
+    const index = makeTestIndex({ knownnessThreshold: SHIPPED_THRESHOLD });
+
+    expect(index.tierOf("docility").tier).toBe("answer");
+    expect(index.tierOf("servility").tier).toBe("bonus");
+    expect(index.tierOf("objurgate").tier).toBe("bonus");
+  });
+
+  it("keeps an `answer-rare` verdict rare on a word measured above the rare line", () => {
+    // collate measures 1.8, above the rare line (1.278): the verdict, not the
+    // measurement, is what earns it the rare bonus.
+    const index = makeTestIndex({
+      tierOverrides: row({ word: "collate", verdict: "answer-rare", measured: 1.8 }),
+      knownnessThreshold: SHIPPED_THRESHOLD,
+    });
+
+    const { tier, knownness } = index.tierOf("collate");
+    expect(tier).toBe("answer");
+    expect(isRare(knownness, DEFAULT_SCORING_CONFIG)).toBe(true);
   });
 
   it("tiers an overridden word to a rare Answer — earning the rare bonus scoring reads separately", () => {

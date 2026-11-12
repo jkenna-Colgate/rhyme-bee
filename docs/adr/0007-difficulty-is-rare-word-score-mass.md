@@ -1,5 +1,7 @@
 # Difficulty is the share of a Puzzle's Score locked in rare words, and the week ramps up it
 
+**Status:** amended 2026-11-10. The rare line Difficulty is measured on is 1.278, placed to keep the rare share of Answers at 9%, above an Answer line of 1.00. Every day's Difficulty was re-measured, and each week was then re-sorted once to hold the ramp again (#312, ADR-0012 amended 2026-11-10).
+
 Within the playable size band, a Puzzle's **Difficulty** is the fraction of its
 maximum achievable Score that lives in **rare** Answers:
 
@@ -110,3 +112,20 @@ deliberately if the flat ramp feels wrong in play, not smuggled in now.
   for.
 - **A continuous knownness gradient for Difficulty** — rejected above.
 - **The Saturday-peak / Sunday cool-down curve** — deferred above.
+
+## Amendment, 2026-11-10: the rare line moved, and so did Difficulty
+
+"Rare" is still the scoring line, and that line is now **1.278** (ADR-0006, amended
+the same day), above an Answer line of 1.00 (ADR-0003, amended). It was placed to
+keep the share of Answers that are rare at the 9.0% it was before the Answer line
+moved, not from the sitting's marks, which would have put it at 1.75. A rare line
+placed by share keeps Difficulty in the range the Schedule was dealt in: at 1.278 the
+median day's Difficulty is 0.11 and none is over 0.5, where at 1.75 the median is
+0.34 and 39 days are over 0.5.
+
+Every day's Difficulty was re-measured at the new lines, as this ADR's
+Consequences say it must be. As "downstream of `ScoringConfig`" predicts, no
+week of the 37 still ran Monday easiest to Sunday hardest at the new lines, so
+the weeks were re-sorted once, in #312 (ADR-0012), all but the week then in
+progress. The size band stays advisory: 42 days hold fewer than 20 Answers and
+none fewer than 10.

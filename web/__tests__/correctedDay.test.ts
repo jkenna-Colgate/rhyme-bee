@@ -14,9 +14,9 @@
  * the very correction under test written in the file format it belongs to, and
  * asserts the browser's arithmetic landed where the rebuild did.
  *
- * Everything is built at the shipped threshold rather than the fixture's own
- * 1.0, for the reason `retier.test.ts` gives: the verdict sentinels are
- * calibrated for it (ADR-0015).
+ * Everything is built at the shipped Answer line, for the reason
+ * `retier.test.ts` gives: the verdict sentinels are calibrated for it
+ * (ADR-0015). Since the Tier sitting (#310) it is 1.0, the fixture's own.
  */
 
 import { describe, expect, it } from "vitest";
@@ -25,13 +25,14 @@ import { measureAnswers } from "../../src/curation.ts";
 import { serialiseDemotion, type Demotion } from "../../src/demotions.ts";
 import type { PuzzleEntry, RhymeIndex } from "../../src/rhymeIndex.ts";
 import { TIER_OVERRIDE_HEADER } from "../../src/tierOverride.ts";
+import { ANSWER_LINE } from "../../src/verdict.ts";
 import { buildTestIndex, makeTestIndex, type TestInputs } from "../../src/__fixtures__/index.ts";
 import { tierPickerState } from "../editorTierPayload.ts";
 import { correctedDay } from "../src/editor/correctedDay.ts";
 import type { DayLists, TierPickerState } from "../src/editor/retier.ts";
 
 /** See `retier.test.ts`: the override sentinels are calibrated for this. */
-const SHIPPED_THRESHOLD = 0.0;
+const SHIPPED_THRESHOLD = ANSWER_LINE;
 
 /** The fixture's `-ate` family — the widest one it has, and the Tutorial's Seed. */
 const ATE = { seed: "ate", key: "EY T" };

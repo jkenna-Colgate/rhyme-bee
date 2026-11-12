@@ -36,6 +36,8 @@ const words = new Set<string>([
   // The syllabic-consonant variant and the two vowels it must not touch: a
   // stressed one (`pool`) and a full unstressed one (`crayon`) — issue #74.
   "cool", "pool", "gruel", "duel", "crewel", "renewal", "crane", "crayon",
+  // The ADR-0003 anchor the Tier sitting named (#310): `docility` for `facility`.
+  "facility", "docility", "servility",
   // `sate` is a real word we deliberately leave out of the prevalence data,
   // to exercise the absent-from-knownness -> Bonus default (ADR-0003).
   "sate",
@@ -79,9 +81,11 @@ const names = new Set<string>(["kate"]);
 
 /**
  * Word-prevalence scores (lemma -> knownness), on the Brysbaert z-scale. The
- * threshold is 1.0. `objurgate` sits below it (Bonus); `defenestrate` above it
- * (Answer) — the ADR-0003 assumption made into data. `gates` is absent on
- * purpose: its lemma `gate` carries the score.
+ * threshold is 1.0, the shipped Answer line since the Tier sitting (#310).
+ * `objurgate` sits below it (Bonus). Most values are the fixture's own; the
+ * ADR-0003 anchor, `docility` above the line and `servility` below, carries its
+ * measured values. `gates` is absent on purpose: its lemma `gate` carries the
+ * score.
  */
 const prevalence = new Map<string, number>([
   ["ate", 2.5], ["eight", 2.5], ["late", 2.5], ["collate", 1.8],
@@ -122,6 +126,10 @@ const prevalence = new Map<string, number>([
   ["high", 2.5], ["buy", 2.5], ["eye", 2.5], ["arrows", 2.4], ["nose", 2.5],
   // The glide-before-r guardrails (#261).
   ["fire", 2.5], ["fur", 2.4], ["player", 2.5], ["hair", 2.5], ["lower", 2.4], ["lore", 2.0],
+  // The ADR-0003 anchor (#310, #311), at their measured values: `docility`
+  // just clears the Answer line and sits below the rare line; `servility` is
+  // recognised and not produced, so it falls below.
+  ["facility", 2.58], ["docility", 1.03], ["servility", 0.84],
 ]);
 
 export const KNOWNNESS_THRESHOLD = 1.0;

@@ -222,8 +222,9 @@ describe("playableSeeds: the shared in-band Seed pool", () => {
 
 describe("Difficulty of a candidate Seed Word (ADR-0007)", () => {
   it("computes the real EY T family's Difficulty from the shared scoreEntry", () => {
-    // The default rare cutoff (0.7) marks nothing rare on the fixture's z-scale,
-    // so we pin the same fixture-appropriate 1.55 the session suite uses — only
+    // The default rare cutoff (1.278) sits below every EY T Answer on the fixture
+    // (the lowest, `defenestrate`, is 1.5), so it marks nothing rare there, and we
+    // pin the same fixture-appropriate 1.55 the session suite uses: only
     // `defenestrate` (1.5) is then rare. The 7 EY T Answers (with the seed `ate`
     // excluded as the representative):
     //   adjudicate 10, collate 7, eight 5, gate 4, impregnate 10, late 4  (common)
@@ -238,7 +239,7 @@ describe("Difficulty of a candidate Seed Word (ADR-0007)", () => {
   it("is exactly rareMass / maxScore, and 1 − Difficulty is the common-only ceiling", () => {
     // A hand-built family under one Rhyme Key with controlled lengths and
     // knownness. Representative `og` (uniquely shortest) is skipped, leaving four
-    // Answers under DEFAULT_SCORING_CONFIG (rare cutoff 0.7, rare bonus 2):
+    // Answers under DEFAULT_SCORING_CONFIG (rare cutoff 1.278, rare bonus 2):
     //   quag   len 4, knownness 2.0 -> 4   (common)
     //   shabog len 6, knownness 2.0 -> 6   (common)
     //   vroog  len 5, knownness 0.2 -> 7   (rare: 5 + 2)
@@ -276,7 +277,7 @@ function makeSyntheticIndex(): RhymeIndex {
     ["vroog", p("V", "R", "AO1", "G")],
     ["yog", p("Y", "AO1", "G")],
   ]);
-  // Threshold 0 so every rhyming word tiers to Answer; rarity (the 0.7 cutoff) is
+  // Threshold 0 so every rhyming word tiers to Answer; rarity (the 1.278 cutoff) is
   // a separate line, so `vroog`/`yog` are rare Answers, not Bonus Words.
   return buildSlice({
     pronunciations,
