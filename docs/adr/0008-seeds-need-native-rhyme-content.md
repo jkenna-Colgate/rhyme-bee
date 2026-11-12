@@ -1,6 +1,6 @@
 # A Seed Word must have native rhyme content, not be an inflection shadow of another Seed
 
-**Status:** amended 2026-07-30. A Shadow Key still cannot be a Seed Word, and *derived* now includes the configured derivational suffixes (`-ly`, `-ness`, `-er` and the rest) as well as inflections and prefixes. The build's detector does not count suffixes (Resolution 2026-08-06, #88 declined), so three suffix-only Shadow Keys stay scheduled as a known and accepted deviation.
+**Status:** amended 2026-07-30 and 2026-11-12. A Shadow Key still cannot be a Seed Word, and *derived* now includes the configured derivational suffixes (`-ly`, `-ness`, `-er` and the rest) as well as inflections and prefixes. The build's detector does not count suffixes (Resolution 2026-08-06, #88 declined), so three suffix-only Shadow Keys stay scheduled as a known and accepted deviation. Since 2026-11-12 the Schedule is also checked for an **Echo**, a day with no native Answer that gives back other scheduled days' words (#315); the check reports, and the days it finds are replaced by hand.
 
 A Rhyme Key is eligible to be a **Seed Word** only if its family contains
 **native** words — words that are *not* a regular inflection (`-s/-es/-ed/-ing`)
@@ -309,3 +309,103 @@ This ADR's [Measurement](#measurement) section predicted exactly that ("shadows
 wearing a costume") and its Consequences name tightening the names filter as an
 orthogonal lever. It gates more keys than the suffix gap does and is tracked as
 issue #89; widening *derived* neither fixes nor worsens it.
+
+## Amendment (2026-11-12): an Echo is a matter for the Schedule
+
+**A family with one native word passes the Shadow Key gate, and many scheduled
+days pass on that one word alone.** Every Answer the player can find on such a day
+is a plural, a past tense or a suffixed form of a word in another family, and often
+that family has a day of its own: the Schedule served `air`, `airs` and `aired` as
+three days. The one native word is usually obscure (`housewares`, `mesdames`), the
+Seed Word itself, or a compound whose last part is derived (`crossbones`,
+`grassroots`). Issue #315 named the day, and the decisions below were settled with
+the maintainer in its triage.
+
+### The decisions
+
+1. **An Echo** is a Daily Puzzle with no native Answer, more than half of whose
+   Answers are derived from words in other scheduled Puzzles. `airs` is an Echo of
+   `air`.
+2. **Both parts are needed.** `eclipse` is 93% `ship` words with an `s`, and is no
+   Echo, because `ellipse` and `apocalypse` are native Answers. `lopsided` has no
+   native Answer and is no Echo, because its derived Answers come from words no day
+   holds.
+3. **The share is counted against all the other scheduled days together**, not the
+   single largest. `sordid` takes 57% from `import` and 83% from all scheduled days,
+   and is an Echo. An Answer counts once however many days hold its stem, and a stem
+   with several Rhyme Keys counts if any of them is scheduled.
+4. **The Seed Word is given and not found**, so a native Seed Word does not save a
+   day. `hertz`, `bronze` and `quartz` are Echoes.
+5. **For this test, derived is wider than the build's detector.** It also covers a
+   configured derivational suffix (`essentially`), as the 2026-07-30 Amendment's
+   definition already says, and a compound whose last part is derived
+   (`shellshocked`, `crossbones`, `bestselling`). A compound is split only where both
+   parts are words and the last part is derived, so `carpet` is never `car` + `pet`.
+6. **The wider reading is the Echo test's alone.** `isDerived`, the Shadow Key gate
+   and the size band keep their behaviour. Measured by curation at the default band
+   [20, 120] before and after: 100 Shadow Keys and a Seed pool of 233, unchanged.
+7. **An Echo is a matter for the Schedule.** Free Play and the Seed pool's own
+   eligibility are unchanged. Only the unscheduled pool a replacement is drawn from
+   drops a family that would be an Echo of the days already scheduled.
+8. **When an added Seed Word would make an Echo of a day already scheduled, the
+   Puzzle with more to find takes the place**, and a person gives the echoing day
+   another Seed Word in the same change. The tooling reports and does not choose.
+
+A Puzzle's own Rhyme Key never counts as another day, including another spelling of
+it that holds the same Puzzle (an appending Normalisation can file one family under
+two key spellings). Exactly half is no Echo; the line is more than half.
+
+### Where it runs
+
+`src/echo.ts` holds the test. `testSeedWord` stays a test of one word on one Rhyme
+Key, because an Echo depends on what else is scheduled. The check runs over every day
+holding a place, at the end of the Seed Word run (`npm run seeds:test`) and of the
+Schedule's growth (`npm run schedule:grow`), and names the Echoes a change made: a
+newcomer that echoes, and a scheduled day a newcomer echoes. It fails nothing, since
+Echoes stay scheduled until they are replaced.
+
+### The measured list
+
+Run over the committed Schedule on 2026-11-12, the check reports 31 Echoes:
+`concoct`, `proper`, `shatter`, `airs`, `storytelling`, `klutz`, `damns`,
+`typewriter`, `trainer`, `breathtaking`, `grassroots`, `longstanding`,
+`shortsighted`, `triceratops`, `sordid`, `bloodletting`, `shortcoming`, `blitz`,
+`hardwired`, `gatekeeper`, `quartz`, `bronze`, `congrats`, `essentially`,
+`splendid`, `songwriting`, `crossbones`, `bioengineering`, `hertz`,
+`experimentally`, `dolls`.
+
+Triage predicted 26. Its prototype read no suffix, and all 26 are in the list. The five
+it could not see are on `-er` keys:
+
+- **`trainer`, `gatekeeper` and `typewriter` are Echoes by the definition.** Every
+  Answer is a scheduled family's word with `-er` (`container` from `contain` on
+  `gain`'s day, `keeper` from `keep` on `sleep`'s, `fighter` from `fight` on
+  `quite`'s).
+- **`proper` and `shatter` are reported on spelling coincidences.** The suffix
+  reading is morphological, as the 2026-07-30 Amendment chose, so it takes `copper`
+  from `cop`, `pauper` from `paup`, `ladder` from `lad`, `matter` from `mat` and
+  `bladder` from `blad`. It also reads `improper` as `imp` + `roper`, a compound
+  whose last part is derived. Read by an ear, both days have native Answers. The
+  check only reports, so no rule is narrowed for two days. Whoever replaces the
+  Echoes leaves these two in place and names that reason.
+
+The must-not list from triage is not reported: `eclipse`, `collapse` and `build`
+have native Answers, and `lopsided`, `highflying`, `taxpaying`, `ongoing` and
+`devastatingly` restate no scheduled day by more than half.
+
+**Two of the three days #88 left as a deviation are now Echoes.** `essentially`
+gives back `confidential`'s day at 94% and `experimentally` gives back
+`incidental`'s at 100%. `devastatingly` is no Echo: no scheduled day holds the words
+it is derived from.
+
+### Rejected
+
+- **Bar on overlap alone.** A day restating most of another would remove `eclipse`,
+  whose `ellipse` and `apocalypse` are the finds no other day offers.
+- **Bar on no native Answer alone.** That would remove days like `lopsided`, whose
+  derived Answers come from words no day holds, so the player meets those rhymes
+  nowhere else.
+- **Keep the suffixed day and drop its base.** Measured on the pair that tests it
+  hardest, keeping `eclipse` over `ship` loses 46 `ship` Answers (`ownership`,
+  `kinship`, `starship`, ...) to gain 3 native ones. The base has more to find,
+  which is decision 8.

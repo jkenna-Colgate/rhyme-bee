@@ -6,6 +6,8 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { Derivation, IndexDataSource } from "../derivation.ts";
+import type { EchoLexicon } from "../echo.ts";
 import { parseLabelSet } from "../judgeLabels.ts";
 import { compareSignals, consequencesAt, drawSample, marksOf, placeLines, unscheduledPool, type Mark, type MarkedWord, type SittingDay } from "../tierSitting.ts";
 
@@ -279,23 +281,39 @@ describe("the unscheduled Seed pool (#311)", () => {
     day("wall", [["ball", 2], ["call", 2]], { rhymeKey: "AA L" }),
     day("hire", [["fire", 2], ["expire", 2]], { rhymeKey: "AY ER" }),
   ];
+  // Words and their Rhyme Keys, all with wordhood: enough to tell an Echo.
+  const keys: Record<string, string> = {
+    ball: "AA L", call: "AA L", wall: "AA L", balls: "AA L Z", calls: "AA L Z", walls: "AA L Z", dolls: "AA L Z",
+    fire: "AY ER", hire: "AY ER", expire: "AY ER", moon: "UW N", soon: "UW N", tune: "UW N",
+  };
+  const words = new Set(Object.keys(keys));
+  const lex: EchoLexicon = {
+    derivation: new Derivation(new IndexDataSource({ words, pronunciations: new Map() })),
+    hasWord: (w) => words.has(w),
+    rhymeKeysOf: (w) => (keys[w] ? [keys[w]] : []),
+  };
 
   it("keeps a family no scheduled day holds", () => {
     const moon = family("moon", "UW N", ["soon", "tune"]);
-    expect(unscheduledPool([moon], days)).toEqual([moon]);
+    expect(unscheduledPool([moon], days, lex)).toEqual([moon]);
   });
 
   it("passes over a family on a Rhyme Key the Schedule holds", () => {
-    expect(unscheduledPool([family("ball", "AA L", ["wall", "call"])], days)).toEqual([]);
+    expect(unscheduledPool([family("ball", "AA L", ["wall", "call"])], days, lex)).toEqual([]);
   });
 
   it("passes over a family whose Seed Word already holds a place under another Rhyme Key", () => {
     // `wall` leads AA AH L as well as AA L, where it is scheduled.
-    expect(unscheduledPool([family("wall", "AA AH L", ["squall", "brawl"])], days)).toEqual([]);
+    expect(unscheduledPool([family("wall", "AA AH L", ["squall", "brawl"])], days, lex)).toEqual([]);
   });
 
   it("passes over a family whose Puzzle a scheduled day already holds under another Rhyme Key spelling", () => {
     // `expire` on AY R holds the Answers `hire` holds on AY ER: the same Puzzle in a second place.
-    expect(unscheduledPool([family("expire", "AY R", ["fire", "hire"])], days)).toEqual([]);
+    expect(unscheduledPool([family("expire", "AY R", ["fire", "hire"])], days, lex)).toEqual([]);
+  });
+
+  it("passes over a family that would be an Echo of the scheduled days (#315)", () => {
+    // Every Answer is a `wall` word with an `s`, and none is native.
+    expect(unscheduledPool([family("dolls", "AA L Z", ["balls", "calls", "walls"])], days, lex)).toEqual([]);
   });
 });

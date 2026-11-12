@@ -16,6 +16,7 @@
  */
 
 import { DEFAULT_PLAYABLE_BAND, measureAnswers } from "./curation.ts";
+import { testEcho, type EchoLexicon, type EchoPuzzle } from "./echo.ts";
 import { standingVerdict, TIER_MARKS, type LabelSet } from "./judgeLabels.ts";
 import { weekdayOf, type PuzzleFacts } from "./schedule.ts";
 import { DEFAULT_SCORING_CONFIG, type ScoringConfig } from "./scoring.ts";
@@ -467,16 +468,33 @@ const puzzleWords = (seedWord: string, answers: readonly SittingAnswer[]): strin
  * and with a Puzzle no day holds under another spelling of its Rhyme Key
  * (Continuity's one-place rule). `wall` leads AA AH L as well as the AA L it is
  * scheduled on, and `expire` on AY R holds the Answers `hire` holds on AY ER;
- * neither is free to give a day (#311).
+ * neither is free to give a day (#311). Nor is a family that would be an Echo
+ * of the scheduled days (#315), so a replacement is never offered one.
  */
-export function unscheduledPool(families: readonly PoolFamily[], days: readonly SittingDay[]): PoolFamily[] {
+export function unscheduledPool(
+  families: readonly PoolFamily[],
+  days: readonly SittingDay[],
+  lex: EchoLexicon,
+): PoolFamily[] {
   const keys = new Set(days.map((d) => d.rhymeKey));
   const seeds = new Set(days.map((d) => d.seedWord));
   const puzzles = new Set(days.map((d) => puzzleWords(d.seedWord, d.answers)));
+  const scheduled = days.map((d) => asEchoPuzzle(d.date, d));
   return families.filter(
-    (f) => !keys.has(f.rhymeKey) && !seeds.has(f.seedWord) && !puzzles.has(puzzleWords(f.seedWord, f.answers)),
+    (f) =>
+      !keys.has(f.rhymeKey) &&
+      !seeds.has(f.seedWord) &&
+      !puzzles.has(puzzleWords(f.seedWord, f.answers)) &&
+      !testEcho(asEchoPuzzle("", f), scheduled, lex).echo,
   );
 }
+
+const asEchoPuzzle = (date: string, p: { seedWord: string; rhymeKey: string; answers: readonly SittingAnswer[] }): EchoPuzzle => ({
+  date,
+  seedWord: p.seedWord,
+  rhymeKey: p.rhymeKey,
+  answers: p.answers.map((a) => a.word),
+});
 
 export interface ConsequenceContext {
   days: readonly SittingDay[];

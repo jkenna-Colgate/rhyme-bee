@@ -13,9 +13,11 @@
  * day and never moves one that passes. The ranking ran once, in #264, and some
  * of its picks were then corrected by hand, so `--re-rank`, which would undo
  * them, has to be named. The run is `runSeedWordTest` (`src/seedWordRun.ts`);
- * this file only reads, prints and writes.
+ * this file only reads, prints and writes. It ends with the Echo check (#315)
+ * over the whole Schedule, which reports and never fails the run.
  */
 
+import { echoLines, scheduleEchoes } from "../src/echo.ts";
 import { runSeedWordTest } from "../src/seedWordRun.ts";
 import { loadIndex, readScheduleFile, writeScheduleFile } from "./judgeRun.ts";
 
@@ -23,7 +25,8 @@ const write = process.argv.includes("--write");
 const reRank = process.argv.includes("--re-rank");
 const { raw, schedule } = readScheduleFile();
 
-const run = runSeedWordTest(schedule.days, loadIndex(), { reRank });
+const index = loadIndex();
+const run = runSeedWordTest(schedule.days, index, { reRank });
 console.log(
   `Seed Word test: ${schedule.days.length} scheduled days, ${run.changes.length} Seed Word(s) changed, ` +
     `${run.freePlay.length} Free Play${reRank ? " (re-ranking passing days too)" : ""}.`,
@@ -36,6 +39,12 @@ for (const { date, why, before, after } of run.changes) {
 }
 for (const { date, seed, rhymeKey, detail } of run.freePlay) {
   console.log(`  Free Play ${date}: ${seed} on ${rhymeKey}. ${detail}`);
+}
+
+// The Echo check (#315) over the whole Schedule as the run leaves it, naming
+// the days a change swapped in. It reports and changes nothing.
+for (const line of echoLines(scheduleEchoes(run.days, index, schedule.lapStart), run.changes.map((c) => c.date))) {
+  console.log(line);
 }
 
 if (write && run.changes.length > 0) {

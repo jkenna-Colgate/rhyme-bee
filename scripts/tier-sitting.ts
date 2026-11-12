@@ -151,7 +151,7 @@ function place(args: string[]) {
   console.log(`  combined minus knownness: ${margin(signals.combinedOverKnownness.agreement)} in sample, ${margin(signals.combinedOverKnownness.heldOut)} held out`);
   console.log("  (the combined signal holds every knownness cut, so in sample it cannot lose; read the held-out margin)");
 
-  const pool = unscheduledPool(passingPoolFamilies(index), days);
+  const pool = unscheduledPool(passingPoolFamilies(index), days, index);
   const before = consequencesAt(today, { days, pool });
   const at = consequencesAt(placed.inForce, { days, pool });
   console.log(`\nat the placed lines, across ${days.length} scheduled days:`);
