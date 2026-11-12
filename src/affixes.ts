@@ -393,6 +393,12 @@ function suffixRule({ spelling, phonemes }: Suffix): AffixRule {
 }
 
 /**
+ * The configured suffixes as rules, for the one reader of derived that counts
+ * them: the Echo test (`src/echo.ts`, #315). `isDerived` still does not.
+ */
+export const SUFFIX_RULES: readonly AffixRule[] = SUFFIXES.map(suffixRule);
+
+/**
  * Every affix rule, in the order the derivation stage tries them. Longest
  * spelling first, so the most specific segmentation of a word wins: `underpay`
  * is `under` + `pay`, not `un` + `derpay`, and `unhappiness` is `unhappy` +

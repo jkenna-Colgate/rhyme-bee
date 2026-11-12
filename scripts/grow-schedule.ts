@@ -12,6 +12,8 @@
  * test, land in the size band (the Schedule's own, or `--band`, which is then
  * recorded), and hold no place another day holds. Those that do are dealt into
  * whole weeks and placed after the week in progress; the rest of a week waits.
+ * Then the Echo check (#315) runs over the grown Schedule and names any Echo
+ * the new weeks made, without refusing a word for it.
  *
  * The maintainer runs it, present: nothing calls it unattended. Read off the
  * built Rhyme Index, so run `npm run build:index` first. The rules are
@@ -21,6 +23,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseBatchRecord } from "../src/batch.ts";
+import { echoLines, scheduleEchoes } from "../src/echo.ts";
 import { addDays, localCalendarDate, type SizeBand } from "../src/schedule.ts";
 import { growSchedule } from "../src/scheduleGrowth.ts";
 import { loadIndex, readScheduleFile, writeScheduleFile } from "./judgeRun.ts";
@@ -47,7 +50,8 @@ const record = parseBatchRecord(existsSync(batchesPath) ? readFileSync(batchesPa
 // A player east of the maintainer may already be on tomorrow, and that day's
 // week is the one in progress for them.
 const today = addDays(localCalendarDate(), 1);
-const growth = growSchedule(schedule, loadIndex(), record, named, { today, band });
+const index = loadIndex();
+const growth = growSchedule(schedule, index, record, named, { today, band });
 
 for (const { seed, named: asked, reasons } of growth.refused) {
   console.log(`Refused ${seed}${asked ? "" : " (waiting in data/batches.json)"}:`);
@@ -69,6 +73,16 @@ if (growth.grown === null) {
   console.log(`The Schedule is unchanged: ${why}.`);
   process.exit(refusedNamed ? 1 : 0);
 }
+// The Echo check (#315) over the whole grown Schedule, naming the new days: a
+// newcomer that echoes, and a scheduled day a newcomer makes into an Echo. It
+// reports and blocks nothing; which day keeps its place is the maintainer's
+// call, made in the same change.
+const { lapStart: grownLap, days: grownDays } = growth.grown;
+const change = { joining: growth.added.map((d) => d.date), before: scheduleEchoes(schedule.days, index, schedule.lapStart) };
+for (const line of echoLines(scheduleEchoes(grownDays, index, grownLap), change)) {
+  console.log(line);
+}
+
 if (!write) {
   console.log(`Nothing written. The lap would start ${growth.grown.lapStart}; pass --write to write data/schedule.json.`);
 } else {
