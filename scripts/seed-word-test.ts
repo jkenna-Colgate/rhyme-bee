@@ -43,7 +43,9 @@ for (const { date, seed, rhymeKey, detail } of run.freePlay) {
 
 // The Echo check (#315) over the whole Schedule as the run leaves it, naming
 // the days a change swapped in. It reports and changes nothing.
-for (const line of echoLines(scheduleEchoes(run.days, index, schedule.lapStart), run.changes.map((c) => c.date))) {
+const joining = run.changes.map((c) => c.date);
+const before = joining.length > 0 ? scheduleEchoes(schedule.days, index, schedule.lapStart) : [];
+for (const line of echoLines(scheduleEchoes(run.days, index, schedule.lapStart), { joining, before })) {
   console.log(line);
 }
 

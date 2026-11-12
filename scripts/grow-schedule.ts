@@ -78,7 +78,8 @@ if (growth.grown === null) {
 // reports and blocks nothing; which day keeps its place is the maintainer's
 // call, made in the same change.
 const { lapStart: grownLap, days: grownDays } = growth.grown;
-for (const line of echoLines(scheduleEchoes(grownDays, index, grownLap), growth.added.map((d) => d.date))) {
+const change = { joining: growth.added.map((d) => d.date), before: scheduleEchoes(schedule.days, index, schedule.lapStart) };
+for (const line of echoLines(scheduleEchoes(grownDays, index, grownLap), change)) {
   console.log(line);
 }
 

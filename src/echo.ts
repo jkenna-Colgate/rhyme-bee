@@ -14,7 +14,11 @@ import type { RhymeKey } from "./phonology.ts";
 import type { RhymeIndex } from "./rhymeIndex.ts";
 import type { ScheduleDay } from "./schedule.ts";
 
-/** A scheduled Puzzle as the Echo test reads it. `answers` excludes the Seed Word. */
+/**
+ * A scheduled Puzzle as the Echo test reads it. `answers` are the Answers left
+ * to find, as `buildPuzzle` gives them: the Seed Word is an Answer, but it is
+ * given and not found, so it is not among them (decision 4).
+ */
 export interface EchoPuzzle {
   date: string;
   seedWord: string;
@@ -178,13 +182,21 @@ const percent = (share: number) => `${Math.round(share * 100)}%`;
 
 /**
  * The Echoes as lines for a terminal: a count, then each Echo with its date,
- * Seed Word and share, and the days it echoes. `joining` names the dates of
- * days being added or swapped in, so a change says which Echoes are its own
- * doing: a newcomer that echoes, and a day a newcomer is echoed by.
+ * Seed Word and share, and the days it echoes. A change passes `joining`, the
+ * dates of the days it adds or swaps in, and `before`, the Echoes of the
+ * Schedule before it, so the lines say which Echoes are its own doing: a
+ * newcomer that echoes, and a day that was no Echo until a newcomer joined.
  */
-export function echoLines(echoes: readonly Echo[], joining: readonly string[] = []): string[] {
+export function echoLines(
+  echoes: readonly Echo[],
+  change: { joining: readonly string[]; before: readonly Echo[] } = { joining: [], before: [] },
+): string[] {
   if (echoes.length === 0) return ["Echoes: no scheduled day echoes another."];
-  const joins = new Set(joining);
+  const joins = new Set(change.joining);
+  // Known by its Seed Word and Rhyme Key, since growing the Schedule moves the
+  // rest of the lap to later dates.
+  const pair = (e: Echo) => `${e.seedWord}|${e.rhymeKey}`;
+  const already = new Set(change.before.map(pair));
   const lines = [
     `Echoes: ${echoes.length} scheduled day(s) have no native Answer and give back more than half their Answers from other days.`,
   ];
@@ -192,7 +204,7 @@ export function echoLines(echoes: readonly Echo[], joining: readonly string[] = 
     const from = e.echoed.map((d) => `${d.seedWord} ${d.date} ${percent(d.share)}`).join(", ");
     const why = joins.has(e.date)
       ? " (joining)"
-      : e.echoed.some((d) => joins.has(d.date))
+      : !already.has(pair(e)) && e.echoed.some((d) => joins.has(d.date))
         ? " (made an Echo by a day joining)"
         : "";
     lines.push(`  ${e.date} ${e.seedWord} on ${e.rhymeKey}: ${percent(e.share)} restated, from ${from}${why}`);

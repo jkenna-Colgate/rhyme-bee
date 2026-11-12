@@ -346,7 +346,10 @@ the maintainer in its triage.
    [20, 120] before and after: 100 Shadow Keys and a Seed pool of 233, unchanged.
 7. **An Echo is a matter for the Schedule.** Free Play and the Seed pool's own
    eligibility are unchanged. Only the unscheduled pool a replacement is drawn from
-   drops a family that would be an Echo of the days already scheduled.
+   drops a family that would be an Echo of the days already scheduled. At [15, 120],
+   the floor the replacements are drawn at, that leaves 30 of 40 unscheduled
+   families. Triage counted 31; the difference is `selectively`, the `-ly` family
+   of `corrective`, which only the suffix reading sees.
 8. **When an added Seed Word would make an Echo of a day already scheduled, the
    Puzzle with more to find takes the place**, and a person gives the echoing day
    another Seed Word in the same change. The tooling reports and does not choose.

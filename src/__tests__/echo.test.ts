@@ -231,7 +231,19 @@ describe("echoLines", () => {
   });
 
   it("says which Echoes a change made: a newcomer that echoes, or a day a newcomer echoes", () => {
-    expect(echoLines(echoesIn([air, airs], lex), ["2026-11-03"])[1]).toMatch(/\(joining\)$/);
-    expect(echoLines(echoesIn([air, airs], lex), ["2026-11-02"])[1]).toMatch(/\(made an Echo by a day joining\)$/);
+    expect(echoLines(echoesIn([air, airs], lex), { joining: ["2026-11-03"], before: [] })[1]).toMatch(/\(joining\)$/);
+    expect(echoLines(echoesIn([air, airs], lex), { joining: ["2026-11-02"], before: [] })[1]).toMatch(
+      /\(made an Echo by a day joining\)$/,
+    );
+  });
+
+  it("does not credit a change with an Echo that was there before it", () => {
+    // `air` swapped for another Seed Word on its own key: `airs` echoed it already.
+    const before = echoesIn([air, airs], lex);
+    const lines = echoLines(echoesIn([{ ...air, seedWord: "chair", answers: ["air", "stair"] }, airs], lex), {
+      joining: ["2026-11-02"],
+      before,
+    });
+    expect(lines[1]).toBe("  2026-11-03 airs on EH R Z: 100% restated, from chair 2026-11-02 100%");
   });
 });
