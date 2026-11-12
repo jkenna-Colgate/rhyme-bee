@@ -1,20 +1,50 @@
 {
   "note": "Which Seed Words have been through a Batch, and with what result (#267). Written by the batch command; a Seed Word with no entry has not been checked. Each Batch's run report is in data/judge-runs/.",
   "seeds": {
+    "adopt": [
+      {"date":"2026-11-12","rhymeKey":"AA P T","trust":"pass","failuresPerLook":[2,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "arouse": [
       {"date":"2026-11-01","rhymeKey":"AW Z","trust":"untested","failuresPerLook":[2,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "bark": [
       {"date":"2026-11-01","rhymeKey":"AA R K","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":9,"listed":0,"unruled":[],"stillScored":[]}}
     ],
+    "blonde": [
+      {"date":"2026-11-12","rhymeKey":"AA N D","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "blunt": [
+      {"date":"2026-11-12","rhymeKey":"AH N T","trust":"pass","failuresPerLook":[1,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "body": [
+      {"date":"2026-11-12","rhymeKey":"AA D IY","trust":"fail","failuresPerLook":[3,2,3],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":4,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "breach": [
+      {"date":"2026-11-12","rhymeKey":"IY CH","trust":"pass","failuresPerLook":[1,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "breathtaking": [
       {"date":"2026-11-01","rhymeKey":"EY K AH NG","trust":"pass","failuresPerLook":[5,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "brush": [
+      {"date":"2026-11-12","rhymeKey":"AH SH","trust":"pass","failuresPerLook":[2,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "butter": [
+      {"date":"2026-11-12","rhymeKey":"AH D ER","trust":"pass","failuresPerLook":[6,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":1,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "cape": [
+      {"date":"2026-11-12","rhymeKey":"EY P","trust":"pass","failuresPerLook":[3,2,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":1,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "cat": [
       {"date":"2026-11-01","rhymeKey":"AE T","trust":"fail","failuresPerLook":[0,2,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":9,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "cause": [
       {"date":"2026-11-01","rhymeKey":"AA Z","trust":"fail","failuresPerLook":[6,3,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":1,"listed":1,"unruled":[],"stillScored":[]}}
+    ],
+    "chance": [
+      {"date":"2026-11-12","rhymeKey":"AE N S","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":4,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "clever": [
+      {"date":"2026-11-12","rhymeKey":"EH V ER","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":4,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "compressor": [
       {"date":"2026-11-01","rhymeKey":"EH S ER","trust":"pass","failuresPerLook":[6,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":1,"listed":0,"unruled":[],"stillScored":[]}}
@@ -25,11 +55,26 @@
     "deflect": [
       {"date":"2026-11-01","rhymeKey":"EH K T","trust":"pass","failuresPerLook":[5,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
     ],
+    "enthusiastic": [
+      {"date":"2026-11-12","rhymeKey":"AE S T AH K","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "feast": [
+      {"date":"2026-11-12","rhymeKey":"IY S T","trust":"pass","failuresPerLook":[2,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "feet": [
       {"date":"2026-11-01","rhymeKey":"IY T","trust":"pass","failuresPerLook":[4,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":11,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "fetid": [
       {"date":"2026-11-04","rhymeKey":"EH D AH D","trust":"pass","failuresPerLook":[2,2,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-04.batch.seeds.fetid.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "flicker": [
+      {"date":"2026-11-12","rhymeKey":"IH K ER","trust":"fail","failuresPerLook":[2,2,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "font": [
+      {"date":"2026-11-12","rhymeKey":"AA N T","trust":"pass","failuresPerLook":[2,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":3,"listed":1,"unruled":[],"stillScored":[]}}
+    ],
+    "gang": [
+      {"date":"2026-11-12","rhymeKey":"AE NG","trust":"pass","failuresPerLook":[1,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":7,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "grassroots": [
       {"date":"2026-11-01","rhymeKey":"UW T S","trust":"pass","failuresPerLook":[2,3,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":0,"unruled":[],"stillScored":[]}}
@@ -46,8 +91,14 @@
     "hop": [
       {"date":"2026-10-30","rhymeKey":"AA P","trust":"pass","failuresPerLook":[10,2,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-10-30.batch.2026-10-30..2026-11-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
     ],
+    "impressive": [
+      {"date":"2026-11-12","rhymeKey":"EH S AH V","trust":"pass","failuresPerLook":[4,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "inspector": [
       {"date":"2026-11-01","rhymeKey":"EH K T ER","trust":"fail","failuresPerLook":[7,2,3],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":3,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "jump": [
+      {"date":"2026-11-12","rhymeKey":"AH M P","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":1,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "kennel": [
       {"date":"2026-11-01","rhymeKey":"EH N AH L","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"fail","hunted":10,"listed":8,"unruled":["environmental","fundamental","gentle","judgmental","monumental","supplemental","transcendental"],"stillScored":[]}}
@@ -55,14 +106,29 @@
     "longstanding": [
       {"date":"2026-11-01","rhymeKey":"AE N D AH NG","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
     ],
+    "lost": [
+      {"date":"2026-11-12","rhymeKey":"AA S T","trust":"pass","failuresPerLook":[1,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":1,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "match": [
+      {"date":"2026-11-12","rhymeKey":"AE CH","trust":"fail","failuresPerLook":[3,4,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":3,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "meal": [
       {"date":"2026-11-01","rhymeKey":"IY L","trust":"pass","failuresPerLook":[1,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":11,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "momentarily": [
+      {"date":"2026-11-12","rhymeKey":"EH R AH L IY","trust":"fail","failuresPerLook":[1,3,4],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":1,"unruled":[],"stillScored":[]}}
     ],
     "nod": [
       {"date":"2026-11-01","rhymeKey":"AA D","trust":"fail","failuresPerLook":[3,3,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":7,"listed":0,"unruled":[],"stillScored":[]}}
     ],
+    "noise": [
+      {"date":"2026-11-12","rhymeKey":"OY Z","trust":"pass","failuresPerLook":[1,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "one": [
       {"date":"2026-11-01","rhymeKey":"AH N","trust":"pass","failuresPerLook":[0,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":10,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "over": [
+      {"date":"2026-11-12","rhymeKey":"OW V ER","trust":"pass","failuresPerLook":[3,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":3,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "peak": [
       {"date":"2026-11-01","rhymeKey":"IY K","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":8,"listed":0,"unruled":[],"stillScored":[]}}
@@ -72,6 +138,21 @@
     ],
     "plot": [
       {"date":"2026-11-01","rhymeKey":"AA T","trust":"fail","failuresPerLook":[3,2,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":7,"listed":1,"unruled":[],"stillScored":[]}}
+    ],
+    "point": [
+      {"date":"2026-11-12","rhymeKey":"OY N T","trust":"pass","failuresPerLook":[0,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":1,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "productive": [
+      {"date":"2026-11-12","rhymeKey":"AH K T AH V","trust":"pass","failuresPerLook":[1,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "proof": [
+      {"date":"2026-11-12","rhymeKey":"UW F","trust":"fail","failuresPerLook":[6,4,3],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "pub": [
+      {"date":"2026-11-12","rhymeKey":"AH B","trust":"pass","failuresPerLook":[0,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":4,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "riddle": [
+      {"date":"2026-11-12","rhymeKey":"IH D AH L","trust":"pass","failuresPerLook":[1,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":2,"listed":1,"unruled":[],"stillScored":[]}}
     ],
     "schilling": [
       {"date":"2026-11-01","rhymeKey":"IH L AH NG","trust":"pass","failuresPerLook":[1,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
@@ -91,14 +172,26 @@
     "sphinx": [
       {"date":"2026-11-01","rhymeKey":"IH NG K S","trust":"pass","failuresPerLook":[5,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":3,"listed":0,"unruled":[],"stillScored":[]}}
     ],
+    "squash": [
+      {"date":"2026-11-12","rhymeKey":"AA SH","trust":"pass","failuresPerLook":[1,0],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":4,"listed":1,"unruled":[],"stillScored":[]}}
+    ],
+    "squeeze": [
+      {"date":"2026-11-12","rhymeKey":"IY Z","trust":"pass","failuresPerLook":[0,2,1],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":7,"listed":2,"unruled":[],"stillScored":[]}}
+    ],
     "steam": [
       {"date":"2026-10-30","rhymeKey":"IY M","trust":"fail","failuresPerLook":[2,4,2],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-10-30.batch.2026-10-30..2026-11-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":10,"listed":1,"unruled":[],"stillScored":[]}}
     ],
     "town": [
       {"date":"2026-11-01","rhymeKey":"AW N","trust":"fail","failuresPerLook":[2,5,4],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":7,"listed":3,"unruled":[],"stillScored":[]}}
     ],
+    "traffic": [
+      {"date":"2026-11-12","rhymeKey":"AE F AH K","trust":"untested","failuresPerLook":[],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
     "triceratops": [
       {"date":"2026-11-01","rhymeKey":"AA P S","trust":"fail","failuresPerLook":[5,9,3],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
+    ],
+    "viable": [
+      {"date":"2026-11-12","rhymeKey":"AY AH B AH L","trust":"untested","failuresPerLook":[6],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-12.batch.seeds.match-squeeze-body-chance-productive-breach-jump-blunt-cape-.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":0,"listed":0,"unruled":[],"stillScored":[]}}
     ],
     "would": [
       {"date":"2026-11-01","rhymeKey":"UH D","trust":"fail","failuresPerLook":[0,3,3],"gate":{"k":1,"n":3},"playerModel":"claude-sonnet-5-5","judgeModel":"claude-sonnet-5-5","report":"data/judge-runs/2026-11-01.batch.2026-11-02..2026-12-01.claude-sonnet-5-5.run-1.json","noFalseAccepts":{"result":"pass","hunted":10,"listed":0,"unruled":[],"stillScored":[]}}

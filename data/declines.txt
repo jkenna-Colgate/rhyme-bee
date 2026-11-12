@@ -24,3 +24,6 @@
 # ruling: the line itself records only that one was made.
 #
 # There is no un-decline in the tool. Reversing one is deleting its line.
+wont AA N T
+tush AH SH
+exemplarily EH R AH L IY

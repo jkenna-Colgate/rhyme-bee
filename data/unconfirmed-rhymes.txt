@@ -39,3 +39,23 @@ consorted judge:claude-sonnet-5-5 missing-reading medium AO R D AH D
 bluegown judge:claude-sonnet-5-5 missing-reading medium AW N
 undersighted judge:claude-sonnet-5-5 missing-reading medium AY T AH D
 coleslaws judge:claude-sonnet-5-5 missing-reading medium AA Z
+entrance judge:claude-sonnet-5-5 overrule high AE N S
+decoys judge:claude-sonnet-5-5 overrule high OY Z
+envoys judge:claude-sonnet-5-5 overrule high OY Z
+involuntarily judge:claude-sonnet-5-5 overrule high EH R AH L IY
+revolutionarily judge:claude-sonnet-5-5 overrule high EH R AH L IY
+imaginarily judge:claude-sonnet-5-5 overrule high EH R AH L IY
+beelzebub judge:claude-sonnet-5-5 missing-reading medium AH B
+twang judge:claude-sonnet-5-5 overrule high AE NG
+chimpanzees judge:claude-sonnet-5-5 overrule high IY Z
+refugees judge:claude-sonnet-5-5 overrule high IY Z
+buoys judge:claude-sonnet-5-5 overrule high OY Z
+playboys judge:claude-sonnet-5-5 missing-reading medium OY Z
+yond judge:claude-sonnet-5-5 missing-reading medium AA N D
+sedentarily judge:claude-sonnet-5-5 overrule high EH R AH L IY
+hereditarily judge:claude-sonnet-5-5 overrule high EH R AH L IY
+hubbub judge:claude-sonnet-5-5 overrule high AH B
+legendarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
+elementarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
+complementarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
+parliamentarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
