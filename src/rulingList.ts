@@ -1,16 +1,17 @@
 /**
- * The Batch's **ruling list** (#268, #292 to #295): every item a Batch puts to
- * the maintainer after its last model call, what the maintainer is shown for
- * each, and how what they type is read. There are four kinds of item: a hunted
- * Answer the Judge doubts and a day's group of Answers only Normalisation puts
- * on the key (both chosen by `noFalseAccepts.ts`, which gates the day on the
- * rulings), a rhyme the Judge left undecided, and a written-in word with no
- * knownness to Tier. Each kind has its own prompt and parser, and a parser
- * returns only its own kind's Decisions. This module calls no model, reads no
- * file and writes none; `scripts/batchHunt.ts` asks and writes.
+ * The Batch's **ruling list** (#268, #292 to #295, #319): every item a Batch
+ * puts to the maintainer after its last model call, what the maintainer is shown
+ * for each, and how what they type is read. There are five kinds of item: a
+ * hunted Answer the Judge doubts and a day's group of Answers only Normalisation
+ * puts on the key (both chosen by `noFalseAccepts.ts`, which gates the day on
+ * the rulings), a rhyme the Judge left undecided, a written-in word with no
+ * knownness to Tier, and a written-in word whose knownness makes it an Answer,
+ * to keep or make a Bonus Word. Each kind has its own prompt and parser, and a
+ * parser returns only the Decisions its kind can make. This module calls no
+ * model, reads no file and writes none; `scripts/batchHunt.ts` asks and writes.
  */
 
-import type { UndecidedRhyme, UntieredWord } from "./batch.ts";
+import type { UndecidedRhyme, UntieredWord, WrittenInAnswer } from "./batch.ts";
 import type { DemotionReason } from "./demotions.ts";
 import { agreementOver, phonemesOf, readingReachesKey, type Agreement, type TierAnswer, type TierRuling } from "./judge.ts";
 import type { AppendedGroup, ListedAnswer } from "./noFalseAccepts.ts";
@@ -68,8 +69,10 @@ export function shownReadings(
  *
  * On a written-in word with no knownness (#294), tier writes a Tier verdict
  * (`data/tier-overrides.csv`, as the Editor's Pass writes one), and unruled is
- * a word skipped. Each kind of item is read by its own parser (`parseDecision`,
- * `parseUndecided`, `parseTier`), which returns only its own kinds.
+ * a word skipped. On a written-in word that scores (#319), leave keeps it an
+ * Answer and writes nothing, and tier writes a Bonus Word verdict. Each kind of
+ * item is read by its own parser (`parseDecision`, `parseUndecided`,
+ * `parseTier`, `parseWrittenInAnswer`), which returns only its own kinds.
  */
 export type Decision =
   | { kind: "correction"; reading: Pronunciation }
@@ -86,14 +89,17 @@ export type Decision =
  * call: a hunted Answer the Judge doubts (#268), a day's group of Answers only
  * Normalisation puts on the key (#297), a rhyme it left undecided (#293), or a
  * word the Batch wrote in that has no knownness, to Tier (#294), with the
- * Judge's answer to the Tier question as the default (#295). Each word in a
- * group is ruled as a hunted Answer is, with the same prompt and parser.
+ * Judge's answer to the Tier question as the default (#295), or a word it wrote
+ * in whose knownness makes it an Answer, to keep or make a Bonus Word (#319).
+ * Each word in a group is ruled as a hunted Answer is, with the same prompt and
+ * parser.
  */
 export type RulingItem =
   | { kind: "hunted"; listed: ListedAnswer }
   | { kind: "appended-group"; group: AppendedGroup }
   | { kind: "undecided"; rhyme: UndecidedRhyme }
-  | { kind: "tier"; untiered: UntieredWord; judge?: TierRuling };
+  | { kind: "tier"; untiered: UntieredWord; judge?: TierRuling }
+  | { kind: "written-in-answer"; written: WrittenInAnswer };
 
 /** One command a line: what is typed, padded, then its effect. */
 const commandLine = (typed: string, effect: string): string => `  ${typed.padEnd(20)} ${effect}`;
@@ -330,6 +336,47 @@ export function parseTier(input: string, judge?: TierRuling): Decision | null {
       return { kind: "tier", tier: "bonus" };
     case "s":
       return { kind: "unruled" };
+    default:
+      return null;
+  }
+}
+
+// ---- a written-in word that scores ---------------------------------------------
+
+/**
+ * What the maintainer is shown for a word the Batch wrote in whose knownness is
+ * at or above the Answer line (#319): that it scores and nobody has looked at
+ * it, the Retrieval question (ADR-0015), that an answer is awaited, then one
+ * command a line with its effect. Its default is the Tier it already holds, so
+ * Enter keeps it and writes nothing; the Judge is not asked, because over the
+ * maintainer's blind marks it called half the marked Answers Bonus Words.
+ * Every command it names is one `parseWrittenInAnswer` reads.
+ */
+export function writtenInAnswerPrompt(written: WrittenInAnswer, answerLine: number): string[] {
+  return [
+    `Its knownness is ${written.knownness.toFixed(2)}, at or above the Answer line of ${answerLine.toFixed(2)}, ` +
+    "so it scores as an Answer, and nobody has looked at it.",
+    `Would an ordinary player think of ${written.word} when hunting rhymes for ${written.seedWord}?`,
+    "Waiting for your Tier ruling on this word. Type one of these and press Enter:",
+    commandLine("Enter", "keep it an Answer, as it is: nothing is written"),
+    commandLine("a", "the same as Enter"),
+    commandLine("b", "Bonus Word: an unlocked Tier verdict is written to data/tier-overrides.csv, so it stays accepted and unscored from the next build"),
+  ];
+}
+
+/**
+ * A ruling on a written-in word that scores, as the maintainer types it: Enter
+ * alone, or `a`, to keep it an Answer (`leave`, which writes nothing), and `b`
+ * for a Bonus Word. Null when it does not read, so the caller asks again and
+ * writes nothing.
+ */
+export function parseWrittenInAnswer(input: string): Decision | null {
+  switch (input.trim().toLowerCase()) {
+    case "":
+    case "a":
+      return { kind: "leave" };
+    case "b":
+      return { kind: "tier", tier: "bonus" };
     default:
       return null;
   }

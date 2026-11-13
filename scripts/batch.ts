@@ -55,6 +55,13 @@
  * hunting rhymes for the Seed Word: Retrieval, ADR-0015) is filled in as the
  * default, which Enter accepts and nothing writes by itself (#295); the run
  * report records it beside the ruling, and how often the two agreed.
+ * After them, grouped by Seed Word, come the words the looks wrote in whose
+ * knownness is at or above the Answer line, which would otherwise score with
+ * nobody having looked (#319). The Judge is not asked of these: Enter keeps each an Answer
+ * and writes nothing, and `b` writes an unlocked Bonus Word verdict. A word
+ * written in below the line is not listed: it does not score, and Session
+ * Records move it up if players find it. The run report keeps them apart from
+ * the Judge's agreement figures, since the Judge gave no answer on them.
  * The whole list is put after the Batch's last model call, the Tier question's.
  *
  * It writes the run report to `data/judge-runs/` and the result per Seed Word
@@ -93,6 +100,7 @@ import {
   trustVerdict,
   undecidedRhymes,
   untieredWrittenIn,
+  writtenInAnswers,
   type BatchEntry,
   type BatchSeed,
   type KeyCount,
@@ -224,7 +232,9 @@ console.error(
   `(${huntPlan.appendedOnly} of them on the key only through readings Normalisation appended), ` +
   `${huntPlan.rhyme} rhyme calls and ${huntPlan.wordhood} wordhood calls (recounted after the looks land)\n` +
   `  Tier question, Judge (${JUDGE_MODEL}): one call per ${TIER_BATCH} words the looks write in with no knownness, ` +
-  "after the hunt and before the ruling list; none if they write in none",
+  "after the hunt and before the ruling list; none if they write in none\n" +
+  "  Tier step, no call: each word the looks write in with a knownness at or above the Answer line " +
+  `(${index.knownnessThreshold}) is listed after those, grouped by Seed Word, for you to keep an Answer or make a Bonus Word`,
 );
 const cost = batchCost({ seeds: block.length, gate, maxJudgeCalls, hunt: huntPlan }, { player: playerModel, judge: JUDGE_MODEL });
 console.error("The cost, in calls:");
@@ -452,6 +462,7 @@ if (!stopped) {
 // call cap asks nothing more, and its words are put to the maintainer without one.
 
 const untiered = untieredWrittenIn(writtenIn, (word) => index.tierOf(word).knownness);
+const answersWrittenIn = writtenInAnswers(writtenIn, (word) => index.tierOf(word).knownness, index.knownnessThreshold);
 let tierRulings = new Map<string, TierRuling>();
 if (!stopped && untiered.length) {
   console.error(`\nThe Tier question: ${untiered.length} words written in with no knownness, ${Math.ceil(untiered.length / TIER_BATCH)} calls`);
@@ -467,7 +478,7 @@ if (!stopped && untiered.length) {
 // then each day's group of Answers only Normalisation puts on the key (#297),
 // then the rhymes it ruled in the looks and left undecided, then the words the
 // looks wrote in that have no knownness, to Tier (#294) with the Judge's answer
-// filled in (#295).
+// filled in (#295), then the words they wrote in that score, by Seed Word (#319).
 
 const undecided = undecidedRhymes(lookRulings, readDeclines());
 const listing = huntAsked ? huntListing(huntAsked.leg.rulings) : { answers: [], groups: [] };
@@ -479,6 +490,7 @@ const rulingItems: RulingItem[] = [
     const judge = tierRulings.get(word.word);
     return judge ? { kind: "tier", untiered: word, judge } : { kind: "tier", untiered: word };
   }),
+  ...answersWrittenIn.map((written): RulingItem => ({ kind: "written-in-answer", written })),
 ];
 const settled = await settleRulingList(rulingItems, { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
 if (settled.some((s) => s.decision.kind === "demotion" || s.decision.kind === "tier")) {
@@ -496,6 +508,10 @@ const tierSettled = settled.flatMap((s) =>
   s.item.kind === "tier" ? [{ untiered: s.item.untiered, judge: s.item.judge, decision: s.decision, wrote: s.wrote }] : []);
 const tierAgreed = tierAgreement(tierSettled);
 const tierSkipped = tierSettled.filter((s) => s.decision.kind === "unruled").map((s) => `${s.untiered.word} /${s.untiered.rhymeKey}/`);
+const answersWrittenInSettled = settled.flatMap((s) =>
+  s.item.kind === "written-in-answer" ? [{ written: s.item.written, decision: s.decision, wrote: s.wrote }] : []);
+const answersWrittenInMoved = answersWrittenInSettled.filter((s) => s.decision.kind === "tier" && s.decision.tier === "bonus").map((s) => s.written.word);
+const answersWrittenInUnruled = answersWrittenInSettled.filter((s) => s.decision.kind === "unruled").map((s) => s.written.word);
 
 // ---- the report and the record -------------------------------------------------
 
@@ -604,6 +620,20 @@ const reportPath = writeRunReport(date, stem, run, {
     skipped: tierSkipped,
     agreement: tierAgreed,
   },
+  writtenInAnswers: {
+    note:
+      "Words the looks wrote in whose knownness is at or above the Answer line, so each scored as an Answer with nobody " +
+      "having looked, put to the maintainer after the words with no knownness, grouped by Seed Word (#319). The Judge was " +
+      "not asked, so none is in the agreement above. Kept wrote nothing; moved wrote an unlocked Bonus Word verdict to " +
+      "data/tier-overrides.csv, which the next build applies; unruled (no terminal) left the word an Answer.",
+    answerLine: index.knownnessThreshold,
+    listed: answersWrittenInSettled.length,
+    moved: answersWrittenInMoved,
+    unruled: answersWrittenInUnruled,
+    decided: answersWrittenInSettled.map(({ written: w, decision, wrote }) => ({
+      word: w.word, seedWord: w.seedWord, rhymeKey: w.rhymeKey, knownness: w.knownness, decision, wrote,
+    })),
+  },
 });
 
 const reportFromRoot = relative(root, reportPath).replace(/\\/g, "/");
@@ -651,6 +681,11 @@ if (tierSettled.length) {
   console.log(`written-in words with no knownness: ${tierSettled.length}, Tiered Answer ${tiered("answer")}, Bonus Word ${tiered("bonus")}` +
     `${tierSkipped.length ? `, skipped ${tierSkipped.join(", ")}` : ""}` +
     `; agreed with the Judge on ${tierAgreed.agreed} of ${tierAgreed.compared} compared`);
+}
+if (answersWrittenInSettled.length) {
+  console.log(`written-in words that scored: ${answersWrittenInSettled.length}, moved to Bonus Word ${answersWrittenInMoved.length}` +
+    `${answersWrittenInMoved.length ? ` (${answersWrittenInMoved.join(", ")})` : ""}` +
+    `${answersWrittenInUnruled.length ? `, unruled ${answersWrittenInUnruled.length}` : ""}`);
 }
 if (stopped) console.log(`stopped: ${stopped}`);
 console.log(
