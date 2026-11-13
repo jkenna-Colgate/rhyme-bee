@@ -39,14 +39,17 @@ import {
   parseDecision,
   parseTier,
   parseUndecided,
+  parseWrittenInAnswer,
   rulingPrompt,
   shownReadings,
   tierPrompt,
   undecidedPrompt,
+  writtenInAnswerPrompt,
   type Decision,
   type RulingItem,
 } from "../src/rulingList.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
+import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Schedule } from "../src/schedule.ts";
 import { seedWordCheckLines } from "../src/seedWord.ts";
@@ -189,10 +192,17 @@ export function rebuild(): { ok: true } | { ok: false; error: string } {
 
 const TIER_OVERRIDES_PATH = resolve(dataDir, "tier-overrides.csv");
 
+/** The pinned prevalence norms, unpatched, read once: a Tier verdict's measured value is the word's own row. */
+let norms: Map<string, number> | undefined;
+const measuredPrevalence = (): ReadonlyMap<string, number> =>
+  (norms ??= parsePrevalenceCsv(readFileSync(resolve(dataDir, "prevalence.csv"), "utf8")));
+
 /**
  * The Tier verdict each ruling writes. An Answer is `answer-common`: the word
  * is Tiered because a player would think of it (Retrieval), and with no
- * knownness there is no measure that would make it rare.
+ * knownness there is no measure that would make it rare. Only a word with no
+ * knownness is ever Tiered an Answer here; one that already scores is kept by
+ * writing nothing (#319).
  */
 const BATCH_TIER_VERDICT = { answer: "answer-common", bonus: "bonus" } as const satisfies Record<TierAnswer, TierVerdict>;
 
@@ -202,7 +212,8 @@ type SittingContext = { index: () => RhymeIndex; extract: WiktionaryExtract; sch
 const itemPair = (item: RuledItem): { word: string; rhymeKey: RhymeKey } =>
   item.kind === "hunted" ? { word: item.listed.answer.word, rhymeKey: item.listed.rhymeKey }
   : item.kind === "undecided" ? item.rhyme
-  : item.untiered;
+  : item.kind === "tier" ? item.untiered
+  : item.written;
 
 /** The words of the list in the order they are put: a day's group opens into its members, each a hunted Answer. */
 function ruledItems(items: readonly RulingItem[]): { item: RuledItem; group?: AppendedGroup }[] {
@@ -228,6 +239,17 @@ function groupLines(group: AppendedGroup): string[] {
  * the Judge's reasoning shown only for those it held.
  */
 function presentItem(item: RuledItem, index: RhymeIndex, extract: WiktionaryExtract): { lines: string[]; parse: (input: string) => Decision | null } {
+  if (item.kind === "written-in-answer") {
+    const { written } = item;
+    return {
+      lines: [
+        `${written.word} for ${written.seedWord} /${written.rhymeKey}/: written in by this Batch, and an Answer by its knownness`,
+        ...index.readingsOf(written.word).map((r) => `  the game reads: ${r.pronunciation.join(" ")}`),
+        ...writtenInAnswerPrompt(written, index.knownnessThreshold).map((line) => `  ${line}`),
+      ],
+      parse: parseWrittenInAnswer,
+    };
+  }
   if (item.kind === "tier") {
     const { untiered, judge } = item;
     return {
@@ -276,8 +298,8 @@ function presentItem(item: RuledItem, index: RhymeIndex, extract: WiktionaryExtr
  * ruling as it is made. It is called after the Batch's last model call, so a
  * usage stop never lands mid-sitting. With no terminal to ask, the list is
  * printed and every item is left unruled: a hunted Answer, a group's members
- * among them, then fails the day's gate, and a rhyme the Judge left undecided or a word to Tier is listed as
- * skipped.
+ * among them, then fails the day's gate, a rhyme the Judge left undecided or a word to Tier is listed as
+ * skipped, and a written-in word that scores stays an Answer, unruled.
  */
 export async function settleRulingList(items: readonly RulingItem[], ctx: SittingContext): Promise<Settled[]> {
   const settled: Settled[] = [];
@@ -291,7 +313,8 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
       `${count("appended-group")} days' groups of Answers only Normalisation puts on the key (${grouped} words), ` +
       "listed because the Judge held one of the day's, each scored until you rule; " +
       `${count("undecided")} rhymes the Judge ruled and left undecided, each landing nothing until you rule; ` +
-      `and ${count("tier")} words this Batch wrote in with no knownness, each a Bonus Word until you Tier it.`,
+      `${count("tier")} words this Batch wrote in with no knownness, each a Bonus Word until you Tier it; ` +
+      `and ${count("written-in-answer")} words it wrote in whose knownness makes them Answers, each kept an Answer unless you make it a Bonus Word.`,
     );
   }
   if (!asking && items.length) console.error("No terminal to ask on, so every one is left unruled.");
@@ -333,12 +356,14 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
       } else if (decision.kind === "decline") {
         appendDecline(DECLINES_PATH, { word, rhymeKey });
         wrote = `data/declines.txt: ${word} ${rhymeKey}`;
-      } else if (decision.kind === "tier" && item.kind === "tier") {
-        // Written as the Editor's Pass writes a Tier verdict: no measured value (the word has none), unlocked.
+      } else if (decision.kind === "tier" && (item.kind === "tier" || item.kind === "written-in-answer")) {
+        // Written as the Editor's Pass writes a Tier verdict, unlocked, with the word's own prevalence row
+        // as measured (none for a word with no knownness, nor for one that tiers on a stem's row).
         const verdict = BATCH_TIER_VERDICT[decision.tier];
+        const seedWord = item.kind === "tier" ? item.untiered.seedWord : item.written.seedWord;
         appendTierOverride(TIER_OVERRIDES_PATH, {
-          word, verdict, measured: null, decided: new Date().toISOString(),
-          note: `Batch ${ctx.today}: written in on /${rhymeKey}/ for ${item.untiered.seedWord}`,
+          word, verdict, measured: item.kind === "tier" ? null : measuredPrevalence().get(word) ?? null, decided: new Date().toISOString(),
+          note: `Batch ${ctx.today}: written in on /${rhymeKey}/ for ${seedWord}`,
         });
         wrote = `data/tier-overrides.csv: ${word} ${verdict}`;
       }

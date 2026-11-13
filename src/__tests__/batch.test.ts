@@ -20,6 +20,7 @@ import {
   trustVerdict,
   undecidedRhymes,
   untieredWrittenIn,
+  writtenInAnswers,
   type BatchEntry,
 } from "../batch.ts";
 import type { JudgeRulingRecord } from "../judgeLanding.ts";
@@ -476,5 +477,43 @@ describe("the written-in words with no knownness, put to the maintainer to Tier"
       landed("marx", "parks", "AA R K S", "suggested-demotion"),
       landed("barbar", "guitar", "AA R", "nothing"),
     ], knownness)).toEqual([]);
+  });
+});
+
+describe("the written-in words that score, put to the maintainer to keep or make Bonus Words (#319)", () => {
+  const landed = (word: string, seedWord: string, rhymeKey: string, l: JudgeRulingRecord["landed"] = "reading"): JudgeRulingRecord => ({
+    date: "2026-11-12", model: "claude-sonnet-5-5", word, seedWord, rhymeKey, knew: "missing-reading", verdict: "rhyme",
+    reading: null, confidence: "high", why: "rhymes", landed: l,
+  });
+  /** The Answer line is 0.5: `afterschool` and `meringue` are above it, `creased` on it, `retool` below, `throwdown` has none. */
+  const KNOWNNESS: Record<string, number> = { afterschool: 1.33, meringue: 2.1, creased: 0.5, retool: 0.2 };
+  const knownness = (word: string) => KNOWNNESS[word] ?? null;
+
+  it("lists each written-in word at or above the Answer line, with its knownness and the Rhyme Key it was found on", () => {
+    expect(writtenInAnswers([
+      landed("afterschool", "cool", "UW L"),
+      landed("throwdown", "down", "AW N"),
+      landed("retool", "cool", "UW L"),
+      landed("creased", "feast", "IY S T"),
+    ], knownness, 0.5)).toEqual([
+      { word: "afterschool", seedWord: "cool", rhymeKey: "UW L", knownness: 1.33 },
+      { word: "creased", seedWord: "feast", rhymeKey: "IY S T", knownness: 0.5 },
+    ]);
+  });
+
+  it("groups the words by Seed Word, each Seed Word where its first word came", () => {
+    expect(writtenInAnswers([
+      landed("afterschool", "cool", "UW L"),
+      landed("creased", "feast", "IY S T"),
+      landed("meringue", "cool", "UW L"),
+    ], knownness, 0.5).map((w) => w.word)).toEqual(["afterschool", "meringue", "creased"]);
+  });
+
+  it("lists a word once, and none whose ruling wrote no reading", () => {
+    expect(writtenInAnswers([
+      landed("afterschool", "cool", "UW L"),
+      landed("afterschool", "school", "UW L"),
+      landed("meringue", "cool", "UW L", "unconfirmed-rhyme"),
+    ], knownness, 0.5).map((w) => [w.word, w.seedWord])).toEqual([["afterschool", "cool"]]);
   });
 });

@@ -206,8 +206,17 @@ what the No False Accepts hunt sends. It is decided and not built.
   governs Appeals. The list also asks the maintainer to Tier each word the
   Batch wrote in that has no knownness (25 of 131 this time), with the Judge's
   answer filled in. The Judge's Tier answer lands alone only once it has been
-  measured against the maintainer's rulings. And a correction may keep several
-  of a word's readings rather than replace them all with one.
+  measured against the maintainer's rulings. Since #319 (decided 2026-11-12)
+  the Tier step also lists, after those and grouped by Seed Word, each word the
+  Batch wrote in whose knownness is at or above the Answer line, which would
+  otherwise score with nobody having looked: `afterschool` scored for `cool`
+  until the maintainer read the day. Its default is Answer, which writes
+  nothing, and the Judge is not asked: over the maintainer's 150 blind marks it
+  called 48 of 95 marked Answers Bonus Words, where the Answer line erred on 17
+  of them and on 12 of 55 marked Bonus Words. A word written in below the line
+  is not listed: it does not score, and Session Records move it up if players
+  find it. And a correction may keep several of a word's readings rather than
+  replace them all with one.
 - **The No False Accepts hunt sees what Normalisation makes.** The hunt sends
   an Answer to the Judge when its Wiktionary readings miss the Seed Word's
   Rhyme Key. Those readings go through the same Normalisation as the game's

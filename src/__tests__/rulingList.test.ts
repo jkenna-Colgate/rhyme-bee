@@ -5,18 +5,20 @@
  */
 
 import { describe, expect, it } from "vitest";
-import type { UndecidedRhyme, UntieredWord } from "../batch.ts";
+import type { UndecidedRhyme, UntieredWord, WrittenInAnswer } from "../batch.ts";
 import type { TierRuling } from "../judge.ts";
 import type { Pronunciation } from "../phonology.ts";
 import {
   parseDecision,
   parseTier,
   parseUndecided,
+  parseWrittenInAnswer,
   rulingPrompt,
   shownReadings,
   tierAgreement,
   tierPrompt,
   undecidedPrompt,
+  writtenInAnswerPrompt,
 } from "../rulingList.ts";
 
 const r = (s: string): Pronunciation => s.split(" ");
@@ -324,6 +326,44 @@ describe("asking the maintainer to Tier a written-in word with no knownness", ()
         const typed = line.trim().split(/\s{2,}/)[0]!;
         expect(parseTier(typed === "Enter" ? "" : typed, judge), line).not.toBeNull();
       }
+    }
+  });
+});
+
+describe("asking the maintainer to keep a written-in word that scores, or make it a Bonus Word (#319)", () => {
+  const afterschool: WrittenInAnswer = { word: "afterschool", seedWord: "cool", rhymeKey: "UW L", knownness: 1.33 };
+
+  it("says why it is asked, names the Seed Word, says it is waiting, and gives one command a line with its effect", () => {
+    expect(writtenInAnswerPrompt(afterschool, 0.5)).toEqual([
+      "Its knownness is 1.33, at or above the Answer line of 0.50, so it scores as an Answer, and nobody has looked at it.",
+      "Would an ordinary player think of afterschool when hunting rhymes for cool?",
+      "Waiting for your Tier ruling on this word. Type one of these and press Enter:",
+      "  Enter                keep it an Answer, as it is: nothing is written",
+      "  a                    the same as Enter",
+      "  b                    Bonus Word: an unlocked Tier verdict is written to data/tier-overrides.csv, so it stays accepted and unscored from the next build",
+    ]);
+  });
+
+  it("reads Enter, or a, as keeping the Answer, and b as a Bonus Word", () => {
+    expect(parseWrittenInAnswer("")).toEqual({ kind: "leave" });
+    expect(parseWrittenInAnswer(" A ")).toEqual({ kind: "leave" });
+    expect(parseWrittenInAnswer("b")).toEqual({ kind: "tier", tier: "bonus" });
+  });
+
+  it("reads nothing it cannot act on, so the caller asks again and writes nothing", () => {
+    expect(parseWrittenInAnswer("a b")).toBeNull();
+    expect(parseWrittenInAnswer("bonus")).toBeNull();
+    // Other items' commands are not this one's.
+    expect(parseWrittenInAnswer("s")).toBeNull();
+    expect(parseWrittenInAnswer("l")).toBeNull();
+    expect(parseWrittenInAnswer("d")).toBeNull();
+  });
+
+  it("accepts every command it names", () => {
+    const commands = writtenInAnswerPrompt(afterschool, 0.5).filter((line) => /^ {2}\S/.test(line));
+    for (const line of commands) {
+      const typed = line.trim().split(/\s{2,}/)[0]!;
+      expect(parseWrittenInAnswer(typed === "Enter" ? "" : typed), line).not.toBeNull();
     }
   });
 });

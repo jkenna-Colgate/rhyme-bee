@@ -312,6 +312,47 @@ export function untieredWrittenIn(
   return out;
 }
 
+// ---- the written-in words that score -------------------------------------------
+
+/**
+ * A word the Batch wrote a reading for whose knownness is at or above the Answer
+ * line, so it scores as an Answer with nobody having looked at it (#319). Put to
+ * the maintainer, who keeps it or makes it a Bonus Word: knownness measures
+ * recognition, and whether a player would produce it is Retrieval (ADR-0015).
+ */
+export interface WrittenInAnswer {
+  word: string;
+  seedWord: string;
+  rhymeKey: RhymeKey;
+  knownness: number;
+}
+
+/**
+ * The words this Batch's looks wrote in whose knownness is at or above the
+ * Answer line, each once with the first Seed Word and Rhyme Key it was found on,
+ * grouped by Seed Word in the order each Seed Word's first word came. A word
+ * below the line is not listed: it does not score, and Session Records move it
+ * up if players find it. A word with no knownness is `untieredWrittenIn`'s.
+ */
+export function writtenInAnswers(
+  rulings: readonly JudgeRulingRecord[],
+  knownness: (word: string) => number | null,
+  answerLine: number,
+): WrittenInAnswer[] {
+  const seen = new Set<string>();
+  const bySeed = new Map<string, WrittenInAnswer[]>();
+  for (const r of rulings) {
+    if (r.landed !== "reading" || seen.has(r.word)) continue;
+    seen.add(r.word);
+    const k = knownness(r.word);
+    if (k === null || k < answerLine) continue;
+    const group = bySeed.get(r.seedWord) ?? [];
+    group.push({ word: r.word, seedWord: r.seedWord, rhymeKey: r.rhymeKey, knownness: k });
+    bySeed.set(r.seedWord, group);
+  }
+  return [...bySeed.values()].flat();
+}
+
 /** The gate's two settings. No value is claimed for either (#225): they are tuned over Batches. */
 export interface TrustGate {
   /** The most Trust failures a passing look may find. */
