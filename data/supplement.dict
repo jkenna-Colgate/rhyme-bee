@@ -1846,3 +1846,71 @@ employees(3) EH2 M P L OY1 IY2 Z
 whoof HH UW1 F
 # solitarily: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against EH R AH L IY — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
 solitarily S AA2 L AH0 T EH1 R AH0 L IY0
+# avows (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `arouse` on AW Z at high confidence.
+avows AH0 V AW1 Z
+# disavows (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `arouse` on AW Z at high confidence.
+disavows D IH2 S AH0 V AW1 Z
+# lowbrows (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `arouse` on AW Z at high confidence.
+lowbrows L OW1 B R AW2 Z
+# scows (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `arouse` on AW Z at high confidence.
+scows S K AW1 Z
+# biographic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+biographic B AY2 AH0 G R AE1 F IH0 K
+# autobiographic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+autobiographic AO2 T OW0 B AY2 AH0 G R AE1 F IH0 K
+# typographic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+typographic T AY2 P AH0 G R AE1 F IH0 K
+# cinematographic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+cinematographic S IH2 N AH0 M AE2 T AH0 G R AE1 F IH0 K
+# telegraphic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+telegraphic T EH2 L AH0 G R AE1 F IH0 K
+# seismographic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+seismographic S AY2 Z M AH0 G R AE1 F IH0 K
+# cartographic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+cartographic K AA2 R T AH0 G R AE1 F IH0 K
+# sapphic (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `traffic` on AE F AH K at high confidence.
+sapphic S AE1 F IH0 K
+# certifiable (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `viable` on AY AH B AH L at high confidence.
+certifiable S ER1 T AH0 F AY2 AH0 B AH0 L
+# modifiable (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `viable` on AY AH B AH L at high confidence.
+modifiable M AA1 D AH0 F AY2 AH0 B AH0 L
+# falsifiable (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `viable` on AY AH B AH L at high confidence.
+falsifiable F AO1 L S AH0 F AY2 AH0 B AH0 L
+# rectifiable (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `viable` on AY AH B AH L at high confidence.
+rectifiable R EH1 K T AH0 F AY2 AH0 B AH0 L
+# satisfiable (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `viable` on AY AH B AH L at high confidence.
+satisfiable S AE1 T AH0 S F AY2 AH0 B AH0 L
+# inviable (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `viable` on AY AH B AH L at high confidence.
+inviable IH0 N V AY1 AH0 B AH0 L
+# foulard (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `guard` on AA R D at high confidence.
+foulard F UW0 L AA1 R D
+# raws (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `cause` on AA Z at high confidence.
+raws R AO1 Z
+# craws (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `cause` on AA Z at high confidence.
+craws K R AO1 Z
+# lockjaws (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `cause` on AA Z at high confidence.
+lockjaws L AA1 K JH AO2 Z
+# infector (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `inspector` on EH K T ER at high confidence.
+infector IH0 N F EH1 K T ER0
+# perfecter (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `inspector` on EH K T ER at high confidence.
+perfecter P ER0 F EH1 K T ER0
+# selfhood (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `would` on UH D at high confidence.
+selfhood S EH1 L F HH UH2 D
+# dingbat (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `cat` on AE T at high confidence.
+dingbat D IH1 NG B AE2 T
+# hellcat (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `cat` on AE T at high confidence.
+hellcat HH EH1 L K AE2 T
+# meows (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `arouse` on AW Z at high confidence.
+meows M IY0 AW1 Z
+# flyable (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `viable` on AY AH B AH L at high confidence.
+flyable F L AY1 AH0 B AH0 L
+# hacksaws (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `cause` on AA Z at high confidence.
+hacksaws HH AE1 K S AO2 Z
+# rejecter (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `inspector` on EH K T ER at high confidence.
+rejecter R IH0 JH EH1 K T ER0
+# dowse: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AW Z — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+dowse D AW1 S
+dowse(2) D AW1 Z
+# house: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AW Z — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+house HH AW1 S
+house(2) HH AW1 Z
