@@ -59,3 +59,7 @@ legendarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
 elementarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
 complementarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
 parliamentarily judge:claude-sonnet-5-5 missing-reading medium EH R AH L IY
+sows judge:claude-sonnet-5-5 overrule high AW Z
+kowtows judge:claude-sonnet-5-5 missing-reading medium AW Z
+bibliographic judge:claude-sonnet-5-5 overrule high AE F AH K
+menopause judge:claude-sonnet-5-5 overrule high AA Z

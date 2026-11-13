@@ -1,0 +1,3744 @@
+{
+  "date": "2026-11-13",
+  "command": "batch --seeds arouse traffic viable guard cause inspector would cat --model claude-opus-5-5",
+  "run": 1,
+  "model": "claude-sonnet-5-5",
+  "playerModel": "claude-opus-5-5",
+  "answeredBy": [
+    "claude-opus-5-5",
+    "claude-sonnet-5-5"
+  ],
+  "calls": {
+    "player": 17,
+    "rhyme": 9,
+    "wordhood": 5,
+    "tier": 1,
+    "fromCache": 0
+  },
+  "settings": {
+    "gate": {
+      "k": 1,
+      "n": 3
+    },
+    "offKeyRatio": 5,
+    "maxJudgeCalls": 16
+  },
+  "candidatesJudged": 42,
+  "note": "A Batch (#267). Trust failures are Candidates the Judge rules a Rhyme with a reading that reaches the key, leaving out Unconfirmed Rhymes and suggested Demotions; a Rhyme the game accepts, after the look's corrections, as a Bonus Word whose knownness is below the Answer line, or on an editor's Bonus Word Tier verdict, is listed under excused and not counted. Every write is listed under writes; the index was rebuilt after each look that landed one.",
+  "seedsPlayed": [
+    {
+      "seedWord": "arouse",
+      "date": null,
+      "rhymeKey": "AW Z",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        3,
+        3,
+        1
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "browse",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 22,
+                "onKey": 18,
+                "topOther": {
+                  "rhymeKey": "AW S",
+                  "words": 3
+                },
+                "offKey": false
+              },
+              "wordsTyped": 27,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "browse",
+                "cows",
+                "vows",
+                "plows",
+                "bows",
+                "wows",
+                "rouse",
+                "carouse",
+                "espouse",
+                "house",
+                "blouse",
+                "drowse",
+                "allows",
+                "avows",
+                "disavows",
+                "endows",
+                "sows",
+                "boughs",
+                "prows",
+                "eyebrows",
+                "highbrows",
+                "lowbrows",
+                "chows",
+                "scows",
+                "powwows",
+                "kowtows",
+                "dowse"
+              ]
+            }
+          ],
+          "score": 82,
+          "maxScore": 126,
+          "share": 0.6508,
+          "rank": "Wordsmith",
+          "candidates": [
+            "carouse",
+            "espouse",
+            "house",
+            "blouse",
+            "avows",
+            "disavows",
+            "sows",
+            "prows",
+            "lowbrows",
+            "scows",
+            "powwows",
+            "kowtows",
+            "dowse"
+          ],
+          "trustFailures": [
+            "house",
+            "lowbrows",
+            "dowse"
+          ],
+          "excused": [
+            "avows",
+            "disavows",
+            "scows"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "browse",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 28,
+                "onKey": 24,
+                "topOther": {
+                  "rhymeKey": "AW S",
+                  "words": 2
+                },
+                "offKey": false
+              },
+              "wordsTyped": 30,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "browse",
+                "cows",
+                "vows",
+                "plows",
+                "bows",
+                "boughs",
+                "allows",
+                "rouse",
+                "carouse",
+                "drowse",
+                "house",
+                "espouse",
+                "brows",
+                "eyebrows",
+                "wows",
+                "sows",
+                "chows",
+                "prows",
+                "endows",
+                "avows",
+                "disavows",
+                "meows",
+                "kowtows",
+                "powwows",
+                "rows",
+                "scows",
+                "dowse",
+                "highbrows",
+                "lowbrows",
+                "snowplows"
+              ]
+            }
+          ],
+          "score": 104,
+          "maxScore": 134,
+          "share": 0.7761,
+          "rank": "Laureate",
+          "candidates": [
+            "carouse",
+            "house",
+            "espouse",
+            "sows",
+            "prows",
+            "avows",
+            "disavows",
+            "meows",
+            "kowtows",
+            "powwows",
+            "rows",
+            "scows",
+            "dowse"
+          ],
+          "trustFailures": [
+            "house",
+            "meows",
+            "dowse"
+          ],
+          "excused": [
+            "avows",
+            "disavows",
+            "scows"
+          ]
+        },
+        {
+          "look": 3,
+          "example": "browse",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 23,
+                "onKey": 21,
+                "topOther": {
+                  "rhymeKey": "AW S",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 24,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "browse",
+                "cows",
+                "vows",
+                "plows",
+                "allows",
+                "rouse",
+                "carouse",
+                "espouse",
+                "drowse",
+                "bows",
+                "brows",
+                "eyebrows",
+                "sows",
+                "wows",
+                "endows",
+                "avows",
+                "disavows",
+                "boughs",
+                "prows",
+                "chows",
+                "house",
+                "powwows",
+                "kowtows",
+                "highbrows"
+              ]
+            }
+          ],
+          "score": 87,
+          "maxScore": 139,
+          "share": 0.6259,
+          "rank": "Wordsmith",
+          "candidates": [
+            "carouse",
+            "espouse",
+            "sows",
+            "avows",
+            "disavows",
+            "prows",
+            "house",
+            "powwows",
+            "kowtows"
+          ],
+          "trustFailures": [
+            "house"
+          ],
+          "excused": [
+            "avows",
+            "disavows"
+          ]
+        }
+      ]
+    },
+    {
+      "seedWord": "traffic",
+      "date": null,
+      "rhymeKey": "AE F AH K",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        8,
+        1
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "photographic",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 14,
+                "onKey": 13,
+                "topOther": {
+                  "rhymeKey": "AA F AH K",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 22,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "graphic",
+                "photographic",
+                "geographic",
+                "demographic",
+                "biographic",
+                "autobiographic",
+                "pornographic",
+                "topographic",
+                "typographic",
+                "calligraphic",
+                "choreographic",
+                "cinematographic",
+                "holographic",
+                "stenographic",
+                "telegraphic",
+                "seismographic",
+                "oceanographic",
+                "cartographic",
+                "bibliographic",
+                "ethnographic",
+                "infographic",
+                "sapphic"
+              ]
+            }
+          ],
+          "score": 126,
+          "maxScore": 165,
+          "share": 0.7636,
+          "rank": "Laureate",
+          "candidates": [
+            "biographic",
+            "autobiographic",
+            "typographic",
+            "cinematographic",
+            "telegraphic",
+            "seismographic",
+            "cartographic",
+            "bibliographic",
+            "ethnographic",
+            "infographic",
+            "sapphic"
+          ],
+          "trustFailures": [
+            "biographic",
+            "autobiographic",
+            "typographic",
+            "cinematographic",
+            "telegraphic",
+            "seismographic",
+            "cartographic",
+            "sapphic"
+          ],
+          "excused": []
+        },
+        {
+          "look": 2,
+          "example": "photographic",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 23,
+                "onKey": 22,
+                "topOther": {
+                  "rhymeKey": "AA F AH K",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 23,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "graphic",
+                "photographic",
+                "geographic",
+                "demographic",
+                "biographic",
+                "autobiographic",
+                "pornographic",
+                "topographic",
+                "typographic",
+                "calligraphic",
+                "choreographic",
+                "cinematographic",
+                "holographic",
+                "telegraphic",
+                "bibliographic",
+                "seismographic",
+                "infographic",
+                "oceanographic",
+                "stenographic",
+                "ethnographic",
+                "cartographic",
+                "lithographic",
+                "sapphic"
+              ]
+            }
+          ],
+          "score": 226,
+          "maxScore": 253,
+          "share": 0.8933,
+          "rank": "Laureate",
+          "candidates": [
+            "bibliographic",
+            "infographic",
+            "ethnographic",
+            "sapphic"
+          ],
+          "trustFailures": [
+            "sapphic"
+          ],
+          "excused": []
+        }
+      ]
+    },
+    {
+      "seedWord": "viable",
+      "date": null,
+      "rhymeKey": "AY AH B AH L",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        5,
+        1
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "deniable",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 17,
+                "onKey": 17,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 23,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "deniable",
+                "undeniable",
+                "reliable",
+                "unreliable",
+                "liable",
+                "pliable",
+                "justifiable",
+                "unjustifiable",
+                "identifiable",
+                "unidentifiable",
+                "verifiable",
+                "unverifiable",
+                "quantifiable",
+                "certifiable",
+                "classifiable",
+                "modifiable",
+                "falsifiable",
+                "rectifiable",
+                "satisfiable",
+                "triable",
+                "friable",
+                "nonviable",
+                "inviable"
+              ]
+            }
+          ],
+          "score": 154,
+          "maxScore": 199,
+          "share": 0.7739,
+          "rank": "Laureate",
+          "candidates": [
+            "certifiable",
+            "modifiable",
+            "falsifiable",
+            "rectifiable",
+            "satisfiable",
+            "triable",
+            "friable",
+            "inviable"
+          ],
+          "trustFailures": [
+            "certifiable",
+            "modifiable",
+            "falsifiable",
+            "rectifiable",
+            "satisfiable"
+          ],
+          "excused": [
+            "triable",
+            "friable",
+            "inviable"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "deniable",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 19,
+                "onKey": 19,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 20,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "deniable",
+                "undeniable",
+                "reliable",
+                "unreliable",
+                "liable",
+                "pliable",
+                "triable",
+                "friable",
+                "flyable",
+                "buyable",
+                "justifiable",
+                "unjustifiable",
+                "identifiable",
+                "unidentifiable",
+                "verifiable",
+                "certifiable",
+                "quantifiable",
+                "classifiable",
+                "modifiable",
+                "rectifiable"
+              ]
+            }
+          ],
+          "score": 172,
+          "maxScore": 244,
+          "share": 0.7049,
+          "rank": "Laureate",
+          "candidates": [
+            "triable",
+            "friable",
+            "flyable"
+          ],
+          "trustFailures": [
+            "flyable"
+          ],
+          "excused": [
+            "triable",
+            "friable"
+          ]
+        }
+      ]
+    },
+    {
+      "seedWord": "guard",
+      "date": null,
+      "rhymeKey": "AA R D",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        1,
+        0
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "hard",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 36,
+                "onKey": 34,
+                "topOther": {
+                  "rhymeKey": "AE K ER D",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 38,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "hard",
+                "card",
+                "yard",
+                "lard",
+                "bard",
+                "barred",
+                "charred",
+                "scarred",
+                "starred",
+                "marred",
+                "jarred",
+                "tarred",
+                "regard",
+                "discard",
+                "retard",
+                "leotard",
+                "backyard",
+                "lifeguard",
+                "bodyguard",
+                "safeguard",
+                "vanguard",
+                "graveyard",
+                "avant-garde",
+                "postcard",
+                "boulevard",
+                "shard",
+                "blowhard",
+                "diehard",
+                "bombard",
+                "placard",
+                "mallard",
+                "pard",
+                "sparred",
+                "scarred",
+                "unbarred",
+                "foulard",
+                "chard",
+                "nard"
+              ]
+            }
+          ],
+          "score": 207,
+          "maxScore": 398,
+          "share": 0.5201,
+          "rank": "Wordsmith",
+          "candidates": [
+            "marred",
+            "placard",
+            "mallard",
+            "pard",
+            "foulard",
+            "nard"
+          ],
+          "trustFailures": [
+            "placard"
+          ],
+          "excused": [
+            "pard",
+            "foulard"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "hard",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 28,
+                "onKey": 28,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 30,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "hard",
+                "card",
+                "yard",
+                "lard",
+                "bard",
+                "shard",
+                "scarred",
+                "charred",
+                "barred",
+                "starred",
+                "marred",
+                "jarred",
+                "tarred",
+                "regard",
+                "discard",
+                "retard",
+                "backyard",
+                "lifeguard",
+                "bodyguard",
+                "vanguard",
+                "postcard",
+                "blackguard",
+                "graveyard",
+                "leotard",
+                "avant-garde",
+                "boulevard",
+                "safeguard",
+                "scorecard",
+                "credit card",
+                "deodorized"
+              ]
+            }
+          ],
+          "score": 168,
+          "maxScore": 398,
+          "share": 0.4221,
+          "rank": "Bard",
+          "candidates": [
+            "marred",
+            "blackguard",
+            "deodorized"
+          ],
+          "trustFailures": [],
+          "excused": [
+            "blackguard"
+          ]
+        }
+      ]
+    },
+    {
+      "seedWord": "cause",
+      "date": null,
+      "rhymeKey": "AA Z",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        3,
+        1
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "applause",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 26,
+                "onKey": 24,
+                "topOther": {
+                  "rhymeKey": "AA K S",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 34,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "applause",
+                "because",
+                "pause",
+                "laws",
+                "paws",
+                "jaws",
+                "claws",
+                "flaws",
+                "draws",
+                "saws",
+                "straws",
+                "gnaws",
+                "thaws",
+                "clause",
+                "gauze",
+                "raws",
+                "caws",
+                "hawks",
+                "outlaws",
+                "withdraws",
+                "jigsaws",
+                "seesaws",
+                "menopause",
+                "santa claus",
+                "bylaws",
+                "in-laws",
+                "guffaws",
+                "hee-haws",
+                "craws",
+                "squaws",
+                "macaws",
+                "coleslaws",
+                "lockjaws",
+                "oversaws"
+              ]
+            }
+          ],
+          "score": 132,
+          "maxScore": 183,
+          "share": 0.7213,
+          "rank": "Laureate",
+          "candidates": [
+            "raws",
+            "caws",
+            "hawks",
+            "seesaws",
+            "menopause",
+            "craws",
+            "coleslaws",
+            "lockjaws",
+            "oversaws"
+          ],
+          "trustFailures": [
+            "raws",
+            "craws",
+            "lockjaws"
+          ],
+          "excused": [
+            "caws"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "applause",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 25,
+                "onKey": 23,
+                "topOther": {
+                  "rhymeKey": "AA K S",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 30,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "because",
+                "applause",
+                "pause",
+                "laws",
+                "jaws",
+                "claws",
+                "paws",
+                "flaws",
+                "draws",
+                "straws",
+                "saws",
+                "gnaws",
+                "thaws",
+                "clause",
+                "gauze",
+                "hawks",
+                "because",
+                "cause",
+                "outlaws",
+                "jigsaws",
+                "seesaws",
+                "in-laws",
+                "withdraws",
+                "bylaws",
+                "guffaws",
+                "hacksaws",
+                "coleslaws",
+                "macaws",
+                "menopause",
+                "santa claus"
+              ]
+            }
+          ],
+          "score": 124,
+          "maxScore": 202,
+          "share": 0.6139,
+          "rank": "Wordsmith",
+          "candidates": [
+            "hawks",
+            "seesaws",
+            "hacksaws",
+            "coleslaws",
+            "menopause"
+          ],
+          "trustFailures": [
+            "hacksaws"
+          ],
+          "excused": []
+        }
+      ]
+    },
+    {
+      "seedWord": "inspector",
+      "date": null,
+      "rhymeKey": "EH K T ER",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        3,
+        1
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "collector",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 25,
+                "onKey": 25,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 27,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "collector",
+                "director",
+                "protector",
+                "projector",
+                "detector",
+                "selector",
+                "reflector",
+                "connector",
+                "corrector",
+                "objector",
+                "defector",
+                "deflector",
+                "elector",
+                "ejector",
+                "injector",
+                "sector",
+                "vector",
+                "nectar",
+                "lecter",
+                "dissector",
+                "prospector",
+                "rejector",
+                "respecter",
+                "erector",
+                "neglecter",
+                "infector",
+                "perfecter"
+              ]
+            }
+          ],
+          "score": 171,
+          "maxScore": 209,
+          "share": 0.8182,
+          "rank": "Laureate",
+          "candidates": [
+            "lecter",
+            "rejector",
+            "respecter",
+            "neglecter",
+            "infector",
+            "perfecter"
+          ],
+          "trustFailures": [
+            "rejector",
+            "infector",
+            "perfecter"
+          ],
+          "excused": []
+        },
+        {
+          "look": 2,
+          "example": "collector",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 28,
+                "onKey": 28,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 29,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "collector",
+                "director",
+                "protector",
+                "detector",
+                "selector",
+                "projector",
+                "reflector",
+                "connector",
+                "objector",
+                "deflector",
+                "defector",
+                "injector",
+                "rejecter",
+                "corrector",
+                "elector",
+                "lector",
+                "sector",
+                "vector",
+                "nectar",
+                "hector",
+                "respecter",
+                "erector",
+                "dissector",
+                "bisector",
+                "ejector",
+                "perfecter",
+                "neglecter",
+                "infector",
+                "effector"
+              ]
+            }
+          ],
+          "score": 181,
+          "maxScore": 219,
+          "share": 0.8265,
+          "rank": "Laureate",
+          "candidates": [
+            "rejecter",
+            "lector",
+            "hector",
+            "respecter",
+            "perfecter",
+            "neglecter",
+            "effector"
+          ],
+          "trustFailures": [
+            "perfecter"
+          ],
+          "excused": [
+            "rejecter"
+          ]
+        }
+      ]
+    },
+    {
+      "seedWord": "would",
+      "date": null,
+      "rhymeKey": "UH D",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        0,
+        0
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "could",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 44,
+                "onKey": 40,
+                "topOther": {
+                  "rhymeKey": "AY Z",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 47,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "could",
+                "should",
+                "good",
+                "hood",
+                "wood",
+                "stood",
+                "understood",
+                "childhood",
+                "neighborhood",
+                "likewise",
+                "misunderstood",
+                "firewood",
+                "hollywood",
+                "driftwood",
+                "plywood",
+                "hardwood",
+                "livelihood",
+                "falsehood",
+                "manhood",
+                "adulthood",
+                "motherhood",
+                "fatherhood",
+                "brotherhood",
+                "sisterhood",
+                "parenthood",
+                "boyhood",
+                "girlhood",
+                "withstood",
+                "dogwood",
+                "redwood",
+                "sainthood",
+                "knighthood",
+                "statehood",
+                "priesthood",
+                "likelihood",
+                "womanhood",
+                "babyhood",
+                "selfhood",
+                "nationhood",
+                "cottonwood",
+                "boxwood",
+                "sandalwood",
+                "softwood",
+                "deadwood",
+                "goodwood",
+                "woulda",
+                "couldn't"
+              ]
+            }
+          ],
+          "score": 297,
+          "maxScore": 336,
+          "share": 0.8839,
+          "rank": "Laureate",
+          "candidates": [
+            "likewise",
+            "hollywood",
+            "sisterhood",
+            "priesthood",
+            "babyhood",
+            "selfhood",
+            "nationhood",
+            "boxwood",
+            "softwood",
+            "goodwood",
+            "woulda"
+          ],
+          "trustFailures": [],
+          "excused": [
+            "selfhood"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "could",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 36,
+                "onKey": 32,
+                "topOther": {
+                  "rhymeKey": "AY Z",
+                  "words": 1
+                },
+                "offKey": false
+              },
+              "wordsTyped": 36,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "could",
+                "should",
+                "good",
+                "hood",
+                "wood",
+                "stood",
+                "understood",
+                "childhood",
+                "neighborhood",
+                "likewise",
+                "misunderstood",
+                "firewood",
+                "hollywood",
+                "driftwood",
+                "plywood",
+                "withstood",
+                "manhood",
+                "boyhood",
+                "brotherhood",
+                "motherhood",
+                "fatherhood",
+                "sisterhood",
+                "parenthood",
+                "falsehood",
+                "likelihood",
+                "livelihood",
+                "adulthood",
+                "womanhood",
+                "knighthood",
+                "priesthood",
+                "statehood",
+                "hardwood",
+                "redwood",
+                "dogwood",
+                "sainthood",
+                "couldn't"
+              ]
+            }
+          ],
+          "score": 259,
+          "maxScore": 336,
+          "share": 0.7708,
+          "rank": "Laureate",
+          "candidates": [
+            "likewise",
+            "hollywood",
+            "sisterhood",
+            "priesthood"
+          ],
+          "trustFailures": [],
+          "excused": []
+        }
+      ]
+    },
+    {
+      "seedWord": "cat",
+      "date": null,
+      "rhymeKey": "AE T",
+      "played": false,
+      "trust": "pass",
+      "failuresPerLook": [
+        2,
+        0
+      ],
+      "looks": [
+        {
+          "look": 1,
+          "example": "hat",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 46,
+                "onKey": 46,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 51,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "hat",
+                "bat",
+                "mat",
+                "rat",
+                "sat",
+                "fat",
+                "pat",
+                "vat",
+                "flat",
+                "chat",
+                "that",
+                "brat",
+                "spat",
+                "splat",
+                "gnat",
+                "scat",
+                "slat",
+                "drat",
+                "at",
+                "combat",
+                "acrobat",
+                "diplomat",
+                "democrat",
+                "aristocrat",
+                "bureaucrat",
+                "thermostat",
+                "doormat",
+                "format",
+                "habitat",
+                "wombat",
+                "nonfat",
+                "copycat",
+                "tomcat",
+                "bobcat",
+                "wildcat",
+                "fiat",
+                "begat",
+                "caveat",
+                "laundromat",
+                "welcome mat",
+                "chitchat",
+                "pussycat",
+                "cravat",
+                "dingbat",
+                "fruitbat",
+                "hellcat",
+                "muskrat",
+                "nougat",
+                "sprat",
+                "stat",
+                "tat"
+              ]
+            }
+          ],
+          "score": 231,
+          "maxScore": 287,
+          "share": 0.8049,
+          "rank": "Laureate",
+          "candidates": [
+            "begat",
+            "laundromat",
+            "cravat",
+            "dingbat",
+            "fruitbat",
+            "hellcat",
+            "nougat",
+            "sprat",
+            "tat"
+          ],
+          "trustFailures": [
+            "dingbat",
+            "hellcat"
+          ],
+          "excused": [
+            "cravat",
+            "sprat"
+          ]
+        },
+        {
+          "look": 2,
+          "example": "hat",
+          "runs": [
+            {
+              "attempt": 1,
+              "offKey": false,
+              "keyCount": {
+                "withReading": 39,
+                "onKey": 39,
+                "topOther": null,
+                "offKey": false
+              },
+              "wordsTyped": 41,
+              "answeredBy": [
+                "claude-opus-5-5"
+              ],
+              "words": [
+                "hat",
+                "bat",
+                "mat",
+                "rat",
+                "sat",
+                "fat",
+                "pat",
+                "vat",
+                "gnat",
+                "flat",
+                "chat",
+                "that",
+                "brat",
+                "spat",
+                "splat",
+                "slat",
+                "scat",
+                "drat",
+                "at",
+                "combat",
+                "doormat",
+                "format",
+                "acrobat",
+                "diplomat",
+                "thermostat",
+                "habitat",
+                "democrat",
+                "bureaucrat",
+                "aristocrat",
+                "copycat",
+                "wildcat",
+                "bobcat",
+                "tomcat",
+                "nonfat",
+                "laundromat",
+                "welcome mat",
+                "begat",
+                "chitchat",
+                "format",
+                "stat",
+                "caveat"
+              ]
+            }
+          ],
+          "score": 204,
+          "maxScore": 303,
+          "share": 0.6733,
+          "rank": "Wordsmith",
+          "candidates": [
+            "laundromat",
+            "begat"
+          ],
+          "trustFailures": [],
+          "excused": []
+        }
+      ]
+    }
+  ],
+  "untested": [],
+  "writes": {
+    "readings": [
+      {
+        "word": "avows",
+        "reading": "AH0 V AW1 Z"
+      },
+      {
+        "word": "disavows",
+        "reading": "D IH2 S AH0 V AW1 Z"
+      },
+      {
+        "word": "lowbrows",
+        "reading": "L OW1 B R AW2 Z"
+      },
+      {
+        "word": "scows",
+        "reading": "S K AW1 Z"
+      },
+      {
+        "word": "biographic",
+        "reading": "B AY2 AH0 G R AE1 F IH0 K"
+      },
+      {
+        "word": "autobiographic",
+        "reading": "AO2 T OW0 B AY2 AH0 G R AE1 F IH0 K"
+      },
+      {
+        "word": "typographic",
+        "reading": "T AY2 P AH0 G R AE1 F IH0 K"
+      },
+      {
+        "word": "cinematographic",
+        "reading": "S IH2 N AH0 M AE2 T AH0 G R AE1 F IH0 K"
+      },
+      {
+        "word": "telegraphic",
+        "reading": "T EH2 L AH0 G R AE1 F IH0 K"
+      },
+      {
+        "word": "seismographic",
+        "reading": "S AY2 Z M AH0 G R AE1 F IH0 K"
+      },
+      {
+        "word": "cartographic",
+        "reading": "K AA2 R T AH0 G R AE1 F IH0 K"
+      },
+      {
+        "word": "sapphic",
+        "reading": "S AE1 F IH0 K"
+      },
+      {
+        "word": "certifiable",
+        "reading": "S ER1 T AH0 F AY2 AH0 B AH0 L"
+      },
+      {
+        "word": "modifiable",
+        "reading": "M AA1 D AH0 F AY2 AH0 B AH0 L"
+      },
+      {
+        "word": "falsifiable",
+        "reading": "F AO1 L S AH0 F AY2 AH0 B AH0 L"
+      },
+      {
+        "word": "rectifiable",
+        "reading": "R EH1 K T AH0 F AY2 AH0 B AH0 L"
+      },
+      {
+        "word": "satisfiable",
+        "reading": "S AE1 T AH0 S F AY2 AH0 B AH0 L"
+      },
+      {
+        "word": "inviable",
+        "reading": "IH0 N V AY1 AH0 B AH0 L"
+      },
+      {
+        "word": "foulard",
+        "reading": "F UW0 L AA1 R D"
+      },
+      {
+        "word": "raws",
+        "reading": "R AO1 Z"
+      },
+      {
+        "word": "craws",
+        "reading": "K R AO1 Z"
+      },
+      {
+        "word": "lockjaws",
+        "reading": "L AA1 K JH AO2 Z"
+      },
+      {
+        "word": "infector",
+        "reading": "IH0 N F EH1 K T ER0"
+      },
+      {
+        "word": "perfecter",
+        "reading": "P ER0 F EH1 K T ER0"
+      },
+      {
+        "word": "selfhood",
+        "reading": "S EH1 L F HH UH2 D"
+      },
+      {
+        "word": "dingbat",
+        "reading": "D IH1 NG B AE2 T"
+      },
+      {
+        "word": "hellcat",
+        "reading": "HH EH1 L K AE2 T"
+      },
+      {
+        "word": "meows",
+        "reading": "M IY0 AW1 Z"
+      },
+      {
+        "word": "flyable",
+        "reading": "F L AY1 AH0 B AH0 L"
+      },
+      {
+        "word": "hacksaws",
+        "reading": "HH AE1 K S AO2 Z"
+      },
+      {
+        "word": "rejecter",
+        "reading": "R IH0 JH EH1 K T ER0"
+      }
+    ],
+    "unconfirmedRhymes": [
+      {
+        "word": "sows",
+        "rhymeKey": "AW Z",
+        "writer": "judge:claude-sonnet-5-5",
+        "ruling": "overrule",
+        "confidence": "high"
+      },
+      {
+        "word": "kowtows",
+        "rhymeKey": "AW Z",
+        "writer": "judge:claude-sonnet-5-5",
+        "ruling": "missing-reading",
+        "confidence": "medium"
+      },
+      {
+        "word": "bibliographic",
+        "rhymeKey": "AE F AH K",
+        "writer": "judge:claude-sonnet-5-5",
+        "ruling": "overrule",
+        "confidence": "high"
+      },
+      {
+        "word": "menopause",
+        "rhymeKey": "AA Z",
+        "writer": "judge:claude-sonnet-5-5",
+        "ruling": "overrule",
+        "confidence": "high"
+      }
+    ],
+    "suggestedDemotions": []
+  },
+  "rulings": [
+    {
+      "word": "carouse",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "espouse",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "avows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "AH0 V AW1 Z",
+      "confidence": "high",
+      "why": "Stress falls on the final syllable, AW-Z, matching 'arouse'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Third-person singular of the verb avow.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "disavows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "D IH2 S AH0 V AW1 Z",
+      "confidence": "high",
+      "why": "Final stressed syllable is AW-Z.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Third-person singular of the verb disavow.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "sows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "overrule",
+      "verdict": "rhyme",
+      "reading": "S AW1 Z",
+      "confidence": "high",
+      "why": "The noun 'sows' (female pigs) has the rime AW1 Z, the same as arouse.",
+      "reachesKey": true,
+      "wouldLand": "unconfirmed-rhyme",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Plural of 'sow' (female pig) and third-person singular of the verb 'sow'.",
+      "look": 1,
+      "landed": "unconfirmed-rhyme"
+    },
+    {
+      "word": "prows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "lowbrows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "L OW1 B R AW2 Z",
+      "confidence": "high",
+      "why": "Compound whose last part 'brows' keeps secondary stress, giving AW-Z.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Plural of lowbrow.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "scows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S K AW1 Z",
+      "confidence": "high",
+      "why": "Rime AW1 Z matches arouse exactly.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Plural of 'scow', a flat-bottomed boat.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "powwows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "kowtows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "K AW1 T AW2 Z",
+      "confidence": "medium",
+      "why": "The last syllable carries a full AW with secondary stress, giving the key AW-Z.",
+      "reachesKey": true,
+      "wouldLand": "unconfirmed-rhyme",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Third-person singular of the verb kowtow.",
+      "look": 1,
+      "landed": "unconfirmed-rhyme"
+    },
+    {
+      "word": "dowse",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "overrule",
+      "verdict": "rhyme",
+      "reading": "D AW1 Z",
+      "confidence": "medium",
+      "why": "The water-divining sense 'dowse' is said D AW1 Z, the same as 'douse'.",
+      "reachesKey": true,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "biographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "B AY2 AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Stress falls on 'graph', so the key is AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Adjective variant of biographical.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "autobiographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "AO2 T OW0 B AY2 AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Last stressed syllable is AE1 F IH0 K, the same key as traffic.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Variant adjective of autobiographical, listed in dictionaries.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "typographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "T AY2 P AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Stress falls on 'graph', so the key is AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective relating to typography.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "cinematographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S IH2 N AH0 M AE2 T AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Stress falls on 'graph', so the key is AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective relating to cinematography.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "telegraphic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "T EH2 L AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Stress falls on 'graph', so the key is AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective relating to telegraphs or terse style.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "seismographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S AY2 Z M AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Stress falls on 'graph', so the key is AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective relating to seismographs.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "cartographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "K AA2 R T AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Stress falls on 'graph', so the key is AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective relating to cartography.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "bibliographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "overrule",
+      "verdict": "rhyme",
+      "reading": "B IH2 B L IY0 AH0 G R AE1 F IH0 K",
+      "confidence": "high",
+      "why": "Stress falls on 'graph', so the key is AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "unconfirmed-rhyme",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective relating to bibliography.",
+      "look": 1,
+      "landed": "unconfirmed-rhyme"
+    },
+    {
+      "word": "ethnographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "infographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "sapphic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S AE1 F IH0 K",
+      "confidence": "high",
+      "why": "It is stressed on the first syllable and ends AE1 F IH0 K, the same as 'traffic'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "English adjective relating to Sappho or to a verse form, also relating to love between women.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "certifiable",
+      "seedWord": "viable",
+      "rhymeKey": "AY AH B AH L",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S ER1 T AH0 F AY2 AH0 B AH0 L",
+      "confidence": "high",
+      "why": "The secondary-stressed 'fy' gives the key AY AH B AH L, the same as viable.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective meaning able to be certified.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "modifiable",
+      "seedWord": "viable",
+      "rhymeKey": "AY AH B AH L",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "M AA1 D AH0 F AY2 AH0 B AH0 L",
+      "confidence": "high",
+      "why": "The secondary-stressed 'fy' gives the key AY AH B AH L, the same as viable.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective meaning able to be modified.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "falsifiable",
+      "seedWord": "viable",
+      "rhymeKey": "AY AH B AH L",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F AO1 L S AH0 F AY2 AH0 B AH0 L",
+      "confidence": "high",
+      "why": "The secondary-stressed 'fy' gives the key AY AH B AH L, the same as viable.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective meaning capable of being proved false.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "rectifiable",
+      "seedWord": "viable",
+      "rhymeKey": "AY AH B AH L",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "R EH1 K T AH0 F AY2 AH0 B AH0 L",
+      "confidence": "high",
+      "why": "The secondary-stressed 'fy' gives the key AY AH B AH L, the same as viable.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective meaning able to be rectified.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "satisfiable",
+      "seedWord": "viable",
+      "rhymeKey": "AY AH B AH L",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S AE1 T AH0 S F AY2 AH0 B AH0 L",
+      "confidence": "high",
+      "why": "The secondary-stressed 'fy' gives the key AY AH B AH L, the same as viable.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard adjective meaning capable of being satisfied, also used in logic.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "inviable",
+      "seedWord": "viable",
+      "rhymeKey": "AY AH B AH L",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "IH0 N V AY1 AH0 B AH0 L",
+      "confidence": "high",
+      "why": "It is viable with a prefix added, so the last part is the seed word.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Rare but valid English adjective meaning not viable.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "marred",
+      "seedWord": "guard",
+      "rhymeKey": "AA R D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "mallard",
+      "seedWord": "guard",
+      "rhymeKey": "AA R D",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Stress is on the first syllable (AE1 L ER0 D), so the key is AE-L-ER-D, not AA-R-D.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "foulard",
+      "seedWord": "guard",
+      "rhymeKey": "AA R D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F UW0 L AA1 R D",
+      "confidence": "high",
+      "why": "Final syllable is stressed AA-R-D, the same Rhyme Key as guard.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "English noun for a lightweight silk or silk-cotton fabric or scarf.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "nard",
+      "seedWord": "guard",
+      "rhymeKey": "AA R D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "raws",
+      "seedWord": "cause",
+      "rhymeKey": "AA Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "R AO1 Z",
+      "confidence": "high",
+      "why": "Same AO-Z rime as cause.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Plural of the noun 'raw' (a raw state, as in 'in the raw'), also Scots for rows; valid in Scrabble lists.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "hawks",
+      "seedWord": "cause",
+      "rhymeKey": "AA Z",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "It ends in AO-K-S, not AO-Z.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "menopause",
+      "seedWord": "cause",
+      "rhymeKey": "AA Z",
+      "knew": "overrule",
+      "verdict": "rhyme",
+      "reading": "M EH1 N AH0 P AO2 Z",
+      "confidence": "high",
+      "why": "The final syllable has a full vowel AO in a closed syllable, so it carries secondary stress and has the AO-Z key.",
+      "reachesKey": true,
+      "wouldLand": "unconfirmed-rhyme",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard English noun for the end of menstruation.",
+      "look": 1,
+      "landed": "unconfirmed-rhyme"
+    },
+    {
+      "word": "craws",
+      "seedWord": "cause",
+      "rhymeKey": "AA Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "K R AO1 Z",
+      "confidence": "high",
+      "why": "Same AO-Z rime as cause.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Plural of craw, an animal's crop or stomach.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "lockjaws",
+      "seedWord": "cause",
+      "rhymeKey": "AA Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "L AA1 K JH AO2 Z",
+      "confidence": "high",
+      "why": "Compound whose last part, jaws, keeps secondary stress with an AO-Z rime.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Plural of lockjaw, the tetanus symptom.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "oversaws",
+      "seedWord": "cause",
+      "rhymeKey": "AA Z",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "lecter",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "respecter",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "neglecter",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "infector",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "IH0 N F EH1 K T ER0",
+      "confidence": "high",
+      "why": "Stress falls on 'fec', so the key is EH-K-T-ER, the same as 'inspector'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Regular agent noun for one who infects, listed in dictionaries.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "perfecter",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "P ER0 F EH1 K T ER0",
+      "confidence": "high",
+      "why": "Stress falls on 'fect', so the key is EH-K-T-ER, the same as 'inspector'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Regular agent noun of 'perfect' (one who perfects), listed in dictionaries.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "likewise",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "It ends in AY-Z, not UH-D.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "hollywood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "babyhood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "selfhood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "S EH1 L F HH UH2 D",
+      "confidence": "high",
+      "why": "It is a compound whose last part 'hood' keeps secondary stress and has the key UH-D, the same as 'would'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Standard noun meaning the state of having an individual identity.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "nationhood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "boxwood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "softwood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "goodwood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "woulda",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "begat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "laundromat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "dingbat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "D IH1 NG B AE2 T",
+      "confidence": "high",
+      "why": "Compound whose last part 'bat' keeps secondary stress, so the key is AE-T.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Common noun for a typographic ornament or a silly person.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "fruitbat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "hellcat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "HH EH1 L K AE2 T",
+      "confidence": "high",
+      "why": "Compound ending in 'cat' with secondary stress.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Common noun for a spiteful, violent woman, though also a brand and aircraft name.",
+      "look": 1,
+      "landed": "reading"
+    },
+    {
+      "word": "nougat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "knew": "missing-reading",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "medium",
+      "why": "General American says it with a weak last syllable (N UW1 G AH0 T), so only an unstressed ending matches; the French-style 'nuh-GAH' ending doesn't give AE-T either.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 1,
+      "landed": "nothing"
+    },
+    {
+      "word": "tat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 1,
+      "landed": null
+    },
+    {
+      "word": "carouse",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "espouse",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "prows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "meows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "M IY0 AW1 Z",
+      "confidence": "high",
+      "why": "Stress falls on AW1 Z, the same Rhyme Key as 'arouse'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Plural noun or third-person verb form of meow.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "powwows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "rows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "knew": "overrule",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "It ends in OW Z, which differs from the AW Z of 'arouse'.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "infographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "setAside": "not-on-word-list",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "ethnographic",
+      "seedWord": "traffic",
+      "rhymeKey": "AE F AH K",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "flyable",
+      "seedWord": "viable",
+      "rhymeKey": "AY AH B AH L",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "F L AY1 AH0 B AH0 L",
+      "confidence": "high",
+      "why": "It has the same AY AH B AH L Rhyme Key as 'viable'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "medium",
+      "wordhoodWhy": "Regular -able derivative meaning capable of being flown, found in some dictionaries.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "marred",
+      "seedWord": "guard",
+      "rhymeKey": "AA R D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "deodorized",
+      "seedWord": "guard",
+      "rhymeKey": "AA R D",
+      "knew": "missing-reading",
+      "verdict": "no-rhyme",
+      "reading": null,
+      "confidence": "high",
+      "why": "Its last stressed syllable is AY2 Z D, which is not the AA R D of 'guard'.",
+      "reachesKey": false,
+      "wouldLand": "editors-pass",
+      "look": 2,
+      "landed": "nothing"
+    },
+    {
+      "word": "hacksaws",
+      "seedWord": "cause",
+      "rhymeKey": "AA Z",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "HH AE1 K S AO2 Z",
+      "confidence": "high",
+      "why": "In this compound, 'saws' keeps secondary stress on AO2 Z, which matches the Rhyme Key of 'cause'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Plural of the common noun hacksaw.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "rejecter",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "knew": "missing-reading",
+      "verdict": "rhyme",
+      "reading": "R IH0 JH EH1 K T ER0",
+      "confidence": "high",
+      "why": "Its Rhyme Key EH K T ER matches 'inspector'.",
+      "reachesKey": true,
+      "wouldLand": "reading",
+      "wordhood": "word",
+      "wordhoodConfidence": "high",
+      "wordhoodWhy": "Accepted variant of rejector, one who rejects.",
+      "look": 2,
+      "landed": "reading"
+    },
+    {
+      "word": "lector",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "hector",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "respecter",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "neglecter",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "effector",
+      "seedWord": "inspector",
+      "rhymeKey": "EH K T ER",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "hollywood",
+      "seedWord": "would",
+      "rhymeKey": "UH D",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "laundromat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "begat",
+      "seedWord": "cat",
+      "rhymeKey": "AE T",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 2,
+      "landed": null
+    },
+    {
+      "word": "carouse",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "espouse",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "prows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    },
+    {
+      "word": "powwows",
+      "seedWord": "arouse",
+      "rhymeKey": "AW Z",
+      "setAside": "already-rhymes",
+      "verdict": "no-ruling",
+      "reading": null,
+      "confidence": "low",
+      "why": "not sent to the Judge",
+      "look": 3,
+      "landed": null
+    }
+  ],
+  "noFalseAccepts": {
+    "note": "The hunt (#268): scored Answers with no Wiktionary reading on the Seed Word's Rhyme Key (another-key), in the names data (names-hit), or on the key only through readings Normalisation appended (appended-only, #297), put to the Judge. Nothing it ruled landed by itself; what landed is what the maintainer decided. On a day the Judge held an appended-only Answer, every appended-only Answer that day was listed as one group (groups), the held ones marked; a decided word with inGroup true was listed so, and empty doubts mean the Judge did not hold it.",
+    "seeds": [
+      {
+        "seedWord": "arouse",
+        "rhymeKey": "AW Z",
+        "answers": 23,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": [
+          {
+            "word": "bows",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "OW Z"
+            ]
+          },
+          {
+            "word": "rouse",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "AW S",
+              "AW Z"
+            ]
+          }
+        ]
+      },
+      {
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "answers": 21,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": []
+      },
+      {
+        "seedWord": "viable",
+        "rhymeKey": "AY AH B AH L",
+        "answers": 24,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": []
+      },
+      {
+        "seedWord": "guard",
+        "rhymeKey": "AA R D",
+        "answers": 51,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": [
+          {
+            "word": "bard",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "AA R D"
+            ]
+          },
+          {
+            "word": "chard",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "AA R D"
+            ]
+          },
+          {
+            "word": "jarred",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          }
+        ]
+      },
+      {
+        "seedWord": "cause",
+        "rhymeKey": "AA Z",
+        "answers": 35,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": []
+      },
+      {
+        "seedWord": "inspector",
+        "rhymeKey": "EH K T ER",
+        "answers": 26,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": [
+          {
+            "word": "rector",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "EH K T ER"
+            ]
+          }
+        ]
+      },
+      {
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "answers": 39,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": [
+          {
+            "word": "firewood",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AY ER W UH D",
+              "AY R W UH D"
+            ]
+          },
+          {
+            "word": "hood",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "UH D",
+              "IH D"
+            ]
+          },
+          {
+            "word": "livelihood",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AY V L IY HH UH D"
+            ]
+          },
+          {
+            "word": "plywood",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AY W UH D"
+            ]
+          },
+          {
+            "word": "redwood",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "EH D W UH D"
+            ]
+          },
+          {
+            "word": "underwood",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "wood",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "UH D"
+            ]
+          },
+          {
+            "word": "wormwood",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "ER M W UH D"
+            ]
+          }
+        ]
+      },
+      {
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "answers": 52,
+        "result": "pass",
+        "unruled": [],
+        "stillScored": [],
+        "sent": [
+          {
+            "word": "brat",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AA T"
+            ]
+          },
+          {
+            "word": "caveat",
+            "reasons": [
+              "another-key"
+            ],
+            "wiktionaryKeys": [
+              "AE V IY AA T",
+              "AA V IY AA T",
+              "AA T"
+            ]
+          },
+          {
+            "word": "chat",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "AE T"
+            ]
+          },
+          {
+            "word": "fiat",
+            "reasons": [
+              "appended-only"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "mat",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": [
+              "AE T",
+              "AE T T"
+            ]
+          },
+          {
+            "word": "matt",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "pat",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          },
+          {
+            "word": "patt",
+            "reasons": [
+              "names-hit"
+            ],
+            "wiktionaryKeys": []
+          }
+        ]
+      }
+    ],
+    "rulings": [
+      {
+        "word": "bows",
+        "seedWord": "arouse",
+        "rhymeKey": "AW Z",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "B AW1 Z",
+        "confidence": "high",
+        "why": "Bows (bends at the waist) is said with AW Z, matching arouse.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Plural of bow, or verb form."
+      },
+      {
+        "word": "rouse",
+        "seedWord": "arouse",
+        "rhymeKey": "AW Z",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "R AW1 Z",
+        "confidence": "high",
+        "why": "Same AW Z rime as arouse, and the base of it.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "To wake or stir up."
+      },
+      {
+        "word": "bard",
+        "seedWord": "guard",
+        "rhymeKey": "AA R D",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "B AA1 R D",
+        "confidence": "high",
+        "why": "Same rime AA-R-D as guard.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A poet or minstrel; common English noun."
+      },
+      {
+        "word": "chard",
+        "seedWord": "guard",
+        "rhymeKey": "AA R D",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "CH AA1 R D",
+        "confidence": "high",
+        "why": "Same rime AA-R-D as guard.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A leafy vegetable."
+      },
+      {
+        "word": "jarred",
+        "seedWord": "guard",
+        "rhymeKey": "AA R D",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "JH AA1 R D",
+        "confidence": "high",
+        "why": "Jarred is said with the stressed AA-R-D rime, a single syllable like guard.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Past tense of jar, as in jolted or put in a jar."
+      },
+      {
+        "word": "rector",
+        "seedWord": "inspector",
+        "rhymeKey": "EH K T ER",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "R EH1 K T ER0",
+        "confidence": "high",
+        "why": "Same EH K T ER rime as inspector.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A parish priest or head of a college."
+      },
+      {
+        "word": "firewood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "F AY1 ER0 W UH2 D",
+        "confidence": "high",
+        "why": "The compound's last part wood keeps secondary stress and has the UH D rime.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Wood used as fuel; common compound."
+      },
+      {
+        "word": "hood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "HH UH1 D",
+        "confidence": "high",
+        "why": "Same UH D rime as would.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A head covering or car part; common noun."
+      },
+      {
+        "word": "livelihood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "L AY1 V L IY0 H UH2 D",
+        "confidence": "high",
+        "why": "Ends in -hood with a full UH vowel and secondary stress, giving the key UH D.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A means of earning a living."
+      },
+      {
+        "word": "plywood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "P L AY1 W UH2 D",
+        "confidence": "high",
+        "why": "The compound's last part is 'wood', which keeps secondary stress, so the key is UH D.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Board made of layered wood veneers."
+      },
+      {
+        "word": "redwood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "R EH1 D W UH2 D",
+        "confidence": "high",
+        "why": "The compound's last part is 'wood', which keeps secondary stress, so the key is UH D.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A type of tree and its timber."
+      },
+      {
+        "word": "underwood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "AH1 N D ER0 W UH2 D",
+        "confidence": "high",
+        "why": "The compound's last part is 'wood', which keeps secondary stress, so the key is UH D.",
+        "wordhood": "word",
+        "wordhoodConfidence": "medium",
+        "wordhoodWhy": "Undergrowth or small trees beneath larger ones; archaic but real, also a surname."
+      },
+      {
+        "word": "wood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "W UH1 D",
+        "confidence": "high",
+        "why": "It is a homophone of 'would'.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common English noun for the material from trees or a small forest."
+      },
+      {
+        "word": "wormwood",
+        "seedWord": "would",
+        "rhymeKey": "UH D",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "W ER1 M W UH2 D",
+        "confidence": "high",
+        "why": "The compound's last part is 'wood', which keeps secondary stress, so the key is UH D.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "English word for the bitter aromatic plant Artemisia absinthium, used in absinthe."
+      },
+      {
+        "word": "brat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "B R AE1 T",
+        "confidence": "high",
+        "why": "Same rime AE-T as cat.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A badly behaved child; common noun."
+      },
+      {
+        "word": "caveat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "another-key"
+        ],
+        "verdict": "rhyme",
+        "reading": "K AE1 V IY0 AE2 T",
+        "confidence": "high",
+        "why": "The final closed syllable has a full vowel with secondary stress, so the key is AE-T.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A warning or qualification; English noun."
+      },
+      {
+        "word": "chat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "CH AE1 T",
+        "confidence": "high",
+        "why": "Same rime AE-T as cat.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "Common noun and verb."
+      },
+      {
+        "word": "fiat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "appended-only"
+        ],
+        "verdict": "rhyme",
+        "reading": "F IY1 AE2 T",
+        "confidence": "medium",
+        "why": "The common reading 'fee-at' has a full AE vowel with secondary stress in the last syllable, giving the key AE-T.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "An authoritative decree, as in fiat currency; English word."
+      },
+      {
+        "word": "mat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "M AE1 T",
+        "confidence": "high",
+        "why": "Same rime AE-T as cat.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "A floor covering; common noun and verb."
+      },
+      {
+        "word": "matt",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "M AE1 T",
+        "confidence": "high",
+        "why": "Same AE T rime as cat.",
+        "wordhood": "word",
+        "wordhoodConfidence": "medium",
+        "wordhoodWhy": "Variant spelling of matte (dull finish), though mostly seen as a name."
+      },
+      {
+        "word": "pat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "P AE1 T",
+        "confidence": "high",
+        "why": "Same AE T rime as cat.",
+        "wordhood": "word",
+        "wordhoodConfidence": "high",
+        "wordhoodWhy": "To tap gently, or a small lump of butter; also a name."
+      },
+      {
+        "word": "patt",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "reasons": [
+          "names-hit"
+        ],
+        "verdict": "rhyme",
+        "reading": "P AE1 T",
+        "confidence": "medium",
+        "why": "Variant spelling of pat, same AE T rime as cat.",
+        "wordhood": "not-a-word",
+        "wordhoodConfidence": "medium",
+        "wordhoodWhy": "Not a standard English word; at most a surname or fragment."
+      }
+    ],
+    "groups": [],
+    "decided": []
+  },
+  "undecidedRhymes": {
+    "note": "Rulings of the Judge's in the looks that said Rhyme and landed nothing, whatever their confidence, put to the maintainer in the sitting (#293). A confirm wrote its reading beside the word's others, a decline a Decline for the word and the Rhyme Key; a skip wrote nothing and is listed under skipped.",
+    "listed": 3,
+    "decided": [
+      {
+        "word": "dowse",
+        "seedWord": "arouse",
+        "rhymeKey": "AW Z",
+        "knew": "overrule",
+        "confidence": "medium",
+        "reading": "D AW1 Z",
+        "why": "The water-divining sense 'dowse' is said D AW1 Z, the same as 'douse'.",
+        "decision": {
+          "kind": "confirm",
+          "reading": [
+            "D",
+            "AW1",
+            "Z"
+          ]
+        },
+        "wrote": "data/supplement.dict: dowse D AW1 S; dowse D AW1 Z"
+      },
+      {
+        "word": "house",
+        "seedWord": "arouse",
+        "rhymeKey": "AW Z",
+        "knew": "overrule",
+        "confidence": "medium",
+        "reading": "HH AW1 Z",
+        "why": "The verb 'to house' is said with final Z, which gives the rime AW Z.",
+        "decision": {
+          "kind": "confirm",
+          "reading": [
+            "HH",
+            "AW1",
+            "Z"
+          ]
+        },
+        "wrote": "data/supplement.dict: house HH AW1 S; house HH AW1 Z"
+      },
+      {
+        "word": "placard",
+        "seedWord": "guard",
+        "rhymeKey": "AA R D",
+        "knew": "overrule",
+        "confidence": "medium",
+        "reading": "P L AE1 K AA2 R D",
+        "why": "The full vowel in the closed last syllable takes secondary stress, giving AA-R-D.",
+        "decision": {
+          "kind": "decline"
+        },
+        "wrote": "data/declines.txt: placard AA R D"
+      }
+    ],
+    "skipped": []
+  },
+  "tiered": {
+    "note": "Words the looks wrote in that have no knownness, so each was a Bonus Word whatever it is, put to the maintainer to Tier in the sitting (#294), with the Judge's answer to the Tier question as the default (#295). An Answer or a Bonus Word wrote an unlocked Tier verdict to data/tier-overrides.csv, which the next build applies; a skip wrote nothing and is listed under skipped. The Judge's answer landed nothing by itself. agreement compares it with the maintainer's ruling over the words both answered, overall and at each confidence ([agreed, compared]).",
+    "listed": 3,
+    "decided": [
+      {
+        "word": "sapphic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "judge": {
+          "verdict": "bonus",
+          "confidence": "high",
+          "why": "A fairly specialized word that few players would think of when hunting rhymes for 'traffic'."
+        },
+        "decision": {
+          "kind": "tier",
+          "tier": "answer"
+        },
+        "agreed": false,
+        "wrote": "data/tier-overrides.csv: sapphic answer-common"
+      },
+      {
+        "word": "satisfiable",
+        "seedWord": "viable",
+        "rhymeKey": "AY AH B AH L",
+        "judge": {
+          "verdict": "bonus",
+          "confidence": "high",
+          "why": "A rare technical/logic term and a derived form that players would not produce when seeking rhymes for 'viable'."
+        },
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "agreed": true,
+        "wrote": "data/tier-overrides.csv: satisfiable bonus"
+      },
+      {
+        "word": "perfecter",
+        "seedWord": "inspector",
+        "rhymeKey": "EH K T ER",
+        "judge": {
+          "verdict": "bonus",
+          "confidence": "high",
+          "why": "An uncommon agent-noun derivation that players would not come up with for 'inspector'."
+        },
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "agreed": true,
+        "wrote": "data/tier-overrides.csv: perfecter bonus"
+      }
+    ],
+    "skipped": [],
+    "agreement": {
+      "words": 3,
+      "compared": 3,
+      "agreed": 2,
+      "rate": 0.6666666666666666,
+      "byConfidence": {
+        "high": [
+          2,
+          3
+        ],
+        "medium": [
+          0,
+          0
+        ],
+        "low": [
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "writtenInAnswers": {
+    "note": "Words the looks wrote in whose knownness is at or above the Answer line, so each scored as an Answer with nobody having looked, put to the maintainer after the words with no knownness, grouped by Seed Word (#319). The Judge was not asked, so none is in the agreement above. Kept wrote nothing; moved wrote an unlocked Bonus Word verdict to data/tier-overrides.csv, which the next build applies; unruled (no terminal) left the word an Answer.",
+    "answerLine": 1,
+    "listed": 21,
+    "moved": [
+      "lowbrows",
+      "cinematographic",
+      "telegraphic",
+      "rectifiable",
+      "flyable",
+      "raws",
+      "craws",
+      "infector",
+      "dingbat"
+    ],
+    "unruled": [],
+    "decided": [
+      {
+        "word": "lowbrows",
+        "seedWord": "arouse",
+        "rhymeKey": "AW Z",
+        "knownness": 1.3712863334749972,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: lowbrows bonus"
+      },
+      {
+        "word": "meows",
+        "seedWord": "arouse",
+        "rhymeKey": "AW Z",
+        "knownness": 2.1591039245241963,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "biographic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "knownness": 2.0095615711628527,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "autobiographic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "knownness": 2.1024318467301693,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "typographic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "knownness": 1.5614035219003182,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "cinematographic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "knownness": 1.487821289741024,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: cinematographic bonus"
+      },
+      {
+        "word": "telegraphic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "knownness": 2.057627183319821,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: telegraphic bonus"
+      },
+      {
+        "word": "seismographic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "knownness": 1.47196839736797,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "cartographic",
+        "seedWord": "traffic",
+        "rhymeKey": "AE F AH K",
+        "knownness": 1.1704874093361488,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "certifiable",
+        "seedWord": "viable",
+        "rhymeKey": "AY AH B AH L",
+        "knownness": 2.0474027489206117,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "modifiable",
+        "seedWord": "viable",
+        "rhymeKey": "AY AH B AH L",
+        "knownness": 1.8059696723110197,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "falsifiable",
+        "seedWord": "viable",
+        "rhymeKey": "AY AH B AH L",
+        "knownness": 1.1867484029077884,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "rectifiable",
+        "seedWord": "viable",
+        "rhymeKey": "AY AH B AH L",
+        "knownness": 1.5352992941580759,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: rectifiable bonus"
+      },
+      {
+        "word": "flyable",
+        "seedWord": "viable",
+        "rhymeKey": "AY AH B AH L",
+        "knownness": 1.1291761577077977,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: flyable bonus"
+      },
+      {
+        "word": "raws",
+        "seedWord": "cause",
+        "rhymeKey": "AA Z",
+        "knownness": 2.310163194293704,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: raws bonus"
+      },
+      {
+        "word": "craws",
+        "seedWord": "cause",
+        "rhymeKey": "AA Z",
+        "knownness": 1.0458647700587982,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: craws bonus"
+      },
+      {
+        "word": "lockjaws",
+        "seedWord": "cause",
+        "rhymeKey": "AA Z",
+        "knownness": 1.9030740854769161,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "hacksaws",
+        "seedWord": "cause",
+        "rhymeKey": "AA Z",
+        "knownness": 1.9642487930055914,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      },
+      {
+        "word": "infector",
+        "seedWord": "inspector",
+        "rhymeKey": "EH K T ER",
+        "knownness": 1.1271538960769443,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: infector bonus"
+      },
+      {
+        "word": "dingbat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "knownness": 1.644853626951473,
+        "decision": {
+          "kind": "tier",
+          "tier": "bonus"
+        },
+        "wrote": "data/tier-overrides.csv: dingbat bonus"
+      },
+      {
+        "word": "hellcat",
+        "seedWord": "cat",
+        "rhymeKey": "AE T",
+        "knownness": 1.0533646196686193,
+        "decision": {
+          "kind": "leave"
+        },
+        "wrote": null
+      }
+    ]
+  }
+}
