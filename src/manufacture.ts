@@ -2,10 +2,10 @@
  * Manufacture: pinned text in, index data out.
  *
  * The build turns the pinned inputs into readings in a fixed order — demotions,
- * then the committed supplement, then coverage derivation, then normalisation,
- * then the Retrieval override layer — and that order is load-bearing. Demotions
- * run first so every later stage reads a corrected word list rather than
- * working around it. A hand-authored reading must beat a composed one, so the
+ * then the committed supplement, then coverage derivation, then normalisation
+ * and its exceptions, then the Retrieval override layer — and that order is
+ * load-bearing. Demotions run first so every later stage reads a corrected
+ * word list rather than working around it. A hand-authored reading must beat a composed one, so the
  * supplement precedes coverage. And every reading must reach the accent
  * specification as an *input* rather than an exemption, so normalisation runs
  * before anything else is considered finished (ADR-0010, ADR-0011).
@@ -39,6 +39,7 @@ import { parseCmudict } from "./cmudict.ts";
 import { applyCoverage, type DerivedWord } from "./coverage.ts";
 import { applyDemotions, type AppliedDemotion } from "./demotions.ts";
 import { applyNormalisation } from "./normalise.ts";
+import { applyNormalisationExceptions, type AppliedNormalisationExceptions } from "./normalisationExceptions.ts";
 import type { Pronunciation } from "./phonology.ts";
 import { parsePrevalenceCsv, parseWordList } from "./pipeline.ts";
 import { matchingPronunciation, type RhymeIndexData } from "./rhymeIndex.ts";
@@ -85,6 +86,11 @@ export interface PinnedInputs {
    */
   tierMoves?: string;
   /**
+   * The committed Normalisation Exceptions (#323): each takes one reading
+   * Normalisation appended off one word. Absent or empty excepts nothing.
+   */
+  normalisationExceptions?: string;
+  /**
    * The committed Unconfirmed Rhyme list (#259): words the Judge ruled a Rhyme
    * on one Rhyme Key, accepted there without Points. Empty text lists nothing.
    */
@@ -116,6 +122,8 @@ export interface ManufacturedIndex {
   overridden: AppliedTierOverride[];
   /** Every word the Tier moves from Session Records moved, over the editor's verdicts (#270). */
   moved: AppliedTierMove[];
+  /** The Normalisation Exceptions as applied, with the lines refused, stale or unreadable (#323). */
+  excepted: AppliedNormalisationExceptions;
   /** The Unconfirmed Rhyme list as applied, with what it dropped (#259). */
   unconfirmed: AppliedUnconfirmedRhymes;
 }
@@ -152,6 +160,12 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
   // has already passed the wordhood gate, so nothing else would ever read one.
   const unmerged = new Map<string, Pronunciation[]>();
   applyNormalisation({ pronunciations, unmergedReadings: unmerged });
+
+  // 4b. The Normalisation Exceptions (#323), straight after the rules they
+  // answer: each takes one appended reading off one word, which the supplement
+  // cannot do from in front of Normalisation. Before anything reads a Rhyme Key,
+  // so no later stage sees the reading. See src/normalisationExceptions.ts.
+  const excepted = applyNormalisationExceptions(inputs.normalisationExceptions ?? "", { pronunciations, unmergedReadings: unmerged });
   const unmergedReadings = new Map([...unmerged].filter(([word]) => words.has(word)));
 
   // 5. The Retrieval override layer (ADR-0015), merged over the finished
@@ -199,6 +213,7 @@ export function manufactureIndexData(inputs: PinnedInputs): ManufacturedIndex {
     dropped,
     overridden,
     moved,
+    excepted,
     unconfirmed,
   };
 }

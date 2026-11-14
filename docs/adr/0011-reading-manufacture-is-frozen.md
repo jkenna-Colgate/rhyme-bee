@@ -1,6 +1,6 @@
 # Reading manufacture is frozen; a correction lands in the data, not in a new rule
 
-**Status:** amended 2026-07-30, 2026-10-07, 2026-10-14, 2026-10-16, 2026-10-26 and 2026-11-02. Reading manufacture is still frozen, now at seven normalisation rules, all built, and thirty affix rules. Stress promotion no longer stresses a vowel the syllabic consonant rule exposed (decided, not built). A name or a non-word the word list holds is corrected by a Demotion in `data/demotions.txt`, not in `data/names.txt` or `data/words.txt`, and the Judge writes a reading unattended only for a Missing Reading, never a Demotion.
+**Status:** amended 2026-07-30, 2026-10-07, 2026-10-14, 2026-10-16, 2026-10-26, 2026-11-02 and 2026-11-14. Reading manufacture is still frozen, now at seven normalisation rules, all built, and thirty affix rules. Stress promotion no longer stresses a vowel the syllabic consonant rule exposed (decided, not built). A name or a non-word the word list holds is corrected by a Demotion in `data/demotions.txt`, not in `data/names.txt` or `data/words.txt`, and the Judge writes a reading unattended only for a Missing Reading, never a Demotion. A reading Normalisation appended that is wrong for one word is taken off that word by a Normalisation Exception in `data/normalisation-exceptions.txt`, with no rule changed.
 
 The build manufactures readings in two stages — coverage derivation
 (`src/coverage.ts`, `src/affixes.ts`) composes a reading for a known word that
@@ -560,3 +560,67 @@ words in the `kennel` family. The maintainer ruled that they do not rhyme with
 `kennel`. They are removed word by word in `data/supplement.dict`, which is
 where this ADR says a wrong reading is corrected. Whether every t-dropped
 reading should go (`twenty`, `winter`) is measured separately.
+
+## Amendment, 2026-11-14: one appended reading can be taken off one word
+
+Settled in [#323](https://github.com/jkenna-Colgate/rhyme-bee/issues/323): in
+the Batch's ruling list a reading can be right while the reading Normalisation
+appended to it is wrong, and there was no way to say so. The freeze stands at **seven normalisation rules** and thirty affix
+rules: this adds no rule and narrows none. The Rhyme rule is unchanged.
+
+### A fifth correction site, for one thing only
+
+Until now a wrong appended reading had no correction site. The pronunciation
+supplement is applied before Normalisation, so whatever is written there goes
+back through every rule, and the variant comes back. The ruling list said as
+much: it showed an appended reading unnumbered, with a note that it comes back
+by itself.
+
+A **Normalisation Exception** is a line in `data/normalisation-exceptions.txt`
+(`src/normalisationExceptions.ts`) naming a word and one exact reading
+Normalisation appended to it. The build applies the exceptions straight after
+Normalisation: the word keeps the reading the variant was made from and loses
+the variant. It is data, it is per word, and like a Demotion it carries no date
+and no Rhyme Key, so it holds on every day the word appears on. It manufactures
+no reading and changes no rule, so the closed set in `src/normalise.ts` is
+untouched.
+
+**Only an appended reading can be excepted.** A line naming a reading a
+replacing rule produced, a reading the word was given directly, or a word's
+only reading is refused and named in the build output, and the index is built
+as if the line were absent. A reading a replacing rule produced is the accent
+itself (ADR-0010 admits a replacing rule only where the contrast is inaudible),
+so taking one off a word would put the word in another accent; a reading the
+word was given is corrected in the supplement, where this ADR already sends it.
+A line whose word no longer holds the reading is stale and is named too, as a
+stale Demotion is.
+
+Whether a reading was appended is told the way the index already tells it, by
+its shape against an earlier reading of the same word (`isGeneratedVariantOf`).
+That test is a little loose on purpose: a word the dictionary writes both ways
+(`fire`) has its second reading taken for appended. So an exception can take
+that reading off too. The ruling list marks the same readings as appended, and
+using one test in both places is what stops the list writing a line the build
+then refuses.
+
+The reading a Weak Rhyme is worked out from goes with the excepted one, so the
+word is not left accepted on the variant's unmerged form.
+
+### Who writes one
+
+The Batch's ruling list, and a hand edit. In the list an appended reading is
+now numbered like the others and still marked. A keep that holds the reading it
+was made from and leaves it out writes the exception; a keep of both writes
+none; a keep of the appended reading without a reading it was made from is
+asked again. Taking an exception back is a hand edit to the file. The Editor's
+Pass does not write one yet.
+
+### What was not made a rule
+
+**Narrowing the rule instead.** Each of these words is a place where an
+appending rule goes a little too far. Narrowing the rule to miss them is the
+move [#211](https://github.com/jkenna-Colgate/rhyme-bee/issues/211) warns
+against: a limit drawn from a handful of words, with a blast radius nobody has
+measured. Where a rule's own error rate has been measured and a limit holds
+across the family, the rule is amended, as on 2026-11-02. The exception is for
+the leftovers.

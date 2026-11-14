@@ -160,6 +160,7 @@ const DATA_INPUTS = [
   "tier-overrides.csv",
   "tier-moves.csv",
   "unconfirmed-rhymes.txt",
+  "normalisation-exceptions.txt",
 ];
 
 /**

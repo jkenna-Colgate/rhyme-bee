@@ -201,32 +201,20 @@ export async function applyCorrection(
   ask: CorrectionAsk,
   deps: CorrectionDeps,
 ): Promise<CorrectionWriteResult> {
-  const word = normaliseWord(ask.word);
-  const ctx = deps.context();
+  const planned = planCorrection(ask, deps.context());
+  const { word } = planned;
   const schedule = deps.schedule();
-
-  const current = ctx.pronunciations.get(word) ?? [];
-  const written = readingsToWrite(current, ask.phonemes, ask.mode, ask.kept);
-  const keysBefore = keysOf(current);
-  const keysAfter = keysOf(written);
-  const rechecked = union(keysBefore, keysAfter);
+  const rechecked = union(planned.keysBefore, planned.keysAfter);
 
   const days = daysOnKeys(schedule, rechecked, deps.today());
   const before = days.map((day) => readDay(deps.openIndex, schedule, day.date));
 
-  appendCorrection(
-    deps.supplementPath ?? resolve(root, "data", SUPPLEMENT),
-    { word, mode: ask.mode, target: ask.target, readings: written, source: deps.source },
-  );
+  appendPlanned(planned, ask.target, deps);
   const rebuilt = await deps.rebuild();
   const after = days.map((day) => readDay(deps.openIndex, schedule, day.date));
 
   return {
-    word,
-    mode: ask.mode,
-    written,
-    keysBefore,
-    keysAfter,
+    ...planned,
     rechecked,
     rebuilt,
     days: days.map((day, i) => movementOf(word, day, before[i]!, after[i]!)),
@@ -234,6 +222,48 @@ export async function applyCorrection(
     // Word test runs (#264), whichever path gave it.
     seedWords: seedWordChecksAfterWrite(schedule.days, [word], rebuilt.ok, deps.openIndex),
   };
+}
+
+/** What one correction wrote: the word, the readings in file order, and the Rhyme Keys on either side. */
+export type CorrectionWritten = Pick<CorrectionWriteResult, "word" | "mode" | "written" | "keysBefore" | "keysAfter">;
+
+/**
+ * Write a correction and do nothing else: no rebuild, and no day read on either
+ * side of one. It is a Batch's ruling list's write (#322), which rebuilds once
+ * at the end of the sitting, so the line is in the supplement when this returns
+ * and the index is stale until that rebuild.
+ *
+ * `context` is read on every call and must read the supplement from disk, as
+ * `pinnedEvidenceContext` does: a word joined twice in one sitting then joins
+ * the reading the first write gave it, with no rebuild between.
+ */
+export function writeCorrection(
+  ask: CorrectionAsk,
+  deps: Pick<CorrectionDeps, "context" | "supplementPath" | "source">,
+): CorrectionWritten {
+  const planned = planCorrection(ask, deps.context());
+  appendPlanned(planned, ask.target, deps);
+  return planned;
+}
+
+/** What a correction will write, worked out from the readings the word holds before it. */
+function planCorrection(ask: CorrectionAsk, ctx: EvidenceContext): CorrectionWritten {
+  const word = normaliseWord(ask.word);
+  const current = ctx.pronunciations.get(word) ?? [];
+  const written = readingsToWrite(current, ask.phonemes, ask.mode, ask.kept);
+  return { word, mode: ask.mode, written, keysBefore: keysOf(current), keysAfter: keysOf(written) };
+}
+
+/** Append a planned correction to the supplement, with the Rhyme Key it was aimed at and where it was approved. */
+function appendPlanned(
+  planned: CorrectionWritten,
+  target: RhymeKey,
+  deps: Pick<CorrectionDeps, "supplementPath" | "source">,
+): void {
+  appendCorrection(
+    deps.supplementPath ?? resolve(root, "data", SUPPLEMENT),
+    { word: planned.word, mode: planned.mode, target, readings: planned.written, source: deps.source },
+  );
 }
 
 /**

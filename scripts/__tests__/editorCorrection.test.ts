@@ -31,6 +31,7 @@ import {
   movementOf,
   proposeCorrection,
   readingsToWrite,
+  writeCorrection,
 } from "../editorCorrection.ts";
 
 function context(overrides: {
@@ -612,3 +613,52 @@ function dayReadout({
     bonusWords: bonusWords.map(word),
   };
 }
+
+/**
+ * #322: a Batch's ruling list writes each ruling as it is made and rebuilds once,
+ * at the end of the sitting, so its write is the correction without the rebuild
+ * and without the days read on either side of it.
+ */
+describe("writeCorrection", () => {
+  let dir: string;
+  let supplementPath: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), "rhyme-bee-correction-"));
+    supplementPath = join(dir, "supplement.dict");
+    writeFileSync(supplementPath, "# a committed supplement\n");
+  });
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  const deps = () => ({
+    context: () => context({ pronunciations: [["gate", [["G", "EY1", "T"]]]], words: ["gate"] }),
+    supplementPath,
+    source: "batch" as const,
+  });
+
+  it("has the line in the supplement when it returns, and says what it wrote", () => {
+    const result = writeCorrection({ word: "Gate", target: "AE T", phonemes: ["G", "AE1", "T"], mode: "join" }, deps());
+    const written = readFileSync(supplementPath, "utf8");
+    expect(written).toContain("gate G EY1 T\ngate(2) G AE1 T\n");
+    expect(written).toContain("correction approved on a Batch's No False Accepts ruling list");
+    expect(result).toEqual({
+      word: "gate",
+      mode: "join",
+      written: [["G", "EY1", "T"], ["G", "AE1", "T"]],
+      keysBefore: ["EY T"],
+      keysAfter: ["EY T", "AE T"],
+    });
+  });
+
+  it("writes a replace that keeps readings as those kept, then the proposal", () => {
+    const result = writeCorrection(
+      { word: "gate", target: "AE T", phonemes: ["G", "AE1", "T"], kept: [["G", "EH1", "T"]], mode: "replace" },
+      deps(),
+    );
+    expect(result.written).toEqual([["G", "EH1", "T"], ["G", "AE1", "T"]]);
+    expect(readFileSync(supplementPath, "utf8")).toContain("gate G EH1 T\ngate(2) G AE1 T\n");
+  });
+});

@@ -41,6 +41,9 @@ desktop.ini
 # The Unconfirmed Rhymes the Judge writes (#259, ADR-0017). Authored, like the
 # demotion list, so kept for its reason: the next clone could not derive it.
 !/data/unconfirmed-rhymes.txt
+# The Normalisation Exceptions (#323, ADR-0011 amended). Hand-written or written
+# by a Batch's ruling list, and kept for the demotion list's reason.
+!/data/normalisation-exceptions.txt
 # The Editor's Pass defers what it cannot compose a reading for. Unlike the
 # Appeal candidates queue beside it, which is pulled down from R2 and can be
 # pulled again, this is the only record that a miss happened — it is the work

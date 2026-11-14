@@ -16,6 +16,7 @@ import type { DemotionReason } from "./demotions.ts";
 import { agreementOver, phonemesOf, readingReachesKey, type Agreement, type TierAnswer, type TierRuling } from "./judge.ts";
 import type { AppendedGroup, ListedAnswer } from "./noFalseAccepts.ts";
 import { isVowelSound, type Pronunciation, type RhymeKey } from "./phonology.ts";
+import { isGeneratedVariantOf } from "./rhymeIndex.ts";
 
 // ---- the maintainer's ruling ---------------------------------------------------
 
@@ -24,14 +25,18 @@ import { isVowelSound, type Pronunciation, type RhymeKey } from "./phonology.ts"
  * (`game`), one Normalisation appended to a reading the game holds
  * (`normalisation`), or one Wiktionary has and the game does not, offered as an
  * addition (`wiktionary`). Wiktionary's are ARPAbet before Normalisation, which
- * the build applies to whatever is written. Every one but an appended reading is
- * numbered, by its place among those: an appended reading comes back by itself
- * while a reading it was made from is kept, so writing it as a source line would
- * only put a reading the build makes into the supplement.
+ * the build applies to whatever is written. Every one is numbered, by its place
+ * in the list. An appended reading carries the readings it was made from
+ * (`madeFrom`), told by its shape as the index tells it: it is never written
+ * as a source line, because the build makes it again while one of those is
+ * kept, and leaving it out of a keep that holds one of them takes a
+ * Normalisation Exception (#323).
  */
 export interface ShownReading {
   reading: Pronunciation;
   from: "game" | "normalisation" | "wiktionary";
+  /** The earlier readings of the word an appended reading was made from. Only on `normalisation`. */
+  madeFrom?: Pronunciation[];
 }
 
 /**
@@ -43,7 +48,13 @@ export function shownReadings(
   game: readonly { pronunciation: Pronunciation; generated: boolean }[],
   wiktionary: readonly Pronunciation[],
 ): ShownReading[] {
-  const out: ShownReading[] = game.map((g) => ({ reading: [...g.pronunciation], from: g.generated ? "normalisation" : "game" }));
+  const out: ShownReading[] = game.map((g, i) => g.generated
+    ? {
+        reading: [...g.pronunciation],
+        from: "normalisation",
+        madeFrom: game.slice(0, i).filter((earlier) => isGeneratedVariantOf(g.pronunciation, earlier.pronunciation)).map((earlier) => [...earlier.pronunciation]),
+      }
+    : { reading: [...g.pronunciation], from: "game" });
   const seen = new Set(out.map((s) => s.reading.join(" ")));
   for (const reading of wiktionary) {
     const spelling = reading.join(" ");
@@ -58,7 +69,12 @@ export function shownReadings(
  * What the maintainer decided about a listed Answer. A correction replaces the
  * word's readings with one, and a keep with the several the maintainer kept
  * (both in `data/supplement.dict`, several readings written as one word's
- * alternates); a Demotion takes the word's wordhood (`data/demotions.txt`);
+ * alternates). A keep's `readings` are the ones to write: a kept reading that
+ * Normalisation appended is not among them, since the build makes it again.
+ * Its `excepted` are the appended readings left out that the build would make
+ * again from what is kept, each written as a Normalisation Exception
+ * (`data/normalisation-exceptions.txt`, #323). A Demotion takes the word's
+ * wordhood (`data/demotions.txt`);
  * leave it keeps it scored on the maintainer's word; unruled is an Answer
  * skipped.
  *
@@ -76,7 +92,7 @@ export function shownReadings(
  */
 export type Decision =
   | { kind: "correction"; reading: Pronunciation }
-  | { kind: "keep"; readings: Pronunciation[] }
+  | { kind: "keep"; readings: Pronunciation[]; excepted?: Pronunciation[] }
   | { kind: "demotion"; reason: DemotionReason }
   | { kind: "leave" }
   | { kind: "confirm"; reading: Pronunciation }
@@ -104,22 +120,26 @@ export type RulingItem =
 /** One command a line: what is typed, padded, then its effect. */
 const commandLine = (typed: string, effect: string): string => `  ${typed.padEnd(20)} ${effect}`;
 
-const APPENDED_NOTE = "  (appended by Normalisation, so not numbered: it comes back by itself while a reading it was made from is kept)";
+const spelt = (reading: Pronunciation): string => reading.join(" ");
 
-/** The readings that can be kept or corrected to, in the order shown: `numbered[n - 1]` is number n. */
-const numberedOf = (shown: readonly ShownReading[]): ShownReading[] => shown.filter((s) => s.from !== "normalisation");
+/** What an appended reading's line says after it: which numbers it was made from, and what leaving it out does. */
+function appendedNote(appended: ShownReading, shown: readonly ShownReading[]): string {
+  const sources = (appended.madeFrom ?? []).map((source) => shown.findIndex((s) => spelt(s.reading) === spelt(source)) + 1);
+  return sources.length
+    ? `  (appended by Normalisation to ${sources.join(" and ")}: keep ${sources.join(" or ")} without it and a Normalisation Exception is written for it)`
+    : "  (appended by Normalisation)";
+}
 
 /**
  * What the maintainer is shown when a ruling is wanted: the readings under who
- * holds them, numbered but for those Normalisation appended, then that an answer
- * is awaited and one command a line with its effect. Every command it names is
- * one `parseDecision` reads.
+ * holds them, each numbered by its place and those Normalisation appended
+ * marked, then that an answer is awaited and one command a line with its
+ * effect. Every command it names is one `parseDecision` reads.
  */
 export function rulingPrompt(shown: readonly ShownReading[]): string[] {
-  const numbered = numberedOf(shown);
-  const lines = shown.map((s) => ({
+  const lines = shown.map((s, i) => ({
     from: s.from,
-    text: s.from === "normalisation" ? `     ${s.reading.join(" ")}${APPENDED_NOTE}` : `  ${numbered.indexOf(s) + 1}. ${s.reading.join(" ")}`,
+    text: `  ${i + 1}. ${s.reading.join(" ")}${s.from === "normalisation" ? appendedNote(s, shown) : ""}`,
   }));
   const game = lines.filter((l) => l.from !== "wiktionary").map((l) => l.text);
   const wiktionary = lines.filter((l) => l.from === "wiktionary").map((l) => l.text);
@@ -132,9 +152,9 @@ export function rulingPrompt(shown: readonly ShownReading[]): string[] {
   return [
     ...readings,
     "Waiting for your ruling on this word. Type one of these and press Enter:",
-    ...(numbered.length
+    ...(shown.length
       ? [
-          commandLine("k <n> <n> ...", `keep only the readings numbered, e.g. k ${numbered.length > 1 ? "1 2" : "1"} (every other reading goes)`),
+          commandLine("k <n> <n> ...", `keep only the readings numbered, e.g. k ${shown.length > 1 ? "1 2" : "1"} (every other reading goes)`),
           commandLine("k <n> ... <ARPAbet>", "keep those and add one you type, e.g. k 1 K AE1 T"),
           commandLine("c <n>", "correct the reading to number <n> alone, e.g. c 1 (it replaces every reading)"),
         ]
@@ -149,7 +169,7 @@ export function rulingPrompt(shown: readonly ShownReading[]): string[] {
 
 /** The reading numbered `n` in the list shown, or null when there is none. */
 function numberedReading(shown: readonly ShownReading[], n: string): Pronunciation | null {
-  const reading = /^\d+$/.test(n) ? numberedOf(shown)[Number(n) - 1]?.reading : undefined;
+  const reading = /^\d+$/.test(n) ? shown[Number(n) - 1]?.reading : undefined;
   return reading ? [...reading] : null;
 }
 
@@ -157,25 +177,44 @@ function numberedReading(shown: readonly ShownReading[], n: string): Pronunciati
  * `k <n> <n> ... [<ARPAbet>]`: the numbered readings, in the order shown and
  * once each, then the typed one if it is not among them. At least one number,
  * since a reading typed alone is a correction.
+ *
+ * A reading Normalisation appended can be kept only with a reading it was made
+ * from, numbered in the same keep: without one nothing would make it, and
+ * writing it as a source line would make it a reading the word was given. Kept
+ * that way it is written nowhere. Left out, it is excepted when the build would
+ * make it again: when a reading it was made from is kept, or is itself an
+ * appended reading being excepted here (the build makes that one first).
  */
 function keepOf(args: readonly string[], shown: readonly ShownReading[]): Decision | null {
   const firstTyped = args.findIndex((a) => !/^\d+$/.test(a));
   const numbers = firstTyped === -1 ? args : args.slice(0, firstTyped);
   if (!numbers.length || numbers.some((n) => !numberedReading(shown, n))) return null;
-  const numbered = numberedOf(shown);
-  const readings = [...new Set(numbers.map(Number))].sort((a, b) => a - b).map((n) => [...numbered[n - 1]!.reading]);
-  if (firstTyped !== -1) {
-    const typed = phonemesOf(args.slice(firstTyped).join(" "));
-    if (!typed) return null;
-    if (!readings.some((r) => r.join(" ") === typed.join(" "))) readings.push(typed);
+  const typed = firstTyped === -1 ? null : phonemesOf(args.slice(firstTyped).join(" "));
+  if (firstTyped !== -1 && !typed) return null;
+  // A reading typed out that is one of those shown is that reading's number.
+  const typedAt = typed ? shown.findIndex((s) => spelt(s.reading) === spelt(typed)) : -1;
+  const places = [...numbers.map(Number), ...(typedAt === -1 ? [] : [typedAt + 1])];
+  const kept = [...new Set(places)].sort((a, b) => a - b).map((n) => shown[n - 1]!);
+  const isKept = (reading: Pronunciation) => kept.some((k) => spelt(k.reading) === spelt(reading));
+  const appendedKept = kept.filter((s) => s.from === "normalisation");
+  if (appendedKept.some((s) => !(s.madeFrom ?? []).some(isKept))) return null;
+
+  const readings = kept.filter((s) => s.from !== "normalisation").map((s) => [...s.reading]);
+  if (typed && typedAt === -1) readings.push(typed);
+
+  // In the order shown, so a reading appended to an appended reading meets its source already decided.
+  const excepted: Pronunciation[] = [];
+  const madeAgain = (reading: Pronunciation) => isKept(reading) || excepted.some((e) => spelt(e) === spelt(reading));
+  for (const s of shown) {
+    if (s.from === "normalisation" && !isKept(s.reading) && (s.madeFrom ?? []).some(madeAgain)) excepted.push([...s.reading]);
   }
-  return { kind: "keep", readings };
+  return { kind: "keep", readings, ...(excepted.length ? { excepted } : {}) };
 }
 
 /**
  * A ruling as the maintainer types it: `k <n> <n> ...` to keep the numbered
  * readings shown, optionally followed by one typed in ARPAbet; `c <n>` for the
- * nth reading shown alone, or `c <ARPAbet>` for one typed; `d` for a Demotion
+ * nth reading shown alone, unless Normalisation appended it, or `c <ARPAbet>` for one typed; `d` for a Demotion
  * as a name, `d word` as not a word; `l` to leave it; `s` to skip it. Null when
  * it does not read, so the caller asks again and writes nothing.
  */
@@ -187,7 +226,8 @@ export function parseDecision(input: string, shown: readonly ShownReading[]): De
       return keepOf(rest, shown);
     case "c": {
       if (/^\d+$/.test(arg)) {
-        const reading = numberedReading(shown, arg);
+        // Not to a reading Normalisation appended: alone, it would be kept without a reading it was made from.
+        const reading = shown[Number(arg) - 1]?.from === "normalisation" ? null : numberedReading(shown, arg);
         return reading ? { kind: "correction", reading } : null;
       }
       const reading = phonemesOf(arg);

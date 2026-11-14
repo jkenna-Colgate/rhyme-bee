@@ -141,6 +141,7 @@ import {
   loadWiktionary,
   planHunt,
   rebuild,
+  rebuildAfterSitting,
   sessionOn,
   settledHunted,
   settleRulingList,
@@ -492,11 +493,13 @@ const rulingItems: RulingItem[] = [
   }),
   ...answersWrittenIn.map((written): RulingItem => ({ kind: "written-in-answer", written })),
 ];
-const settled = await settleRulingList(rulingItems, { index: () => index, extract: wiktionary, schedule, today: date, loadIndex });
-if (settled.some((s) => s.decision.kind === "demotion" || s.decision.kind === "tier")) {
-  console.error("rebuilding the index with the Demotions and Tier verdicts");
-  const built = rebuild();
-  if (!built.ok) throw new Error(`the index build failed:\n${built.error}`);
+const settled = await settleRulingList(rulingItems, { index: () => index, extract: wiktionary, today: date, loadIndex });
+// The sitting's one rebuild (#322): every reading, Demotion and Tier verdict it wrote, then the
+// Seed Word test for a reading given to a scheduled Seed Word.
+const sittingEnd = rebuildAfterSitting(settled, { rebuild, loadIndex, schedule });
+for (const line of sittingEnd.seedWordLines) console.error(`  ${line}`);
+if (sittingEnd.rebuilt && !sittingEnd.rebuilt.ok) {
+  throw new Error(`the index build failed. Every ruling written in the sitting is still in data/, and npm run build:index builds with them:\n${sittingEnd.rebuilt.error}`);
 }
 if (settled.some((s) => s.wrote)) index = loadIndex();
 const hunt: { days: HuntDay[]; leg: HuntLeg; settled: ReturnType<typeof settledHunted>; results: Map<string, NoFalseAcceptsResult> } | null = huntAsked
@@ -690,5 +693,5 @@ if (answersWrittenInSettled.length) {
 if (stopped) console.log(`stopped: ${stopped}`);
 console.log(
   `report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/demotions.txt, data/declines.txt, ` +
-  "data/tier-overrides.csv, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl",
+  "data/tier-overrides.csv, data/normalisation-exceptions.txt, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl",
 );
