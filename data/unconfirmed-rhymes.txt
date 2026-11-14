@@ -63,3 +63,22 @@ sows judge:claude-sonnet-5-5 overrule high AW Z
 kowtows judge:claude-sonnet-5-5 missing-reading medium AW Z
 bibliographic judge:claude-sonnet-5-5 overrule high AE F AH K
 menopause judge:claude-sonnet-5-5 overrule high AA Z
+corporeal judge:claude-sonnet-5-5 missing-reading medium AO R IY AH L
+gubernatorial judge:claude-sonnet-5-5 overrule high AO R IY AH L
+valise judge:claude-sonnet-5-5 missing-reading medium IY S
+spandex judge:claude-sonnet-5-5 overrule high EH K S
+bivouacked judge:claude-sonnet-5-5 missing-reading medium AE K T
+imam judge:claude-sonnet-5-5 overrule high AA M
+killjoy judge:claude-sonnet-5-5 overrule high OY
+buoy judge:claude-sonnet-5-5 overrule high OY
+envoy judge:claude-sonnet-5-5 overrule high OY
+bivouacs judge:claude-sonnet-5-5 missing-reading medium AE K S
+zodiacs judge:claude-sonnet-5-5 missing-reading medium AE K S
+sumacs judge:claude-sonnet-5-5 missing-reading medium AE K S
+mayhap judge:claude-sonnet-5-5 missing-reading medium AE P
+shellacked judge:claude-sonnet-5-5 overrule high AE K T
+paperboy judge:claude-sonnet-5-5 overrule high OY
+distaff judge:claude-sonnet-5-5 missing-reading medium AE F
+quag judge:claude-sonnet-5-5 missing-reading medium AE G
+marmoreal judge:claude-sonnet-5-5 missing-reading medium AO R IY AH L
+ancestorial judge:claude-sonnet-5-5 missing-reading medium AO R IY AH L
