@@ -1914,3 +1914,337 @@ dowse(2) D AW1 Z
 # house: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AW Z — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
 house HH AW1 S
 house(2) HH AW1 Z
+# nightcap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+nightcap N AY1 T K AE2 P
+# snowcap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+snowcap S N OW1 K AE2 P
+# dap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+dap D AE1 P
+# whap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+whap W AE1 P
+# thunderclap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+thunderclap TH AH1 N D ER0 K L AE2 P
+# firetrap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+firetrap F AY1 ER0 T R AE2 P
+# claptrap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+claptrap K L AE1 P T R AE2 P
+# giftwrap (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flap` on AE P at high confidence.
+giftwrap G IH1 F T R AE2 P
+# millipede (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `succeed` on IY D at high confidence.
+millipede M IH1 L AH0 P IY2 D
+# treed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `succeed` on IY D at high confidence.
+treed T R IY1 D
+# tumbleweed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `succeed` on IY D at high confidence.
+tumbleweed T AH1 M B AH0 L W IY2 D
+# chickweed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `succeed` on IY D at high confidence.
+chickweed CH IH1 K W IY2 D
+# refereed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `succeed` on IY D at high confidence.
+refereed R EH2 F ER0 IY1 D
+# auditorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+auditorial AO2 D IH0 T AO1 R IY0 AH0 L
+# armorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+armorial AA0 R M AO1 R IY0 AH0 L
+# mentorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+mentorial M EH0 N T AO1 R IY0 AH0 L
+# proctorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+proctorial P R AA0 K T AO1 R IY0 AH0 L
+# codpiece (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+codpiece K AA1 D P IY2 S
+# hairpiece (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+hairpiece HH EH1 R P IY2 S
+# afterpiece (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+afterpiece AE1 F T ER0 P IY2 S
+# mantelpiece (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+mantelpiece M AE1 N T AH0 L P IY2 S
+# frontispiece (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+frontispiece F R AH1 N T IH0 S P IY2 S
+# headpiece (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+headpiece HH EH1 D P IY2 S
+# pelisse (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+pelisse P AH0 L IY1 S
+# coulisse (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `police` on IY S at high confidence.
+coulisse K UW0 L IY1 S
+# warthog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+warthog W AO1 R T HH AA2 G
+# pecks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flex` on EH K S at high confidence.
+pecks P EH1 K S
+# codex (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flex` on EH K S at high confidence.
+codex K OW1 D EH2 K S
+# bedecks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flex` on EH K S at high confidence.
+bedecks B IH0 D EH1 K S
+# rechecks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flex` on EH K S at high confidence.
+rechecks R IY0 CH EH1 K S
+# shipwrecks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flex` on EH K S at high confidence.
+shipwrecks SH IH1 P R EH2 K S
+# henpecks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flex` on EH K S at high confidence.
+henpecks HH EH1 N P EH2 K S
+# googolplex (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `flex` on EH K S at high confidence.
+googolplex G UW1 G AH0 L P L EH2 K S
+# quacked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+quacked K W AE1 K T
+# yakked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+yakked Y AE1 K T
+# shacked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+shacked SH AE1 K T
+# knacked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+knacked N AE1 K T
+# bract (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+bract B R AE1 K T
+# thwacked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+thwacked TH W AE1 K T
+# refract (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+refract R IH0 F R AE1 K T
+# qualm (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `bomb` on AA M at high confidence.
+qualm K W AA1 M
+# glom (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `bomb` on AA M at high confidence.
+glom G L AA1 M
+# yakker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tracker` on AE K ER at high confidence.
+yakker Y AE1 K ER0
+# jacker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tracker` on AE K ER at high confidence.
+jacker JH AE1 K ER0
+# safecracker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tracker` on AE K ER at high confidence.
+safecracker S EY1 F K R AE2 K ER0
+# skyjacker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tracker` on AE K ER at high confidence.
+skyjacker S K AY1 JH AE2 K ER0
+# caulker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `locker` on AA K ER at high confidence.
+caulker K AA1 K ER0
+# slub (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `pub` on AH B at high confidence.
+slub S L AH1 B
+# upheaver (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `beaver` on IY V ER at high confidence.
+upheaver AH0 P HH IY1 V ER0
+# smite (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+smite S M AY1 T
+# stalactite (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+stalactite S T AH0 L AE1 K T AY2 T
+# streetlight (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+streetlight S T R IY1 T L AY2 T
+# taillight (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+taillight T EY1 L L AY2 T
+# lamplight (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+lamplight L AE1 M P L AY2 T
+# firelight (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+firelight F AY1 ER0 L AY2 T
+# newsboy (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `joy` on OY at high confidence.
+newsboy N UW1 Z B OY2
+# choirboy (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `joy` on OY at high confidence.
+choirboy K W AY2 R B OY2
+# bonbon (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `lawn` on AA N at high confidence.
+bonbon B AA1 N B AA2 N
+# hereupon (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `lawn` on AA N at high confidence.
+hereupon HH IH2 R AH0 P AA2 N
+# begone (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `lawn` on AA N at high confidence.
+begone B IH0 G AO1 N
+# outgone (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `lawn` on AA N at high confidence.
+outgone AW2 T G AO1 N
+# sawn (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `lawn` on AA N at high confidence.
+sawn S AO1 N
+# outdrawn (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `lawn` on AA N at high confidence.
+outdrawn AW2 T D R AO1 N
+# sportscast (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `vast` on AE S T at high confidence.
+sportscast S P AO1 R T S K AE2 S T
+# sassed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `vast` on AE S T at high confidence.
+sassed S AE1 S T
+# lambast (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `vast` on AE S T at high confidence.
+lambast L AE0 M B AE1 S T
+# avast (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `vast` on AE S T at high confidence.
+avast AH0 V AE1 S T
+# yaks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+yaks Y AE1 K S
+# zax (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+zax Z AE1 K S
+# thumbtacks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+thumbtacks TH AH1 M T AE2 K S
+# almanacs (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+almanacs AO1 L M AH0 N AE2 K S
+# insomniacs (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+insomniacs IH0 N S AA1 M N IY0 AE2 K S
+# cardiacs (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+cardiacs K AA1 R D IY0 AE2 K S
+# lumberjacks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+lumberjacks L AH1 M B ER0 JH AE2 K S
+# hijacks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+hijacks HH AY1 JH AE2 K S
+# piggybacks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+piggybacks P IH1 G IY0 B AE2 K S
+# beeswax (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+beeswax B IY1 Z W AE2 K S
+# pickaxe (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+pickaxe P IH1 K AE2 K S
+# poleaxe (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+poleaxe P OW1 L AE2 K S
+# throwbacks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+throwbacks TH R OW1 B AE2 K S
+# outbacks (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+outbacks AW1 T B AE2 K S
+# shellacs (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `wax` on AE K S at high confidence.
+shellacs SH AH0 L AE1 K S
+# sunburst (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `thirst` on ER S T at high confidence.
+sunburst S AH1 N B ER2 S T
+# perdition (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `ambition` on IH SH AH N at high confidence.
+perdition P ER0 D IH1 SH AH0 N
+# seismograph (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `graph` on AE F at high confidence.
+seismograph S AY1 Z M AH0 G R AE2 F
+# kowtowed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `proud` on AW D at high confidence.
+kowtowed K AW1 T AW2 D
+# highbrowed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `proud` on AW D at high confidence.
+highbrowed HH AY1 B R AW2 D
+# courtships (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `eclipse` on IH P S at high confidence.
+courtships K AO1 R T SH IH2 P S
+# filmstrips (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `eclipse` on IH P S at high confidence.
+filmstrips F IH1 L M S T R IH2 P S
+# catnips (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `eclipse` on IH P S at high confidence.
+catnips K AE1 T N IH2 P S
+# unzips (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `eclipse` on IH P S at high confidence.
+unzips AH0 N Z IH1 P S
+# egad (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `bad` on AE D at high confidence.
+egad IH0 G AE1 D
+# launchpad (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `bad` on AE D at high confidence.
+launchpad L AO1 N CH P AE2 D
+# pram (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `damn` on AE M at high confidence.
+pram P R AE1 M
+# gramme (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `damn` on AE M at high confidence.
+gramme G R AE1 M
+# shazam (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `damn` on AE M at high confidence.
+shazam SH AH0 Z AE1 M
+# dishrag (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `rag` on AE G at high confidence.
+dishrag D IH1 SH R AE2 G
+# beanbag (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `rag` on AE G at high confidence.
+beanbag B IY1 N B AE2 G
+# fleabag (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `rag` on AE G at high confidence.
+fleabag F L IY1 B AE2 G
+# woolpack (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `back` on AE K at high confidence.
+woolpack W UH1 L P AE2 K
+# factorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+factorial F AE0 K T AO1 R IY0 AH0 L
+# manorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+manorial M AH0 N AO1 R IY0 AH0 L
+# authorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+authorial AO0 TH AO1 R IY0 AH0 L
+# sog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+sog S AA1 G
+# prog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+prog P R AA1 G
+# pollywog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+pollywog P AA1 L IY0 W AA2 G
+# unbacked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+unbacked AH0 N B AE1 K T
+# clacked (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `act` on AE K T at high confidence.
+clacked K L AE1 K T
+# ransacker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tracker` on AE K ER at high confidence.
+ransacker R AE1 N S AE2 K ER0
+# homebody (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `body` on AA D IY at high confidence.
+homebody HH OW1 M B AA2 D IY0
+# footlocker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `locker` on AA K ER at high confidence.
+footlocker F UH1 T L AA2 K ER0
+# balker (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `locker` on AA K ER at high confidence.
+balker B AO1 K ER0
+# uncross (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `cross` on AA S at high confidence.
+uncross AH0 N K R AO1 S
+# interweaver (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `beaver` on IY V ER at high confidence.
+interweaver IH2 N T ER0 W IY1 V ER0
+# fistfight (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+fistfight F IH1 S T F AY2 T
+# sidelight (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `quite` on AY T at high confidence.
+sidelight S AY1 D L AY2 T
+# curst (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `thirst` on ER S T at high confidence.
+curst K ER1 S T
+# hearsed (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `thirst` on ER S T at high confidence.
+hearsed HH ER1 S T
+# apposition (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `ambition` on IH SH AH N at high confidence.
+apposition AE2 P AH0 Z IH1 SH AH0 N
+# cosmetician (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `ambition` on IH SH AH N at high confidence.
+cosmetician K AA0 Z M AH0 T IH1 SH AH0 N
+# cenotaph (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `graph` on AE F at high confidence.
+cenotaph S EH1 N AH0 T AE2 F
+# sketchpad (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `bad` on AE D at high confidence.
+sketchpad S K EH1 CH P AE2 D
+# scallywag (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `rag` on AE G at high confidence.
+scallywag S K AE1 L IY0 W AE2 G
+# oratorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+oratorial AO2 R AH0 T AO1 R IY0 AH0 L
+# piscatorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+piscatorial P IH2 S K AH0 T AO1 R IY0 AH0 L
+# inquisitorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+inquisitorial IH2 N K W IH0 Z AH0 T AO1 R IY0 AH0 L
+# boreal (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+boreal B AO1 R IY0 AH0 L
+# consistorial (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `tutorial` on AO R IY AH L at high confidence.
+consistorial K AA2 N S IH0 S T AO1 R IY0 AH0 L
+# firedog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+firedog F AY1 ER0 D AO2 G
+# sundog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+sundog S AH1 N D AO2 G
+# befog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+befog B IH0 F AA1 G
+# sheepdog (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `hog` on AA G at high confidence.
+sheepdog SH IY1 P D AO2 G
+# helipad (#266): no reading upstream; the Judge (claude-sonnet-5-5, 2026-11-13) ruled it a Rhyme for `bad` on AE D at high confidence.
+helipad HH EH1 L AH0 P AE2 D
+# nice: correction approved on a Batch's No False Accepts ruling list (#268), against IY S — replaces every reading the pinned sources hold for this word (ADR-0009).
+nice N AY1 S
+# won: correction approved on a Batch's No False Accepts ruling list (#268), against AA N — replaces every reading the pinned sources hold for this word (ADR-0009).
+won W AH1 N
+# coyotes: correction approved on a Batch's No False Accepts ruling list (#268), against IY S — replaces every reading the pinned sources hold for this word (ADR-0009).
+coyotes K AY0 OW1 D IY0 S
+coyotes(2) K AY1 OW0 T S
+# cortex: correction approved on a Batch's No False Accepts ruling list (#268), against EH K S — replaces every reading the pinned sources hold for this word (ADR-0009).
+cortex K AO1 R D EH0 K S
+cortex(2) K AO1 R T EH0 K S
+# vortex: correction approved on a Batch's No False Accepts ruling list (#268), against EH K S — replaces every reading the pinned sources hold for this word (ADR-0009).
+vortex V AO1 R D EH0 K S
+vortex(2) V AO1 R T EH0 K S
+# electron: correction approved on a Batch's No False Accepts ruling list (#268), against AA N — replaces every reading the pinned sources hold for this word (ADR-0009).
+electron IH2 L EH1 K T R AA0 N
+electron(2) IH0 L EH1 K T R AA0 N
+# marzipan: correction approved on a Batch's No False Accepts ruling list (#268), against AA N — replaces every reading the pinned sources hold for this word (ADR-0009).
+marzipan M AA1 R Z AH0 P AE0 N
+marzipan(2) M AA1 R T S AH0 P AA0 N
+# orangutan: correction approved on a Batch's No False Accepts ruling list (#268), against AA N — replaces every reading the pinned sources hold for this word (ADR-0009).
+orangutan AO0 R AE1 NG UH0 T AE2 N
+orangutan(2) AH0 R AE1 NG AH0 T AE2 N
+orangutan(3) AH0 R AE1 NG AH0 T AE2 NG
+# nog: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+nog N AA1 G
+# pedagogue: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+pedagogue P EH1 D AH0 G AO2 G
+# footlog: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+footlog F UH1 T L AO2 G
+# anybody: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA D IY — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+anybody EH1 N IY0 B AH0 D IY0
+anybody(2) EH1 N IY0 B AA2 D IY0
+# busybody: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA D IY — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+busybody B IH1 Z IY0 B AA2 D IY0
+# toddy: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA D IY — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+toddy T AA1 D IY0
+# rayon: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA N — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+rayon R EY1 AH0 N
+rayon(2) R EY1 AA2 N
+# crouton: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA N — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+crouton K R UW1 T AH0 N
+crouton(2) K R UW1 T N
+crouton(3) K R UW1 T AA2 N
+# mignon: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA N — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+mignon M IH1 G N AH0 N
+mignon(2) M IH1 G N N
+mignon(3) M IH1 N Y AA2 N
+# squab: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AA B — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+squab S K W AA1 B
+# gonad: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE D — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+gonad G OW1 N AE0 D
+gonad(2) G OW1 N AE2 D
+# swag: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+swag S W AE1 G
+# jag: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+jag JH AE1 G
+# scrag: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+scrag S K R AE1 G
+# windbag: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+windbag W IH1 N D B AE2 G
+# gasbag: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE G — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+gasbag G AE2 S B AE2 G
+# thumbtack: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE K — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+thumbtack TH AH1 M T AE2 K
+# fastback: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE K — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+fastback F AE1 S T B AE2 K
+# skyjack: correction approved on a Batch's ruling list, confirming a rhyme the Judge left undecided (#293), against AE K — joins the engine's reading as an alternate rather than replacing it, so the word is accepted on either pronunciation (ADR-0017).
+skyjack S K AY1 JH AE2 K

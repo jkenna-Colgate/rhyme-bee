@@ -117,3 +117,5 @@ winfree proper-noun
 zuni proper-noun          # the Pueblo people
 finns proper-noun         # the people, as `zuni`
 scots proper-noun         # #311, the people, as `finns`
+kodak proper-noun
+krypton proper-noun
