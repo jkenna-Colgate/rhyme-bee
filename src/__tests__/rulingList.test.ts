@@ -88,9 +88,14 @@ describe("reading the maintainer's ruling", () => {
       [r("K AA1 M AH0 L")],
     );
 
-    it("numbers it like the others, so it can be kept or corrected to", () => {
-      expect(parseDecision("c 2", appended)).toEqual({ kind: "correction", reading: r("K AE1 M L") });
+    it("numbers it like the others, and reads nothing from a correction to it alone, which would keep it without its source", () => {
+      expect(parseDecision("c 2", appended)).toBeNull();
       expect(parseDecision("c 3", appended)).toEqual({ kind: "correction", reading: r("K AA1 M AH0 L") });
+    });
+
+    it("reads it typed out as it reads its number", () => {
+      expect(parseDecision("k 1 K AE1 M L", appended)).toEqual({ kind: "keep", readings: [r("K AE1 M AH0 L")] });
+      expect(parseDecision("k 3 K AE1 M L", appended)).toBeNull();
     });
 
     it("reads a keep of its source without it as a Normalisation Exception for it", () => {
@@ -106,7 +111,8 @@ describe("reading the maintainer's ruling", () => {
     it("reads nothing from a keep of it without a reading it was made from", () => {
       expect(parseDecision("k 2", appended)).toBeNull();
       expect(parseDecision("k 2 3", appended)).toBeNull();
-      expect(parseDecision("k 2 K AE1 M AH0 L", appended)).toBeNull();
+      // Its source typed out is its source kept.
+      expect(parseDecision("k 2 K AE1 M AH0 L", appended)).toEqual({ kind: "keep", readings: [r("K AE1 M AH0 L")] });
     });
 
     it("writes no exception for one whose source goes too, since nothing makes it again", () => {

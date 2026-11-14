@@ -55,6 +55,7 @@ import {
   type Decision,
   type RulingItem,
 } from "../src/rulingList.ts";
+import { applyNormalisation } from "../src/normalise.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import { appendNormalisationException } from "./normalisationExceptionFile.ts";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
@@ -270,6 +271,38 @@ export function rebuildAfterSitting(
   };
 }
 
+/**
+ * What a keep writes (#323). A Normalisation Exception names a reading exactly
+ * as the index spells it, and the supplement is read before Normalisation, so
+ * rewriting a word's readings there can change how the build spells a variant:
+ * `acquittal` is held as `D AH0 L` with the variant `T L`, and written back
+ * that way the variant is made again as `D L`. Measured on the index of
+ * 2026-11-14, 245 of the 17,980 words holding an appended reading are like
+ * that (`.scratch/323/keepRoundTrip.ts`).
+ *
+ * So a keep that excepts and leaves the word's own readings as they are writes
+ * only the exceptions, and the supplement is not touched. A keep that changes
+ * them rewrites them, and excepts only what Normalisation makes again, as
+ * spelt, from the readings written; the rest are `notRemade`, for the
+ * maintainer to be told, since an exception for one would name no reading.
+ * `held` is the word's readings as the index shown holds them.
+ */
+export function keepWrites(
+  held: readonly { pronunciation: Pronunciation; generated: boolean }[],
+  decision: Extract<Decision, { kind: "keep" }>,
+): { rewrite: boolean; excepted: Pronunciation[]; notRemade: Pronunciation[] } {
+  const spelt = (reading: Pronunciation) => reading.join(" ");
+  const excepted = decision.excepted ?? [];
+  if (!excepted.length) return { rewrite: true, excepted: [], notRemade: [] };
+  const given = held.filter((h) => !h.generated).map((h) => spelt(h.pronunciation));
+  const kept = new Set(decision.readings.map(spelt));
+  if (kept.size === given.length && given.every((g) => kept.has(g))) return { rewrite: false, excepted, notRemade: [] };
+  const pronunciations = new Map([["", decision.readings.map((r) => [...r])]]);
+  applyNormalisation({ pronunciations });
+  const made = new Set(pronunciations.get("")!.map(spelt));
+  return { rewrite: true, excepted: excepted.filter((e) => made.has(spelt(e))), notRemade: excepted.filter((e) => !made.has(spelt(e))) };
+}
+
 const TIER_OVERRIDES_PATH = resolve(dataDir, "tier-overrides.csv");
 const NORMALISATION_EXCEPTIONS_PATH = resolve(dataDir, "normalisation-exceptions.txt");
 
@@ -412,7 +445,8 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
   try {
     for (const [i, { item, group }] of ruled.entries()) {
       const { word, rhymeKey } = itemPair(item);
-      const { lines, parse } = presentItem(item, shownOn.showing(word), ctx.extract);
+      const shownIndex = shownOn.showing(word);
+      const { lines, parse } = presentItem(item, shownIndex, ctx.extract);
       if (group && ruled[i - 1]?.group !== group) for (const line of groupLines(group)) console.error(`\n${line}`);
       console.error(`\n[${i + 1}/${ruled.length}] ${lines[0]}`);
       for (const line of lines.slice(1)) console.error(line);
@@ -426,7 +460,8 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
       // A correction writes one reading and a keep the several kept, both replacing every reading
       // the word had; a confirm writes one beside them. A keep that leaves out a reading Normalisation
       // appended to one it keeps writes a Normalisation Exception for it as well (#323).
-      const replacing = decision.kind === "correction" ? [decision.reading] : decision.kind === "keep" ? decision.readings : [];
+      const keep = decision.kind === "keep" ? keepWrites(shownIndex.readingsOf(word), decision) : null;
+      const replacing = decision.kind === "correction" ? [decision.reading] : decision.kind === "keep" && keep!.rewrite ? decision.readings : [];
       const correction: CorrectionAsk | null = replacing.length
         ? { word, target: rhymeKey, phonemes: replacing.at(-1)!, kept: replacing.slice(0, -1), mode: "replace" }
         : decision.kind === "confirm" ? { word, target: rhymeKey, phonemes: decision.reading, mode: "join" } : null;
@@ -434,11 +469,20 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
         // Written now and rebuilt at the end of the sitting, when the Seed Word test for it runs too (#322).
         const result = writeCorrection(correction, { context: pinnedEvidenceContext, source: item.kind === "hunted" ? "batch" : "batch-undecided" });
         wrote = `data/supplement.dict: ${result.written.map((r) => `${word} ${r.join(" ")}`).join("; ")}`;
-        const excepted = decision.kind === "keep" ? decision.excepted ?? [] : [];
-        for (const reading of excepted) appendNormalisationException(NORMALISATION_EXCEPTIONS_PATH, { word, reading });
-        if (excepted.length) wrote += `; data/normalisation-exceptions.txt: ${excepted.map((r) => `${word} ${r.join(" ")}`).join("; ")}`;
         shownOn.wroteReading(word);
-      } else if (decision.kind === "demotion") {
+      }
+      if (keep?.excepted.length) {
+        for (const reading of keep.excepted) appendNormalisationException(NORMALISATION_EXCEPTIONS_PATH, { word, reading });
+        wrote = [...(wrote ? [wrote] : []), `data/normalisation-exceptions.txt: ${keep.excepted.map((r) => `${word} ${r.join(" ")}`).join("; ")}`].join("; ");
+        shownOn.wroteReading(word);
+      }
+      if (keep?.notRemade.length) {
+        console.error(
+          `  not excepted: ${keep.notRemade.map((r) => r.join(" ")).join("; ")}. The readings written change how the build spells it, ` +
+          `so look ${word} up after the rebuild and write the exception by hand if the reading is still there.`,
+        );
+      }
+      if (decision.kind === "demotion") {
         appendDemotion(resolve(dataDir, "demotions.txt"), { word, reason: decision.reason });
         wrote = `data/demotions.txt: ${word} ${decision.reason}`;
       } else if (decision.kind === "decline") {

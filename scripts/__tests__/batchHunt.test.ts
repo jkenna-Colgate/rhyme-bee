@@ -12,7 +12,7 @@ import type { RhymeKey } from "../../src/phonology.ts";
 import type { Schedule } from "../../src/schedule.ts";
 import { makeTestIndex } from "../../src/__fixtures__/index.ts";
 import type { RebuildResult } from "../../web/src/editor/add.ts";
-import { rebuildAfterSitting, sittingIndex, type Settled } from "../batchHunt.ts";
+import { keepWrites, rebuildAfterSitting, sittingIndex, type Settled } from "../batchHunt.ts";
 
 const before = makeTestIndex();
 const after = makeTestIndex({ supplement: "gate G EY1 T\ngate(2) G AE1 T" });
@@ -33,6 +33,36 @@ function builds(result: RebuildResult = { ok: true }) {
     loadIndex: () => (built ? after : before),
   };
 }
+
+describe("what a keep that excepts a reading writes (#323)", () => {
+  const p = (s: string) => s.split(" ");
+  const held = (...readings: [string, boolean][]) => readings.map(([s, generated]) => ({ pronunciation: p(s), generated }));
+
+  it("writes only the exception when the keep leaves the word's own readings as they are", () => {
+    // acquittal's variant keeps its t, and the reading it was made from is held tapped: written back to the
+    // supplement, that reading would make the variant again with a d, and the exception would name no reading.
+    const acquittal = held(["AH0 K W IH1 D AH0 L", false], ["AH0 K W IH1 T L", true]);
+    expect(keepWrites(acquittal, { kind: "keep", readings: [p("AH0 K W IH1 D AH0 L")], excepted: [p("AH0 K W IH1 T L")] }))
+      .toEqual({ rewrite: false, excepted: [p("AH0 K W IH1 T L")], notRemade: [] });
+  });
+
+  it("rewrites the readings and writes the exception when the keep changes them and the variant is made again as spelt", () => {
+    const flower = held(["F L AW1 ER0", false], ["F L AW1 R", true]);
+    expect(keepWrites(flower, { kind: "keep", readings: [p("F L AW1 ER0"), p("F L AA1 ER0")], excepted: [p("F L AW1 R")] }))
+      .toEqual({ rewrite: true, excepted: [p("F L AW1 R")], notRemade: [] });
+  });
+
+  it("writes no exception the rewritten readings would leave naming nothing, and says which", () => {
+    const acquittal = held(["AH0 K W IH1 D AH0 L", false], ["AH0 K W IH1 T L", true]);
+    expect(keepWrites(acquittal, { kind: "keep", readings: [p("AH0 K W IH1 D AH0 L"), p("AE1 K W IH0 T")], excepted: [p("AH0 K W IH1 T L")] }))
+      .toEqual({ rewrite: true, excepted: [], notRemade: [p("AH0 K W IH1 T L")] });
+  });
+
+  it("rewrites the readings as before when nothing is excepted", () => {
+    const flower = held(["F L AW1 ER0", false], ["F L AW1 R", true]);
+    expect(keepWrites(flower, { kind: "keep", readings: [p("F L AW1 ER0")] })).toEqual({ rewrite: true, excepted: [], notRemade: [] });
+  });
+});
 
 describe("the index a ruling list item is shown on", () => {
   it("is the one the sitting started with, with no rebuild, for a word no reading was written for", () => {

@@ -189,17 +189,18 @@ function keepOf(args: readonly string[], shown: readonly ShownReading[]): Decisi
   const firstTyped = args.findIndex((a) => !/^\d+$/.test(a));
   const numbers = firstTyped === -1 ? args : args.slice(0, firstTyped);
   if (!numbers.length || numbers.some((n) => !numberedReading(shown, n))) return null;
-  const kept = [...new Set(numbers.map(Number))].sort((a, b) => a - b).map((n) => shown[n - 1]!);
+  const typed = firstTyped === -1 ? null : phonemesOf(args.slice(firstTyped).join(" "));
+  if (firstTyped !== -1 && !typed) return null;
+  // A reading typed out that is one of those shown is that reading's number.
+  const typedAt = typed ? shown.findIndex((s) => spelt(s.reading) === spelt(typed)) : -1;
+  const places = [...numbers.map(Number), ...(typedAt === -1 ? [] : [typedAt + 1])];
+  const kept = [...new Set(places)].sort((a, b) => a - b).map((n) => shown[n - 1]!);
   const isKept = (reading: Pronunciation) => kept.some((k) => spelt(k.reading) === spelt(reading));
   const appendedKept = kept.filter((s) => s.from === "normalisation");
   if (appendedKept.some((s) => !(s.madeFrom ?? []).some(isKept))) return null;
 
   const readings = kept.filter((s) => s.from !== "normalisation").map((s) => [...s.reading]);
-  if (firstTyped !== -1) {
-    const typed = phonemesOf(args.slice(firstTyped).join(" "));
-    if (!typed) return null;
-    if (!readings.some((r) => spelt(r) === spelt(typed))) readings.push(typed);
-  }
+  if (typed && typedAt === -1) readings.push(typed);
 
   // In the order shown, so a reading appended to an appended reading meets its source already decided.
   const excepted: Pronunciation[] = [];
@@ -213,7 +214,7 @@ function keepOf(args: readonly string[], shown: readonly ShownReading[]): Decisi
 /**
  * A ruling as the maintainer types it: `k <n> <n> ...` to keep the numbered
  * readings shown, optionally followed by one typed in ARPAbet; `c <n>` for the
- * nth reading shown alone, or `c <ARPAbet>` for one typed; `d` for a Demotion
+ * nth reading shown alone, unless Normalisation appended it, or `c <ARPAbet>` for one typed; `d` for a Demotion
  * as a name, `d word` as not a word; `l` to leave it; `s` to skip it. Null when
  * it does not read, so the caller asks again and writes nothing.
  */
@@ -225,7 +226,8 @@ export function parseDecision(input: string, shown: readonly ShownReading[]): De
       return keepOf(rest, shown);
     case "c": {
       if (/^\d+$/.test(arg)) {
-        const reading = numberedReading(shown, arg);
+        // Not to a reading Normalisation appended: alone, it would be kept without a reading it was made from.
+        const reading = shown[Number(arg) - 1]?.from === "normalisation" ? null : numberedReading(shown, arg);
         return reading ? { kind: "correction", reading } : null;
       }
       const reading = phonemesOf(arg);

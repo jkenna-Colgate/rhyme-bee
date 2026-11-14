@@ -61,7 +61,7 @@ describe("a Normalisation Exception in the build", () => {
 
     expect(readings("flower")).toEqual(["F L AW1 ER0"]);
     expect(readings("power")).toEqual(["P AW1 ER0", "P AW1 R"]);
-    expect(excepted.applied).toEqual([{ word: "flower", reading: ["F L AW1 R".split(" ")].flat() }]);
+    expect(excepted.applied).toEqual([{ word: "flower", reading: "F L AW1 R".split(" ") }]);
     // The key only the excepted reading gave it: flower is out of scour's family, power is still in.
     expect(index.rhymeKeysOf("flower")).toEqual(["AW ER"]);
     expect(index.rhymeKeysOf("power")).toContain("AW R");
