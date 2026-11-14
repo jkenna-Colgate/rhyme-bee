@@ -1,0 +1,17 @@
+# Committed Normalisation Exceptions: each line takes one reading Normalisation
+# appended off one word (GLOSSARY.md; ADR-0011, amended 2026-11-14; #323).
+#
+# `<word> <ARPAbet reading>`, `#` comments, applied by `npm run build:index`
+# straight after Normalisation. The reading is written exactly as the index
+# holds it (`npx tsx scripts/lookup.ts <word>` shows it, marked as appended by
+# Normalisation). The word keeps the reading the variant was made from and
+# loses the variant, on every day the word appears on. No rule changes.
+#
+# Only a reading Normalisation appended can be excepted. A line naming any other
+# reading, or a word's only reading, is refused and named in the build output,
+# and so is a stale line, whose word no longer holds the reading. The build
+# carries on without either.
+#
+# Written by the Batch's ruling list, when a keep includes the reading an
+# appended one was made from and leaves the appended one out, and by hand.
+# Taking an exception back is a hand edit: delete the line and rebuild.

@@ -34,7 +34,7 @@ describe("the readings shown for a ruling", () => {
     expect(shownReadings(game, wiktionary)).toEqual([
       { reading: r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L"), from: "game" },
       { reading: r("IH0 N V AY2 R AH0 N M EH1 N AH0 L"), from: "game" },
-      { reading: r("IH0 N V AY2 R AH0 N M EH1 N T L"), from: "normalisation" },
+      { reading: r("IH0 N V AY2 R AH0 N M EH1 N T L"), from: "normalisation", madeFrom: [r("IH0 N V AY2 R AH0 N M EH1 N T AH0 L")] },
       { reading: r("EH0 N V AY2 R AH0 N M EH1 N T AH0 L"), from: "wiktionary" },
     ]);
   });
@@ -81,16 +81,53 @@ describe("reading the maintainer's ruling", () => {
     expect(parseDecision("", shown)).toBeNull();
   });
 
-  it("numbers no reading Normalisation appended, so none can be kept or corrected to", () => {
+  describe("with a reading Normalisation appended (#323)", () => {
+    // camel's syllabic variant, numbered 2 after the reading it was made from; 3 is Wiktionary's.
     const appended = shownReadings(
-      [{ pronunciation: r("CH AA1 K L AH0 T"), generated: false }, { pronunciation: r("CH AA1 K L T"), generated: true }],
-      [r("CH AO1 K L AH0 T")],
+      [{ pronunciation: r("K AE1 M AH0 L"), generated: false }, { pronunciation: r("K AE1 M L"), generated: true }],
+      [r("K AA1 M AH0 L")],
     );
-    // 2 is Wiktionary's, the appended reading having no number.
-    expect(parseDecision("k 1 2", appended)).toEqual({ kind: "keep", readings: [r("CH AA1 K L AH0 T"), r("CH AO1 K L AH0 T")] });
-    expect(parseDecision("c 2", appended)).toEqual({ kind: "correction", reading: r("CH AO1 K L AH0 T") });
-    expect(parseDecision("k 3", appended)).toBeNull();
-    expect(parseDecision("c 3", appended)).toBeNull();
+
+    it("numbers it like the others, so it can be kept or corrected to", () => {
+      expect(parseDecision("c 2", appended)).toEqual({ kind: "correction", reading: r("K AE1 M L") });
+      expect(parseDecision("c 3", appended)).toEqual({ kind: "correction", reading: r("K AA1 M AH0 L") });
+    });
+
+    it("reads a keep of its source without it as a Normalisation Exception for it", () => {
+      expect(parseDecision("k 1", appended)).toEqual({ kind: "keep", readings: [r("K AE1 M AH0 L")], excepted: [r("K AE1 M L")] });
+      expect(parseDecision("k 1 3", appended)).toEqual({ kind: "keep", readings: [r("K AE1 M AH0 L"), r("K AA1 M AH0 L")], excepted: [r("K AE1 M L")] });
+    });
+
+    it("reads a keep of both as no exception, and writes the appended one nowhere: the build makes it", () => {
+      expect(parseDecision("k 1 2", appended)).toEqual({ kind: "keep", readings: [r("K AE1 M AH0 L")] });
+      expect(parseDecision("k 2 1 3", appended)).toEqual({ kind: "keep", readings: [r("K AE1 M AH0 L"), r("K AA1 M AH0 L")] });
+    });
+
+    it("reads nothing from a keep of it without a reading it was made from", () => {
+      expect(parseDecision("k 2", appended)).toBeNull();
+      expect(parseDecision("k 2 3", appended)).toBeNull();
+      expect(parseDecision("k 2 K AE1 M AH0 L", appended)).toBeNull();
+    });
+
+    it("writes no exception for one whose source goes too, since nothing makes it again", () => {
+      expect(parseDecision("k 3", appended)).toEqual({ kind: "keep", readings: [r("K AA1 M AH0 L")] });
+    });
+
+    it("excepts a reading appended to an appended reading along with the one it was made from", () => {
+      // Stress promotion appends vampire's second reading, and glide-r appends the third to that.
+      const chain = shownReadings(
+        [
+          { pronunciation: r("V AE1 M P AY0 R"), generated: false },
+          { pronunciation: r("V AE1 M P AY2 R"), generated: true },
+          { pronunciation: r("V AE1 M P AY2 ER0"), generated: true },
+        ],
+        [],
+      );
+      expect(parseDecision("k 1", chain)).toEqual({ kind: "keep", readings: [r("V AE1 M P AY0 R")], excepted: [r("V AE1 M P AY2 R"), r("V AE1 M P AY2 ER0")] });
+      expect(parseDecision("k 1 2", chain)).toEqual({ kind: "keep", readings: [r("V AE1 M P AY0 R")], excepted: [r("V AE1 M P AY2 ER0")] });
+      // The third was made from the second, which is not kept.
+      expect(parseDecision("k 1 3", chain)).toBeNull();
+    });
   });
 
   it("reads nothing from a keep that names no reading shown, or adds one that is not ARPAbet", () => {
@@ -106,17 +143,17 @@ describe("reading the maintainer's ruling", () => {
 
 describe("asking the maintainer for a ruling", () => {
   const shown = shownReadings(
-    [{ pronunciation: r("CH AA1 K L AH0 T"), generated: false }, { pronunciation: r("CH AA1 K L T"), generated: true }],
-    [r("CH AO1 K L AH0 T")],
+    [{ pronunciation: r("K AE1 M AH0 L"), generated: false }, { pronunciation: r("K AE1 M L"), generated: true }],
+    [r("K AA1 M AH0 L")],
   );
 
   it("numbers the readings under who holds them, says it is waiting, and gives one command a line with its effect", () => {
     expect(rulingPrompt(shown)).toEqual([
       "The game's readings of this word (ARPAbet):",
-      "  1. CH AA1 K L AH0 T",
-      "     CH AA1 K L T  (appended by Normalisation, so not numbered: it comes back by itself while a reading it was made from is kept)",
+      "  1. K AE1 M AH0 L",
+      "  2. K AE1 M L  (appended by Normalisation to 1: keep 1 without it and a Normalisation Exception is written for it)",
       "Wiktionary's readings the game lacks, which you can add:",
-      "  2. CH AO1 K L AH0 T",
+      "  3. K AA1 M AH0 L",
       "Waiting for your ruling on this word. Type one of these and press Enter:",
       "  k <n> <n> ...        keep only the readings numbered, e.g. k 1 2 (every other reading goes)",
       "  k <n> ... <ARPAbet>  keep those and add one you type, e.g. k 1 K AE1 T",

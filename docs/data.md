@@ -107,6 +107,7 @@ ordinary pronunciations.
 | `sources.json` | `{ "<name>": "<version/url>" }` | pinned provenance |
 | `supplement.dict` | CMUdict text, `#` comments | **committed** human adds + stress corrections (ADR-0009) |
 | `demotions.txt` | `<word> <reason>`, `#` comments | **committed** human wordhood corrections (#90) |
+| `normalisation-exceptions.txt` | `<word> <ARPAbet reading>`, `#` comments | **committed** Normalisation Exceptions: each takes one reading Normalisation appended off one word (#323) |
 | `unconfirmed-rhymes.txt` | `<word> <writer> <ruling> <confidence> <rhyme key>`, `#` comments | **committed** Unconfirmed Rhymes the Judge writes, accepted without Points on their key (#259) |
 | `wiktionary.tsv` | `<word><TAB><IPA>`, `#` header | General American transcriptions from Wiktionary, read by a Batch's No False Accepts hunt only and **not** by the build (#268, `scripts/extract-wiktionary.ts`) |
 

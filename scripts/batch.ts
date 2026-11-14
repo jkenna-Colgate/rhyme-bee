@@ -693,5 +693,5 @@ if (answersWrittenInSettled.length) {
 if (stopped) console.log(`stopped: ${stopped}`);
 console.log(
   `report: ${reportFromRoot}\nrecord: data/batches.json\ncommit both with data/supplement.dict, data/demotions.txt, data/declines.txt, ` +
-  "data/tier-overrides.csv, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl",
+  "data/tier-overrides.csv, data/normalisation-exceptions.txt, data/unconfirmed-rhymes.txt and data/judge-rulings.jsonl",
 );

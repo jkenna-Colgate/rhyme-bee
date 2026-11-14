@@ -18,7 +18,9 @@
  * confirmed rhyme the same way as a join beside them; a Demotion through
  * `appendDemotion` (`data/demotions.txt`); a Decline through `appendDecline`
  * (`data/declines.txt`); a Tier verdict through `appendTierOverride`
- * (`data/tier-overrides.csv`). There is no fifth.
+ * (`data/tier-overrides.csv`). The one write the Editor's Pass does not make
+ * is a Normalisation Exception (`data/normalisation-exceptions.txt`, #323),
+ * for a keep that leaves out a reading Normalisation appended.
  *
  * Each ruling is written as it is made and the Rhyme Index is rebuilt once, at
  * the end of the sitting (#322). The Editor's Pass rebuilds on each correction
@@ -54,6 +56,7 @@ import {
   type RulingItem,
 } from "../src/rulingList.ts";
 import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
+import { appendNormalisationException } from "./normalisationExceptionFile.ts";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Schedule } from "../src/schedule.ts";
@@ -268,6 +271,7 @@ export function rebuildAfterSitting(
 }
 
 const TIER_OVERRIDES_PATH = resolve(dataDir, "tier-overrides.csv");
+const NORMALISATION_EXCEPTIONS_PATH = resolve(dataDir, "normalisation-exceptions.txt");
 
 /** The pinned prevalence norms, unpatched, read once: a Tier verdict's measured value is the word's own row. */
 let norms: Map<string, number> | undefined;
@@ -420,7 +424,8 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
       }
       let wrote: string | null = null;
       // A correction writes one reading and a keep the several kept, both replacing every reading
-      // the word had; a confirm writes one beside them.
+      // the word had; a confirm writes one beside them. A keep that leaves out a reading Normalisation
+      // appended to one it keeps writes a Normalisation Exception for it as well (#323).
       const replacing = decision.kind === "correction" ? [decision.reading] : decision.kind === "keep" ? decision.readings : [];
       const correction: CorrectionAsk | null = replacing.length
         ? { word, target: rhymeKey, phonemes: replacing.at(-1)!, kept: replacing.slice(0, -1), mode: "replace" }
@@ -429,6 +434,9 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
         // Written now and rebuilt at the end of the sitting, when the Seed Word test for it runs too (#322).
         const result = writeCorrection(correction, { context: pinnedEvidenceContext, source: item.kind === "hunted" ? "batch" : "batch-undecided" });
         wrote = `data/supplement.dict: ${result.written.map((r) => `${word} ${r.join(" ")}`).join("; ")}`;
+        const excepted = decision.kind === "keep" ? decision.excepted ?? [] : [];
+        for (const reading of excepted) appendNormalisationException(NORMALISATION_EXCEPTIONS_PATH, { word, reading });
+        if (excepted.length) wrote += `; data/normalisation-exceptions.txt: ${excepted.map((r) => `${word} ${r.join(" ")}`).join("; ")}`;
         shownOn.wroteReading(word);
       } else if (decision.kind === "demotion") {
         appendDemotion(resolve(dataDir, "demotions.txt"), { word, reason: decision.reason });

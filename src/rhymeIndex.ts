@@ -218,7 +218,7 @@ function isGlideRVariantOf(candidate: Pronunciation, earlier: Pronunciation): bo
  * after an appending rule and rewrites its variant differently (see `RULES` in
  * src/normalise.ts).
  */
-function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
+export function isGeneratedVariantOf(candidate: Pronunciation, earlier: Pronunciation): boolean {
   return (
     isSyllabicConsonantVariantOf(candidate, earlier) ||
     isStressPromotionVariantOf(candidate, earlier) ||

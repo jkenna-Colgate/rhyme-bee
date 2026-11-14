@@ -93,10 +93,10 @@ function readOptional(name: string): string {
 const sources = JSON.parse(read("sources.json")) as Record<string, string>;
 
 // The whole stage order lives behind this one call — demotions, supplement,
-// coverage, normalisation, the Retrieval override layer — so the script cannot
+// coverage, normalisation and its exceptions, the Retrieval override layer — so the script cannot
 // run them out of turn, twice, or not at all. Its job from here is files in,
 // files out. See src/manufacture.ts.
-const { data, demoted, derived, dropped, overridden, moved, unconfirmed } = manufactureIndexData({
+const { data, demoted, derived, dropped, overridden, moved, excepted, unconfirmed } = manufactureIndexData({
   cmudict: read("cmudict.dict"),
   words: read("words.txt"),
   names: read("names.txt"),
@@ -105,6 +105,7 @@ const { data, demoted, derived, dropped, overridden, moved, unconfirmed } = manu
   supplement: read("supplement.dict"),
   tierOverrides: readOptional("tier-overrides.csv"),
   tierMoves: readOptional("tier-moves.csv"),
+  normalisationExceptions: read("normalisation-exceptions.txt"),
   unconfirmedRhymes: read("unconfirmed-rhymes.txt"),
 });
 
@@ -133,6 +134,17 @@ const stale = demoted.filter((d) => !d.hadWordhood);
 console.log(
   `Demoted ${demoted.length} words (${demoted.filter((d) => d.reason === "proper-noun").length} ` +
     `proper nouns)${stale.length > 0 ? `; ${stale.length} stale: ${stale.map((d) => d.word).join(", ")}` : ""}.`,
+);
+
+// The Normalisation Exceptions (#323). The file is hand-writable, so a line that
+// did nothing is named with its reason, as a stale Demotion is, and the index
+// above was built as if the line were absent.
+const exceptionLine = (e: { word: string; reading: readonly string[] }) => `${e.word} ${e.reading.join(" ")}`;
+console.log(
+  `Normalisation Exceptions: ${excepted.applied.length} applied` +
+    `${excepted.refused.length > 0 ? `; ${excepted.refused.length} refused: ${excepted.refused.map((r) => `${exceptionLine(r)} (${r.reason === "only-reading" ? "the word's only reading" : "not a reading Normalisation appended"})`).join(", ")}` : ""}` +
+    `${excepted.stale.length > 0 ? `; ${excepted.stale.length} stale, the word does not hold the reading: ${excepted.stale.map(exceptionLine).join(", ")}` : ""}` +
+    `${excepted.malformed.length > 0 ? `; ${excepted.malformed.length} unreadable, ignored: ${excepted.malformed.join(" | ")}` : ""}.`,
 );
 
 // A reversed override (more than one row) is worth naming on its own — it is

@@ -92,6 +92,7 @@ describe("the Rhyme Index input list", () => {
         "/data/supplement.dict",
         "/data/tier-overrides.csv",
         "/data/tier-moves.csv",
+        "/data/normalisation-exceptions.txt",
       ]),
     );
   });
