@@ -13,12 +13,17 @@
  * to Tier (#294), so one ruling list holds all four kinds of item.
  *
  * Every write goes through a path the Editor's Pass already uses: a correction
- * or a keep through `applyCorrection` (`data/supplement.dict`, replacing the
+ * or a keep through `writeCorrection` (`data/supplement.dict`, replacing the
  * readings the game holds with the one corrected or the several kept), and a
  * confirmed rhyme the same way as a join beside them; a Demotion through
  * `appendDemotion` (`data/demotions.txt`); a Decline through `appendDecline`
  * (`data/declines.txt`); a Tier verdict through `appendTierOverride`
  * (`data/tier-overrides.csv`). There is no fifth.
+ *
+ * Each ruling is written as it is made and the Rhyme Index is rebuilt once, at
+ * the end of the sitting (#322). The Editor's Pass rebuilds on each correction
+ * and reports how the days moved; a sitting does neither, because a rebuild is
+ * most of half a minute and a Batch prints no movement.
  */
 
 import { spawnSync } from "node:child_process";
@@ -52,15 +57,16 @@ import type { Pronunciation, RhymeKey } from "../src/phonology.ts";
 import { parsePrevalenceCsv } from "../src/pipeline.ts";
 import type { RhymeIndex } from "../src/rhymeIndex.ts";
 import type { Schedule } from "../src/schedule.ts";
-import { seedWordCheckLines } from "../src/seedWord.ts";
+import { seedWordCheckLines, seedWordChecksAfterWrite } from "../src/seedWord.ts";
 import type { TierVerdict } from "../src/tierOverride.ts";
+import type { RebuildResult } from "../web/src/editor/add.ts";
 import { startSession, type PuzzleContext, type ScoringConfig } from "../src/session.ts";
 import { ipaReadings, parseWiktionaryExtract, wiktionaryReadings, type WiktionaryExtract } from "../src/wiktionary.ts";
 import { appendDecline, DECLINES_PATH } from "../web/declinesFile.ts";
 import { appendDemotion } from "../web/demotionFile.ts";
 import { appendTierOverride } from "../web/tierOverrideFile.ts";
 import { pinnedEvidenceContext } from "./editorAdd.ts";
-import { applyCorrection, type CorrectionAsk, type CorrectionSource } from "./editorCorrection.ts";
+import { writeCorrection, type CorrectionAsk } from "./editorCorrection.ts";
 import { askBoth, type JudgeCalls } from "./judgeRun.ts";
 import { root } from "./modelCall.ts";
 import { checkLocalSources, WIKTIONARY_SOURCE } from "./sourceMirror.ts";
@@ -184,10 +190,81 @@ function wiktionaryOffered(extract: WiktionaryExtract, word: string): Pronunciat
   return (extract.get(word) ?? []).flatMap(ipaReadings);
 }
 
-/** Rebuild the Rhyme Index, as a Batch does after each look that lands a write. */
-export function rebuild(): { ok: true } | { ok: false; error: string } {
+/** Rebuild the Rhyme Index, as a Batch does after each look that lands a write and once after the sitting. */
+export function rebuild(): RebuildResult {
   const built = spawnSync("npx", ["tsx", "scripts/build-index.ts"], { cwd: root, shell: true, encoding: "utf8" });
   return built.status === 0 ? { ok: true } : { ok: false, error: built.stderr };
+}
+
+/** The build and the read of what it wrote, which a test replaces. */
+interface IndexBuild {
+  rebuild: () => RebuildResult;
+  loadIndex: () => RhymeIndex;
+}
+
+/**
+ * The Rhyme Index a sitting shows its items on (#322). No rebuild runs between
+ * items, so the index goes stale with the first reading written, and that only
+ * shows on the word the reading was written for. Such a word coming up again is
+ * rare, so one rebuild on demand at that point is enough; it folds in every
+ * reading written so far. A rebuild that fails is not tried again for the same
+ * writes: it would fail the same way, and the end of the sitting reports it.
+ */
+export function sittingIndex(
+  start: RhymeIndex,
+  build: IndexBuild,
+  say: (line: string) => void = (line) => console.error(line),
+): { showing: (word: string) => RhymeIndex; wroteReading: (word: string) => void } {
+  let index = start;
+  const stale = new Set<string>();
+  return {
+    wroteReading: (word) => void stale.add(word),
+    showing: (word) => {
+      if (!stale.has(word)) return index;
+      say(`\nrebuilding the index, to show ${word} with the reading written for it in this sitting`);
+      const built = build.rebuild();
+      stale.clear();
+      if (built.ok) index = build.loadIndex();
+      else {
+        say(
+          `The rebuild failed, so ${word} is shown as the game read it before. What was written stays in data/supplement.dict, ` +
+          `and a keep or a correction typed here replaces it.\n${built.error}`,
+        );
+      }
+      return index;
+    },
+  };
+}
+
+/** The decisions that write a reading to the pronunciation supplement. */
+const writesReading = (decision: Decision): boolean =>
+  decision.kind === "correction" || decision.kind === "keep" || decision.kind === "confirm";
+
+/** The decisions that write to a file the index is built from: a reading, a Demotion or a Tier verdict. A Decline does not. */
+const writesIndexInput = (decision: Decision): boolean =>
+  writesReading(decision) || decision.kind === "demotion" || decision.kind === "tier";
+
+/**
+ * The end of the sitting (#322): one rebuild when a ruling wrote something the
+ * index is built from, then the Seed Word test for each reading written to a
+ * scheduled Seed Word (#264), on the index that rebuild wrote. `rebuilt` is
+ * null when nothing needed one. A failed rebuild is the caller's to report; the
+ * lines written stay where they are, and the Seed Word test says it could not run.
+ */
+export function rebuildAfterSitting(
+  settled: readonly Settled[],
+  deps: IndexBuild & { schedule: Schedule },
+  say: (line: string) => void = (line) => console.error(line),
+): { rebuilt: RebuildResult | null; seedWordLines: string[] } {
+  const written = settled.filter((s) => s.wrote);
+  if (!written.some((s) => writesIndexInput(s.decision))) return { rebuilt: null, seedWordLines: [] };
+  say("\nrebuilding the index with what the sitting wrote");
+  const rebuilt = deps.rebuild();
+  const givenReadings = [...new Set(written.filter((s) => writesReading(s.decision)).map((s) => itemPair(s.item).word))];
+  return {
+    rebuilt,
+    seedWordLines: seedWordCheckLines(seedWordChecksAfterWrite(deps.schedule.days, givenReadings, rebuilt.ok, deps.loadIndex)),
+  };
 }
 
 const TIER_OVERRIDES_PATH = resolve(dataDir, "tier-overrides.csv");
@@ -206,7 +283,7 @@ const measuredPrevalence = (): ReadonlyMap<string, number> =>
  */
 const BATCH_TIER_VERDICT = { answer: "answer-common", bonus: "bonus" } as const satisfies Record<TierAnswer, TierVerdict>;
 
-type SittingContext = { index: () => RhymeIndex; extract: WiktionaryExtract; schedule: Schedule; today: string; loadIndex: () => RhymeIndex };
+type SittingContext = { index: () => RhymeIndex; extract: WiktionaryExtract; loadIndex: () => RhymeIndex; today: string };
 
 /** The item's word and the Rhyme Key it is ruled on. */
 const itemPair = (item: RuledItem): { word: string; rhymeKey: RhymeKey } =>
@@ -295,7 +372,9 @@ function presentItem(item: RuledItem, index: RhymeIndex, extract: WiktionaryExtr
 
 /**
  * Put the ruling list to the maintainer, one item at a time, and write each
- * ruling as it is made. It is called after the Batch's last model call, so a
+ * ruling as it is made, so a sitting that stops early loses nothing. Nothing
+ * is rebuilt between items (#322): the caller rebuilds once afterwards, with
+ * `rebuildAfterSitting`. It is called after the Batch's last model call, so a
  * usage stop never lands mid-sitting. With no terminal to ask, the list is
  * printed and every item is left unruled: a hunted Answer, a group's members
  * among them, then fails the day's gate, a rhyme the Judge left undecided or a word to Tier is listed as
@@ -318,16 +397,18 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
     );
   }
   if (!asking && items.length) console.error("No terminal to ask on, so every one is left unruled.");
-  // Reloaded after each reading written, so a word listed twice shows what it holds now.
-  let index = ctx.index();
-  const correctionDeps = (source: CorrectionSource) => ({
-    context: pinnedEvidenceContext, schedule: () => ctx.schedule, today: () => ctx.today,
-    openIndex: ctx.loadIndex, rebuild: async () => rebuild(), source,
-  });
+  if (asking && items.length) {
+    console.error(
+      "Each ruling is written as you make it, and the index is rebuilt once, after the last. " +
+      "If the sitting stops before then, run npm run build:index, then npm run seeds:test.",
+    );
+  }
+  // Rebuilt only for a word listed again after a reading was written for it, so it shows what it holds now.
+  const shownOn = sittingIndex(ctx.index(), { rebuild, loadIndex: ctx.loadIndex });
   try {
     for (const [i, { item, group }] of ruled.entries()) {
       const { word, rhymeKey } = itemPair(item);
-      const { lines, parse } = presentItem(item, index, ctx.extract);
+      const { lines, parse } = presentItem(item, shownOn.showing(word), ctx.extract);
       if (group && ruled[i - 1]?.group !== group) for (const line of groupLines(group)) console.error(`\n${line}`);
       console.error(`\n[${i + 1}/${ruled.length}] ${lines[0]}`);
       for (const line of lines.slice(1)) console.error(line);
@@ -345,11 +426,10 @@ export async function settleRulingList(items: readonly RulingItem[], ctx: Sittin
         ? { word, target: rhymeKey, phonemes: replacing.at(-1)!, kept: replacing.slice(0, -1), mode: "replace" }
         : decision.kind === "confirm" ? { word, target: rhymeKey, phonemes: decision.reading, mode: "join" } : null;
       if (correction) {
-        const result = await applyCorrection(correction, correctionDeps(item.kind === "hunted" ? "batch" : "batch-undecided"));
-        wrote = `data/supplement.dict: ${result.written.map((r) => `${word} ${r.join(" ")}`).join("; ")}${result.rebuilt.ok ? "" : " (the rebuild failed)"}`;
-        if (result.rebuilt.ok) index = ctx.loadIndex();
-        // A reading given to a scheduled Seed Word runs the Seed Word test (#264), as it does in the Editor's Pass.
-        for (const line of seedWordCheckLines(result.seedWords)) console.error(`  ${line}`);
+        // Written now and rebuilt at the end of the sitting, when the Seed Word test for it runs too (#322).
+        const result = writeCorrection(correction, { context: pinnedEvidenceContext, source: item.kind === "hunted" ? "batch" : "batch-undecided" });
+        wrote = `data/supplement.dict: ${result.written.map((r) => `${word} ${r.join(" ")}`).join("; ")}`;
+        shownOn.wroteReading(word);
       } else if (decision.kind === "demotion") {
         appendDemotion(resolve(dataDir, "demotions.txt"), { word, reason: decision.reason });
         wrote = `data/demotions.txt: ${word} ${decision.reason}`;
