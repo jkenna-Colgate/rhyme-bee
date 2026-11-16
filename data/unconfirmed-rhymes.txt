@@ -82,3 +82,16 @@ distaff judge:claude-sonnet-5-5 missing-reading medium AE F
 quag judge:claude-sonnet-5-5 missing-reading medium AE G
 marmoreal judge:claude-sonnet-5-5 missing-reading medium AO R IY AH L
 ancestorial judge:claude-sonnet-5-5 missing-reading medium AO R IY AH L
+toucan judge:claude-sonnet-5-5 missing-reading medium AE N
+causality judge:claude-sonnet-5-5 overrule high AE L AH D IY
+shaster judge:claude-sonnet-5-5 missing-reading medium AE S T ER
+provolone judge:claude-sonnet-5-5 overrule high OW N IY
+horology judge:claude-sonnet-5-5 missing-reading medium AA L AH JH IY
+typology judge:claude-sonnet-5-5 overrule high AA L AH JH IY
+upstand judge:claude-sonnet-5-5 missing-reading medium AE N D
+roebucks judge:claude-sonnet-5-5 missing-reading medium AH K S
+quadratic judge:claude-sonnet-5-5 overrule high AE D AH K
+somatic judge:claude-sonnet-5-5 overrule high AE D AH K
+storefront judge:claude-sonnet-5-5 overrule high AH N T
+biltong judge:claude-sonnet-5-5 missing-reading medium AA NG
+mutuality judge:claude-sonnet-5-5 overrule high AE L AH D IY

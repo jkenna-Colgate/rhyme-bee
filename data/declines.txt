@@ -31,3 +31,10 @@ placard AA R D
 from AA M
 silicon AA N
 quaff AE F
+misconduct AH K T
+gallant AE N T
+extant AE N T
+absent EH N T
+residence EH N S
+providence EH N S
+experiment EH N T
