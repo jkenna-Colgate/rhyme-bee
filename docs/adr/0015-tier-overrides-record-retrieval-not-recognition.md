@@ -1,6 +1,6 @@
 # Tier overrides record retrieval, which prevalence cannot measure
 
-**Status:** amended 2026-10-25. The editor is no longer the only writer of Tier verdicts. With nobody ruling on it, the unattended loop moves a Bonus Word to Answer once Session Records show that enough players produce it, from a file of its own read over this one, and a verdict the editor locks beats it. Nothing but the editor moves a word to Bonus Word.
+**Status:** amended 2026-10-25 and 2026-11-19. The editor is no longer the only writer of Tier verdicts. With nobody ruling on it, the unattended loop moves a Bonus Word to Answer once Session Records show that enough players produce it, from a file of its own read over this one, and a verdict the editor locks beats it. Nothing but the editor moves a word to Bonus Word. The threshold did move, to an Answer line of 1.00, on blind marks of Retrieval rather than on the collateral argued below (ADR-0003, amended 2026-11-10); the override is still the only lever for a ranking inversion, and the `answer-rare` sentinel is now 1.1.
 
 A committed layer, `data/tier-overrides.csv`, lets the puzzles editor set any word's **Tier** by name, overriding the measured prevalence the split is otherwise drawn from ([ADR-0003](./0003-word-prevalence-not-corpus-frequency.md)). It is merged over the parsed prevalence map at index-build time, before `RhymeIndex#tier` reads it, so no adjudication code learns that overrides exist. Like the pronunciation supplement it is **permanent infrastructure, not a patch** ([ADR-0009](./0009-pronunciation-supplement-is-the-permanent-override-layer.md)): any prevalence source will get some words wrong for this game's purposes, because the game needs a quantity no such source measures.
 
@@ -156,6 +156,40 @@ verdicts in this file were made by judgment alone, and evidence is stronger.
 **The newest row wins, whoever wrote it.** It looks like a way for the editor
 to correct the job, but the job's next run sees the same evidence and writes
 the move again, so the correction lasts a month.
+
+## Amendment, 2026-11-19: the threshold moved, and the override still stands
+
+Recorded here after the fact. The decision was made on 2026-11-10 in
+[ADR-0003](./0003-word-prevalence-not-corpus-frequency.md), whose amendment
+said this ADR was unchanged. Its argument is unchanged; two of its statements of
+fact are not.
+
+**The threshold is 1.00, not 0.0.** "Why not move the threshold instead" ruled
+that the line stays at 0.0 or nudges no further than 0.5, and gave the words
+just under 1.0 (`assuage`, `tryst`, `linchpin`, `tome`) as the collateral that
+made a move to 1.0 destructive. That argument assumed those words belonged among
+the Answers because they are widely recognised. The Tier sitting tested the
+assumption directly: the maintainer marked 150 Answers for Retrieval with the
+knownness hidden, and B (a player would not produce it) was the majority in every
+band below 1.00 and in none from 1.00 up
+([#310](https://github.com/jkenna-Colgate/rhyme-bee/issues/310)). So the words
+this ADR called collateral are Bonus Words by the same test the override layer
+exists to serve, and the Answer line is **1.00** (`ANSWER_LINE` in
+`src/verdict.ts`, moved in
+[#311](https://github.com/jkenna-Colgate/rhyme-bee/issues/311)). The table of
+Answers demoted at each threshold is kept as the measurement it was.
+
+**The override is still the lever for a ranking inversion.** Moving the line
+fixed a miscalibrated line, which is the one thing a line can fix. Prevalence
+still ranks `misadjust` above `readjust`, and no line closes that; a per-word
+verdict in this file does.
+
+**The `answer-rare` sentinel is 1.1, not 0.6.** It stays boxed between the
+two lines, which both moved: the Answer line (1.00) below it and
+`rareKnownnessCutoff` (1.278, ADR-0006 amended 2026-11-10) above. The margin is
+still narrow, a few hundredths either side, and `checkTierSentinels` covers a
+nudge beyond that (`src/tierOverride.ts`). Likewise, the `none` row's "measured
+below 0.7" now reads "below the rare line", which is 1.278.
 
 **Each day's evidence acts alone.** A word on two Rhyme Keys (`excuse` on the
 `booze` and `juice` days) would be moved by one day and moved back by the

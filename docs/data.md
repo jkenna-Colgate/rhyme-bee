@@ -1,20 +1,28 @@
 # Data pipeline
 
-The Rhyme Index is a build artifact derived from three static, pinned inputs.
-The raw data is **not committed** (large, regenerable — see `.gitignore` and
-ADR-0003/0004). The build reads it from `data/` and writes the artifact to
+The Rhyme Index is a build artifact derived from four large, pinned sources and
+a set of small, committed, hand-authored files layered over them. The four
+sources are **not committed** (large, regenerable; see `.gitignore` and
+ADR-0003/0004). `npm run sources:fetch` pulls them from a private mirror and
+checks them against the committed `data/sources.sha256`, and the build refuses
+to run on bytes that do not match, so a laptop and CI cannot build different
+judges from one commit (#272, ADR-0013 amended 2026-10-26; see
+[deploy.md](./deploy.md)). The build reads `data/` and writes the artifact to
 `dist-data/`, and adjudication runs against that artifact with no network call
 (ADR-0013).
 
 ```
-data/            (uncommitted)         dist-data/            (uncommitted)
-  cmudict.dict   pronunciations          index-<hash>.json     the built index
-  words.txt      wordhood gate      ->   index.manifest.json   which one is current
-  names.txt      proper nouns            dropped-report.json   why each word dropped
-  prevalence.csv knownness               derived-report.json   what gained a reading
-  sources.json   pinned versions
-  supplement.dict human overrides  (committed — see below)
-  demotions.txt   human overrides  (committed — see below)
+data/                                         dist-data/            (uncommitted)
+  cmudict.dict    pronunciations   (fetched)    index-<hash>.json     the built index
+  words.txt       wordhood gate    (fetched)    index.manifest.json   which one is current
+  names.txt       proper nouns     (fetched) -> dropped-report.json   why each word dropped
+  prevalence.csv  knownness        (fetched)    derived-report.json   what gained a reading
+  sources.json    pinned versions  (committed)
+  sources.sha256  pinned bytes     (committed)
+  demotions.txt, supplement.dict, normalisation-exceptions.txt,
+  tier-overrides.csv, tier-moves.csv, unconfirmed-rhymes.txt
+                  corrections      (committed, see below)
+  schedule.json   the Schedule     (committed; the build may repair it)
 ```
 
 The index is **content-addressed**: its filename carries a hash of its contents,
@@ -32,47 +40,62 @@ a rhyme bug. **Only the current artifact and the manifest are published**, by
 name, so nothing else written there ends up at a public URL. See
 [deploy.md](./deploy.md).
 
-`supplement.dict` and `demotions.txt` are the hand-authored inputs and the only
-committed files in `data/` — the permanent human override layer. The build merges
-them over the pinned inputs, so they survive the rebuild: the supplement's adds
-and stress corrections assert *readings* (ADR-0009), the demotion list corrects
-*wordhood* (ADR-0011, amended). The rest of `data/` is regenerable, so a hand-edit
-to `words.txt` or `names.txt` is lost on the next fresh clone; that is the whole
-reason the demotion list exists rather than an edit in place.
+The committed correction files are the permanent override layer. The build
+merges them over the pinned sources, so they survive the rebuild: the
+supplement's adds and stress corrections assert *readings* (ADR-0009), the
+demotion list corrects *wordhood* (ADR-0011, amended), a Normalisation Exception
+takes one appended reading off one word (#323), the Tier files set a word's
+*Tier* (ADR-0015), and the Unconfirmed Rhyme list accepts a word without Points
+on one Rhyme Key (#259). Each is a correction to a word, never to a day. The four
+fetched sources are regenerable, so a hand-edit to `words.txt` or `names.txt` is
+lost on the next fresh clone; that is the whole reason the demotion list exists
+rather than an edit in place.
+
+`data/` also holds committed records that the build does not read: the Batch
+log (`batches.json`), Declines (`declines.txt`), the Judge's rulings and runs
+(`judge-rulings.jsonl`, `judge-runs/`), the maintainer's labelled sets
+(`judge-labels/`) and the readings the add path deferred
+(`deferred-readings.jsonl`).
 
 Build with `npm run build:index`, then `npm run histogram` to answer ADR-0004.
 
 ## Build stages
 
 The pinned inputs pass through an ordered sequence of stages before the index is
-constructed. The **order is a contract**, not an implementation detail — adding a
-stage means choosing a position in this list and saying why:
+constructed. The **order is a contract**, not an implementation detail: adding a
+stage means choosing a position in this list and saying why. The whole order
+lives behind one call, `manufactureIndexData` in `src/manufacture.ts`, whose
+comments carry the same numbers, so `scripts/build-index.ts` cannot run a stage
+out of turn, twice, or not at all.
 
 | # | Stage | Code | What it asserts |
 |---|---|---|---|
-| 0 | Committed demotions | `src/demotions.ts` | *wordhood* — proper nouns and junk the upstream word list wrongly holds (#90) |
-| 1 | Committed supplement | `src/supplement.ts` | *readings* — hand-authored adds and stress corrections (ADR-0009) |
-| 2 | Coverage derivation | `src/coverage.ts` | *readings* — composed from a known stem, for well-known words CMUdict has none for |
-| 3 | Normalisation | `src/normalise.ts` | the *accent* — contrasts a General American listener cannot hear are erased (ADR-0010) |
+| 1 | Committed demotions | `src/demotions.ts` | *wordhood*: proper nouns and junk the upstream word list wrongly holds (#90) |
+| 2 | Committed supplement | `src/supplement.ts` | *readings*: hand-authored adds and stress corrections (ADR-0009) |
+| 3 | Coverage derivation | `src/coverage.ts` | *readings*: composed from a known stem, for well-known words CMUdict has none for |
+| 4 | Normalisation | `src/normalise.ts` | the *accent*: contrasts a General American listener cannot hear are erased (ADR-0010) |
+| 4b | Normalisation Exceptions | `src/normalisationExceptions.ts` | *readings*: one appended reading taken off one word (#323, ADR-0011 amended 2026-11-14) |
+| 5 | Tier layers | `src/tierOverride.ts`, `src/tierMoves.ts` | *Tier*: the editor's verdicts, then the moves from Session Records, then a locked verdict, merged over prevalence (ADR-0015) |
+| 6 | Unconfirmed Rhymes | `src/unconfirmedRhymes.ts` | *acceptance without Points* on one Rhyme Key, read against the finished readings (#259) |
 
 Demotion runs **first**, and is the only stage that *withdraws* wordhood. Placing
 it ahead of the supplement makes it a correction to the pinned word list rather
 than an override of the override: every stage below reads a corrected list, and
-the supplement's standing refusal to launder a name into a word (stage 1) then
+the supplement's standing refusal to launder a name into a word (stage 2) then
 covers demoted names without knowing this stage exists. It is hand-curated and
 bounded to words a human read — 9,133 words are in *both* upstream lists,
 `heart`, `faith` and `joy` among them, so name-hood can never be allowed to
 outrank wordhood wholesale.
 
-Normalisation runs **last** because the stages before it assert readings while it
-asserts the accent those readings are spoken in. A hand-authored correction is
+Normalisation runs **after every stage that asserts a reading** because those
+stages assert readings while it asserts the accent those readings are spoken in. A hand-authored correction is
 therefore an input to the accent specification, never an exemption from it, and
 so is a derived reading. Normalisation also runs **before any Rhyme Key is
 computed**, so a verdict and the respelling shown beside it are derived from the
 same reading and cannot disagree.
 
-Stage 2 runs after stage 1 so a hand-authored reading always beats a composed
-one, and it **never grants wordhood** — only stage 1 can introduce a word. Its
+Stage 3 runs after stage 2 so a hand-authored reading always beats a composed
+one, and it **never grants wordhood**: only stage 2 can introduce a word. Its
 affix inventory (`src/affixes.ts`) is plain configured data, so widening
 coverage is a data change; its candidate set is bounded to words that are in the
 prevalence norms, already carry wordhood, are not names, and have no reading
@@ -92,9 +115,26 @@ about where the stress falls is declined outright, because `articulate` the verb
 and `articulate` the adjective are two words and `-ly` attaches to one of them.
 The voicing-conditioned `-ed` and `-s` are not in the inventory yet.
 
-Nothing downstream of stage 3 knows the stages exist: Rhyme Key computation,
-respelling, tiering, Puzzle building, adjudication and curation all receive
-ordinary pronunciations.
+Normalisation Exceptions (stage 4b) run straight after the rules they answer,
+because the supplement is read in front of Normalisation and cannot take off a
+reading Normalisation has not yet appended. Like every reading stage, they run
+before any Rhyme Key is read.
+
+The Tier layers (stage 5) touch only the prevalence map, so no adjudication code
+learns that overrides exist; they come after coverage so that a fabricated
+prevalence entry cannot wander into coverage's candidate set. The Unconfirmed
+Rhyme list (stage 6) is no reading and no Tier, and runs last so it can drop a
+line whose word now rhymes on its key by itself, and yield to a Demotion of the
+same word.
+
+Nothing downstream of the reading stages knows they exist: Rhyme Key
+computation, respelling, tiering, Puzzle building, adjudication and curation all
+receive ordinary pronunciations.
+
+After the index is written, the build runs the Continuity check over
+`data/schedule.json`, the one file in `data/` it may write: a day whose Seed
+Word can no longer be pinned to its Rhyme Key is repaired there where it can be,
+and counted as Free Play where it cannot (#256). The check never fails the build.
 
 ## Inputs
 
@@ -104,10 +144,14 @@ ordinary pronunciations.
 | `words.txt` | one lower-case word per line | wordhood; **excludes names** |
 | `names.txt` | one name per line | labels a rejection as Proper Noun |
 | `prevalence.csv` | header with `Word`,`Prevalence` | knownness (lemma → score) |
-| `sources.json` | `{ "<name>": "<version/url>" }` | pinned provenance |
+| `sources.json` | `{ "<name>": "<version/url>" }` | **committed** pinned provenance |
+| `sources.sha256` | `<sha256>  <file>` | **committed** checksums of the four fetched sources; the build refuses bytes that do not match (#272) |
 | `supplement.dict` | CMUdict text, `#` comments | **committed** human adds + stress corrections (ADR-0009) |
 | `demotions.txt` | `<word> <reason>`, `#` comments | **committed** human wordhood corrections (#90) |
 | `normalisation-exceptions.txt` | `<word> <ARPAbet reading>`, `#` comments | **committed** Normalisation Exceptions: each takes one reading Normalisation appended off one word (#323) |
+| `tier-overrides.csv` | `word,verdict,measured,decided,note`, plus an optional `locked` column, `#` comments | **committed** the editor's Tier verdicts, written by the Editor's Pass; optional to the build (ADR-0015) |
+| `tier-moves.csv` | `word,moved,finds,sessions,lower_bound` | **committed** Bonus Words moved to Answer from Session Records, written by `npm run tier:moves`; optional to the build, and absent until the first move (ADR-0015 amended 2026-10-25, #270) |
+| `schedule.json` | JSON: the dealt days, with the size band and scoring settings they were dealt under | **committed** the Schedule; the one file in `data/` the build may write, when the Continuity check repairs a day (#256) |
 | `unconfirmed-rhymes.txt` | `<word> <writer> <ruling> <confidence> <rhyme key>`, `#` comments | **committed** Unconfirmed Rhymes the Judge writes, accepted without Points on their key (#259) |
 | `wiktionary.tsv` | `<word><TAB><IPA>`, `#` header | General American transcriptions from Wiktionary, read by a Batch's No False Accepts hunt only and **not** by the build (#268, `scripts/extract-wiktionary.ts`) |
 
